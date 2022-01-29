@@ -1,6 +1,7 @@
-﻿using TShockAPI;
+﻿using TrProtocol;
+using TShockAPI;
 
-namespace BossPlugin.BCore
+namespace BossPlugin.BModels
 {
     public partial class BPlayer
     {
@@ -13,10 +14,25 @@ namespace BossPlugin.BCore
 
     }
     /// <summary>
+    /// 方法
+    /// </summary>
+    public partial class BPlayer
+    {
+        /// <summary>
+        /// 向玩家发送数据包
+        /// </summary>
+        /// <param name="p"></param>
+        public void SendPacket(Packet p)
+        {
+            Player?.SendRawData(p.Serialize());
+        }
+    }
+    /// <summary>
     /// 小游戏部分   
     /// </summary>
     public partial class BPlayer
     {
+        public long Point { get; set; }
         /// <summary>
         /// 正在玩的游戏, 通过 JoinGame 加入
         /// </summary>

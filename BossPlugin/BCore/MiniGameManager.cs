@@ -1,5 +1,6 @@
 ﻿using BossPlugin.BAttributes;
 using BossPlugin.BInterfaces;
+using BossPlugin.BModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

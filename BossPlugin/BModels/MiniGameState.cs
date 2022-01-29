@@ -1,4 +1,4 @@
-﻿namespace BossPlugin.BCore
+﻿namespace BossPlugin.BModels
 {
     public enum MiniGameState
     {

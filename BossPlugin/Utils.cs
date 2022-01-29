@@ -1,5 +1,10 @@
-﻿using System;
+﻿using BossPlugin.BCore;
+using BossPlugin.BModels;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using TrProtocol;
+using TShockAPI;
 
 namespace BossPlugin
 {
@@ -15,6 +20,8 @@ namespace BossPlugin
             {
                 throw new ArgumentNullException(nameof(action));
             }
+            if (source.Count() < 1)
+                return;
             int count = 0;
             foreach (T obj in source)
             {
@@ -38,5 +45,10 @@ namespace BossPlugin
                 action();
             }
         }
+        public static BPlayer GetBPlayer(this TSPlayer plr)
+        {
+            return plr.GetData<BPlayer>("BossPlugin.BPlayer");
+        }
+        public static byte[] Serialize(this Packet p) => PacketHandler.Serializer.Serialize(p);
     }
 }

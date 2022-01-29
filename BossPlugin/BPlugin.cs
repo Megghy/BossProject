@@ -1,10 +1,12 @@
 ﻿using BossPlugin.BAttributes;
+using OTAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
+using TrProtocol;
 using TShockAPI.Hooks;
 
 namespace BossPlugin
@@ -19,6 +21,7 @@ namespace BossPlugin
         public override string Author => "Megghy";
         public override string Description => "写给boss服务器的插件";
         public override Version Version => Assembly.GetExecutingAssembly().GetName().Version;
+
         #region 初始化
         public override void Initialize()
         {
@@ -62,6 +65,8 @@ namespace BossPlugin
         private void HandleHooks()
         {
             GeneralHooks.ReloadEvent += OnReload;
+
+            Hooks.Net.ReceiveData += BCore.PacketHandler.OnGetPacket;
         }
         #endregion
         private void OnReload(ReloadEventArgs args)
@@ -75,5 +80,6 @@ namespace BossPlugin
                                 m.Invoke(this, null);
                         }));
         }
+        
     }
 }

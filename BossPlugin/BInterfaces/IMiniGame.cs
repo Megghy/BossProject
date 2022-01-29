@@ -1,10 +1,11 @@
 ﻿using BossPlugin.BCore;
+using BossPlugin.BModels;
 using System;
 using System.Collections.Generic;
 
 namespace BossPlugin.BInterfaces
 {
-    public interface IMiniGame : ICloneable
+    public interface IMiniGame
     {
         #region 成员
         /// <summary>

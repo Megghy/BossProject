@@ -3,6 +3,9 @@ using CSScriptLibrary;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using Terraria;
 
 namespace BossPlugin.BCore
 {
@@ -10,6 +13,7 @@ namespace BossPlugin.BCore
     {
         public static string ScriptRootPath => Path.Combine(BInfo.FilePath, "Scripts");
         public static string MiniGameScriptPath => Path.Combine(ScriptRootPath, "MiniGames");
+        private static Assembly _currentAssembly => AppDomain.CurrentDomain.GetAssemblies().First(a => a.FullName.StartsWith("BossPlugin"));
         /// <summary>
         /// 加载指定脚本文件
         /// </summary>
@@ -21,7 +25,18 @@ namespace BossPlugin.BCore
         {
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"脚本文件 {filePath} 不存在");
-            return CSScript.Evaluator.LoadCode<T>(File.ReadAllText(filePath));
+            try
+            {
+                var code = File.ReadAllText(filePath);
+                return CSScript.MonoEvaluator.ReferenceAssembly(_currentAssembly)
+                    .ReferenceAssembliesFromCode(code)
+                    .LoadCode<T>(code);
+            }
+            catch (Exception ex)
+            {
+                BLog.Error($"脚本加载失败: {ex}");
+                return null;
+            }
         }
         /// <summary>
         /// 加载指定路径下的所有脚本文件
@@ -35,7 +50,7 @@ namespace BossPlugin.BCore
             if (!Directory.Exists(path))
                 throw new DirectoryNotFoundException($"路径 {path} 不存在");
             var scripts = new List<T>();
-            Directory.GetFiles(MiniGameScriptPath, "*.cs").ForEach(f =>
+            Directory.GetFiles(path, "*.cs").ForEach(f =>
             {
                 try
                 {

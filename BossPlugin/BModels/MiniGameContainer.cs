@@ -1,7 +1,7 @@
 ﻿using BossPlugin.BInterfaces;
 using System;
 
-namespace BossPlugin.BCore
+namespace BossPlugin.BModels
 {
     /// <summary> 
     /// 小游戏的运行时容器
