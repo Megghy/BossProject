@@ -3,10 +3,8 @@ using BossPlugin.BInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace BossPlugin.BModels
+namespace BossPlugin.BCore
 {
     public static class MiniGameManager
     {
@@ -20,11 +18,12 @@ namespace BossPlugin.BModels
         /// </summary>
         public static List<MiniGameContainer> RunningGames { get; set; } = new();
 
-        [AutoInit("加载所有小游戏")]
+        [AutoInit("加载小游戏")]
         [Reloadable]
         public static void LoadAllMiniGames()
         {
             Games = ScriptManager.LoadScripts<IMiniGame>(ScriptManager.MiniGameScriptPath);
+            BLog.Success($"成功加载 {Games.Length} 个小游戏");
         }
 
         /// <summary>
@@ -38,7 +37,7 @@ namespace BossPlugin.BModels
         }
         public static MiniGameContainer CreateGame(IMiniGame game)
         {
-            if(RunningGames.Where(g => g.Name == game.Name).Count() < game.MaxCount)
+            if (RunningGames.Where(g => g.Name == game.Name).Count() < game.MaxCount)
             {
                 var g = new MiniGameContainer(game);
                 RunningGames.Add(g);

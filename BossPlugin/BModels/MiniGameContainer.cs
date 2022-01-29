@@ -1,12 +1,7 @@
 ﻿using BossPlugin.BInterfaces;
-using BossPlugin.BModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace BossPlugin.BModels
+namespace BossPlugin.BCore
 {
     /// <summary> 
     /// 小游戏的运行时容器
@@ -27,7 +22,7 @@ namespace BossPlugin.BModels
         public IMiniGame Game { get; private set; }
 
         public string Name => Game.Name;
-        
+
 
         #region 方法
         public bool Join(BPlayer player) => Game.Join(player);

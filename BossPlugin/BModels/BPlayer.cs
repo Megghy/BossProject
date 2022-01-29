@@ -1,13 +1,6 @@
-﻿using BossPlugin.BInterfaces;
-using BossPlugin.BModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TShockAPI;
+﻿using TShockAPI;
 
-namespace BossPlugin.BModels
+namespace BossPlugin.BCore
 {
     public partial class BPlayer
     {
@@ -17,7 +10,7 @@ namespace BossPlugin.BModels
         }
         public TSPlayer Player { get; private set; }
         public string Name => Player.Name;
-        
+
     }
     /// <summary>
     /// 小游戏部分   

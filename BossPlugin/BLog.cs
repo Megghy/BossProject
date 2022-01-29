@@ -6,10 +6,9 @@ namespace BossPlugin
 {
     public static class BLog
     {
-        public const ConsoleColor DefaultColor = ConsoleColor.Gray;
         public static void Log(object text, bool save = true)
         {
-            LogDirect(text, "Log", DefaultColor, save);
+            LogDirect(text, "Log", ConsoleColor.Gray, save);
         }
         public static void Info(object text, bool save = true)
         {
@@ -27,13 +26,13 @@ namespace BossPlugin
         {
             LogDirect(text, "Success", ConsoleColor.Green, save);
         }
-        private static void LogDirect(object message, string prefix = "Log", ConsoleColor color = DefaultColor, bool save = true)
+        private static void LogDirect(object message, string prefix = "Log", ConsoleColor color = ConsoleColor.Gray, bool save = true)
         {
             var caller = new StackFrame(2).GetMethod();
             var log = $"[BossPlugin] {prefix} - <{caller.DeclaringType.Namespace}.{caller.Name}>: {message}";
             Console.ForegroundColor = color;
             Console.WriteLine(log);
-            Console.ForegroundColor = DefaultColor;
+            Console.ResetColor();
             if (save)
                 TShock.Log.Write(log, TraceLevel.Info);
         }

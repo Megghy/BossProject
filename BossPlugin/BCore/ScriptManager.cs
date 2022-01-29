@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace BossPlugin.BModels
+namespace BossPlugin.BCore
 {
     public static class ScriptManager
     {
@@ -35,7 +35,7 @@ namespace BossPlugin.BModels
             if (!Directory.Exists(path))
                 throw new DirectoryNotFoundException($"路径 {path} 不存在");
             var scripts = new List<T>();
-            Directory.GetFiles(MiniGameScriptPath).ForEach(f =>
+            Directory.GetFiles(MiniGameScriptPath, "*.cs").ForEach(f =>
             {
                 try
                 {
