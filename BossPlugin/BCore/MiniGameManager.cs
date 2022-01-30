@@ -26,7 +26,12 @@ namespace BossPlugin.BCore
             Games = ScriptManager.LoadScripts<IMiniGame>(ScriptManager.MiniGameScriptPath);
             BLog.Success($"成功加载 {Games.Length} 个小游戏");
         }
-
+        /// <summary>
+        /// 创建一个新小游戏实例
+        /// </summary>
+        /// <param name="game"></param>
+        /// <returns></returns>
+        public static IMiniGame CreateGameInstance(this IMiniGame game) => (IMiniGame)Activator.CreateInstance(game.GetType());
         /// <summary>
         /// 通过名字寻找小游戏
         /// </summary>
@@ -40,7 +45,7 @@ namespace BossPlugin.BCore
         {
             if (RunningGames.Where(g => g.Name == game.Name).Count() < game.MaxCount)
             {
-                var g = new MiniGameContainer(game);
+                var g = new MiniGameContainer(game.CreateGameInstance()); //创建新实例
                 RunningGames.Add(g);
                 BLog.Info($"创建新小游戏实例: {g}");
                 return g;
@@ -51,5 +56,21 @@ namespace BossPlugin.BCore
                 return null;
             }
         }
+
+        #region 玩家类拓展函数
+        /// <summary>
+        /// 玩家是否在游戏中
+        /// </summary>
+        /// <param name="plr"></param>
+        /// <param name="name">可选 游戏名</param>
+        /// <returns></returns>
+        public static bool IsInGame(this BPlayer plr, string name = null)
+        {
+            if (string.IsNullOrEmpty(name))
+                return plr.PlayingGame != null;
+            else
+                return plr.PlayingGame?.Name == name;
+        }
+        #endregion
     }
 }

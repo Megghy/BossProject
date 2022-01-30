@@ -4,6 +4,9 @@ using TShockAPI;
 
 namespace BossPlugin.BModels
 {
+    /// <summary>
+    /// 可以直接用下标来取命令参数
+    /// </summary>
     public class SubCommandArgs : IEnumerable<string>
     {
         public SubCommandArgs(CommandArgs args)

@@ -38,10 +38,15 @@ namespace BossPlugin.DB
     }
     public abstract class UserConfigBase<T> : ConfigBase<T> where T : UserConfigBase<T>
     {
+        public UserConfigBase()
+        {
+
+        }
         public new class Context : ConfigBase<T>.Context
         {
             public void InsertDirect(T t)
             {
+                t.LastUpdate = DateTime.Now;
                 this.Insert(t);
             }
             public IQueryable<T> Get(string id)
@@ -51,7 +56,7 @@ namespace BossPlugin.DB
                     var r = Activator.CreateInstance<T>();
                     r.ID = id;
                     r.Init();
-                    this.Insert(r);
+                    InsertDirect(r);
                 }
                 return GetNonInsert(id);
             }
@@ -74,8 +79,11 @@ namespace BossPlugin.DB
         }
         public void Update<TV>(Expression<Func<T, TV>> extract, TV value, bool updateProp = true)
         {
-            var prop = (extract.Body.GetType()
-                           .GetProperties().FirstOrDefault(p => p.Name.Contains("Member")).GetValue(extract.Body) as PropertyInfo);
+            var prop = extract.Body
+                .GetType()
+                .GetProperties()
+                .FirstOrDefault(p => p.Name.Contains("Member"))
+                .GetValue(extract.Body) as PropertyInfo;
             try
             {
                 using var query = GetContext(typeof(T).Name);

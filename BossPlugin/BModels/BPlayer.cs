@@ -1,4 +1,5 @@
 ﻿using BossPlugin.DB;
+using System.Linq;
 using TrProtocol;
 using TShockAPI;
 
@@ -6,11 +7,16 @@ namespace BossPlugin.BModels
 {
     public partial class BPlayer : UserConfigBase<BPlayer>
     {
+        public BPlayer() { }
         public BPlayer(TSPlayer plr)
         {
             Player = plr;
         }
-        public TSPlayer Player { get; private set; }
+        public override void Init()
+        {
+            Player = TShock.Players.FirstOrDefault(p => p?.Account?.ID.ToString() == ID);
+        }
+        public TSPlayer Player { get; internal set; }
         public string Name => Player?.Name ?? "unknown";
 
     }
