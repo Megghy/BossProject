@@ -18,7 +18,7 @@ namespace BossPlugin.BModules
         public static readonly List<BaseCommand> Cmds = new();
         private static readonly List<Command> _tsCmds = new();
         [AutoInit("注册Boss服命令")]
-        public static void RegisterAllCommands()
+        public static void RegisteAllCommands()
         {
             if (!Directory.Exists(ScriptCmdPath))
                 Directory.CreateDirectory(ScriptCmdPath);
@@ -34,7 +34,8 @@ namespace BossPlugin.BModules
                         Cmds.Add(tempCMD);
                         RegisteToTS(tempCMD);
                     });
-                var aa = ScriptManager.LoadScripts<BaseCommand>(ScriptCmdPath);
+
+                //加载脚本命令文件
                 ScriptManager.LoadScripts<BaseCommand>(ScriptCmdPath)?
                     .ForEach(s =>
                     {
@@ -61,11 +62,11 @@ namespace BossPlugin.BModules
             _tsCmds.ForEach(c => Commands.ChatCommands.Remove(c));
             _tsCmds.Clear();
             Cmds.Clear();
-            RegisterAllCommands();
+            RegisteAllCommands();
             BLog.Success("指令已重载");
         }
         /// <summary>
-        /// 当玩家调用命令
+        /// 当ts玩家调用命令
         /// </summary>
         /// <param name="args"></param>
         private static void OnCmd(CommandArgs args)
@@ -79,16 +80,16 @@ namespace BossPlugin.BModules
                     if (subCmds.Any())
                         subCmds.ForEach(s =>
                         {
-                            ExcuteSubCmd(cmd, s, args);
+                            ExcuteSubCmd(cmd, s, args, cmdName);
                         });
                     else if (cmd.SubCommands.FirstOrDefault(s => !s.Names?.Any() ?? true) is { } defaultSubCmd)
-                        ExcuteSubCmd(cmd, defaultSubCmd, args);
+                        ExcuteSubCmd(cmd, defaultSubCmd, args, cmdName);
                     else
                         args.Player.SendInfoMessage($"无效的命令");
                 }
             }
         }
-        private static async void ExcuteSubCmd(BaseCommand baseCmd, SubCommandAttribute subCmd, CommandArgs args)
+        private static async void ExcuteSubCmd(BaseCommand baseCmd, SubCommandAttribute subCmd, CommandArgs args, string cmdName)
         {
             try
             {
@@ -99,7 +100,7 @@ namespace BossPlugin.BModules
                 }
                 else
                 {
-                    var subArg = new SubCommandArgs(args);
+                    var subArg = new SubCommandArgs(args, cmdName);
                     var isAwaitable = subCmd.Method.ReturnType.GetMethod(nameof(Task.GetAwaiter)) != null;
                     var invokeArg = subCmd.Method.GetParameters().Any() ? new object[] { subArg } : new object[] { };
                     if (isAwaitable)

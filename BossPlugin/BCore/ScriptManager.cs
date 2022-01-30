@@ -1,5 +1,5 @@
 ﻿using BossPlugin.BAttributes;
-using CSScriptLibrary;
+using CSScriptLib;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,6 +8,9 @@ using System.Reflection;
 
 namespace BossPlugin.BCore
 {
+    /// <summary>
+    /// 脚本管理类
+    /// </summary>
     public static class ScriptManager
     {
         public static string ScriptRootPath => Path.Combine(BInfo.FilePath, "Scripts");
@@ -27,8 +30,7 @@ namespace BossPlugin.BCore
             try
             {
                 var code = File.ReadAllText(filePath);
-                return CSScript.MonoEvaluator.ReferenceAssembly(_currentAssembly)
-                    .ReferenceAssembliesFromCode(code)
+                return CSScript.Evaluator.ReferenceAssembliesFromCode(code)
                     .LoadCode<T>(code);
             }
             catch (Exception ex)

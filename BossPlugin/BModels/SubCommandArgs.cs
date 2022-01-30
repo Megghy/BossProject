@@ -9,15 +9,17 @@ namespace BossPlugin.BModels
     /// </summary>
     public class SubCommandArgs : IEnumerable<string>
     {
-        public SubCommandArgs(CommandArgs args)
+        public SubCommandArgs(CommandArgs args, string cmdName)
         {
             OriginArg = args;
+            CommandName = cmdName;
             SubCommandName = args.Parameters[0];
             args.Parameters.RemoveAt(0); //第一个已经被默认读取为子命令名字
             Param = args.Parameters.ToArray();
             BPlayer = args.Player.GetBPlayer();
         }
         public CommandArgs OriginArg { get; private set; }
+        public string CommandName { get; private set; }
         public string SubCommandName { get; private set; }
         public string FullCommand { get; private set; }
         public BPlayer BPlayer { get; private set; }

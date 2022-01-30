@@ -13,15 +13,11 @@ namespace BossPlugin.BInterfaces
         /// <summary>
         /// 小游戏名称
         /// </summary>
-        public string Name { get; }
+        public string[] Names { get; }
         /// <summary>
         /// 状态
         /// </summary>
         public MiniGameState State { get; set; }
-        /// <summary>
-        /// 游玩的玩家
-        /// </summary>
-        public List<BPlayer> Players { get; }
         #endregion
 
         #region 方法
@@ -35,11 +31,21 @@ namespace BossPlugin.BInterfaces
         /// </summary>
         public void Start();
         /// <summary>
-        /// 尝试将指定玩家加入游戏
+        /// 游戏逻辑更新, 每秒10次
+        /// </summary>
+        /// /// <param name="gameTime">次数</param>
+        public void Update(long gameTime);
+        /// <summary>
+        /// 玩家加入游戏
+        /// </summary>
+        /// <param name="player"></param>
+        public bool Join(BPlayer plr);
+        /// <summary>
+        /// 玩家离开游戏
         /// </summary>
         /// <param name="player"></param>
         /// <returns>是否成功加入</returns>
-        public bool Join(BPlayer player);
+        public void Leave(BPlayer plr);
         /// <summary>
         /// 尝试暂停
         /// </summary>

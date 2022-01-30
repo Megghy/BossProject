@@ -10,6 +10,10 @@ namespace BossPlugin.BCore
     public static class MiniGameManager
     {
         /// <summary>
+        /// 每秒更新次数
+        /// </summary>
+        public static readonly int UPDATE_PRE_SECEND = 10; //netfx的css好像用常量有点问题
+        /// <summary>
         /// 储存所有小游戏初始实例
         /// 别直接用这里头的, 先克隆一个
         /// </summary>
@@ -17,7 +21,7 @@ namespace BossPlugin.BCore
         /// <summary>
         /// 服务器内正在运行的小游戏
         /// </summary>
-        public static List<MiniGameContainer> RunningGames { get; set; } = new();
+        public static List<MiniGameContext> RunningGames { get; set; } = new();
 
         [AutoInit("加载小游戏")]
         [Reloadable]
@@ -39,20 +43,21 @@ namespace BossPlugin.BCore
         /// <returns>没有则为null</returns>
         public static IMiniGame TryFindByName(string name)
         {
-            return Games.FirstOrDefault(g => g.Name.ToLower() == name.ToLower() || g.Name.StartsWith(name));
+            return Games.FirstOrDefault(g => g.Names.Any(n =>n .ToLower() == name.ToLower() || n.StartsWith(name)));
         }
-        public static MiniGameContainer CreateGame(IMiniGame game)
+        public static MiniGameContext CreateGame(IMiniGame game, BPlayer creator = null)
         {
-            if (RunningGames.Where(g => g.Name == game.Name).Count() < game.MaxCount)
+            if (RunningGames.Where(g => g.Name == game.Names.First()).Count() < game.MaxCount)
             {
-                var g = new MiniGameContainer(game.CreateGameInstance()); //创建新实例
-                RunningGames.Add(g);
-                BLog.Info($"创建新小游戏实例: {g}");
-                return g;
+                var context = new MiniGameContext(game.CreateGameInstance()); //创建新实例
+                context.Game.Init(creator);
+                RunningGames.Add(context);
+                BLog.Info($"创建新小游戏实例: {context}");
+                return context;
             }
             else
             {
-                BLog.Warn($"小游戏 [{game.Name}] 达到最大数量限制 [{game.MaxCount}], 无法继续创建");
+                BLog.Warn($"小游戏 [{game.Names.First()}] 达到最大数量限制 [{game.MaxCount}], 无法继续创建");
                 return null;
             }
         }
@@ -70,6 +75,30 @@ namespace BossPlugin.BCore
                 return plr.PlayingGame != null;
             else
                 return plr.PlayingGame?.Name == name;
+        }
+
+        /// <summary>
+        /// 尝试加入一场游戏
+        /// </summary>
+        public static bool JoinGame(this BPlayer plr, MiniGameContext game)
+        {
+            if (!plr.IsInGame())
+            {
+                if (game.Join(plr))
+                {
+                    plr.PlayingGame = game;
+                    BLog.Success($"[{plr}] 加入小游戏 <{game}>");
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else
+            {
+                plr.Player.SendInfoMessage($"你已处于一局游戏中");
+                BLog.Log($"[{plr}] 尝试加入 <{game}> 失败: 已处于一场游戏中");
+                return false;
+            }
         }
         #endregion
     }

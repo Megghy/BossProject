@@ -1,145 +1,27 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
     <LangVersion>preview</LangVersion>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F102EB6A-D757-4F60-A2C1-29DC045A2396}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BossPlugin</RootNamespace>
-    <AssemblyName>BossPlugin</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
     <LangVersion>preview</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <LangVersion>preview</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="CSScriptLibrary, Version=3.30.5.1, Culture=neutral, PublicKeyToken=70fcc3d18c749033, processorArchitecture=MSIL">
-      <HintPath>..\packages\CS-Script.lib.3.30.5.1\lib\net45\CSScriptLibrary.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="linq2db">
-      <HintPath>Lib\linq2db.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System">
-      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="FakeProvider">
-      <HintPath>Lib\FakeProvider.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Lib\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="OTAPI">
-      <HintPath>Lib\OTAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="TerrariaServer">
-      <HintPath>Lib\TerrariaServer.exe</HintPath>
-    </Reference>
-    <Reference Include="TrProtocol_netfx">
-      <HintPath>Lib\TrProtocol_netfx.dll</HintPath>
-    </Reference>
-    <Reference Include="TShockAPI">
-      <HintPath>Lib\TShockAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="TUI">
-      <HintPath>Lib\TUI.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="BAttributes\AutoInitAttribute.cs" />
-    <Compile Include="BAttributes\NeedPermissionAttribute.cs" />
-    <Compile Include="BAttributes\ReloadableAttribute.cs" />
-    <Compile Include="BAttributes\SubCommandAttribute.cs" />
-    <Compile Include="BConfig.cs" />
-    <Compile Include="BCore\BPointSystem.cs" />
-    <Compile Include="BCore\Cmds\MiniGameCmd.cs" />
-    <Compile Include="BCore\HookHandlers\PlayerGreetHandler.cs" />
-    <Compile Include="BCore\HookHandlers\ReloadHandler.cs" />
-    <Compile Include="BCore\PacketHandler.cs" />
-    <Compile Include="BCore\PacketHandlers\CreateProjectileHandler.cs" />
-    <Compile Include="BCore\PacketHandlers\PlayerJoinHandler.cs" />
-    <Compile Include="BCore\ProjRedirect.cs" />
-    <Compile Include="BCore\TagRegion.cs" />
-    <Compile Include="BCore\PacketHandlers\PlayerDeathHandler.cs" />
-    <Compile Include="BInfo.cs" />
-    <Compile Include="BInterfaces\BaseCommand.cs" />
-    <Compile Include="BInterfaces\IPacketHandler.cs" />
-    <Compile Include="BInterfaces\IMiniGame.cs" />
-    <Compile Include="BLog.cs" />
-    <Compile Include="BModels\BPlayer.cs" />
-    <Compile Include="BModels\MiniGameState.cs" />
-    <Compile Include="BModels\MiniGameContainer.cs" />
-    <Compile Include="BCore\BCommand.cs" />
-    <Compile Include="BCore\MiniGameManager.cs" />
-    <Compile Include="BCore\ScriptManager.cs" />
-    <Compile Include="BModels\SubCommandArgs.cs" />
-    <Compile Include="BPlugin.cs" />
-    <Compile Include="DB\DBTools.cs" />
-    <Compile Include="DB\DisposableQuery.cs" />
-    <Compile Include="DB\UserConfigBase.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Lib\FakeProvider.dll" />
-    <Content Include="Lib\Newtonsoft.Json.dll" />
-    <Content Include="Lib\OTAPI.dll" />
-    <Content Include="Lib\TerrariaServer.exe" />
-    <Content Include="Lib\TrProtocol_netfx.dll" />
-    <Content Include="Lib\TShockAPI.dll" />
-    <Content Include="Lib\TUI.dll" />
-    <Content Include="Lib\TUIPlugin.dll" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y $(TargetPath) D:\TShock4.5.0_Terraria1.4.2.1\ServerPlugins</PostBuildEvent>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CS-Script" Version="4.3.0" />
+    <PackageReference Include="linq2db.MySql" Version="4.0.0-preview.9-fixed" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="TrProtocol">
+      <HintPath>..\Lib\TrProtocol.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>
