@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
-using TrProtocol;
 using TShockAPI.Hooks;
 
 namespace BossPlugin
@@ -14,8 +13,10 @@ namespace BossPlugin
     [ApiVersion(2, 1)]
     public class BPlugin : TerrariaPlugin
     {
+        public static BPlugin Instance { get; private set; }
         public BPlugin(Main game) : base(game)
         {
+            Instance = this;
         }
         public override string Name => "BossPlugin";
         public override string Author => "Megghy";
@@ -56,30 +57,15 @@ namespace BossPlugin
             });
             BLog.Success($"BossPlugin 加载完成");
         }
-        [AutoInit("加载所有Boss服命令")]
-        private void InitBCmd()
-        {
-
-        }
         [AutoInit("挂载所有Hook")]
         private void HandleHooks()
         {
-            GeneralHooks.ReloadEvent += OnReload;
+            GeneralHooks.ReloadEvent += BCore.HookHandlers.ReloadHandler.OnReload;
+
+            ServerApi.Hooks.NetGreetPlayer.Register(this, BCore.HookHandlers.PlayerGreetHandler.OnGreetPlayer);
 
             Hooks.Net.ReceiveData += BCore.PacketHandler.OnGetPacket;
         }
         #endregion
-        private void OnReload(ReloadEventArgs args)
-        {
-            Assembly.GetExecutingAssembly()
-                        .GetTypes()
-                        .ForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-                        .ForEach(m =>
-                        {
-                            if (m.GetCustomAttribute<ReloadableAttribute>() is { })
-                                m.Invoke(this, null);
-                        }));
-        }
-        
     }
 }

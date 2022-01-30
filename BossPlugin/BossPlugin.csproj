@@ -56,6 +56,9 @@
       <HintPath>..\packages\CS-Script.lib.3.30.5.1\lib\net45\CSScriptLibrary.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="linq2db">
+      <HintPath>Lib\linq2db.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System">
       <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.dll</HintPath>
@@ -98,8 +101,11 @@
     <Compile Include="BConfig.cs" />
     <Compile Include="BCore\BPointSystem.cs" />
     <Compile Include="BCore\Cmds\MiniGameCmd.cs" />
+    <Compile Include="BCore\HookHandlers\PlayerGreetHandler.cs" />
+    <Compile Include="BCore\HookHandlers\ReloadHandler.cs" />
     <Compile Include="BCore\PacketHandler.cs" />
     <Compile Include="BCore\PacketHandlers\CreateProjectileHandler.cs" />
+    <Compile Include="BCore\PacketHandlers\PlayerJoinHandler.cs" />
     <Compile Include="BCore\ProjRedirect.cs" />
     <Compile Include="BCore\TagRegion.cs" />
     <Compile Include="BCore\PacketHandlers\PlayerDeathHandler.cs" />
@@ -116,14 +122,11 @@
     <Compile Include="BCore\ScriptManager.cs" />
     <Compile Include="BModels\SubCommandArgs.cs" />
     <Compile Include="BPlugin.cs" />
+    <Compile Include="DB\DBTools.cs" />
+    <Compile Include="DB\DisposableQuery.cs" />
+    <Compile Include="DB\UserConfigBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-    <None Include="packages.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Lib\FakeProvider.dll" />

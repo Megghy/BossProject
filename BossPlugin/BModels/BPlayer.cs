@@ -1,16 +1,17 @@
-﻿using TrProtocol;
+﻿using BossPlugin.DB;
+using TrProtocol;
 using TShockAPI;
 
 namespace BossPlugin.BModels
 {
-    public partial class BPlayer
+    public partial class BPlayer : UserConfigBase<BPlayer>
     {
         public BPlayer(TSPlayer plr)
         {
             Player = plr;
         }
         public TSPlayer Player { get; private set; }
-        public string Name => Player.Name;
+        public string Name => Player?.Name ?? "unknown";
 
     }
     /// <summary>

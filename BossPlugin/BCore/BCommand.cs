@@ -20,7 +20,7 @@ namespace BossPlugin.BModules
         [AutoInit("注册Boss服命令")]
         public static void RegisterAllCommands()
         {
-            if(!Directory.Exists(ScriptCmdPath))
+            if (!Directory.Exists(ScriptCmdPath))
                 Directory.CreateDirectory(ScriptCmdPath);
             try
             {

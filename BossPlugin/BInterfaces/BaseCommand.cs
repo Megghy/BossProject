@@ -1,5 +1,4 @@
 ﻿using BossPlugin.BAttributes;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -28,7 +27,7 @@ namespace BossPlugin.BInterfaces
                     attr.Permission = method.GetCustomAttribute<NeedPermissionAttribute>()?.Perms?.FirstOrDefault();
                     list.Add(attr);
                 }
-                else if(method.IsStatic)
+                else if (method.IsStatic)
                 {
                     attr = new SubCommandAttribute()
                     {

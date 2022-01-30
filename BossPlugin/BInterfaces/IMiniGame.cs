@@ -1,6 +1,4 @@
-﻿using BossPlugin.BCore;
-using BossPlugin.BModels;
-using System;
+﻿using BossPlugin.BModels;
 using System.Collections.Generic;
 
 namespace BossPlugin.BInterfaces

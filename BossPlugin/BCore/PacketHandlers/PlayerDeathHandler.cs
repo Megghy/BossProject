@@ -1,11 +1,5 @@
 ﻿using BossPlugin.BInterfaces;
 using BossPlugin.BModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TrProtocol;
 using TrProtocol.Packets;
 
 namespace BossPlugin.BCore.PacketHandlers
@@ -16,7 +10,7 @@ namespace BossPlugin.BCore.PacketHandlers
 
         public override bool OnGetPacket(BPlayer plr, PlayerDeathV2 packet)
         {
-            if(plr.Player.TPlayer.hostile)
+            if (plr.Player.TPlayer.hostile)
             {
                 return true;
             }

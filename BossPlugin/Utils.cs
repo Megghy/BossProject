@@ -45,10 +45,8 @@ namespace BossPlugin
                 action();
             }
         }
-        public static BPlayer GetBPlayer(this TSPlayer plr)
-        {
-            return plr.GetData<BPlayer>("BossPlugin.BPlayer");
-        }
+
+        public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("BossPlugin.BPlayer");
         public static byte[] Serialize(this Packet p) => PacketHandler.Serializer.Serialize(p);
     }
 }

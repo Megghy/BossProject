@@ -3,10 +3,7 @@ using BossPlugin.BInterfaces;
 using OTAPI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using TrProtocol;
 using TShockAPI;
@@ -34,7 +31,7 @@ namespace BossPlugin.BCore
         }
         public static HookResult OnGetPacket(MessageBuffer buffer, ref byte packetId, ref int readOffset, ref int start, ref int length)
         {
-            if(Handlers.TryGetValue((PacketTypes)packetId, out var handler))
+            if (Handlers.TryGetValue((PacketTypes)packetId, out var handler))
             {
                 try
                 {
