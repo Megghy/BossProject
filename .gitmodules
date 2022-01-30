@@ -1,0 +1,4 @@
+[submodule "TShock"]
+	path = TShock
+	url = https://github.com/AxeelAnder/TShock.git
+	branch = boss
