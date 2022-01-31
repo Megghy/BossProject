@@ -29,19 +29,19 @@ namespace WorldEdit
 	{
 		public const string WorldEditFolderName = "worldedit";
         public static readonly string ConfigPath = Path.Combine(WorldEditFolderName, "config.json");
-        public static Config Config = new Config();
+        public static Config Config = new();
 
-		public static Dictionary<string, Commands.Biomes.Biome> Biomes = new Dictionary<string, Commands.Biomes.Biome>();
-		public static Dictionary<string, int> Colors = new Dictionary<string, int>();
+		public static Dictionary<string, Commands.Biomes.Biome> Biomes = new();
+		public static Dictionary<string, int> Colors = new();
 		public static IDbConnection Database;
-		public static Dictionary<string, Selection> Selections = new Dictionary<string, Selection>();
-		public static Dictionary<string, int> Tiles = new Dictionary<string, int>();
-		public static Dictionary<string, int> Walls = new Dictionary<string, int>();
-		public static Dictionary<string, int> Slopes = new Dictionary<string, int>();
+		public static Dictionary<string, Selection> Selections = new();
+        public static Dictionary<string, int> Tiles = new();
+        public static Dictionary<string, int> Walls = new();
+		public static Dictionary<string, int> Slopes = new();
 
 		public static readonly HandlerCollection<CanEditEventArgs> CanEdit;
 
-		public override string Author => "Nyx Studios, massive upgrade by Anzhelika";
+		public override string Author => "Nyx Studios, massive upgrade by Anzhelika, Megghy";
 		private readonly CancellationTokenSource _cancel = new CancellationTokenSource();
 		private readonly BlockingCollection<WECommand> _commandQueue = new BlockingCollection<WECommand>();
 		public override string Description => "Adds commands for mass editing of blocks.";

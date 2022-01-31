@@ -116,7 +116,7 @@ namespace TerrariaApi.Server
         /// <param name="e"></param>
         private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Console.WriteLine($"Unhandled exception\n{e}");
+            Console.WriteLine($"[Unhandled exception]\n{e}");
         }
     }
 }
