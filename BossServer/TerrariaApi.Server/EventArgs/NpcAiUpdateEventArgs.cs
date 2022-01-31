@@ -3,8 +3,8 @@ using Terraria;
 
 namespace TerrariaApi.Server
 {
-	public class NpcAiUpdateEventArgs : HandledEventArgs
-	{
-		public NPC Npc { get; internal set; }
-	}
+    public class NpcAiUpdateEventArgs : HandledEventArgs
+    {
+        public NPC Npc { get; internal set; }
+    }
 }

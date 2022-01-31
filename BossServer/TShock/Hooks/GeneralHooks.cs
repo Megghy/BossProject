@@ -34,7 +34,7 @@ namespace TShockAPI.Hooks
 
         public static void OnReloadEvent(TSPlayer ply)
         {
-            if(ReloadEvent == null)
+            if (ReloadEvent == null)
                 return;
 
             ReloadEvent(new ReloadEventArgs(ply));

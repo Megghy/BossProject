@@ -1,14 +1,13 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace TerrariaApi.Server
 {
-	public class HalloweenCheckEventArgs : HandledEventArgs
-	{
-		public bool Halloween
-		{
-			get; 
-			set;
-		}
-	}
+    public class HalloweenCheckEventArgs : HandledEventArgs
+    {
+        public bool Halloween
+        {
+            get;
+            set;
+        }
+    }
 }

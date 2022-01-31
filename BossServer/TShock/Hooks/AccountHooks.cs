@@ -19,48 +19,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using TShockAPI.DB;
 namespace TShockAPI.Hooks
 {
-	public class AccountDeleteEventArgs
-	{
-		public UserAccount Account { get; private set; }
+    public class AccountDeleteEventArgs
+    {
+        public UserAccount Account { get; private set; }
 
-		public AccountDeleteEventArgs(UserAccount account)
-		{
-			this.Account = account;
-		}
-	}
+        public AccountDeleteEventArgs(UserAccount account)
+        {
+            this.Account = account;
+        }
+    }
 
-	public class AccountCreateEventArgs
-	{
-		public UserAccount Account { get; private set; }
+    public class AccountCreateEventArgs
+    {
+        public UserAccount Account { get; private set; }
 
-		public AccountCreateEventArgs(UserAccount account)
-		{
-			this.Account = account;
-		}
-	}
+        public AccountCreateEventArgs(UserAccount account)
+        {
+            this.Account = account;
+        }
+    }
 
-	public class AccountHooks
-	{
-		public delegate void AccountCreateD(AccountCreateEventArgs e);
-		public static event AccountCreateD AccountCreate;
+    public class AccountHooks
+    {
+        public delegate void AccountCreateD(AccountCreateEventArgs e);
+        public static event AccountCreateD AccountCreate;
 
-		public static void OnAccountCreate(UserAccount u)
-		{
-			if (AccountCreate == null)
-				return;
+        public static void OnAccountCreate(UserAccount u)
+        {
+            if (AccountCreate == null)
+                return;
 
-			AccountCreate(new AccountCreateEventArgs(u));
-		}
+            AccountCreate(new AccountCreateEventArgs(u));
+        }
 
-		public delegate void AccountDeleteD(AccountDeleteEventArgs e);
-		public static event AccountDeleteD AccountDelete;
+        public delegate void AccountDeleteD(AccountDeleteEventArgs e);
+        public static event AccountDeleteD AccountDelete;
 
-		public static void OnAccountDelete(UserAccount u)
-		{
-			if (AccountDelete == null)
-				return;
+        public static void OnAccountDelete(UserAccount u)
+        {
+            if (AccountDelete == null)
+                return;
 
-			AccountDelete(new AccountDeleteEventArgs(u));
-		}
-	}
+            AccountDelete(new AccountDeleteEventArgs(u));
+        }
+    }
 }

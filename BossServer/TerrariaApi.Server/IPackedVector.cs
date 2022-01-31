@@ -1,16 +1,15 @@
 using Microsoft.Xna.Framework;
-using System;
 
 public interface IPackedVector
 {
-	void PackFromVector4(Vector4 vector);
-	Vector4 ToVector4();
+    void PackFromVector4(Vector4 vector);
+    Vector4 ToVector4();
 }
 public interface IPackedVector<TPacked> : IPackedVector
 {
-	TPacked PackedValue
-	{
-		get;
-		set;
-	}
+    TPacked PackedValue
+    {
+        get;
+        set;
+    }
 }

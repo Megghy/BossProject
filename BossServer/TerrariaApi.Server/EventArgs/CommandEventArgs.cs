@@ -1,14 +1,13 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace TerrariaApi.Server
 {
-	public class CommandEventArgs : HandledEventArgs
-	{
-		public string Command
-		{
-			get; 
-			internal set;
-		}
-	}
+    public class CommandEventArgs : HandledEventArgs
+    {
+        public string Command
+        {
+            get;
+            internal set;
+        }
+    }
 }

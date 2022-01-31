@@ -16,28 +16,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using Microsoft.Xna.Framework;
 using System;
 
 namespace TShockAPI
 {
-	public static class StringExt
-	{
-		//Can't name it Format :(
-		public static String SFormat(this String str, params object[] args)
-		{
-			return String.Format(str, args);
-		}
+    public static class StringExt
+    {
+        //Can't name it Format :(
+        public static String SFormat(this String str, params object[] args)
+        {
+            return String.Format(str, args);
+        }
 
-		/// <summary>
-		/// Wraps the string representation of an object with a Terraria color code for the given color
-		/// </summary>
-		/// <param name="obj"></param>
-		/// <param name="color"></param>
-		/// <returns></returns>
-		public static string Color(this object obj, string color)
-		{
-			return $"[c/{color}:{obj}]";
-		}
-	}
+        /// <summary>
+        /// Wraps the string representation of an object with a Terraria color code for the given color
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static string Color(this object obj, string color)
+        {
+            return $"[c/{color}:{obj}]";
+        }
+    }
 }

@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 
 namespace ClientApi.Networking
 {
-	public interface IPacket
-	{
-		void Read(Stream s);
-		void Write(Stream s);
-	}
+    public interface IPacket
+    {
+        void Read(Stream s);
+        void Write(Stream s);
+    }
 }

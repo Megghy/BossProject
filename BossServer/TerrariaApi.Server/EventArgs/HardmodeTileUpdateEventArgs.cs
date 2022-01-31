@@ -1,26 +1,25 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace TerrariaApi.Server
 {
-  public class HardmodeTileUpdateEventArgs : HandledEventArgs
-  {
-    public int X
+    public class HardmodeTileUpdateEventArgs : HandledEventArgs
     {
-      get;
-      internal set;
-    }
+        public int X
+        {
+            get;
+            internal set;
+        }
 
-    public int Y
-    {
-      get;
-      internal set;
-    }
+        public int Y
+        {
+            get;
+            internal set;
+        }
 
-    public int Type
-    {
-      get;
-      internal set;
+        public int Type
+        {
+            get;
+            internal set;
+        }
     }
-  }
 }

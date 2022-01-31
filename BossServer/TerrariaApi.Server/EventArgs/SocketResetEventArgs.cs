@@ -3,12 +3,12 @@ using Terraria;
 
 namespace TerrariaApi.Server
 {
-	public class SocketResetEventArgs : EventArgs
-	{
-		public RemoteClient Socket
-		{
-			get; 
-			internal set;
-		}
-	}
+    public class SocketResetEventArgs : EventArgs
+    {
+        public RemoteClient Socket
+        {
+            get;
+            internal set;
+        }
+    }
 }

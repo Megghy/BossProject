@@ -16,250 +16,249 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using System;
 using System.IO;
 using System.IO.Streams;
 using Terraria;
 
 namespace TShockAPI.Net
 {
-	public class NetTile : IPackable
-	{
-		public bool Active { get; set; }
-		public ushort Type { get; set; }
-		public short FrameX { get; set; }
-		public short FrameY { get; set; }
-		public bool Lighted { get; set; }
-		public ushort Wall { get; set; }
-		public byte Liquid { get; set; }
-		public byte LiquidType { get; set; }
-		public bool Wire { get; set; }
-		public bool Wire2 { get; set; }
-		public bool Wire3 { get; set; }
-		public bool Wire4 { get; set; }
-		public bool Inactive { get; set; }
-		public bool IsHalf { get; set; }
-		public bool IsActuator { get; set; }
-		public byte TileColor { get; set; }
-		public byte WallColor { get; set; }
-		public bool Slope1 { get; set; }
-		public bool Slope2 { get; set; }
-		public bool Slope3 { get; set; }
+    public class NetTile : IPackable
+    {
+        public bool Active { get; set; }
+        public ushort Type { get; set; }
+        public short FrameX { get; set; }
+        public short FrameY { get; set; }
+        public bool Lighted { get; set; }
+        public ushort Wall { get; set; }
+        public byte Liquid { get; set; }
+        public byte LiquidType { get; set; }
+        public bool Wire { get; set; }
+        public bool Wire2 { get; set; }
+        public bool Wire3 { get; set; }
+        public bool Wire4 { get; set; }
+        public bool Inactive { get; set; }
+        public bool IsHalf { get; set; }
+        public bool IsActuator { get; set; }
+        public byte TileColor { get; set; }
+        public byte WallColor { get; set; }
+        public bool Slope1 { get; set; }
+        public bool Slope2 { get; set; }
+        public bool Slope3 { get; set; }
 
-		public byte Slope
-		{
-			get
-			{
-				byte sl = 0;
+        public byte Slope
+        {
+            get
+            {
+                byte sl = 0;
 
-				if (Slope1)
-					sl += 1;
+                if (Slope1)
+                    sl += 1;
 
-				if (Slope2)
-					sl += 2;
+                if (Slope2)
+                    sl += 2;
 
-				if (Slope3)
-					sl += 4;
+                if (Slope3)
+                    sl += 4;
 
-				return sl;
-			}
-		}
+                return sl;
+            }
+        }
 
-	public bool HasColor
-		{
-			get { return TileColor > 0; }
-		}
+        public bool HasColor
+        {
+            get { return TileColor > 0; }
+        }
 
-		public bool HasWallColor
-		{
-			get { return WallColor > 0; }
-		}
+        public bool HasWallColor
+        {
+            get { return WallColor > 0; }
+        }
 
-		public bool HasWall
-		{
-			get { return Wall > 0; }
-		}
+        public bool HasWall
+        {
+            get { return Wall > 0; }
+        }
 
-		public bool HasLiquid
-		{
-			get { return Liquid > 0; }
-		}
+        public bool HasLiquid
+        {
+            get { return Liquid > 0; }
+        }
 
-		public bool FrameImportant
-		{
-			get { return Main.tileFrameImportant[Type]; }
-		}
+        public bool FrameImportant
+        {
+            get { return Main.tileFrameImportant[Type]; }
+        }
 
-		public NetTile()
-		{
-			Active = false;
-			Type = 0;
-			FrameX = -1;
-			FrameY = -1;
-			Wall = 0;
-			Liquid = 0;
-			Wire = false;
-			Wire2 = false;
-			Wire3 = false;
-			Wire4 = false;
-			Inactive = false;
-			TileColor = 0;
-			WallColor = 0;
-			Lighted = false;
-			Slope1 = false;
-			Slope2 = false;
-			Slope3 = false;
-		}
+        public NetTile()
+        {
+            Active = false;
+            Type = 0;
+            FrameX = -1;
+            FrameY = -1;
+            Wall = 0;
+            Liquid = 0;
+            Wire = false;
+            Wire2 = false;
+            Wire3 = false;
+            Wire4 = false;
+            Inactive = false;
+            TileColor = 0;
+            WallColor = 0;
+            Lighted = false;
+            Slope1 = false;
+            Slope2 = false;
+            Slope3 = false;
+        }
 
-		public NetTile(Stream stream)
-			: this()
-		{
-			Unpack(stream);
-		}
+        public NetTile(Stream stream)
+            : this()
+        {
+            Unpack(stream);
+        }
 
-		public void Pack(Stream stream)
-		{
-			var bits = new BitsByte();
+        public void Pack(Stream stream)
+        {
+            var bits = new BitsByte();
 
-			if ((Active) && (!Inactive))
-				bits[0] = true;
+            if ((Active) && (!Inactive))
+                bits[0] = true;
 
-			if (HasWall)
-				bits[2] = true;
+            if (HasWall)
+                bits[2] = true;
 
-			if (HasLiquid)
-				bits[3] = true;
+            if (HasLiquid)
+                bits[3] = true;
 
-			if (Wire)
-				bits[4] = true;
-			
-			if (IsHalf)
-				bits[5] = true;
+            if (Wire)
+                bits[4] = true;
 
-			if (IsActuator)
-				bits[6] = true;
+            if (IsHalf)
+                bits[5] = true;
 
-			if (Inactive)
-				bits[7] = true;
+            if (IsActuator)
+                bits[6] = true;
 
-			stream.WriteInt8((byte) bits);
+            if (Inactive)
+                bits[7] = true;
 
-			bits = new BitsByte();
+            stream.WriteInt8((byte)bits);
 
-			if ((Wire2))
-				bits[0] = true;
+            bits = new BitsByte();
 
-			if (Wire3)
-				bits[1] = true;
+            if ((Wire2))
+                bits[0] = true;
 
-			if (HasColor)
-				bits[2] = true;
+            if (Wire3)
+                bits[1] = true;
 
-			if (HasWallColor)
-				bits[3] = true;
+            if (HasColor)
+                bits[2] = true;
 
-			if (Slope1)
-				bits[4] = true;
+            if (HasWallColor)
+                bits[3] = true;
 
-			if (Slope2)
-				bits[5] = true;
+            if (Slope1)
+                bits[4] = true;
 
-			if (Slope3)
-				bits[6] = true;
+            if (Slope2)
+                bits[5] = true;
 
-			if (Wire4)
-				bits[7] = true;
+            if (Slope3)
+                bits[6] = true;
 
-			stream.WriteByte(bits);
+            if (Wire4)
+                bits[7] = true;
 
-			if (HasColor)
-			{
-				stream.WriteByte(TileColor);
-			}
+            stream.WriteByte(bits);
 
-			if (HasWallColor)
-			{
-				stream.WriteByte(WallColor);
-			}
+            if (HasColor)
+            {
+                stream.WriteByte(TileColor);
+            }
 
-			if (Active)
-			{
-				stream.WriteInt16((short)Type);
-				if (FrameImportant)
-				{
-					stream.WriteInt16(FrameX);
-					stream.WriteInt16(FrameY);
-				}
-			}
+            if (HasWallColor)
+            {
+                stream.WriteByte(WallColor);
+            }
 
-			if (HasWall)
-				stream.WriteInt16((short)Wall);
+            if (Active)
+            {
+                stream.WriteInt16((short)Type);
+                if (FrameImportant)
+                {
+                    stream.WriteInt16(FrameX);
+                    stream.WriteInt16(FrameY);
+                }
+            }
 
-			if (HasLiquid)
-			{
-				stream.WriteInt8(Liquid);
-				stream.WriteInt8(LiquidType);
-			}
-		}
+            if (HasWall)
+                stream.WriteInt16((short)Wall);
 
-		public void Unpack(Stream stream)
-		{
-			var flags = (BitsByte) stream.ReadInt8();
-			var flags2 = (BitsByte)stream.ReadInt8();
+            if (HasLiquid)
+            {
+                stream.WriteInt8(Liquid);
+                stream.WriteInt8(LiquidType);
+            }
+        }
 
-			Wire2 = flags2[0];
-			Wire3 = flags2[1];
-			Slope1 = flags2[4];
-			Slope2 = flags2[5];
-			Slope3 = flags2[6];
-			Wire4 = flags2[7];
+        public void Unpack(Stream stream)
+        {
+            var flags = (BitsByte)stream.ReadInt8();
+            var flags2 = (BitsByte)stream.ReadInt8();
 
-			if (flags2[2])
-			{
-				TileColor = stream.ReadInt8();
-			}
+            Wire2 = flags2[0];
+            Wire3 = flags2[1];
+            Slope1 = flags2[4];
+            Slope2 = flags2[5];
+            Slope3 = flags2[6];
+            Wire4 = flags2[7];
 
-			if (flags2[3])
-			{
-				WallColor = stream.ReadInt8();
-			}
+            if (flags2[2])
+            {
+                TileColor = stream.ReadInt8();
+            }
 
-			Active = flags[0];
-			if (Active)
-			{
-				Type = stream.ReadUInt16();
-				if (FrameImportant)
-				{
-					FrameX = stream.ReadInt16();
-					FrameY = stream.ReadInt16();
-				}
-			}
+            if (flags2[3])
+            {
+                WallColor = stream.ReadInt8();
+            }
 
-			if (flags[2])
-			{
-				Wall = stream.ReadUInt16();
-			}
+            Active = flags[0];
+            if (Active)
+            {
+                Type = stream.ReadUInt16();
+                if (FrameImportant)
+                {
+                    FrameX = stream.ReadInt16();
+                    FrameY = stream.ReadInt16();
+                }
+            }
 
-			if (flags[3])
-			{
-				Liquid = stream.ReadInt8();
-				LiquidType = stream.ReadInt8();
-			}
+            if (flags[2])
+            {
+                Wall = stream.ReadUInt16();
+            }
 
-			if (flags[4])
-				Wire = true;
+            if (flags[3])
+            {
+                Liquid = stream.ReadInt8();
+                LiquidType = stream.ReadInt8();
+            }
 
-			if (flags[5])
-				IsHalf = true;
-			
-			if (flags[6])
-				IsActuator = true;
+            if (flags[4])
+                Wire = true;
 
-			if (flags[7])
-			{
-				Inactive = true;
-				Active = false;
-			}
-		}
-	}
+            if (flags[5])
+                IsHalf = true;
+
+            if (flags[6])
+                IsActuator = true;
+
+            if (flags[7])
+            {
+                Inactive = true;
+                Active = false;
+            }
+        }
+    }
 }

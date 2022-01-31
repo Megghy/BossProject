@@ -18,22 +18,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.IO;
 using System.IO.Streams;
-using System.Text;
 
 namespace TShockAPI.Net
 {
-	internal class DisconnectMsg : BaseMsg
-	{
-		public override PacketTypes ID
-		{
-			get { return PacketTypes.Disconnect; }
-		}
+    internal class DisconnectMsg : BaseMsg
+    {
+        public override PacketTypes ID
+        {
+            get { return PacketTypes.Disconnect; }
+        }
 
-		public string Reason { get; set; }
+        public string Reason { get; set; }
 
-		public override void Pack(Stream stream)
-		{
-			stream.WriteString(Reason);
-		}
-	}
+        public override void Pack(Stream stream)
+        {
+            stream.WriteString(Reason);
+        }
+    }
 }

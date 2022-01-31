@@ -1,14 +1,13 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace TerrariaApi.Server
 {
-	public class ConnectEventArgs : HandledEventArgs
-	{
-		public int Who
-		{
-			get; 
-			internal set;
-		}
-	}
+    public class ConnectEventArgs : HandledEventArgs
+    {
+        public int Who
+        {
+            get;
+            internal set;
+        }
+    }
 }
