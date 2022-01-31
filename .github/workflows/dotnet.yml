@@ -23,4 +23,5 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: BossServer
-        path: ./BossServer/bin/Release/net6.0/publish/win-x64/TerrariaServer.exe
+        path: ./BossServer/bin/Release/net6.0/win-x64/publish/**
+          
