@@ -1,0 +1,27 @@
+name: Publish Server
+
+on:
+  push:
+    paths:
+      .github/BossServer/**
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: |
+        dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true --self-contained false
+    - uses: actions/upload-artifact@v2
+      with:
+        name: BossServer
+        path: ./BossServer/bin/Release/net6.0/publish/win-x64/TerrariaServer.exe
