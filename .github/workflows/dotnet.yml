@@ -2,8 +2,7 @@ name: Publish Server
 
 on:
   push:
-    paths:
-      BossServer/**
+    branches: [ master ]
 
 jobs:
   build:
@@ -19,7 +18,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: |
+      run:
         dotnet publish BossServer -c Release -r win-x64 -p:PublishSingleFile=true --self-contained false
     - uses: actions/upload-artifact@v2
       with:
@@ -31,3 +30,4 @@ jobs:
     - name: Push generated package to GitHub registry
       run: |
         dotnet nuget push ./BossServer/bin/Release/*.nupkg -s "github" --skip-duplicate -n true
+        otnet nuget push ./BossServer/bin/Release/*.nupkg -s https://api.nuget.org/v3/index.json -n true --skip-duplicate -k ${{secrets.NUGETKEY}}
