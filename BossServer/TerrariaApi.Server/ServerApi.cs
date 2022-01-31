@@ -279,6 +279,11 @@ namespace TerrariaApi.Server
 			fileInfos.AddRange(new DirectoryInfo(ServerPluginsDirectoryPath).GetFiles("*.dll-plugin"));
 
 			Dictionary<TerrariaPlugin, Stopwatch> pluginInitWatches = new Dictionary<TerrariaPlugin, Stopwatch>();
+
+			var ts = new PluginContainer((TerrariaPlugin)Activator.CreateInstance(typeof(TShockAPI.TShock), game));
+			plugins.Add(ts); //默认加载ts
+			pluginInitWatches.Add(ts.Plugin, new());
+
 			foreach (FileInfo fileInfo in fileInfos)
 			{
 				string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileInfo.Name);

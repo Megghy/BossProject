@@ -241,7 +241,6 @@ namespace TShockAPI
 		}
 
 		/// <summary>Initialize - Called by the TerrariaServerAPI during initialization.</summary>
-		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public override void Initialize()
 		{
 			string logFilename;
@@ -254,7 +253,7 @@ namespace TShockAPI
 			OTAPI.Hooks.NetMessage.PlayerAnnounce += (sender, args) =>
 			{
 				//TShock handles this
-				args.Result = OTAPI.Hooks.NetMessage.PlayerAnnounceResult.WriteToConsole;
+				//args.Result = OTAPI.Hooks.NetMessage.PlayerAnnounceResult.Default;
 			};
 			// if sqlite.interop cannot be found, try and search the runtimes folder. this usually happens when debugging tsapi
 			// since it does not have the dependency installed directly

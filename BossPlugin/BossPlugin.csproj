@@ -21,10 +21,6 @@
     <PackageReference Include="OTAPI.Upcoming" Version="3.0.30-alpha" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TerrariaServerAPI\TerrariaServerAPI.csproj" />
-    <ProjectReference Include="..\TShock\TShockAPI\TShockAPI.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="TrProtocol">
       <HintPath>..\Lib\TrProtocol.dll</HintPath>
     </Reference>
