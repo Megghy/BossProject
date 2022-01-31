@@ -1,59 +1,57 @@
-﻿using System;
-using System.Linq;
-using Terraria;
+﻿using Terraria;
 using WorldEdit.Expressions;
 
 namespace WorldEdit
 {
-	public class PlayerInfo
-	{
-		private int _x = -1;
-		private int _x2 = -1;
-		private int _y = -1;
-		private int _y2 = -1;
+    public class PlayerInfo
+    {
+        private int _x = -1;
+        private int _x2 = -1;
+        private int _y = -1;
+        private int _y2 = -1;
 
         public const string Key = "WorldEdit_Data";
-        
+
         public int Point = 0;
-		public Selection Select = null;
+        public Selection Select = null;
         private MagicWand _magicWand = null;
         public Expression SavedExpression = null;
         public int X
-		{
-			get => _x;
+        {
+            get => _x;
             set
             {
                 _x = Math.Max(0, value);
                 _magicWand = null;
             }
-		}
-		public int X2
-		{
-			get => _x2;
+        }
+        public int X2
+        {
+            get => _x2;
             set
             {
                 _x2 = Math.Min(value, Main.maxTilesX - 1);
                 _magicWand = null;
             }
-		}
-		public int Y
-		{
-			get => _y;
+        }
+        public int Y
+        {
+            get => _y;
             set
             {
                 _y = Math.Max(0, value);
                 _magicWand = null;
             }
-		}
-		public int Y2
-		{
-			get => _y2;
+        }
+        public int Y2
+        {
+            get => _y2;
             set
             {
                 _y2 = Math.Min(value, Main.maxTilesY - 1);
                 _magicWand = null;
             }
-		}
+        }
         public MagicWand MagicWand
         {
             get => _magicWand;

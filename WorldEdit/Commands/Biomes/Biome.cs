@@ -1,6 +1,4 @@
-﻿using OTAPI.Tile;
-using System;
-using System.Linq;
+﻿using Terraria;
 
 namespace WorldEdit.Commands.Biomes
 {
@@ -32,7 +30,7 @@ namespace WorldEdit.Commands.Biomes
         public virtual ushort GrassWallUnsafe { get; }
         public virtual ushort FlowerWall { get; }
         public virtual ushort FlowerWallUnsafe { get; }
-        
+
         public virtual ushort CaveWall1 { get; }
         public virtual ushort CaveWall2 { get; }
         public virtual ushort CaveWall3 { get; }

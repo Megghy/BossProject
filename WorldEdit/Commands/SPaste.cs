@@ -1,5 +1,4 @@
-﻿using OTAPI.Tile;
-using Terraria;
+﻿using Terraria;
 using TShockAPI;
 using WorldEdit.Expressions;
 

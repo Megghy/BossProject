@@ -1,36 +1,35 @@
-﻿using System.Collections.Generic;
-using Terraria;
+﻿using Terraria;
 using Terraria.GameContent.Tile_Entities;
 using Terraria.ID;
 using TShockAPI;
 
 namespace WorldEdit.Commands
 {
-	public class FixGhosts : WECommand
-	{
-		public FixGhosts(int x, int y, int x2, int y2, TSPlayer plr)
-			: base(x, y, x2, y2, plr)
-		{
-		}
+    public class FixGhosts : WECommand
+    {
+        public FixGhosts(int x, int y, int x2, int y2, TSPlayer plr)
+            : base(x, y, x2, y2, plr)
+        {
+        }
 
-		public override void Execute()
+        public override void Execute()
         {
             if (!CanUseCommand()) { return; }
             Tools.PrepareUndo(x, y, x2, y2, plr);
             int signs = 0, frames = 0, chests = 0, sensors = 0, dummies = 0;
             int weaponRacks = 0, pylons = 0, mannequins = 0, hatRacks = 0, foodPlates = 0;
-			foreach (Sign sign in Main.sign)
-			{
-				if (sign == null) continue;
-				ushort type = Main.tile[sign.x, sign.y].type;
-				if (!Main.tile[sign.x, sign.y].active()
+            foreach (Sign sign in Main.sign)
+            {
+                if (sign == null) continue;
+                ushort type = Main.tile[sign.x, sign.y].type;
+                if (!Main.tile[sign.x, sign.y].active()
                     || ((type != TileID.Signs)
-					&& (type != TileID.Tombstones)
-					&& (type != TileID.AnnouncementBox)))
-				{
-					Sign.KillSign(sign.x, sign.y);
-					signs++;
-				}
+                    && (type != TileID.Tombstones)
+                    && (type != TileID.AnnouncementBox)))
+                {
+                    Sign.KillSign(sign.x, sign.y);
+                    signs++;
+                }
             }
             foreach (Chest chest in Main.chest)
             {
@@ -46,9 +45,9 @@ namespace WorldEdit.Commands
                 }
             }
             for (int i = x; i <= x2; i++)
-			{
-				for (int j = y; j <= y2; j++)
-				{
+            {
+                for (int j = y; j <= y2; j++)
+                {
                     if (TEItemFrame.Find(i, j) != -1)
                     {
                         if (!Main.tile[i, j].active() || (Main.tile[i, j].type != TileID.ItemFrame))
@@ -114,7 +113,7 @@ namespace WorldEdit.Commands
                         }
                     }
                 }
-			}
+            }
             ResetSection();
 
             List<string> ghosts = new List<string>();
@@ -133,5 +132,5 @@ namespace WorldEdit.Commands
             { plr.SendSuccessMessage($"Fixed ghost {string.Join(", ", ghosts)}."); }
             else { plr.SendSuccessMessage("There are no ghost objects in this area."); }
         }
-	}
+    }
 }

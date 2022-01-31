@@ -1,5 +1,4 @@
-﻿using System;
-using Terraria;
+﻿using Terraria;
 using TShockAPI;
 using WorldEdit.Expressions;
 using WorldEdit.Extensions;
@@ -30,7 +29,7 @@ namespace WorldEdit.Commands
             if (newY >= Main.maxTilesY - Math.Abs(y - y2))
             { newY = Main.maxTilesY - Math.Abs(y - y2) - 1; }
             int newX2 = newX + Math.Abs(x - x2), newY2 = newY + Math.Abs(y - y2);
-            
+
             int tX = Math.Min(x, Math.Min(newX, newX2));
             int tY = Math.Min(y, Math.Min(newY, newY2));
             int tX2 = Math.Max(x2, Math.Max(newX, newX2));

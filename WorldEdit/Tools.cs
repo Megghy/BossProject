@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using Microsoft.Xna.Framework;
 using System.IO.Compression;
-using System.Linq;
-using OTAPI.Tile;
 using Terraria;
+using Terraria.DataStructures;
+using Terraria.GameContent.Tile_Entities;
+using Terraria.ID;
 using TShockAPI;
 using TShockAPI.DB;
-using Terraria.GameContent.Tile_Entities;
-using Terraria.DataStructures;
-using Microsoft.Xna.Framework;
-using Terraria.ID;
-using System.Threading;
 
 namespace WorldEdit
 {
@@ -27,7 +21,7 @@ namespace WorldEdit
             string tempPath = tempCopyPath ?? Path.Combine(WorldEdit.WorldEditFolderName,
                 $"temp-{rnd.Next()}-{Interlocked.Increment(ref TranslateTempCounter)}.dat");
             File.Copy(path, tempPath, true);
-            
+
             bool translated = true;
             try { LoadWorldDataOld(path).Write(path); }
             catch (Exception e)
@@ -36,7 +30,7 @@ namespace WorldEdit
                     TShock.Log.ConsoleError($"[WorldEdit] File '{path}' could not be converted to Terraria v1.4:\n{e}");
                 translated = false;
             }
-            
+
             if (!translated)
                 File.Copy(tempPath, path, true);
             File.Delete(tempPath);
@@ -447,7 +441,7 @@ namespace WorldEdit
             LoadWorldSection(LoadWorldData(path), X, Y, Tiles);
 
         public static void LoadWorldSection(WorldSectionData Data, int? X = null, int? Y = null, bool Tiles = true)
-		{
+        {
             int x = (X ?? Data.X), y = (Y ?? Data.Y);
 
             if (Tiles)
@@ -467,47 +461,47 @@ namespace WorldEdit
             ClearObjects(x, y, x + Data.Width, y + Data.Height);
 
             foreach (var sign in Data.Signs)
-			{
-				var id = Sign.ReadSign(sign.X + x, sign.Y + y);
+            {
+                var id = Sign.ReadSign(sign.X + x, sign.Y + y);
                 if ((id == -1) || !InMapBoundaries(sign.X, sign.Y))
                 { continue; }
-				Sign.TextSign(id, sign.Text);
-			}
+                Sign.TextSign(id, sign.Text);
+            }
 
-			foreach (var itemFrame in Data.ItemFrames)
-			{
-				var id = TEItemFrame.Place(itemFrame.X + x, itemFrame.Y + y);
-				if (id == -1) { continue; }
+            foreach (var itemFrame in Data.ItemFrames)
+            {
+                var id = TEItemFrame.Place(itemFrame.X + x, itemFrame.Y + y);
+                if (id == -1) { continue; }
 
-                var frame = (TEItemFrame) TileEntity.ByID[id];
+                var frame = (TEItemFrame)TileEntity.ByID[id];
                 if (!InMapBoundaries(frame.Position.X, frame.Position.Y))
                 { continue; }
                 frame.item = new Item();
-				frame.item.netDefaults(itemFrame.Item.NetId);
-				frame.item.stack = itemFrame.Item.Stack;
-				frame.item.prefix = itemFrame.Item.PrefixId;
-			}
+                frame.item.netDefaults(itemFrame.Item.NetId);
+                frame.item.stack = itemFrame.Item.Stack;
+                frame.item.prefix = itemFrame.Item.PrefixId;
+            }
 
-			foreach (var chest in Data.Chests)
-			{
-				int chestX = chest.X + x, chestY = chest.Y + y;
+            foreach (var chest in Data.Chests)
+            {
+                int chestX = chest.X + x, chestY = chest.Y + y;
 
-				int id;
-				if ((id = Chest.FindChest(chestX, chestY)) == -1 &&
-				    (id = Chest.CreateChest(chestX, chestY)) == -1)
-				{ continue; }
+                int id;
+                if ((id = Chest.FindChest(chestX, chestY)) == -1 &&
+                    (id = Chest.CreateChest(chestX, chestY)) == -1)
+                { continue; }
                 Chest _chest = Main.chest[id];
                 if (!InMapBoundaries(chest.X, chest.Y)) { continue; }
 
                 for (var index = 0; index < chest.Items.Length; index++)
-				{
-					var netItem = chest.Items[index];
-					var item = new Item();
-					item.netDefaults(netItem.NetId);
-					item.stack = netItem.Stack;
-					item.prefix = netItem.PrefixId;
-					Main.chest[id].item[index] = item;
-				}
+                {
+                    var netItem = chest.Items[index];
+                    var item = new Item();
+                    item.netDefaults(netItem.NetId);
+                    item.stack = netItem.Stack;
+                    item.prefix = netItem.PrefixId;
+                    Main.chest[id].item[index] = item;
+                }
             }
 
             foreach (var logicSensor in Data.LogicSensors)
@@ -620,115 +614,115 @@ namespace WorldEdit
             }
 
             ResetSection(x, y, x + Data.Width, y + Data.Height);
-		}
+        }
 
-		public static void PrepareUndo(int x, int y, int x2, int y2, TSPlayer plr)
-		{
+        public static void PrepareUndo(int x, int y, int x2, int y2, TSPlayer plr)
+        {
             if (WorldEdit.Config.DisableUndoSystemForUnrealPlayers && !plr.RealPlayer)
                 return;
 
-			if (WorldEdit.Database.GetSqlType() == SqlType.Mysql)
-				WorldEdit.Database.Query("INSERT IGNORE INTO WorldEdit VALUES (@0, -1, -1)", plr.Account.ID);
-			else
-				WorldEdit.Database.Query("INSERT OR IGNORE INTO WorldEdit VALUES (@0, 0, 0)", plr.Account.ID);
-			WorldEdit.Database.Query("UPDATE WorldEdit SET RedoLevel = -1 WHERE Account = @0", plr.Account.ID);
-			WorldEdit.Database.Query("UPDATE WorldEdit SET UndoLevel = UndoLevel + 1 WHERE Account = @0", plr.Account.ID);
+            if (WorldEdit.Database.GetSqlType() == SqlType.Mysql)
+                WorldEdit.Database.Query("INSERT IGNORE INTO WorldEdit VALUES (@0, -1, -1)", plr.Account.ID);
+            else
+                WorldEdit.Database.Query("INSERT OR IGNORE INTO WorldEdit VALUES (@0, 0, 0)", plr.Account.ID);
+            WorldEdit.Database.Query("UPDATE WorldEdit SET RedoLevel = -1 WHERE Account = @0", plr.Account.ID);
+            WorldEdit.Database.Query("UPDATE WorldEdit SET UndoLevel = UndoLevel + 1 WHERE Account = @0", plr.Account.ID);
 
-			int undoLevel = 0;
-			using (var reader = WorldEdit.Database.QueryReader("SELECT UndoLevel FROM WorldEdit WHERE Account = @0", plr.Account.ID))
-			{
-				if (reader.Read())
-					undoLevel = reader.Get<int>("UndoLevel");
-			}
+            int undoLevel = 0;
+            using (var reader = WorldEdit.Database.QueryReader("SELECT UndoLevel FROM WorldEdit WHERE Account = @0", plr.Account.ID))
+            {
+                if (reader.Read())
+                    undoLevel = reader.Get<int>("UndoLevel");
+            }
 
-			string path = Path.Combine("worldedit", string.Format("undo-{0}-{1}-{2}.dat", Main.worldID, plr.Account.ID, undoLevel));
-			SaveWorldSection(x, y, x2, y2, path);
+            string path = Path.Combine("worldedit", string.Format("undo-{0}-{1}-{2}.dat", Main.worldID, plr.Account.ID, undoLevel));
+            SaveWorldSection(x, y, x2, y2, path);
 
-			foreach (string fileName in Directory.EnumerateFiles("worldedit", string.Format("redo-{0}-{1}-*.dat", Main.worldID, plr.Account.ID)))
-				File.Delete(fileName);
-			File.Delete(Path.Combine("worldedit", string.Format("undo-{0}-{1}-{2}.dat", Main.worldID, plr.Account.ID, undoLevel - MAX_UNDOS)));
-		}
+            foreach (string fileName in Directory.EnumerateFiles("worldedit", string.Format("redo-{0}-{1}-*.dat", Main.worldID, plr.Account.ID)))
+                File.Delete(fileName);
+            File.Delete(Path.Combine("worldedit", string.Format("undo-{0}-{1}-{2}.dat", Main.worldID, plr.Account.ID, undoLevel - MAX_UNDOS)));
+        }
 
-		public static bool Redo(int accountID)
+        public static bool Redo(int accountID)
         {
             if (WorldEdit.Config.DisableUndoSystemForUnrealPlayers && accountID == 0)
                 return false;
 
             int redoLevel = 0;
-			int undoLevel = 0;
-			using (var reader = WorldEdit.Database.QueryReader("SELECT RedoLevel, UndoLevel FROM WorldEdit WHERE Account = @0", accountID))
-			{
-				if (reader.Read())
-				{
-					redoLevel = reader.Get<int>("RedoLevel") - 1;
-					undoLevel = reader.Get<int>("UndoLevel") + 1;
-				}
-				else
-					return false;
-			}
+            int undoLevel = 0;
+            using (var reader = WorldEdit.Database.QueryReader("SELECT RedoLevel, UndoLevel FROM WorldEdit WHERE Account = @0", accountID))
+            {
+                if (reader.Read())
+                {
+                    redoLevel = reader.Get<int>("RedoLevel") - 1;
+                    undoLevel = reader.Get<int>("UndoLevel") + 1;
+                }
+                else
+                    return false;
+            }
 
-			if (redoLevel < -1)
-				return false;
+            if (redoLevel < -1)
+                return false;
 
-			string redoPath = Path.Combine("worldedit", string.Format("redo-{0}-{1}-{2}.dat", Main.worldID, accountID, redoLevel + 1));
-			WorldEdit.Database.Query("UPDATE WorldEdit SET RedoLevel = @0 WHERE Account = @1", redoLevel, accountID);
+            string redoPath = Path.Combine("worldedit", string.Format("redo-{0}-{1}-{2}.dat", Main.worldID, accountID, redoLevel + 1));
+            WorldEdit.Database.Query("UPDATE WorldEdit SET RedoLevel = @0 WHERE Account = @1", redoLevel, accountID);
 
-			if (!File.Exists(redoPath))
-				return false;
+            if (!File.Exists(redoPath))
+                return false;
 
-			string undoPath = Path.Combine("worldedit", string.Format("undo-{0}-{1}-{2}.dat", Main.worldID, accountID, undoLevel));
-			WorldEdit.Database.Query("UPDATE WorldEdit SET UndoLevel = @0 WHERE Account = @1", undoLevel, accountID);
+            string undoPath = Path.Combine("worldedit", string.Format("undo-{0}-{1}-{2}.dat", Main.worldID, accountID, undoLevel));
+            WorldEdit.Database.Query("UPDATE WorldEdit SET UndoLevel = @0 WHERE Account = @1", undoLevel, accountID);
 
             Rectangle size = ReadSize(redoPath);
             SaveWorldSection(Math.Max(0, size.X), Math.Max(0, size.Y),
                 Math.Min(size.X + size.Width - 1, Main.maxTilesX - 1),
                 Math.Min(size.Y + size.Height - 1, Main.maxTilesY - 1), undoPath);
             LoadWorldSection(redoPath);
-			File.Delete(redoPath);
-			return true;
-		}
+            File.Delete(redoPath);
+            return true;
+        }
 
-		public static void ResetSection(int x, int y, int x2, int y2)
-		{
-			int lowX = Netplay.GetSectionX(x);
-			int highX = Netplay.GetSectionX(x2);
-			int lowY = Netplay.GetSectionY(y);
-			int highY = Netplay.GetSectionY(y2);
-			foreach (RemoteClient sock in Netplay.Clients.Where(s => s.IsActive))
-			{
+        public static void ResetSection(int x, int y, int x2, int y2)
+        {
+            int lowX = Netplay.GetSectionX(x);
+            int highX = Netplay.GetSectionX(x2);
+            int lowY = Netplay.GetSectionY(y);
+            int highY = Netplay.GetSectionY(y2);
+            foreach (RemoteClient sock in Netplay.Clients.Where(s => s.IsActive))
+            {
                 int w = sock.TileSections.GetLength(0), h = sock.TileSections.GetLength(1);
                 for (int i = lowX; i <= highX; i++)
-				{
+                {
                     for (int j = lowY; j <= highY; j++)
                     {
                         if (i < 0 || j < 0 || i >= w || j >= h) { continue; }
                         sock.TileSections[i, j] = false;
                     }
-				}
-			}
-		}
+                }
+            }
+        }
 
-		public static void SaveWorldSection(int x, int y, int x2, int y2, string path) =>
+        public static void SaveWorldSection(int x, int y, int x2, int y2, string path) =>
             SaveWorldSection(x, y, x2, y2).Write(path);
 
-		public static void Write(this BinaryWriter writer, ITile tile)
-		{
-			writer.Write(tile.sTileHeader);
-			writer.Write(tile.bTileHeader);
-			writer.Write(tile.bTileHeader2);
+        public static void Write(this BinaryWriter writer, ITile tile)
+        {
+            writer.Write(tile.sTileHeader);
+            writer.Write(tile.bTileHeader);
+            writer.Write(tile.bTileHeader2);
 
-			if (tile.active())
-			{
-				writer.Write(tile.type);
-				if (Main.tileFrameImportant[tile.type])
-				{
-					writer.Write(tile.frameX);
-					writer.Write(tile.frameY);
-				}
-			}
-			writer.Write(tile.wall);
-			writer.Write(tile.liquid);
-		}
+            if (tile.active())
+            {
+                writer.Write(tile.type);
+                if (Main.tileFrameImportant[tile.type])
+                {
+                    writer.Write(tile.frameX);
+                    writer.Write(tile.frameY);
+                }
+            }
+            writer.Write(tile.wall);
+            writer.Write(tile.liquid);
+        }
 
         public static void Write(this BinaryWriter writer, NetItem item)
         {
@@ -745,64 +739,64 @@ namespace WorldEdit
         }
 
         public static WorldSectionData SaveWorldSection(int x, int y, int x2, int y2)
-		{
-			var width = x2 - x + 1;
-			var height = y2 - y + 1;
+        {
+            var width = x2 - x + 1;
+            var height = y2 - y + 1;
 
-			var data = new WorldSectionData(width, height)
-			{
-				X = x,
-				Y = y
+            var data = new WorldSectionData(width, height)
+            {
+                X = x,
+                Y = y
             };
 
-			for (var i = x; i <= x2; i++)
-			{
-				for (var j = y; j <= y2; j++)
-				{
-					data.ProcessTile(Main.tile[i, j], i - x, j - y);
-				}
-			}
+            for (var i = x; i <= x2; i++)
+            {
+                for (var j = y; j <= y2; j++)
+                {
+                    data.ProcessTile(Main.tile[i, j], i - x, j - y);
+                }
+            }
 
-			return data;
-		}
+            return data;
+        }
 
-		public static bool Undo(int accountID)
+        public static bool Undo(int accountID)
         {
             if (WorldEdit.Config.DisableUndoSystemForUnrealPlayers && accountID == 0)
                 return false;
 
             int redoLevel, undoLevel;
-			using (var reader = WorldEdit.Database.QueryReader("SELECT RedoLevel, UndoLevel FROM WorldEdit WHERE Account = @0", accountID))
-			{
-				if (reader.Read())
-				{
-					redoLevel = reader.Get<int>("RedoLevel") + 1;
-					undoLevel = reader.Get<int>("UndoLevel") - 1;
-				}
-				else
-					return false;
-			}
+            using (var reader = WorldEdit.Database.QueryReader("SELECT RedoLevel, UndoLevel FROM WorldEdit WHERE Account = @0", accountID))
+            {
+                if (reader.Read())
+                {
+                    redoLevel = reader.Get<int>("RedoLevel") + 1;
+                    undoLevel = reader.Get<int>("UndoLevel") - 1;
+                }
+                else
+                    return false;
+            }
 
-			if (undoLevel < -1)
-				return false;
+            if (undoLevel < -1)
+                return false;
 
-			string undoPath = Path.Combine("worldedit", string.Format("undo-{0}-{1}-{2}.dat", Main.worldID, accountID, undoLevel + 1));
-			WorldEdit.Database.Query("UPDATE WorldEdit SET UndoLevel = @0 WHERE Account = @1", undoLevel, accountID);
+            string undoPath = Path.Combine("worldedit", string.Format("undo-{0}-{1}-{2}.dat", Main.worldID, accountID, undoLevel + 1));
+            WorldEdit.Database.Query("UPDATE WorldEdit SET UndoLevel = @0 WHERE Account = @1", undoLevel, accountID);
 
-			if (!File.Exists(undoPath))
-				return false;
+            if (!File.Exists(undoPath))
+                return false;
 
-			string redoPath = Path.Combine("worldedit", string.Format("redo-{0}-{1}-{2}.dat", Main.worldID, accountID, redoLevel));
-			WorldEdit.Database.Query("UPDATE WorldEdit SET RedoLevel = @0 WHERE Account = @1", redoLevel, accountID);
+            string redoPath = Path.Combine("worldedit", string.Format("redo-{0}-{1}-{2}.dat", Main.worldID, accountID, redoLevel));
+            WorldEdit.Database.Query("UPDATE WorldEdit SET RedoLevel = @0 WHERE Account = @1", redoLevel, accountID);
 
             Rectangle size = ReadSize(undoPath);
             SaveWorldSection(Math.Max(0, size.X), Math.Max(0, size.Y),
                 Math.Min(size.X + size.Width - 1, Main.maxTilesX - 1),
                 Math.Min(size.Y + size.Height - 1, Main.maxTilesY - 1), redoPath);
-			LoadWorldSection(undoPath);
-			File.Delete(undoPath);
-			return true;
-		}
+            LoadWorldSection(undoPath);
+            File.Delete(undoPath);
+            return true;
+        }
 
         public static bool CanSet(bool Tile, ITile tile, int type,
             Selection selection, Expressions.Expression expression,
@@ -966,7 +960,7 @@ namespace WorldEdit
                 }
                 y += h;
             }
-            return text;            
+            return text;
         }
 
         private static Tuple<WEPoint[,], int> CreateStatueRow(string Row, int Width, bool FirstRow)
@@ -1059,7 +1053,7 @@ namespace WorldEdit
             else if ((Letter > 96) && (Letter < 123))
             { leftTop = (short)((Letter - 87) * 36); }
             else { return letter; }
-            
+
             for (short i = leftTop; i <= (leftTop + 18); i += 18)
             {
                 int b = 0;

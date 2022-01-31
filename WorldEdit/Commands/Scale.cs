@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using OTAPI.Tile;
+﻿using Terraria;
 using TShockAPI;
-using Terraria;
-using System.Linq;
 
 namespace WorldEdit.Commands
 {
@@ -12,17 +9,17 @@ namespace WorldEdit.Commands
         private readonly int _scale;
 
         public Scale(TSPlayer plr, bool addition, int scale)
-			: base(0, 0, 0, 0, plr)
-		{
+            : base(0, 0, 0, 0, plr)
+        {
             _addition = addition;
-			_scale = scale;
-		}
+            _scale = scale;
+        }
 
-		public override void Execute()
-		{
-			var clipboardPath = Tools.GetClipboardPath(plr.Account.ID);
+        public override void Execute()
+        {
+            var clipboardPath = Tools.GetClipboardPath(plr.Account.ID);
 
-			var data = Tools.LoadWorldData(clipboardPath);
+            var data = Tools.LoadWorldData(clipboardPath);
 
             if (_addition)
             {
@@ -98,7 +95,7 @@ namespace WorldEdit.Commands
                 }
             }
 
-			plr.SendSuccessMessage("Clipboard {0}creased by {1} times.", (_addition ? "in" : "de"), _scale);
-		}
-	}
+            plr.SendSuccessMessage("Clipboard {0}creased by {1} times.", (_addition ? "in" : "de"), _scale);
+        }
+    }
 }

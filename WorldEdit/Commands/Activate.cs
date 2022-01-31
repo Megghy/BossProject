@@ -5,17 +5,17 @@ using TShockAPI;
 
 namespace WorldEdit.Commands
 {
-	public class Activate : WECommand
-	{
-		private readonly int _action;
-		public Activate(int x, int y, int x2, int y2, TSPlayer plr, byte action)
-			: base(x, y, x2, y2, null, plr)
-		{
-			_action = action;
-		}
+    public class Activate : WECommand
+    {
+        private readonly int _action;
+        public Activate(int x, int y, int x2, int y2, TSPlayer plr, byte action)
+            : base(x, y, x2, y2, null, plr)
+        {
+            _action = action;
+        }
 
-		public override void Execute()
-		{
+        public override void Execute()
+        {
             if (!CanUseCommand()) { return; }
             Tools.PrepareUndo(x, y, x2, y2, plr);
             int noMsg = 0;
@@ -292,6 +292,6 @@ namespace WorldEdit.Commands
             if (noMsg == 10)
             { plr.SendSuccessMessage("There are no objects to activate in this area."); }
             ResetSection();
-		}
-	}
+        }
+    }
 }

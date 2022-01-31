@@ -1,21 +1,21 @@
-﻿using OTAPI.Tile;
+﻿using Terraria;
 
 namespace WorldEdit.Expressions
 {
-	public delegate bool Test(ITile tile);
+    public delegate bool Test(ITile tile);
 
-	public sealed class TestExpression : Expression
-	{
-		public Test Test;
+    public sealed class TestExpression : Expression
+    {
+        public Test Test;
 
-		public TestExpression(Test test)
-		{
-			Test = test;
-		}
+        public TestExpression(Test test)
+        {
+            Test = test;
+        }
 
-		public override bool Evaluate(ITile tile)
-		{
-			return Test(tile);
-		}
-	}
+        public override bool Evaluate(ITile tile)
+        {
+            return Test(tile);
+        }
+    }
 }

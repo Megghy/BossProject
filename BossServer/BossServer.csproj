@@ -9,11 +9,16 @@
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 		<RunPostBuildEvent>Always</RunPostBuildEvent>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>		
-		<Version>1.4.3.2-beta</Version>
+		<Version>1.4.3.2-0.1.0</Version>
 		<AssemblyTitle>Terraria</AssemblyTitle>
-		<Product>Terraria</Product>
-		<Company>Re-Logic &amp; The TShock Team</Company>
-		<Copyright>Copyright © Re-Logic, Pryaxis &amp; TShock Contributors 2011-2021</Copyright>
+		<Product></Product>
+		<Company>Boss Team</Company>
+		<Copyright></Copyright>
+		<Authors>Boss</Authors>
+		<PackageId>BossServer.Ref</PackageId>
+		<Description>boss服 开发引用文件</Description>
+		<RepositoryUrl>https://github.com/Megghy/BossProject/</RepositoryUrl>
+		<BaseIntermediateOutputPath />
 	</PropertyGroup>
 
 	<ItemGroup>
