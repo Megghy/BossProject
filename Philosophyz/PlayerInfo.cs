@@ -50,7 +50,7 @@ namespace Philosophyz
 
 		public void ChangeSlot(int slot, int netId, byte prefix, int stack)
 		{
-			if (slot > Main.maxInventory)
+			if (slot > Main.InventorySlotsTotal)
 			{
 				return;
 			}
@@ -79,7 +79,7 @@ namespace Philosophyz
 				return;
 			}
 
-			var max = Math.Min(items.Length, Main.maxInventory) + 1;
+			var max = Math.Min(items.Length, Main.InventorySlotsTotal) + 1;
 
 			for (var i = 0; i < max; i++)
 			{

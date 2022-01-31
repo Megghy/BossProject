@@ -95,7 +95,7 @@ namespace BossPlugin.BCore
             }
             else
             {
-                plr.Player.SendInfoMessage($"你已处于一局游戏中");
+                plr.TsPlayer.SendInfoMessage($"你已处于一局游戏中");
                 BLog.Log($"[{plr}] 尝试加入 <{game}> 失败: 已处于一场游戏中");
                 return false;
             }

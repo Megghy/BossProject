@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using BossPlugin;
+using BossPlugin.BNet;
 using OTAPI;
 using Philosophyz.Hooks;
 using Terraria;
@@ -9,8 +11,10 @@ using Terraria.GameContent.Events;
 using Terraria.Localization;
 using Terraria.Social;
 using TerrariaApi.Server;
+using TrProtocol.Packets;
 using TShockAPI;
 using TShockAPI.Hooks;
+using static BossPlugin.BModels.EventArgs;
 
 namespace Philosophyz
 {
@@ -36,8 +40,6 @@ namespace Philosophyz
 
 		internal PzRegionManager PzRegions;
 
-		private OTAPI.Hooks.Net.SendDataHandler _tsapiHandler;
-
 		public override void Initialize()
 		{
 			ServerApi.Hooks.GameInitialize.Register(this, OnInit);
@@ -46,8 +48,9 @@ namespace Philosophyz
 
 			RegionHooks.RegionDeleted += OnRegionDeleted;
 
-			_tsapiHandler = OTAPI.Hooks.Net.SendData;
-			OTAPI.Hooks.Net.SendData = OnOtapiSendData;
+			PacketHandler.RegisteSendPacketHandler(PacketTypes.WorldInfo, OnSendWorldInfo);
+
+			On.Terraria.NetMessage.SendData += OnOtapiSendData;
 		}
 
 		protected override void Dispose(bool disposing)
@@ -59,7 +62,9 @@ namespace Philosophyz
 
 				RegionHooks.RegionDeleted -= OnRegionDeleted;
 
-				OTAPI.Hooks.Net.SendData = _tsapiHandler;
+				PacketHandler.DeregistePacketHandler(OnSendWorldInfo);
+
+				On.Terraria.NetMessage.SendData -= OnOtapiSendData;
 			}
 			base.Dispose(disposing);
 		}
@@ -125,11 +130,11 @@ namespace Philosophyz
 			_lastCheck = DateTime.UtcNow;
 		}
 
-		private HookResult OnOtapiSendData(ref int bufferId, ref int msgType, ref int remoteClient, ref int ignoreClient, ref NetworkText text, ref int number, ref float number2, ref float number3, ref float number4, ref int number5, ref int number6, ref int number7)
+		private void OnOtapiSendData(On.Terraria.NetMessage.orig_SendData orig, int msgType, int remoteClient, int ignoreClient, NetworkText text, int number, float number2, float number3, float number4, int number5, int number6, int number7)
 		{
 			if (msgType != (int)PacketTypes.WorldInfo)
 			{
-				return _tsapiHandler(ref bufferId, ref msgType, ref remoteClient, ref ignoreClient, ref text, ref number, ref number2, ref number3, ref number4, ref number5, ref number6, ref number7);
+				return;
 			}
 
 			if (remoteClient == -1)
@@ -167,8 +172,7 @@ namespace Philosophyz
 					SendInfo(remoteClient, info.FakeSscStatus ?? DefaultFakeSscStatus);
 				}
 			}
-
-			return HookResult.Cancel;
+			orig(msgType, remoteClient, ignoreClient, text, number, number2, number3, number4, number5, number6, number7);
 		}
 
 		private void OnPostInit(EventArgs args)
@@ -178,7 +182,7 @@ namespace Philosophyz
 
 		private void OnInit(EventArgs args)
 		{
-			if (!TShock.ServerSideCharacterConfig.Enabled)
+			if (!TShock.ServerSideCharacterConfig.Settings.Enabled)
 			{
 				TShock.Log.ConsoleError("[Pz] 未开启SSC! 你可能选错了插件.");
 				Dispose(true);
@@ -442,131 +446,20 @@ namespace Philosophyz
 			}
 		}
 
+		private static void OnSendWorldInfo(PacketEventArgs args)
+        {
+			if (PlayerInfo.GetPlayerInfo(args.Player.TsPlayer) is { } plr)
+            {
+				var bb = (args.Packet as WorldData).EventInfo1;
+				bb[6] = plr.FakeSscStatus ?? DefaultFakeSscStatus;
+
+			}
+				
+		}
 		private static byte[] PackInfo(bool ssc)
 		{
-			var memoryStream = new MemoryStream();
-			var binaryWriter = new BinaryWriter(memoryStream);
-			var position = binaryWriter.BaseStream.Position;
-			binaryWriter.BaseStream.Position += 2L;
-			binaryWriter.Write((byte)PacketTypes.WorldInfo);
-
-			binaryWriter.Write((int)Main.time);
-			BitsByte bb3 = 0;
-			bb3[0] = Main.dayTime;
-			bb3[1] = Main.bloodMoon;
-			bb3[2] = Main.eclipse;
-			binaryWriter.Write(bb3);
-			binaryWriter.Write((byte)Main.moonPhase);
-			binaryWriter.Write((short)Main.maxTilesX);
-			binaryWriter.Write((short)Main.maxTilesY);
-			binaryWriter.Write((short)Main.spawnTileX);
-			binaryWriter.Write((short)Main.spawnTileY);
-			binaryWriter.Write((short)Main.worldSurface);
-			binaryWriter.Write((short)Main.rockLayer);
-			binaryWriter.Write(Main.worldID);
-			binaryWriter.Write(Main.worldName);
-			binaryWriter.Write(Main.ActiveWorldFileData.UniqueId.ToByteArray());
-			binaryWriter.Write(Main.ActiveWorldFileData.WorldGeneratorVersion);
-			binaryWriter.Write((byte)Main.moonType);
-			binaryWriter.Write((byte)WorldGen.treeb);
-			binaryWriter.Write((byte)WorldGen.corruptBG);
-			binaryWriter.Write((byte)WorldGen.jungleBG);
-			binaryWriter.Write((byte)WorldGen.snowBG);
-			binaryWriter.Write((byte)WorldGen.hallowBG);
-			binaryWriter.Write((byte)WorldGen.crimsonBG);
-			binaryWriter.Write((byte)WorldGen.desertBG);
-			binaryWriter.Write((byte)WorldGen.oceanBG);
-			binaryWriter.Write((byte)Main.iceBackStyle);
-			binaryWriter.Write((byte)Main.jungleBackStyle);
-			binaryWriter.Write((byte)Main.hellBackStyle);
-			binaryWriter.Write(Main.windSpeedSet);
-			binaryWriter.Write((byte)Main.numClouds);
-			for (var k = 0; k < 3; k++)
-			{
-				binaryWriter.Write(Main.treeX[k]);
-			}
-			for (var l = 0; l < 4; l++)
-			{
-				binaryWriter.Write((byte)Main.treeStyle[l]);
-			}
-			for (var m = 0; m < 3; m++)
-			{
-				binaryWriter.Write(Main.caveBackX[m]);
-			}
-			for (var n = 0; n < 4; n++)
-			{
-				binaryWriter.Write((byte)Main.caveBackStyle[n]);
-			}
-			if (!Main.raining)
-			{
-				Main.maxRaining = 0f;
-			}
-			binaryWriter.Write(Main.maxRaining);
-			BitsByte bb4 = 0;
-			bb4[0] = WorldGen.shadowOrbSmashed;
-			bb4[1] = NPC.downedBoss1;
-			bb4[2] = NPC.downedBoss2;
-			bb4[3] = NPC.downedBoss3;
-			bb4[4] = Main.hardMode;
-			bb4[5] = NPC.downedClown;
-			bb4[6] = ssc;
-			bb4[7] = NPC.downedPlantBoss;
-			binaryWriter.Write(bb4);
-			BitsByte bb5 = 0;
-			bb5[0] = NPC.downedMechBoss1;
-			bb5[1] = NPC.downedMechBoss2;
-			bb5[2] = NPC.downedMechBoss3;
-			bb5[3] = NPC.downedMechBossAny;
-			bb5[4] = Main.cloudBGActive >= 1f;
-			bb5[5] = WorldGen.crimson;
-			bb5[6] = Main.pumpkinMoon;
-			bb5[7] = Main.snowMoon;
-			binaryWriter.Write(bb5);
-			BitsByte bb6 = 0;
-			bb6[0] = Main.expertMode;
-			bb6[1] = Main.fastForwardTime;
-			bb6[2] = Main.slimeRain;
-			bb6[3] = NPC.downedSlimeKing;
-			bb6[4] = NPC.downedQueenBee;
-			bb6[5] = NPC.downedFishron;
-			bb6[6] = NPC.downedMartians;
-			bb6[7] = NPC.downedAncientCultist;
-			binaryWriter.Write(bb6);
-			BitsByte bb7 = 0;
-			bb7[0] = NPC.downedMoonlord;
-			bb7[1] = NPC.downedHalloweenKing;
-			bb7[2] = NPC.downedHalloweenTree;
-			bb7[3] = NPC.downedChristmasIceQueen;
-			bb7[4] = NPC.downedChristmasSantank;
-			bb7[5] = NPC.downedChristmasTree;
-			bb7[6] = NPC.downedGolemBoss;
-			bb7[7] = BirthdayParty.PartyIsUp;
-			binaryWriter.Write(bb7);
-			BitsByte bb8 = 0;
-			bb8[0] = NPC.downedPirates;
-			bb8[1] = NPC.downedFrost;
-			bb8[2] = NPC.downedGoblins;
-			bb8[3] = Sandstorm.Happening;
-			bb8[4] = DD2Event.Ongoing;
-			bb8[5] = DD2Event.DownedInvasionT1;
-			bb8[6] = DD2Event.DownedInvasionT2;
-			bb8[7] = DD2Event.DownedInvasionT3;
-			binaryWriter.Write(bb8);
-			binaryWriter.Write((sbyte)Main.invasionType);
-			binaryWriter.Write(SocialAPI.Network != null ? SocialAPI.Network.GetLobbyId() : 0UL);
-			binaryWriter.Write(Sandstorm.IntendedSeverity);
-
-			var currentPosition = (int)binaryWriter.BaseStream.Position;
-			binaryWriter.BaseStream.Position = position;
-			binaryWriter.Write((short)currentPosition);
-			binaryWriter.BaseStream.Position = currentPosition;
-			var data = memoryStream.ToArray();
-
-			binaryWriter.Close();
-
-			return data;
+			return BossPlugin.Utils.GetCurrentWorldData(ssc).Serialize();
 		}
-
 		internal static void SendInfo(int remoteClient, bool ssc)
 		{
 			if (!SendDataHooks.InvokePreSendData(remoteClient, remoteClient))
@@ -574,7 +467,7 @@ namespace Philosophyz
 
 			Main.ServerSideCharacter = ssc;
 
-			NetMessage.SendDataDirect((int)PacketTypes.WorldInfo, remoteClient);
+			TShock.Players[remoteClient]?.SendRawData(PackInfo(ssc));
 
 			Main.ServerSideCharacter = true;
 

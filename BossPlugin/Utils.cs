@@ -4,10 +4,14 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TerrariaUI.Base;
-using TerrariaUI.Widgets;
+using Terraria;
+using Terraria.GameContent.Events;
 using TrProtocol;
+using TrProtocol.Models;
+using TrProtocol.Packets;
 using TShockAPI;
+using BitsByte = TrProtocol.Models.BitsByte;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace BossPlugin
 {
@@ -49,6 +53,112 @@ namespace BossPlugin
             }
         }
 
+        public static WorldData GetCurrentWorldData(bool? ssc = null)
+        {
+            var worldInfo = new WorldData();
+
+            worldInfo.Time = (int)Main.time;
+            BitsByte bb3 = 0;
+            bb3[0] = Main.dayTime;
+            bb3[1] = Main.bloodMoon;
+            bb3[2] = Main.eclipse;
+            worldInfo.DayAndMoonInfo = bb3;
+            worldInfo.MoonPhase = (byte)Main.moonPhase;
+            worldInfo.MaxTileX = (short)Main.maxTilesX;
+            worldInfo.MaxTileY = (short)Main.maxTilesY;
+            worldInfo.SpawnX = (short)Main.spawnTileX;
+            worldInfo.SpawnY = (short)Main.spawnTileY;
+            worldInfo.WorldSurface = (short)Main.worldSurface;
+            worldInfo.RockLayer = (short)Main.rockLayer;
+            worldInfo.WorldID = Main.worldID;
+            worldInfo.WorldName = Main.worldName;
+            worldInfo.WorldUniqueID = Main.ActiveWorldFileData.UniqueId;
+            worldInfo.WorldGeneratorVersion = Main.ActiveWorldFileData.WorldGeneratorVersion;
+            worldInfo.MoonType = (byte)Main.moonType;
+            worldInfo.TreeBackground = (byte)WorldGen.treeBG1;
+            worldInfo.CorruptionBackground = (byte)WorldGen.corruptBG;
+            worldInfo.JungleBackground = (byte)WorldGen.jungleBG;
+            worldInfo.SnowBackground = (byte)WorldGen.snowBG;
+            worldInfo.HallowBackground = (byte)WorldGen.hallowBG;
+            worldInfo.CrimsonBackground = (byte)WorldGen.crimsonBG;
+            worldInfo.DesertBackground = (byte)WorldGen.desertBG;
+            worldInfo.OceanBackground = (byte)WorldGen.oceanBG;
+            worldInfo.IceBackStyle = (byte)Main.iceBackStyle;
+            worldInfo.JungleBackStyle = (byte)Main.jungleBackStyle;
+            worldInfo.HellBackStyle = (byte)Main.hellBackStyle;
+            worldInfo.WindSpeedSet = Main.windSpeedCurrent;
+            worldInfo.CloudNumber = (byte)Main.numClouds;
+            worldInfo.Tree1 = Main.treeX[1];
+            worldInfo.Tree2 = Main.treeX[2];
+            worldInfo.Tree3 = Main.treeX[3];
+            worldInfo.TreeStyle1 = (byte)Main.treeStyle[1];
+            worldInfo.TreeStyle2 = (byte)Main.treeStyle[2];
+            worldInfo.TreeStyle3 = (byte)Main.treeStyle[3];
+            worldInfo.TreeStyle4 = (byte)Main.treeStyle[4];
+            worldInfo.CaveBack1 = (byte)Main.caveBackX[1];
+            worldInfo.CaveBack2 = (byte)Main.caveBackX[2];
+            worldInfo.CaveBack3 = (byte)Main.caveBackX[3];
+            worldInfo.CaveBackStyle1 = (byte)Main.caveBackStyle[1];
+            worldInfo.CaveBackStyle2 = (byte)Main.caveBackStyle[2];
+            worldInfo.CaveBackStyle3 = (byte)Main.caveBackStyle[3];
+            worldInfo.CaveBackStyle4 = (byte)Main.caveBackStyle[4];
+            if (!Main.raining)
+            {
+                worldInfo.Rain = 0;
+            }
+            BitsByte bb4 = 0;
+            bb4[0] = WorldGen.shadowOrbSmashed;
+            bb4[1] = NPC.downedBoss1;
+            bb4[2] = NPC.downedBoss2;
+            bb4[3] = NPC.downedBoss3;
+            bb4[4] = Main.hardMode;
+            bb4[5] = NPC.downedClown;
+            bb4[6] = ssc ?? Main.ServerSideCharacter;
+            bb4[7] = NPC.downedPlantBoss;
+            worldInfo.EventInfo1 = bb4;
+            BitsByte bb5 = 0;
+            bb5[0] = NPC.downedMechBoss1;
+            bb5[1] = NPC.downedMechBoss2;
+            bb5[2] = NPC.downedMechBoss3;
+            bb5[3] = NPC.downedMechBossAny;
+            bb5[4] = Main.cloudBGActive >= 1f;
+            bb5[5] = WorldGen.crimson;
+            bb5[6] = Main.pumpkinMoon;
+            bb5[7] = Main.snowMoon;
+            worldInfo.EventInfo2 = bb5;
+            BitsByte bb6 = 0;
+            bb6[0] = Main.expertMode;
+            bb6[1] = Main.fastForwardTime;
+            bb6[2] = Main.slimeRain;
+            bb6[3] = NPC.downedSlimeKing;
+            bb6[4] = NPC.downedQueenBee;
+            bb6[5] = NPC.downedFishron;
+            bb6[6] = NPC.downedMartians;
+            bb6[7] = NPC.downedAncientCultist;
+            worldInfo.EventInfo3 = bb6;
+            BitsByte bb7 = 0;
+            bb7[0] = NPC.downedMoonlord;
+            bb7[1] = NPC.downedHalloweenKing;
+            bb7[2] = NPC.downedHalloweenTree;
+            bb7[3] = NPC.downedChristmasIceQueen;
+            bb7[4] = NPC.downedChristmasSantank;
+            bb7[5] = NPC.downedChristmasTree;
+            bb7[6] = NPC.downedGolemBoss;
+            bb7[7] = BirthdayParty.PartyIsUp;
+            worldInfo.EventInfo4 = bb7;
+            BitsByte bb8 = 0;
+            bb8[0] = NPC.downedPirates;
+            bb8[1] = NPC.downedFrost;
+            bb8[2] = NPC.downedGoblins;
+            bb8[3] = Sandstorm.Happening;
+            bb8[4] = DD2Event.Ongoing;
+            bb8[5] = DD2Event.DownedInvasionT1;
+            bb8[6] = DD2Event.DownedInvasionT2;
+            bb8[7] = DD2Event.DownedInvasionT3;
+            worldInfo.EventInfo5 = bb8;
+            worldInfo.InvasionType = (sbyte)Main.invasionType;
+            return worldInfo;
+        }
         public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("BossPlugin.BPlayer");
         public static byte[] Serialize(this Packet p) => PacketHandler.Serializer.Serialize(p);
 

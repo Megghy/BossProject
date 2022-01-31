@@ -12,16 +12,16 @@ namespace BossPlugin.BModels
         public BPlayer() { }
         public BPlayer(TSPlayer plr)
         {
-            Player = plr;
+            TsPlayer = plr;
         }
         public override void Init()
         {
-            Player = TShock.Players.FirstOrDefault(p => p?.Account?.ID.ToString() == ID);
+            TsPlayer = TShock.Players.FirstOrDefault(p => p?.Account?.ID.ToString() == ID);
         }
 
         #region 变量
-        public TSPlayer Player { get; internal set; }
-        public string Name => Player?.Name ?? "unknown";
+        public TSPlayer TsPlayer { get; internal set; }
+        public string Name => TsPlayer?.Name ?? "unknown";
 
         #region 小游戏部分
         public long Point { get; set; }
@@ -41,41 +41,41 @@ namespace BossPlugin.BModels
         /// <param name="p"></param>
         public void SendPacket(Packet p)
         {
-            Player?.SendRawData(p.Serialize());
+            TsPlayer?.SendRawData(p.Serialize());
         }
         public void SendCombatMessage(string msg, Color color = default, bool randomPosition = true)
         {
-            if (Player != null)
+            if (TsPlayer != null)
             {
                 color = color == default ? Color.White : color;
                 Random random = new();
-                Player.SendData(PacketTypes.CreateCombatTextExtended, msg, (int)color.PackedValue, Player.X + (randomPosition ? random.Next(-75, 75) : 0), Player.Y + (randomPosition ? random.Next(-50, 50) : 0));
+                TsPlayer.SendData(PacketTypes.CreateCombatTextExtended, msg, (int)color.PackedValue, TsPlayer.X + (randomPosition ? random.Next(-75, 75) : 0), TsPlayer.Y + (randomPosition ? random.Next(-50, 50) : 0));
             }
         }
         public void SendCombatMessage(string msg, Point p, Color color = default)
         {
-            if (Player != null)
+            if (TsPlayer != null)
             {
                 color = color == default ? Color.White : color;
-                Player.SendData(PacketTypes.CreateCombatTextExtended, msg, (int)color.PackedValue, p.X, p.Y);
+                TsPlayer.SendData(PacketTypes.CreateCombatTextExtended, msg, (int)color.PackedValue, p.X, p.Y);
             }
         }
         public void SendSuccessEX(object text)
         {
-            Player.SendEX(text, new Color(120, 194, 96));
+            TsPlayer.SendEX(text, new Color(120, 194, 96));
         }
 
         public void SendInfoEX(object text)
         {
-            Player.SendEX(text, new Color(216, 212, 82));
+            TsPlayer.SendEX(text, new Color(216, 212, 82));
         }
         public void SendErrorEX(object text)
         {
-            Player.SendEX(text, new Color(195, 83, 83));
+            TsPlayer.SendEX(text, new Color(195, 83, 83));
         }
         public void SendEX(object text, Color color = default)
         {
-            Player.SendEX(text, color);
+            TsPlayer.SendEX(text, color);
         }
         #endregion
     }

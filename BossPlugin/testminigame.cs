@@ -69,8 +69,8 @@ public class BackGammon : IMiniGame
     /// <param name="creator">创建者</param>
     public void Init(BPlayer creator = null)
     {
-        var x = creator.Player.TileX - (WIDTH / 2);
-        var y = creator.Player.TileY - (HEIGHT / 2);
+        var x = creator.TsPlayer.TileX - (WIDTH / 2);
+        var y = creator.TsPlayer.TileY - (HEIGHT / 2);
         FakePanel = FakeProviderAPI.CreateTileProvider(PanelID, x, y, WIDTH, HEIGHT + TITLE_HEIGHT);
         BGPanel = TUI.Create(new Panel(PanelID, x, y, WIDTH, HEIGHT + TITLE_HEIGHT, new UIConfiguration() { Permission = "boss.panel.move" }, null, FakePanel));
         VisualContainer node = BGPanel.Add(new VisualContainer(0, 10, 40, 40, null, new ContainerStyle
@@ -290,12 +290,12 @@ public class BackGammon : IMiniGame
             if (k == Kind.White)
             {
                 White.SendCombatMessage("现在是你的回合");
-                NetMessage.PlayNetSound(new NetMessage.NetSoundInfo(White.Player.TPlayer.position, 112, -1, 0.62f), White.Player.Index);
+                NetMessage.PlayNetSound(new NetMessage.NetSoundInfo(White.TsPlayer.TPlayer.position, 112, -1, 0.62f), White.TsPlayer.Index);
             }
             else
             {
                 Black.SendCombatMessage("现在是你的回合");
-                NetMessage.PlayNetSound(new NetMessage.NetSoundInfo(White.Player.TPlayer.position, 112, -1, 0.62f), White.Player.Index);
+                NetMessage.PlayNetSound(new NetMessage.NetSoundInfo(White.TsPlayer.TPlayer.position, 112, -1, 0.62f), White.TsPlayer.Index);
             }
             NowKindLabel.UpdateTileColor(k == Kind.Black ? PaintID.BlackPaint : PaintID.WhitePaint);
         }
@@ -534,7 +534,7 @@ public class BackGammon : IMiniGame
         }
         if (plr != null)
         {
-            int num = Projectile.NewProjectile(Projectile.GetNoneSource(), plr.Player.TPlayer.position.X, plr.Player.TPlayer.position.Y - 64f, 0f, -8f, 167, 0, 0f, 255, 0f, 0f);
+            int num = Projectile.NewProjectile(Projectile.GetNoneSource(), plr.TsPlayer.TPlayer.position.X, plr.TsPlayer.TPlayer.position.Y - 64f, 0f, -8f, 167, 0, 0f, 255, 0f, 0f);
             Main.projectile[num].Kill();
         }
         ResetPanel();

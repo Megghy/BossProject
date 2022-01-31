@@ -28,4 +28,7 @@
       <HintPath>..\Lib\TrProtocol.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="BHooks\" />
+  </ItemGroup>
 </Project>

@@ -10,7 +10,7 @@ namespace BossPlugin.BNet.PacketHandlers
 
         public override bool OnGetPacket(BPlayer plr, PlayerDeathV2 packet)
         {
-            if (plr.Player.TPlayer.hostile)
+            if (plr.TsPlayer.TPlayer.hostile)
             {
                 return true;
             }

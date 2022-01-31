@@ -12,7 +12,7 @@ namespace BossPlugin.BNet.HookHandlers
             if (tsPlr != null && tsPlr.Account is { } account)
             {
                 var bPlr = DB.DBTools.GetSingle<BPlayer>(account.ID.ToString());
-                bPlr.Player = tsPlr;
+                bPlr.TsPlayer = tsPlr;
                 tsPlr.SetData("BossPlugin.BPlayer", bPlr);
                 BCore.MiniGameManager.CreateGame(new BackGammon()).Join(bPlr);
                 
