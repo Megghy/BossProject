@@ -1239,10 +1239,10 @@ namespace TShockAPI
 				var account = TShock.UserAccounts.GetUserAccountByName(username);
 				if (account != null)
 				{
-					DateTime LastSeen;
-					string Timezone = TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).Hours.ToString("+#;-#");
 
-					if (DateTime.TryParse(account.LastAccessed, out LastSeen))
+                    string Timezone = TimeZoneInfo.GetSystemTimeZones().FirstOrDefault()?.GetUtcOffset(DateTime.Now).Hours.ToString("+#;-#");
+
+                    if (DateTime.TryParse(account.LastAccessed, out DateTime LastSeen))
 					{
 						LastSeen = DateTime.Parse(account.LastAccessed).ToLocalTime();
 						args.Player.SendSuccessMessage("{0}'s last login occurred {1} {2} UTC{3}.", account.Name, LastSeen.ToShortDateString(),
@@ -1985,7 +1985,7 @@ namespace TShockAPI
 			args.Player.SendInfoMessage("An update check has been queued.");
 			try
 			{
-				TShock.UpdateManager.UpdateCheckAsync(null);
+				TShock.UpdateManager.UpdateCheckAsync(null).Wait();
 			}
 			catch (Exception)
 			{

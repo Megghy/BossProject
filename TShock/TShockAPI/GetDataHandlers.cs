@@ -3693,7 +3693,7 @@ namespace TShockAPI
 			int type = 0;
 			bool isNPC = type == 1;
 			int extraInfo = -1;
-			bool getPositionFromTarget = false;
+			//bool getPositionFromTarget = false;
 
 			if (flag[0])
 			{
@@ -3705,7 +3705,7 @@ namespace TShockAPI
 			}
 			if (flag[2])
 			{
-				getPositionFromTarget = true;
+				//getPositionFromTarget = true;
 			}
 			if (flag[3])
 			{

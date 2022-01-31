@@ -474,7 +474,7 @@ namespace TerrariaApi.Server
 							Guid guid = new Guid();
 							if (Guid.TryParse(Encoding.Default.GetString(uuid, 0, uuid.Length), out guid))
 							{
-								SHA512 shaM = new SHA512Managed();
+								SHA512 shaM = SHA512.Create();
 								var result = shaM.ComputeHash(uuid);
 								Netplay.Clients[buffer.whoAmI].ClientUUID = result.Aggregate("", (s, b) => s + b.ToString("X2"));
 								return true;

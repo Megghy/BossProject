@@ -42,7 +42,7 @@ namespace Rests
 		public Dictionary<string, TokenData> Tokens { get; protected set; }
 		public Dictionary<string, TokenData> AppTokens { get; protected set; }
 
-		private RNGCryptoServiceProvider _rng = new RNGCryptoServiceProvider();
+		private RandomNumberGenerator _rng = RandomNumberGenerator.Create();
 
 		public SecureRest(IPAddress ip, int port)
 			: base(ip, port)
