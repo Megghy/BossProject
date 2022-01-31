@@ -20,8 +20,11 @@ jobs:
       run: dotnet restore
     - name: Build
       run: |
-        dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true --self-contained false
+        dotnet publish BossServer -c Release -r win-x64 -p:PublishSingleFile=true --self-contained false
     - uses: actions/upload-artifact@v2
       with:
         name: BossServer
         path: ./BossServer/bin/Release/net6.0/publish/win-x64/TerrariaServer.exe
+    - name: Push generated package to GitHub registry
+      run: |
+        dotnet nuget push ./BossServer/bin/Release/*.nupkg -s "github" --skip-duplicate -n true
