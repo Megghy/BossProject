@@ -3,7 +3,7 @@ name: Publish Server
 on:
   push:
     paths:
-      .github/BossServer/**
+      BossServer/**
 
 jobs:
   build:
