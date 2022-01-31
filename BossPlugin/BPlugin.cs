@@ -64,7 +64,7 @@ namespace BossPlugin
 
             ServerApi.Hooks.NetGreetPlayer.Register(this, BNet.HookHandlers.PlayerGreetHandler.OnGreetPlayer);
 
-            Hooks.MessageBuffer.GetData += BNet.PacketHandler.OnGetPacket;
+            Hooks.Net.ReceiveData += BNet.PacketHandler.OnGetPacket;
         }
         #endregion
     }

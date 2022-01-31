@@ -5,12 +5,6 @@ VisualStudioVersion = 17.1.32113.165
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BossPlugin", "BossPlugin\BossPlugin.csproj", "{F102EB6A-D757-4F60-A2C1-29DC045A2396}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TShockAPI", "TShock\TShockAPI\TShockAPI.csproj", "{2144ADBE-90F1-4320-B9C0-328639056588}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerrariaServerAPI", "TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaServerAPI.csproj", "{C36BA668-D060-4C11-AA72-8A574BA2B721}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TShockLauncher", "TShock\TShockLauncher\TShockLauncher.csproj", "{44822149-50A1-405E-B7DA-E9F3F2D525A4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,30 +21,6 @@ Global
 		{F102EB6A-D757-4F60-A2C1-29DC045A2396}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F102EB6A-D757-4F60-A2C1-29DC045A2396}.Release|x86.ActiveCfg = Release|x86
 		{F102EB6A-D757-4F60-A2C1-29DC045A2396}.Release|x86.Build.0 = Release|x86
-		{2144ADBE-90F1-4320-B9C0-328639056588}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2144ADBE-90F1-4320-B9C0-328639056588}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2144ADBE-90F1-4320-B9C0-328639056588}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{2144ADBE-90F1-4320-B9C0-328639056588}.Debug|x86.Build.0 = Debug|Any CPU
-		{2144ADBE-90F1-4320-B9C0-328639056588}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2144ADBE-90F1-4320-B9C0-328639056588}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2144ADBE-90F1-4320-B9C0-328639056588}.Release|x86.ActiveCfg = Release|Any CPU
-		{2144ADBE-90F1-4320-B9C0-328639056588}.Release|x86.Build.0 = Release|Any CPU
-		{C36BA668-D060-4C11-AA72-8A574BA2B721}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C36BA668-D060-4C11-AA72-8A574BA2B721}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C36BA668-D060-4C11-AA72-8A574BA2B721}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C36BA668-D060-4C11-AA72-8A574BA2B721}.Debug|x86.Build.0 = Debug|Any CPU
-		{C36BA668-D060-4C11-AA72-8A574BA2B721}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C36BA668-D060-4C11-AA72-8A574BA2B721}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C36BA668-D060-4C11-AA72-8A574BA2B721}.Release|x86.ActiveCfg = Release|Any CPU
-		{C36BA668-D060-4C11-AA72-8A574BA2B721}.Release|x86.Build.0 = Release|Any CPU
-		{44822149-50A1-405E-B7DA-E9F3F2D525A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{44822149-50A1-405E-B7DA-E9F3F2D525A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{44822149-50A1-405E-B7DA-E9F3F2D525A4}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{44822149-50A1-405E-B7DA-E9F3F2D525A4}.Debug|x86.Build.0 = Debug|Any CPU
-		{44822149-50A1-405E-B7DA-E9F3F2D525A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{44822149-50A1-405E-B7DA-E9F3F2D525A4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{44822149-50A1-405E-B7DA-E9F3F2D525A4}.Release|x86.ActiveCfg = Release|Any CPU
-		{44822149-50A1-405E-B7DA-E9F3F2D525A4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
