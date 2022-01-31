@@ -23,11 +23,5 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: BossServer
-        path: ./BossServer/bin/Release/net6.0/publish/win-x64/TerrariaServer.exe
-    - name: Add private GitHub registry to NuGet
-      run: |
-        dotnet nuget add source --username Megghy --password ${{secrets.GHKEY}} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/Megghy/index.json"
-    - name: Push generated package to GitHub registry
-      run: |
-        dotnet nuget push ./BossServer/bin/Release/*.nupkg -s "github" --skip-duplicate -n true
-        otnet nuget push ./BossServer/bin/Release/*.nupkg -s https://api.nuget.org/v3/index.json -n true --skip-duplicate -k ${{secrets.NUGETKEY}}
+        path: ./BossServer/bin/Release/net6.0/win-x64/publish/**
+          
