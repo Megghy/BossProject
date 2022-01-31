@@ -29,23 +29,25 @@ namespace BossPlugin.BNet
                                     (IPacketHandler)Activator.CreateInstance(t, Array.Empty<object>()));
                         });
         }
-        public static HookResult OnGetPacket(MessageBuffer buffer, ref byte packetId, ref int readOffset, ref int start, ref int length)
+        public static void OnGetPacket(object? sender, Hooks.MessageBuffer.GetDataEventArgs args)
         {
-            if (Netplay.Clients[buffer.whoAmI].State < 10 && packetId == 22)
-                return HookResult.Cancel; //很怪
-            if (Handlers.TryGetValue((PacketTypes)packetId, out var handler))
+            if (Netplay.Clients[args.Instance.whoAmI].State < 10 && args.PacketId == 22)
+            {
+                args.Result = HookResult.Cancel;
+                return; //很怪
+            }
+            if (Handlers.TryGetValue((PacketTypes)args.PacketId, out var handler))
             {
                 try
                 {
-                    buffer.reader.BaseStream.Position = start - 2;
-                    return handler.GetPacket(TShock.Players[buffer.whoAmI]?.GetBPlayer(), Serializer.Deserialize(buffer.reader)) ? HookResult.Cancel : HookResult.Continue;
+                    args.Instance.reader.BaseStream.Position = args.Start - 2;
+                    args.Result = handler.GetPacket(TShock.Players[args.Instance.whoAmI]?.GetBPlayer(), Serializer.Deserialize(args.Instance.reader)) ? HookResult.Cancel : HookResult.Continue;
                 }
                 catch (Exception ex)
                 {
                     BLog.Error($"数据包处理失败{Environment.NewLine}{ex}");
                 }
             }
-            return HookResult.Continue;
         }
     }
 }
