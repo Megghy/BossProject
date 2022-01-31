@@ -2,9 +2,8 @@ name: Publish Server
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    paths:
+      .github/BossServer/**
 
 jobs:
   build:
