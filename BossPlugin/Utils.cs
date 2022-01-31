@@ -1,13 +1,13 @@
 ﻿using BossPlugin.BModels;
 using BossPlugin.BNet;
-using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.GameContent.Events;
+using TerrariaUI.Base;
+using TerrariaUI.Widgets;
 using TrProtocol;
-using TrProtocol.Models;
 using TrProtocol.Packets;
 using TShockAPI;
 using BitsByte = TrProtocol.Models.BitsByte;

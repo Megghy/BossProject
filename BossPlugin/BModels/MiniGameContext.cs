@@ -32,7 +32,7 @@ namespace BossPlugin.BModels
         #region 方法
         public bool Join(BPlayer plr)
         {
-            if(Game.Join(plr))
+            if (Game.Join(plr))
             {
                 Players.Add(plr);
                 plr.PlayingGame = this;
@@ -43,12 +43,12 @@ namespace BossPlugin.BModels
         }
         public void Leave(BPlayer plr)
         {
-            if(Players.Contains(plr))
+            if (Players.Contains(plr))
             {
                 Players.Remove(plr);
                 plr.PlayingGame = null;
                 Game.Leave(plr);
-            }    
+            }
         }
         public override string ToString()
         {

@@ -1,9 +1,7 @@
-﻿using System;
-
-namespace AlternativeCommandExecution.ShortCommand
+﻿namespace AlternativeCommandExecution.ShortCommand
 {
-	public sealed class LackOfArgumentException : Exception
-	{
-		public LackOfArgumentException(string msg) : base(msg) { }
-	}
+    public sealed class LackOfArgumentException : Exception
+    {
+        public LackOfArgumentException(string msg) : base(msg) { }
+    }
 }

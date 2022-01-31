@@ -32,17 +32,21 @@ namespace BossPlugin.BNet
                                     (IPacketHandler)Activator.CreateInstance(t, Array.Empty<object>()));
                         });
         }
-        public static HookResult OnGetPacket(MessageBuffer buffer, ref byte packetId, ref int readOffset, ref int start, ref int length)
+        public static void OnGetData(object sender, Hooks.MessageBuffer.GetDataEventArgs args)
         {
-            if (Netplay.Clients[buffer.whoAmI].State < 10 && packetId == 22)
-                return HookResult.Cancel; //很怪
-            var plr = TShock.Players[buffer.whoAmI]?.GetBPlayer();
-            if (Handlers.TryGetValue((PacketTypes)packetId, out var handler))
+            if (Netplay.Clients[args.Instance.whoAmI].State < 10 && args.PacketId == 22)
+            {
+                args.Result = HookResult.Cancel; //很怪
+                return;
+            }
+            var type = (PacketTypes)args.PacketId;
+            var plr = TShock.Players[args.Instance.whoAmI]?.GetBPlayer();
+            if (Handlers.TryGetValue(type, out var handler))
             {
                 try
                 {
-                    buffer.reader.BaseStream.Position = start - 2;
-                    return handler.GetPacket(plr, Serializer.Deserialize(buffer.reader)) ? HookResult.Cancel : HookResult.Continue;
+                    args.Instance.reader.BaseStream.Position = args.Start - 2;
+                    args.Result = handler.GetPacket(plr, Serializer.Deserialize(args.Instance.reader)) ? HookResult.Cancel : HookResult.Continue;
                 }
                 catch (Exception ex)
                 {
@@ -51,10 +55,9 @@ namespace BossPlugin.BNet
             }
             else
             {
-                buffer.reader.BaseStream.Position = start - 2;
-                return OnGetPacket(plr, (PacketTypes)packetId, buffer.reader) ? HookResult.Cancel : HookResult.Continue;
+                args.Instance.reader.BaseStream.Position = args.Start - 2;
+                args.Result = OnGetPacket(plr, type, args.Instance.reader) ? HookResult.Cancel : HookResult.Continue;
             }
-            return HookResult.Continue;
         }
 
         private readonly static Dictionary<PacketTypes, List<Action<PacketEventArgs>>> SendPacketHandlers = new();

@@ -7,13 +7,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BossPlugin", "BossPlugin\Bo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BossServer", "BossServer\BossServer.csproj", "{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldEdit", "WorldEdit\WorldEdit.csproj", "{7F3A8B7C-AC77-424C-BB5A-ED99F24BEAE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldEdit", "WorldEdit\WorldEdit.csproj", "{7F3A8B7C-AC77-424C-BB5A-ED99F24BEAE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlternativeCommandExecution", "AlternativeCommandExecution\AlternativeCommandExecution.csproj", "{F7578C4B-36C1-476E-A849-67613685BAD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlternativeCommandExecution", "AlternativeCommandExecution\AlternativeCommandExecution.csproj", "{F7578C4B-36C1-476E-A849-67613685BAD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Philosophyz", "Philosophyz\Philosophyz.csproj", "{7540BB88-32BB-45A2-9612-76363C3F6206}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Philosophyz", "Philosophyz\Philosophyz.csproj", "{7540BB88-32BB-45A2-9612-76363C3F6206}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chameleon", "Chameleon\Chameleon.csproj", "{1A7949DF-9D9E-459C-A2FE-3D2347634B97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chameleon", "Chameleon\Chameleon.csproj", "{1A7949DF-9D9E-459C-A2FE-3D2347634B97}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TUI", "TUI\TUI.csproj", "{480A6CCD-FD46-4BAB-9CBF-6E3D5084B7C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeProvider", "FakeProvider\FakeProvider.csproj", "{83069944-386A-4616-9234-B223D759F919}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +75,22 @@ Global
 		{1A7949DF-9D9E-459C-A2FE-3D2347634B97}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1A7949DF-9D9E-459C-A2FE-3D2347634B97}.Release|x86.ActiveCfg = Release|Any CPU
 		{1A7949DF-9D9E-459C-A2FE-3D2347634B97}.Release|x86.Build.0 = Release|Any CPU
+		{480A6CCD-FD46-4BAB-9CBF-6E3D5084B7C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{480A6CCD-FD46-4BAB-9CBF-6E3D5084B7C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{480A6CCD-FD46-4BAB-9CBF-6E3D5084B7C8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{480A6CCD-FD46-4BAB-9CBF-6E3D5084B7C8}.Debug|x86.Build.0 = Debug|Any CPU
+		{480A6CCD-FD46-4BAB-9CBF-6E3D5084B7C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{480A6CCD-FD46-4BAB-9CBF-6E3D5084B7C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{480A6CCD-FD46-4BAB-9CBF-6E3D5084B7C8}.Release|x86.ActiveCfg = Release|Any CPU
+		{480A6CCD-FD46-4BAB-9CBF-6E3D5084B7C8}.Release|x86.Build.0 = Release|Any CPU
+		{83069944-386A-4616-9234-B223D759F919}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83069944-386A-4616-9234-B223D759F919}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83069944-386A-4616-9234-B223D759F919}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{83069944-386A-4616-9234-B223D759F919}.Debug|x86.Build.0 = Debug|Any CPU
+		{83069944-386A-4616-9234-B223D759F919}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83069944-386A-4616-9234-B223D759F919}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83069944-386A-4616-9234-B223D759F919}.Release|x86.ActiveCfg = Release|Any CPU
+		{83069944-386A-4616-9234-B223D759F919}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

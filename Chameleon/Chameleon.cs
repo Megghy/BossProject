@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
-using System.IO.Streams;
-using System.Linq;
+﻿using System.IO.Streams;
 using System.Reflection;
-using OTAPI;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
@@ -40,7 +36,7 @@ namespace Chameleon
 
         public override void Initialize()
         {
-            Hooks.Console.WriteLine += OnWriteLine;
+            //Hooks.Console.WriteLine += OnWriteLine;
 
             ServerApi.Hooks.NetGetData.Register(this, OnGetData, 9999);
             ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInit, 9999);
@@ -49,16 +45,16 @@ namespace Chameleon
             GeneralHooks.ReloadEvent += ReloadConfig;
         }
 
-        private HookResult OnWriteLine(ConsoleHookArgs value)
+        /*private HookResult OnWriteLine(ConsoleHookArgs value)
         {
             return value.Arg1?.ToString().Contains(_clientWasBooted) == true ? HookResult.Cancel : HookResult.Continue;
-        }
+        }*/
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                Hooks.Console.WriteLine -= OnWriteLine;
+                //Hooks.con.WriteLine -= OnWriteLine;
 
                 ServerApi.Hooks.NetGetData.Deregister(this, OnGetData);
                 ServerApi.Hooks.GamePostInitialize.Deregister(this, OnPostInit);

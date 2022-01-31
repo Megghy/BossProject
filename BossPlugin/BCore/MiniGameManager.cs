@@ -43,7 +43,7 @@ namespace BossPlugin.BCore
         /// <returns>没有则为null</returns>
         public static IMiniGame TryFindByName(string name)
         {
-            return Games.FirstOrDefault(g => g.Names.Any(n =>n .ToLower() == name.ToLower() || n.StartsWith(name)));
+            return Games.FirstOrDefault(g => g.Names.Any(n => n.ToLower() == name.ToLower() || n.StartsWith(name)));
         }
         public static MiniGameContext CreateGame(IMiniGame game, BPlayer creator = null)
         {

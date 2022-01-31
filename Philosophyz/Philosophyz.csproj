@@ -16,5 +16,7 @@
       <HintPath>..\Lib\TrProtocol.dll</HintPath>
     </Reference>
   </ItemGroup>
-
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="copy /Y $(TargetPath) $(SolutionDir)Output\" />
+	</Target>
 </Project>

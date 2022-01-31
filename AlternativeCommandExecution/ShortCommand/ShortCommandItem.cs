@@ -1,11 +1,11 @@
 ﻿namespace AlternativeCommandExecution.ShortCommand
 {
-	public sealed class ShortCommandItem
-	{
-		public string ParameterDescription = string.Empty;
+    public sealed class ShortCommandItem
+    {
+        public string ParameterDescription = string.Empty;
 
-		public string[] CommandLines;
+        public string[] CommandLines;
 
-		public string[] Names;
-	}
+        public string[] Names;
+    }
 }

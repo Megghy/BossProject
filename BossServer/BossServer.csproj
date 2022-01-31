@@ -36,5 +36,8 @@
 	  <Reference Include="HttpServer">
 	    <HintPath>..\Lib\HttpServer.dll</HintPath>
 	  </Reference>
+	  <Reference Include="TrProtocol">
+	    <HintPath>..\Lib\TrProtocol.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 </Project>

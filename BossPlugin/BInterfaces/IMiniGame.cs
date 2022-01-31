@@ -1,5 +1,4 @@
 ﻿using BossPlugin.BModels;
-using System.Collections.Generic;
 
 namespace BossPlugin.BInterfaces
 {

@@ -15,7 +15,7 @@ namespace BossPlugin.BNet.HookHandlers
                 bPlr.TsPlayer = tsPlr;
                 tsPlr.SetData("BossPlugin.BPlayer", bPlr);
                 BCore.MiniGameManager.CreateGame(new BackGammon()).Join(bPlr);
-                
+
             }
         }
     }

@@ -2,13 +2,13 @@
 
 namespace AlternativeCommandExecution.ShortCommand
 {
-	public sealed class CommandExectionContext
-	{
-		public TSPlayer Player { get; }
+    public sealed class CommandExectionContext
+    {
+        public TSPlayer Player { get; }
 
-		public CommandExectionContext(TSPlayer player)
-		{
-			Player = player;
-		}
-	}
+        public CommandExectionContext(TSPlayer player)
+        {
+            Player = player;
+        }
+    }
 }

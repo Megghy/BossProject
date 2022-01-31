@@ -13,7 +13,7 @@
     <OutputPath>bin\x86\Release\</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy /Y $(TargetPath) D:\TShock4.5.0_Terraria1.4.2.1\ServerPlugins</PostBuildEvent>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CS-Script" Version="4.3.0" />
@@ -22,6 +22,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BossServer\BossServer.csproj" />
+    <ProjectReference Include="..\FakeProvider\FakeProvider.csproj" />
+    <ProjectReference Include="..\TUI\TUI.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="TrProtocol">
@@ -31,4 +33,7 @@
   <ItemGroup>
     <Folder Include="BHooks\" />
   </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy /Y $(TargetPath) $(SolutionDir)Output\" />
+  </Target>
 </Project>
