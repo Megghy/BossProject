@@ -24,7 +24,4 @@
       <HintPath>..\Lib\TrProtocol.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TShock\TShockAPI\TShockAPI.csproj" />
-  </ItemGroup>
 </Project>
