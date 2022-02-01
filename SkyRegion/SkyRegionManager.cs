@@ -1,5 +1,5 @@
-﻿using System.Data;
-using MySqlConnector;
+﻿using MySqlConnector;
+using System.Data;
 using Terraria;
 using TShockAPI;
 using TShockAPI.DB;

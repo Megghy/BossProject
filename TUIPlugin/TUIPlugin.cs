@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using Microsoft.Xna.Framework;
 using System.Timers;
 using Terraria;
 using Terraria.ID;
 using TerrariaApi.Server;
-using TShockAPI;
+using TerrariaUI;
 using TerrariaUI.Base;
 using TerrariaUI.Hooks.Args;
-using TerrariaUI;
 using TerrariaUI.Widgets;
-using Microsoft.Xna.Framework;
+using TShockAPI;
 using TShockAPI.Hooks;
-using OTAPI;
 using Timer = System.Timers.Timer;
 
 namespace TUIPlugin
@@ -417,7 +412,7 @@ namespace TUIPlugin
 
             // Yes, we are converting HashSet<int> to NetworkText to pass it to NetMessage.SendData for FakeManager...
             Terraria.Localization.NetworkText playerList = FakesEnabled
-                ? Terraria.Localization.NetworkText.FromLiteral(string.Concat(players.Select(p => (char) p)))
+                ? Terraria.Localization.NetworkText.FromLiteral(string.Concat(players.Select(p => (char)p)))
                 : null;
 
             if (args.Width * args.Height >= 2500 || args.DrawWithSection)
@@ -870,378 +865,378 @@ namespace TUIPlugin
             {
                 case "tp":
                 case "teleport":
-                {
-                    if (args.Parameters.Count != 2)
                     {
-                        args.Player.SendErrorMessage("/tui tp \"interface name\"");
-                        return;
-                    }
-                    if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
-                        return;
+                        if (args.Parameters.Count != 2)
+                        {
+                            args.Player.SendErrorMessage("/tui tp \"interface name\"");
+                            return;
+                        }
+                        if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
+                            return;
 
-                    args.Player.Teleport((root.X + root.Width / 2) * 16,
-                        (root.Y + root.Height / 2) * 16);
-                    args.Player.SendSuccessMessage($"Teleported to interface '{root.Name}'.");
-                    break;
-                }
+                        args.Player.Teleport((root.X + root.Width / 2) * 16,
+                            (root.Y + root.Height / 2) * 16);
+                        args.Player.SendSuccessMessage($"Teleported to interface '{root.Name}'.");
+                        break;
+                    }
                 case "tphere":
                 case "teleporthere":
-                {
-                    if (args.Parameters.Count < 2
-                        || args.Parameters.Count > 3)
                     {
-                        args.Player.SendErrorMessage("/tui tphere \"interface name\" [-confirm]");
-                        return;
-                    }
-                    if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
-                        return;
+                        if (args.Parameters.Count < 2
+                            || args.Parameters.Count > 3)
+                        {
+                            args.Player.SendErrorMessage("/tui tphere \"interface name\" [-confirm]");
+                            return;
+                        }
+                        if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
+                            return;
 
-                    if (root.UsesDefaultMainProvider
-                        && args.Parameters.Last().ToLower() != "-confirm")
-                    {
-                        args.Player.SendErrorMessage($"Interface '{root.Name}' is drawn on main map.\n" +
-                            $"Type '/tui tphere \"{root.Name}\" -confirm' " +
-                            "to confirm the interface transfer.");
-                        return;
-                    }
+                        if (root.UsesDefaultMainProvider
+                            && args.Parameters.Last().ToLower() != "-confirm")
+                        {
+                            args.Player.SendErrorMessage($"Interface '{root.Name}' is drawn on main map.\n" +
+                                $"Type '/tui tphere \"{root.Name}\" -confirm' " +
+                                "to confirm the interface transfer.");
+                            return;
+                        }
 
-                    int x = args.Player.TileX - root.Width / 2;
-                    int y = args.Player.TileY - root.Height / 2;
-                    root.SetXY(x, y, true);
-                    args.Player.SendSuccessMessage($"Moved interface '{root.Name}' successfully.");
-                    break;
-                }
+                        int x = args.Player.TileX - root.Width / 2;
+                        int y = args.Player.TileY - root.Height / 2;
+                        root.SetXY(x, y, true);
+                        args.Player.SendSuccessMessage($"Moved interface '{root.Name}' successfully.");
+                        break;
+                    }
                 case "e":
                 case "en":
                 case "enable":
-                {
-                    if (args.Parameters.Count < 2
-                        || args.Parameters.Count > 3)
                     {
-                        args.Player.SendErrorMessage("/tui enable \"interface name\" [-confirm]");
-                        return;
-                    }
-                    if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
-                        return;
+                        if (args.Parameters.Count < 2
+                            || args.Parameters.Count > 3)
+                        {
+                            args.Player.SendErrorMessage("/tui enable \"interface name\" [-confirm]");
+                            return;
+                        }
+                        if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
+                            return;
 
-                    if (root.UsesDefaultMainProvider
-                        && args.Parameters.Last().ToLower() != "-confirm")
-                    {
-                        args.Player.SendErrorMessage($"Interface '{root.Name}' will be drawn on main map.\n" +
-                            $"Type '/tui enable \"{root.Name}\" -confirm' " +
-                            "to confirm the interface activation.");
-                        return;
-                    }
+                        if (root.UsesDefaultMainProvider
+                            && args.Parameters.Last().ToLower() != "-confirm")
+                        {
+                            args.Player.SendErrorMessage($"Interface '{root.Name}' will be drawn on main map.\n" +
+                                $"Type '/tui enable \"{root.Name}\" -confirm' " +
+                                "to confirm the interface activation.");
+                            return;
+                        }
 
-                    root.Enable(true);
-                    if (root is Panel panel)
-                        panel.SavePanel();
-                    args.Player.SendSuccessMessage($"Enabled interface '{root.Name}'.");
-                    break;
-                }
+                        root.Enable(true);
+                        if (root is Panel panel)
+                            panel.SavePanel();
+                        args.Player.SendSuccessMessage($"Enabled interface '{root.Name}'.");
+                        break;
+                    }
                 case "d":
                 case "dis":
                 case "disable":
-                {
-                    if (args.Parameters.Count < 2
-                        || args.Parameters.Count > 3)
                     {
-                        args.Player.SendErrorMessage("/tui disable \"interface name\"");
-                        return;
-                    }
-                    if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
-                        return;
+                        if (args.Parameters.Count < 2
+                            || args.Parameters.Count > 3)
+                        {
+                            args.Player.SendErrorMessage("/tui disable \"interface name\"");
+                            return;
+                        }
+                        if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
+                            return;
 
-                    root.Disable(true);
-                    if (root is Panel panel)
-                        panel.SavePanel();
-                    args.Player.SendSuccessMessage($"Disabled interface '{root.Name}'.");
-                    break;
-                }
+                        root.Disable(true);
+                        if (root is Panel panel)
+                            panel.SavePanel();
+                        args.Player.SendSuccessMessage($"Disabled interface '{root.Name}'.");
+                        break;
+                    }
                 case "i":
                 case "info":
-                {
-                    if (args.Parameters.Count != 2)
                     {
-                        args.Player.SendErrorMessage("/tui info \"interface name\"");
-                        return;
-                    }
-                    if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
-                        return;
+                        if (args.Parameters.Count != 2)
+                        {
+                            args.Player.SendErrorMessage("/tui info \"interface name\"");
+                            return;
+                        }
+                        if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
+                            return;
 
-                    string provider_text = root.Provider is MainTileProvider
-                            ? nameof(MainTileProvider)
-                            : $"{root.Provider.Name} ({root.Provider.GetType().Name})";
-                    args.Player.SendInfoMessage(
-$@"Interface '{root.Name}'
+                        string provider_text = root.Provider is MainTileProvider
+                                ? nameof(MainTileProvider)
+                                : $"{root.Provider.Name} ({root.Provider.GetType().Name})";
+                        args.Player.SendInfoMessage(
+    $@"Interface '{root.Name}'
 Position and size: {root.XYWH()}
 Enabled: {root.Enabled}
 Tile provider: {provider_text}
 Layer: {root.Layer}
 Observers: {(root.Observers != null ? string.Join(",", root.Observers.Where(observer => TShock.Players[observer]?.Active == true)
-    .Select(observer => TShock.Players[observer]?.Name)) : "all")}
+        .Select(observer => TShock.Players[observer]?.Name)) : "all")}
 Draw state: {root.DrawState}");
-                    break;
-                }
+                        break;
+                    }
                 case "xywh":
-                {
-                    if (args.Parameters.Count != 4 && args.Parameters.Count != 6)
                     {
-                        args.Player.SendErrorMessage("/tui xywh \"interface name\" <x> <y> [<width> <height>]");
-                        return;
-                    }
-                    if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
-                        return;
+                        if (args.Parameters.Count != 4 && args.Parameters.Count != 6)
+                        {
+                            args.Player.SendErrorMessage("/tui xywh \"interface name\" <x> <y> [<width> <height>]");
+                            return;
+                        }
+                        if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
+                            return;
 
-                    if (!int.TryParse(args.Parameters[2], out int x)
-                        || !int.TryParse(args.Parameters[3], out int y)
-                        || x < 0 || y < 0 || x >= Main.maxTilesX || y >= Main.maxTilesY)
-                    {
-                        args.Player.SendErrorMessage("Invalid coordinates " +
-                            $"'{args.Parameters[2]},{args.Parameters[3]}'.");
-                        return;
-                    }
+                        if (!int.TryParse(args.Parameters[2], out int x)
+                            || !int.TryParse(args.Parameters[3], out int y)
+                            || x < 0 || y < 0 || x >= Main.maxTilesX || y >= Main.maxTilesY)
+                        {
+                            args.Player.SendErrorMessage("Invalid coordinates " +
+                                $"'{args.Parameters[2]},{args.Parameters[3]}'.");
+                            return;
+                        }
 
-                    int width = root.Width;
-                    int height = root.Height;
-                    if (args.Parameters.Count == 6
-                        && (!int.TryParse(args.Parameters[4], out width)
-                        || !int.TryParse(args.Parameters[5], out height)
-                        || width < 0 || x + width >= Main.maxTilesX
-                        || height < 0 || y + height >= Main.maxTilesY))
-                    {
-                        args.Player.SendErrorMessage("Invalid size " +
-                            $"'{args.Parameters[4]},{args.Parameters[5]}'.");
-                        return;
-                    }
+                        int width = root.Width;
+                        int height = root.Height;
+                        if (args.Parameters.Count == 6
+                            && (!int.TryParse(args.Parameters[4], out width)
+                            || !int.TryParse(args.Parameters[5], out height)
+                            || width < 0 || x + width >= Main.maxTilesX
+                            || height < 0 || y + height >= Main.maxTilesY))
+                        {
+                            args.Player.SendErrorMessage("Invalid size " +
+                                $"'{args.Parameters[4]},{args.Parameters[5]}'.");
+                            return;
+                        }
 
-                    root.SetXYWH(x, y, width, height, true);
-                    args.Player.SendSuccessMessage("Set position and size " +
-                        $"of interface '{root.Name}' to {root.XYWH()}.");
-                    break;
-                }
+                        root.SetXYWH(x, y, width, height, true);
+                        args.Player.SendSuccessMessage("Set position and size " +
+                            $"of interface '{root.Name}' to {root.XYWH()}.");
+                        break;
+                    }
                 case "reset":
-                {
-                    if (args.Parameters.Count != 2)
                     {
-                        args.Player.SendErrorMessage("/tui reset \"interface name\"");
-                        return;
-                    }
-                    if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
-                        return;
+                        if (args.Parameters.Count != 2)
+                        {
+                            args.Player.SendErrorMessage("/tui reset \"interface name\"");
+                            return;
+                        }
+                        if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
+                            return;
 
-                    root.Pulse(PulseType.Reset);
-                    if (root is Panel panel)
-                    {
-                        panel.HidePopUp();
-                        panel.UnsummonAll();
-                    }
+                        root.Pulse(PulseType.Reset);
+                        if (root is Panel panel)
+                        {
+                            panel.HidePopUp();
+                            panel.UnsummonAll();
+                        }
 
-                    args.Player.SendSuccessMessage($"Interface '{root.Name}' was reset.");
-                    break;
-                }
+                        args.Player.SendSuccessMessage($"Interface '{root.Name}' was reset.");
+                        break;
+                    }
                 case "del":
                 case "destroy":
                 case "delete":
                 case "rm":
                 case "remove":
-                {
-                    if (args.Parameters.Count != 3)
                     {
-                        args.Player.SendErrorMessage("/tui remove \"interface name\" -confirm");
-                        return;
-                    }
-                    if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
-                        return;
-
-                    TUI.Destroy(root);
-
-                    args.Player.SendSuccessMessage($"Interface '{root.Name}' was destroyed.");
-                    break;
-                }
-                case "app":
-                case "application":
-                {
-                    if (args.Parameters.Count < 2)
-                    {
-                        args.Player.SendErrorMessage("/tui app <add/remove> \"app name\"");
-                        args.Player.SendErrorMessage("/tui app list");
-                        return;
-                    }
-                    switch (args.Parameters[1].ToLower())
-                    {
-                        case "add":
+                        if (args.Parameters.Count != 3)
                         {
-                            if (args.Parameters.Count != 3)
-                            {
-                                args.Player.SendErrorMessage("/tui app add \"app name\"");
-                                return;
-                            }
-                            if (!FindAppType(args.Parameters[2], args.Player, out ApplicationType appType))
-                                return;
+                            args.Player.SendErrorMessage("/tui remove \"interface name\" -confirm");
+                            return;
+                        }
+                        if (!FindRoot(args.Parameters[1], args.Player, out RootVisualObject root))
+                            return;
 
-                            appType.CreateInstance(args.Player.TileX, args.Player.TileY);
-                            args.Player.SendSuccessMessage($"Created new app instance: {appType.Name}");
-                            break;
-                        }
-                        case "private":
-                        {
-                            if (args.Parameters.Count != 3)
-                            {
-                                args.Player.SendErrorMessage("/tui app private \"app name\"");
-                                return;
-                            }
-                            if (!FindAppType(args.Parameters[2], args.Player, out ApplicationType appType))
-                                return;
+                        TUI.Destroy(root);
 
-                            appType.CreateInstance(args.Player.TileX, args.Player.TileY,
-                                new HashSet<int>() { args.Player.Index });
-                            args.Player.SendSuccessMessage($"Created new private app instance: {appType.Name}");
-                            break;
-                        }
-                        case "remove":
-                        {
-                            if (args.Parameters.Count < 3 || args.Parameters.Count > 4)
-                            {
-                                args.Player.SendErrorMessage("/tui app remove \"app name\" [<index>/all]");
-                                return;
-                            }
-                            if (!FindAppType(args.Parameters[2], args.Player, out ApplicationType appType))
-                                return;
-
-                            if (args.Parameters.Count == 3)
-                            {
-                                if (!appType.TryDestroy(args.Player.TileX, args.Player.TileY, out string name))
-                                    args.Player.SendErrorMessage($"There are not app instances of type '{appType.Name}' at this point.");
-                                else
-                                    args.Player.SendSuccessMessage($"Removed app instance: {name}.");
-                            }
-                            else
-                            {
-                                if (args.Parameters[3].ToLower() == "all")
-                                {
-                                    appType.DestroyAll();
-                                    args.Player.SendSuccessMessage($"Removed app instances of type '{appType.Name}'");
-                                }
-                                else if (!Int32.TryParse(args.Parameters[3], out int index))
-                                    args.Player.SendErrorMessage($"Invalid index: {args.Parameters[3]}");
-                                else
-                                {
-                                    if (appType[index] is Application app)
-                                        TUI.Destroy(app);
-                                    args.Player.SendSuccessMessage($"Removed app instance of type '{appType.Name}' with index {index}");
-                                }
-                            }
-                            break;
-                        }
-                        case "list":
-                        {
-                            if (!PaginationTools.TryParsePageNumber(args.Parameters, 2, args.Player, out int page))
-                                return;
-                            List<string> lines = PaginationTools.BuildLinesFromTerms(TUI.ApplicationTypes.Values.Where(appType => appType.AllowManualRun));
-                            PaginationTools.SendPage(args.Player, page, lines, new PaginationTools.Settings()
-                            {
-                                HeaderFormat = "TUI apps ({0}/{1}):",
-                                FooterFormat = "Type '/tui app list {0}' for more.",
-                                NothingToDisplayString = "There are no TUI apps yet."
-                            });
-                            break;
-                        }
-                        default:
-                        {
-                            args.Player.SendInfoMessage("/tui app <add/remove> \"app name\"");
-                            args.Player.SendInfoMessage("/tui app list");
-                            break;
-                        }
-                    }
-                    break;
-                }
-                case "l":
-                case "list":
-                {
-                    if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out int page))
-                        return;
-                    List<string> lines = PaginationTools.BuildLinesFromTerms(TUI.Roots);
-                    PaginationTools.SendPage(args.Player, page, lines, new PaginationTools.Settings()
-                    {
-                        HeaderFormat = "TUI interfaces ({0}/{1}):",
-                        FooterFormat = "Type '/tui list {0}' for more.",
-                        NothingToDisplayString = "There are no TUI interfaces yet."
-                    });
-                    break;
-                }
-                case "debug":
-                {
-                    if (args.Parameters.Count == 1)
-                    {
-                        TUI.TouchedDebug = TUI.PulseDebug = TUI.UpdateDebug = TUI.ApplyDebug = TUI.DrawDebug = !TUI.TouchedDebug;
-                        args.Player.SendSuccessMessage($"Debug mode for ALL {(TUI.DrawDebug ? "enabled" : "disabled")}");
+                        args.Player.SendSuccessMessage($"Interface '{root.Name}' was destroyed.");
                         break;
                     }
-                    switch (args.Parameters[1].ToLower())
+                case "app":
+                case "application":
                     {
-                        case "touch":
-                        case "touched":
+                        if (args.Parameters.Count < 2)
                         {
-                            TUI.TouchedDebug = !TUI.TouchedDebug;
-                            args.Player.SendSuccessMessage($"Debug mode for TOUCHED {(TUI.TouchedDebug ? "enabled" : "disabled")}.");
-                            break;
+                            args.Player.SendErrorMessage("/tui app <add/remove> \"app name\"");
+                            args.Player.SendErrorMessage("/tui app list");
+                            return;
                         }
-                        case "pulse":
+                        switch (args.Parameters[1].ToLower())
                         {
-                            TUI.PulseDebug = !TUI.PulseDebug;
-                            args.Player.SendSuccessMessage($"Debug mode for PULSE {(TUI.PulseDebug ? "enabled" : "disabled")}.");
-                            break;
+                            case "add":
+                                {
+                                    if (args.Parameters.Count != 3)
+                                    {
+                                        args.Player.SendErrorMessage("/tui app add \"app name\"");
+                                        return;
+                                    }
+                                    if (!FindAppType(args.Parameters[2], args.Player, out ApplicationType appType))
+                                        return;
+
+                                    appType.CreateInstance(args.Player.TileX, args.Player.TileY);
+                                    args.Player.SendSuccessMessage($"Created new app instance: {appType.Name}");
+                                    break;
+                                }
+                            case "private":
+                                {
+                                    if (args.Parameters.Count != 3)
+                                    {
+                                        args.Player.SendErrorMessage("/tui app private \"app name\"");
+                                        return;
+                                    }
+                                    if (!FindAppType(args.Parameters[2], args.Player, out ApplicationType appType))
+                                        return;
+
+                                    appType.CreateInstance(args.Player.TileX, args.Player.TileY,
+                                        new HashSet<int>() { args.Player.Index });
+                                    args.Player.SendSuccessMessage($"Created new private app instance: {appType.Name}");
+                                    break;
+                                }
+                            case "remove":
+                                {
+                                    if (args.Parameters.Count < 3 || args.Parameters.Count > 4)
+                                    {
+                                        args.Player.SendErrorMessage("/tui app remove \"app name\" [<index>/all]");
+                                        return;
+                                    }
+                                    if (!FindAppType(args.Parameters[2], args.Player, out ApplicationType appType))
+                                        return;
+
+                                    if (args.Parameters.Count == 3)
+                                    {
+                                        if (!appType.TryDestroy(args.Player.TileX, args.Player.TileY, out string name))
+                                            args.Player.SendErrorMessage($"There are not app instances of type '{appType.Name}' at this point.");
+                                        else
+                                            args.Player.SendSuccessMessage($"Removed app instance: {name}.");
+                                    }
+                                    else
+                                    {
+                                        if (args.Parameters[3].ToLower() == "all")
+                                        {
+                                            appType.DestroyAll();
+                                            args.Player.SendSuccessMessage($"Removed app instances of type '{appType.Name}'");
+                                        }
+                                        else if (!Int32.TryParse(args.Parameters[3], out int index))
+                                            args.Player.SendErrorMessage($"Invalid index: {args.Parameters[3]}");
+                                        else
+                                        {
+                                            if (appType[index] is Application app)
+                                                TUI.Destroy(app);
+                                            args.Player.SendSuccessMessage($"Removed app instance of type '{appType.Name}' with index {index}");
+                                        }
+                                    }
+                                    break;
+                                }
+                            case "list":
+                                {
+                                    if (!PaginationTools.TryParsePageNumber(args.Parameters, 2, args.Player, out int page))
+                                        return;
+                                    List<string> lines = PaginationTools.BuildLinesFromTerms(TUI.ApplicationTypes.Values.Where(appType => appType.AllowManualRun));
+                                    PaginationTools.SendPage(args.Player, page, lines, new PaginationTools.Settings()
+                                    {
+                                        HeaderFormat = "TUI apps ({0}/{1}):",
+                                        FooterFormat = "Type '/tui app list {0}' for more.",
+                                        NothingToDisplayString = "There are no TUI apps yet."
+                                    });
+                                    break;
+                                }
+                            default:
+                                {
+                                    args.Player.SendInfoMessage("/tui app <add/remove> \"app name\"");
+                                    args.Player.SendInfoMessage("/tui app list");
+                                    break;
+                                }
                         }
-                        case "update":
+                        break;
+                    }
+                case "l":
+                case "list":
+                    {
+                        if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out int page))
+                            return;
+                        List<string> lines = PaginationTools.BuildLinesFromTerms(TUI.Roots);
+                        PaginationTools.SendPage(args.Player, page, lines, new PaginationTools.Settings()
                         {
-                            TUI.UpdateDebug = !TUI.UpdateDebug;
-                            args.Player.SendSuccessMessage($"Debug mode for UPDATE {(TUI.UpdateDebug ? "enabled" : "disabled")}.");
-                            break;
-                        }
-                        case "apply":
-                        {
-                            TUI.ApplyDebug = !TUI.ApplyDebug;
-                            args.Player.SendSuccessMessage($"Debug mode for APPLY {(TUI.ApplyDebug ? "enabled" : "disabled")}.");
-                            break;
-                        }
-                        case "draw":
-                        {
-                            TUI.DrawDebug = !TUI.DrawDebug;
-                            args.Player.SendSuccessMessage($"Debug mode for DRAW {(TUI.DrawDebug ? "enabled" : "disabled")}.");
-                            break;
-                        }
-                        case "all":
+                            HeaderFormat = "TUI interfaces ({0}/{1}):",
+                            FooterFormat = "Type '/tui list {0}' for more.",
+                            NothingToDisplayString = "There are no TUI interfaces yet."
+                        });
+                        break;
+                    }
+                case "debug":
+                    {
+                        if (args.Parameters.Count == 1)
                         {
                             TUI.TouchedDebug = TUI.PulseDebug = TUI.UpdateDebug = TUI.ApplyDebug = TUI.DrawDebug = !TUI.TouchedDebug;
-                            args.Player.SendSuccessMessage($"Debug mode for ALL {(TUI.TouchedDebug ? "enabled" : "disabled")}");
+                            args.Player.SendSuccessMessage($"Debug mode for ALL {(TUI.DrawDebug ? "enabled" : "disabled")}");
                             break;
                         }
-                        default:
+                        switch (args.Parameters[1].ToLower())
                         {
-                            args.Player.SendErrorMessage("Debug mode available for: PULSE, UPDATE, APPLY, DRAW");
-                            break;
+                            case "touch":
+                            case "touched":
+                                {
+                                    TUI.TouchedDebug = !TUI.TouchedDebug;
+                                    args.Player.SendSuccessMessage($"Debug mode for TOUCHED {(TUI.TouchedDebug ? "enabled" : "disabled")}.");
+                                    break;
+                                }
+                            case "pulse":
+                                {
+                                    TUI.PulseDebug = !TUI.PulseDebug;
+                                    args.Player.SendSuccessMessage($"Debug mode for PULSE {(TUI.PulseDebug ? "enabled" : "disabled")}.");
+                                    break;
+                                }
+                            case "update":
+                                {
+                                    TUI.UpdateDebug = !TUI.UpdateDebug;
+                                    args.Player.SendSuccessMessage($"Debug mode for UPDATE {(TUI.UpdateDebug ? "enabled" : "disabled")}.");
+                                    break;
+                                }
+                            case "apply":
+                                {
+                                    TUI.ApplyDebug = !TUI.ApplyDebug;
+                                    args.Player.SendSuccessMessage($"Debug mode for APPLY {(TUI.ApplyDebug ? "enabled" : "disabled")}.");
+                                    break;
+                                }
+                            case "draw":
+                                {
+                                    TUI.DrawDebug = !TUI.DrawDebug;
+                                    args.Player.SendSuccessMessage($"Debug mode for DRAW {(TUI.DrawDebug ? "enabled" : "disabled")}.");
+                                    break;
+                                }
+                            case "all":
+                                {
+                                    TUI.TouchedDebug = TUI.PulseDebug = TUI.UpdateDebug = TUI.ApplyDebug = TUI.DrawDebug = !TUI.TouchedDebug;
+                                    args.Player.SendSuccessMessage($"Debug mode for ALL {(TUI.TouchedDebug ? "enabled" : "disabled")}");
+                                    break;
+                                }
+                            default:
+                                {
+                                    args.Player.SendErrorMessage("Debug mode available for: PULSE, UPDATE, APPLY, DRAW");
+                                    break;
+                                }
                         }
+                        break;
                     }
-                    break;
-                }
                 default:
-                {
-                    args.Player.SendSuccessMessage("/tui subcommands:");
-                    args.Player.SendInfoMessage("/tui info \"interface name\"");
-                    args.Player.SendInfoMessage("/tui xywh \"interface name\" <x> <y> [<width> <height>]");
-                    args.Player.SendInfoMessage("/tui tp \"interface name\"");
-                    args.Player.SendInfoMessage("/tui tphere \"interface name\" [-confirm]");
-                    args.Player.SendInfoMessage("/tui enable \"interface name\" [-confirm]");
-                    args.Player.SendInfoMessage("/tui disable \"interface name\"");
-                    args.Player.SendInfoMessage("/tui reset \"interface name\"");
-                    args.Player.SendInfoMessage("/tui remove \"interface name\" -confirm");
-                    args.Player.SendInfoMessage("/tui app <add/remove> \"app name\"");
-                    args.Player.SendInfoMessage("/tui app list");
-                    args.Player.SendInfoMessage("/tui list [page]");
-                    //args.Player.SendInfoMessage("/tui debug <mode>");
-                    break;
-                }
+                    {
+                        args.Player.SendSuccessMessage("/tui subcommands:");
+                        args.Player.SendInfoMessage("/tui info \"interface name\"");
+                        args.Player.SendInfoMessage("/tui xywh \"interface name\" <x> <y> [<width> <height>]");
+                        args.Player.SendInfoMessage("/tui tp \"interface name\"");
+                        args.Player.SendInfoMessage("/tui tphere \"interface name\" [-confirm]");
+                        args.Player.SendInfoMessage("/tui enable \"interface name\" [-confirm]");
+                        args.Player.SendInfoMessage("/tui disable \"interface name\"");
+                        args.Player.SendInfoMessage("/tui reset \"interface name\"");
+                        args.Player.SendInfoMessage("/tui remove \"interface name\" -confirm");
+                        args.Player.SendInfoMessage("/tui app <add/remove> \"app name\"");
+                        args.Player.SendInfoMessage("/tui app list");
+                        args.Player.SendInfoMessage("/tui list [page]");
+                        //args.Player.SendInfoMessage("/tui debug <mode>");
+                        break;
+                    }
             }
         }
 

@@ -1,12 +1,10 @@
 ﻿using BossPlugin.BAttributes;
-using OTAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
-using TShockAPI.Hooks;
 
 namespace BossPlugin
 {
@@ -56,16 +54,6 @@ namespace BossPlugin
                 }
             });
             BLog.Success($"BossPlugin 加载完成");
-        }
-        [AutoInit("挂载所有Hook")]
-        private void HandleHooks()
-        {
-            GeneralHooks.ReloadEvent += BHooks.HookHandlers.ReloadHandler.OnReload;
-
-            ServerApi.Hooks.NetGreetPlayer.Register(this, BHooks.HookHandlers.PlayerGreetHandler.OnGreetPlayer);
-            ServerApi.Hooks.ServerLeave.Register(this, BHooks.HookHandlers.PlayerLeaveHandler.OnPlayerLeave);
-
-            ServerApi.Hooks.NetGetData.Register(this, BNet.PacketHandler.OnGetData);
         }
         #endregion
     }

@@ -72,9 +72,10 @@ namespace AlternativeCommandExecution
                     int wait = sc.WaitTime;
                     if (!sc.IgnorePermission)
                     {
-                        if ( wait > 0)
+                        if (wait > 0)
                         {
-                            Task.Run(() => {
+                            Task.Run(() =>
+                            {
                                 foreach (string text in commandArr)
                                 {
                                     string command = text;
@@ -93,13 +94,14 @@ namespace AlternativeCommandExecution
                                 ShortCommand.ShortCommandUtil.HandleCommand(player, command);
                             }
                         }
-                        
+
                     }
                     else
                     {
                         if (wait > 0)
                         {
-                            Task.Run(() => {
+                            Task.Run(() =>
+                            {
                                 foreach (string text in commandArr)
                                 {
                                     string command = text;

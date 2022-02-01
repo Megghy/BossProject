@@ -27,8 +27,8 @@ namespace Chameleon
              " \r\n         看完下面的再点确定",
              " 1. 请再次加入 \r\n ",
              " 2. 在\"服务器密码\"中输入自己的密码, 以后加服时输入这个密码即可."
-            
-  
+
+
     };
 
         public void Write(string path)

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria;
-
-namespace FakeProvider
+﻿namespace FakeProvider
 {
     public class ObserversEqualityComparer : IEqualityComparer<IEnumerable<TileProvider>>
     {

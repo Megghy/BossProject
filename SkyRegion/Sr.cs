@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using OTAPI;
+﻿using OTAPI;
+using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;

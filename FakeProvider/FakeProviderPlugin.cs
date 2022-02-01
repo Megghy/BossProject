@@ -1,6 +1,5 @@
 ﻿#region Using
 using Microsoft.Xna.Framework;
-using OTAPI;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -164,7 +163,7 @@ namespace FakeProvider
             args.Handled = true;
             if (FastWorldLoad)
                 LoadWorldFast();
-            else 
+            else
                 LoadWorldDirect();
             OnPostLoadWorld();
             TerrariaApi.Server.Hooking.WorldHooks._hookManager.InvokePostWorldLoad();

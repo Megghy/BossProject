@@ -3,7 +3,7 @@
     "TerrariaServerAPI": {
       "commandName": "Project"
     },
-    "Boss": {
+    "Boss_Megghy": {
       "commandName": "Executable",
       "executablePath": "D:\\Code\\BossPlugin\\Output\\TerrariaServer.exe",
       "commandLineArgs": "-language zh-Hans -ip 127.0.0.1 -port 7777 -maxplayers 8 -world C:/Users/Megghy/Documents/My Games/Terraria/Worlds/茑萝地表.wld",

@@ -1,9 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using MySqlConnector;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using TerrariaUI;
 using TShockAPI;
 using TShockAPI.DB;

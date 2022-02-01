@@ -80,7 +80,7 @@ namespace AlternativeCommandExecution.SwitchCommand
                 {
                     while (reader != null && reader.Read())
                     {
-                        time =  reader.Get<int>("WAIT");
+                        time = reader.Get<int>("WAIT");
                     }
                 }
             }
@@ -88,7 +88,7 @@ namespace AlternativeCommandExecution.SwitchCommand
             {
                 TShock.Log.Error(ex.ToString());
             }
-            return time;    
+            return time;
         }
 
         public void Add(int x, int y, string command)
@@ -116,14 +116,14 @@ namespace AlternativeCommandExecution.SwitchCommand
             }
         }
 
-        public void wait(int x, int y ,string sec)
+        public void wait(int x, int y, string sec)
         {
             var sc = SwitchCmds.FirstOrDefault(s => s.X == x && s.Y == y);
             sc.WaitTime = int.Parse(sec);
             try
             {
                 _database.Query("UPDATE SwitchCommands SET wait=@0 WHERE X=@1 AND Y=@2 AND WorldId=@3;",
-                    int.Parse(sec),x, y, Main.worldID);
+                    int.Parse(sec), x, y, Main.worldID);
             }
             catch (Exception ex)
             {
@@ -199,7 +199,7 @@ namespace AlternativeCommandExecution.SwitchCommand
             try
             {
                 _database.Query("UPDATE SwitchCommands SET Command=@0, IgnorePermission=@1, WaitTime=@2,AllPlayerCdSecond=@3 WHERE X=@4 AND Y=@5 AND WorldId=@6",
-                    cmd.Command, cmd.IgnorePermission ? 1 : 0, cmd.WaitTime,cmd.AllPlayerCdSecond, cmd.X, cmd.Y, Main.worldID);
+                    cmd.Command, cmd.IgnorePermission ? 1 : 0, cmd.WaitTime, cmd.AllPlayerCdSecond, cmd.X, cmd.Y, Main.worldID);
             }
             catch (Exception ex)
             {

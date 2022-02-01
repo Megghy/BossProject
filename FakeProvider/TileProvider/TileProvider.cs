@@ -1,8 +1,5 @@
 ﻿#region Using
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Tile_Entities;
@@ -469,7 +466,7 @@ namespace FakeProvider
                     ? AddEntity(chest)
                     : Entity is TileEntity tileEntity
                         ? AddEntity(tileEntity)
-                        : throw new ArgumentException($"Unknown entity type {Entity.GetType().Name}", 
+                        : throw new ArgumentException($"Unknown entity type {Entity.GetType().Name}",
                             nameof(Entity));
 
         public FakeSign AddEntity(Sign Entity, bool replace = false)
