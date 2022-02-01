@@ -68,12 +68,57 @@ namespace AlternativeCommandExecution
                 }
                 try
                 {
+                    string[] commandArr = sc.Command.Split(';');
+                    int wait = sc.WaitTime;
                     if (!sc.IgnorePermission)
                     {
-                        ShortCommand.ShortCommandUtil.HandleCommand(player, sc.Command);
+                        if ( wait > 0)
+                        {
+                            Task.Run(() => {
+                                foreach (string text in commandArr)
+                                {
+                                    string command = text;
+                                    if (command.Contains("@player")) { command = command.Replace("@player", player.Name); }
+                                    ShortCommand.ShortCommandUtil.HandleCommand(player, command);
+                                    Task.Delay(wait).Wait();
+                                }
+                            });
+                        }
+                        else
+                        {
+                            foreach (string text in commandArr)
+                            {
+                                string command = text;
+                                if (command.Contains("@player")) { command = command.Replace("@player", player.Name); }
+                                ShortCommand.ShortCommandUtil.HandleCommand(player, command);
+                            }
+                        }
+                        
                     }
                     else
-                        ShortCommand.ShortCommandUtil.HandleCommandIgnorePermission(player, sc.Command);
+                    {
+                        if (wait > 0)
+                        {
+                            Task.Run(() => {
+                                foreach (string text in commandArr)
+                                {
+                                    string command = text;
+                                    if (command.Contains("@player")) { command = command.Replace("@player", player.Name); }
+                                    ShortCommand.ShortCommandUtil.HandleCommand(player, command);
+                                    Task.Delay(wait).Wait();
+                                }
+                            });
+                        }
+                        else
+                        {
+                            foreach (string text in commandArr)
+                            {
+                                string command = text;
+                                if (command.Contains("@player")) { command = command.Replace("@player", player.Name); }
+                                ShortCommand.ShortCommandUtil.HandleCommand(player, command);
+                            }
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
@@ -107,6 +152,22 @@ namespace AlternativeCommandExecution
                     };
                     args.Player.SendInfoMessage("触发一个开关/压力板以设定其开关指令状态。");
                     break;
+                case "WAIT":
+                    if (empty)
+                    {
+                        args.Player.SendErrorMessage("语法无效！正确语法：/sc wait <ms>");
+                        return;
+                    }
+
+                    info.WaitingSelection = true;
+                    info.Ss += (i, j) =>
+                    {
+                        Scs.wait(i, j, sec);
+                        args.Player.SendSuccessMessage("设定选中开关延迟：{0} ms", sec);
+                    };
+                    args.Player.SendInfoMessage("触发一个开关/压力板以设定其开关指令状态。");
+                    break;
+
                 case "DEL":
                     info.WaitingSelection = true;
                     info.Ss += (i, j) =>
@@ -189,6 +250,7 @@ namespace AlternativeCommandExecution
                         {
                             args.Player.SendInfoMessage("执行指令：{0}", string.Join(" ", sc.Command));
                             args.Player.SendInfoMessage("全局冷却：{0}秒", sc.AllPlayerCdSecond);
+                            args.Player.SendInfoMessage("指令间隔：{0}ms", sc.WaitTime);
                             args.Player.SendInfoMessage("跳过权限：{0}", sc.IgnorePermission ? "开" : "关");
                         }
                     };
@@ -208,6 +270,7 @@ namespace AlternativeCommandExecution
                     {
                         "add <指令> - 设定某开关的指令状态",
                         "del - 删除某开关的指令状态",
+                         "wait <ms> - 设定某开关的指令之间的间隔",
                         "ignore <true/false> - 是否跳过权限执行",
                         "allcd <冷却时间秒> - 设置开关全局冷却时间",
                         "info - 查看某开关的指令状态",
