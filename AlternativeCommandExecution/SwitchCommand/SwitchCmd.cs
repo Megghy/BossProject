@@ -15,6 +15,8 @@ namespace AlternativeCommandExecution.SwitchCommand
 
         public int AllPlayerCdSecond;
 
+        public int WaitTime;
+
         private int _currentCd;
 
         public void Tick()
@@ -46,7 +48,8 @@ namespace AlternativeCommandExecution.SwitchCommand
                 X = reader.Get<int>("X"),
                 Y = reader.Get<int>("Y"),
                 IgnorePermission = reader.Get<int>("IgnorePermission") > 0,
-                AllPlayerCdSecond = reader.Get<int>("AllPlayerCdSecond")
+                AllPlayerCdSecond = reader.Get<int>("AllPlayerCdSecond"),
+                WaitTime = reader.Get<int>("Wait")
             };
         }
     }
