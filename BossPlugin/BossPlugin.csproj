@@ -14,10 +14,12 @@
   </PropertyGroup>
   <PropertyGroup>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CS-Script" Version="4.3.0" />
-    <PackageReference Include="linq2db.MySql" Version="4.0.0-preview.9-fixed" />
+    <PackageReference Include="linq2db.MySqlConnector" Version="4.0.0-preview.9-fixed" />
+    <PackageReference Include="linq2db.SQLite.MS" Version="4.0.0-preview.10" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BossServer\BossServer.csproj" />
@@ -30,12 +32,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="BHooks\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y $(TargetPath) $(SolutionDir)Output\" />
-  </Target>
+  <ItemGroup>
+    <Folder Include="BHooks\" />
+  </ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)OutPut\ServerPlugins\" />
+	</Target>
 </Project>

@@ -6,6 +6,6 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="copy /Y $(TargetPath) $(SolutionDir)Output\" />
+		<Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)OutPut\ServerPlugins\" />
 	</Target>
 </Project>

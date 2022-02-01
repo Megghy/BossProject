@@ -1,8 +1,8 @@
+using Microsoft.Data.Sqlite;
 using Microsoft.Xna.Framework;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using System.Collections.Concurrent;
 using System.Data;
-using System.Data.SQLite;
 using System.Reflection;
 using System.Text;
 using Terraria;
@@ -515,7 +515,7 @@ namespace WorldEdit
                     break;
                 case "sqlite":
                     string sql = Path.Combine(TShock.SavePath, "worldedit.sqlite");
-                    Database = new SQLiteConnection(string.Format("uri=file://{0},Version=3", sql));
+                    Database = new SqliteConnection(string.Format("uri=file://{0},Version=3", sql));
                     break;
             }
 

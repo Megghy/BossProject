@@ -1086,7 +1086,7 @@ namespace TerrariaApi.Server
 
         public bool InvokeServerChat(MessageBuffer buffer, int who, string text, Terraria.Chat.ChatCommandId commandId)
         {
-            ServerChatEventArgs args = new ServerChatEventArgs
+            ServerChatEventArgs args = new()
             {
                 Buffer = buffer,
                 Who = who,
@@ -1094,7 +1094,7 @@ namespace TerrariaApi.Server
                 CommandId = commandId
             };
 
-            this.ServerChat.Invoke(args);
+            ServerChat.Invoke(args);
             return args.Handled;
         }
         #endregion

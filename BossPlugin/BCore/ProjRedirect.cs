@@ -11,7 +11,7 @@ namespace BossPlugin.BCore
     {
         public static bool OnProjCreate(BPlayer plr, SyncProjectile proj)
         {
-            if (plr.TsPlayer.CurrentRegion is { } region)
+            if (plr?.TsPlayer?.CurrentRegion is { } region)
             {
                 BInfo.OnlinePlayers.Where(p => p != plr && p.TsPlayer.CurrentRegion == region)
                     .ForEach(p => p.SendPacket(proj));

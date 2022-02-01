@@ -3,11 +3,11 @@
     "TerrariaServerAPI": {
       "commandName": "Project"
     },
-    "boss": {
+    "Boss": {
       "commandName": "Executable",
-      "executablePath": "D:\\BossServer\\TerrariaServer.exe",
+      "executablePath": "D:\\Code\\BossPlugin\\OutPut\\TerrariaServer.exe",
       "commandLineArgs": "-language zh-Hans -ip 127.0.0.1 -port 7777 -maxplayers 8 -world C:/Users/Megghy/Documents/My Games/Terraria/Worlds/亚东考核——威力.wld",
-      "workingDirectory": "D:\\BossServer\\"
+      "workingDirectory": "D:\\Code\\BossPlugin\\OutPut\\"
     }
   }
 }

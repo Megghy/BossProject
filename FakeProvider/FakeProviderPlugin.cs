@@ -35,7 +35,6 @@ namespace FakeProvider
         public override string Description => "TODO";
         public override Version Version => Assembly.GetExecutingAssembly().GetName().Version;
         internal static int[] AllPlayers;
-        internal static Func<RemoteClient, byte[], int, int, bool> NetSendBytes;
         private static long LoadWorldSize;
         public static string Debug;
 
@@ -45,9 +44,8 @@ namespace FakeProvider
         public static int VisibleHeight { get; private set; }
         public static bool FastWorldLoad { get; private set; }
 
-        internal static List<TileProvider> ProvidersToAdd = new List<TileProvider>();
+        internal static List<TileProvider> ProvidersToAdd = new();
         internal static bool ProvidersLoaded = false;
-        private static FieldInfo StatusTextField;
         public static Command[] CommandList = new Command[]
         {
             new Command("FakeProvider.Control", FakeCommand, "fake")
@@ -123,8 +121,6 @@ namespace FakeProvider
 
             // WARNING: has not been heavily tested
             FastWorldLoad = args.Any(x => (x.ToLower() == "-fastworldload"));
-
-            StatusTextField = typeof(Main).GetField("statusText", BindingFlags.NonPublic | BindingFlags.Static);
         }
 
         #endregion
@@ -132,11 +128,6 @@ namespace FakeProvider
 
         public override void Initialize()
         {
-            NetSendBytes = (Func<RemoteClient, byte[], int, int, bool>)Delegate.CreateDelegate(
-                typeof(Func<RemoteClient, byte[], int, int, bool>),
-                ServerApi.Hooks,
-                ServerApi.Hooks.GetType().GetMethod("InvokeNetSendBytes", BindingFlags.NonPublic | BindingFlags.Instance));
-
             AllPlayers = new int[Main.maxPlayers];
             for (int i = 0; i < Main.maxPlayers; i++)
                 AllPlayers[i] = i;
@@ -295,7 +286,7 @@ namespace FakeProvider
             foreach (RemoteClient client in clients)
                 try
                 {
-                    if (NetSendBytes(client, data, 0, data.Length))
+                    if (ServerApi.Hooks.InvokeNetSendBytes(client, data, 0, data.Length))
                         continue;
 
                     client.Socket.AsyncSend(data, 0, data.Length,
@@ -521,7 +512,7 @@ Entities: {provider.Entities.Count}");
             {
                 StatusTextField.SetValue(null, text);
             }*/
-            StatusTextField.SetValue(null, text);
+            Main.statusText = text;
         }
 
         #endregion

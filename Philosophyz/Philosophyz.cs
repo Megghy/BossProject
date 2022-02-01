@@ -180,8 +180,8 @@ namespace Philosophyz
             if (!TShock.ServerSideCharacterConfig.Settings.Enabled)
             {
                 TShock.Log.ConsoleError("[Pz] 未开启SSC! 你可能选错了插件.");
-                Dispose(true);
-                throw new NotSupportedException("该插件不支持非SSC模式运行!");
+                //Dispose(true);
+                //throw new NotSupportedException("该插件不支持非SSC模式运行!");
             }
 
             Commands.ChatCommands.Add(new Command("pz.admin.manage", PzCmd, "pz") { AllowServer = false });
