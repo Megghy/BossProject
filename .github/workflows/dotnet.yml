@@ -19,9 +19,9 @@ jobs:
       run: dotnet restore
     - name: Build
       run:
-        dotnet publish BossServer -c Release -r win-x64 -p:PublishSingleFile=true --self-contained false
+        dotnet build
     - uses: actions/upload-artifact@v2
       with:
         name: BossServer
-        path: ./BossServer/bin/Release/net6.0/win-x64/publish/**
+        path: ./Output/**
           
