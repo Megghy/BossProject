@@ -38,6 +38,6 @@
     <Folder Include="BHooks\" />
   </ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)OutPut\ServerPlugins\" />
+		<Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)Output\ServerPlugins\" />
 	</Target>
 </Project>

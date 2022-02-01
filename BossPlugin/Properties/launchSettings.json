@@ -5,9 +5,9 @@
     },
     "Boss": {
       "commandName": "Executable",
-      "executablePath": "D:\\Code\\BossPlugin\\OutPut\\TerrariaServer.exe",
+      "executablePath": "D:\\Code\\BossPlugin\\Output\\TerrariaServer.exe",
       "commandLineArgs": "-language zh-Hans -ip 127.0.0.1 -port 7777 -maxplayers 8 -world C:/Users/Megghy/Documents/My Games/Terraria/Worlds/亚东考核——威力.wld",
-      "workingDirectory": "D:\\Code\\BossPlugin\\OutPut\\"
+      "workingDirectory": "D:\\Code\\BossPlugin\\Output\\"
     }
   }
 }
