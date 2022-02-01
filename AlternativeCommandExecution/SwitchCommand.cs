@@ -68,8 +68,8 @@ namespace AlternativeCommandExecution
                 }
                 try
                 {
-                        string[] commandArr = sc.Command.Split(';');
-                        int wait = Scs.getWaitTime(i, j);
+                    string[] commandArr = sc.Command.Split(';');
+                    int wait = sc.WaitTime;
                     if (!sc.IgnorePermission)
                     {
                         if ( wait > 0)
