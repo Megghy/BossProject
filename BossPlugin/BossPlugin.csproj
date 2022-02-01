@@ -17,11 +17,6 @@
     <Nullable>annotations</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CS-Script" Version="4.3.0" />
-    <PackageReference Include="linq2db.MySqlConnector" Version="4.0.0-preview.9-fixed" />
-    <PackageReference Include="linq2db.SQLite.MS" Version="4.0.0-preview.10" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\BossServer\BossServer.csproj" />
     <ProjectReference Include="..\FakeProvider\FakeProvider.csproj" />
     <ProjectReference Include="..\TUI\TUI.csproj" />

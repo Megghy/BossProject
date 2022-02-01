@@ -23,6 +23,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
+		<PackageReference Include="CS-Script" Version="4.3.0" />
+		<PackageReference Include="linq2db.MySqlConnector" Version="4.0.0-preview.9-fixed" />
+		<PackageReference Include="linq2db.SQLite.MS" Version="4.0.0-preview.10" />
 		<PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.1" />
 		<PackageReference Include="MySqlConnector" Version="2.1.5" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

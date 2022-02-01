@@ -15,6 +15,7 @@ namespace BossPlugin
         public BPlugin(Main game) : base(game)
         {
             Instance = this;
+            Order = int.MaxValue; //最后加载
         }
         public override string Name => "BossPlugin";
         public override string Author => "Megghy";
