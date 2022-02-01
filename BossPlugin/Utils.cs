@@ -55,9 +55,10 @@ namespace BossPlugin
 
         public static WorldData GetCurrentWorldData(bool? ssc = null)
         {
-            var worldInfo = new WorldData();
-
-            worldInfo.Time = (int)Main.time;
+            var worldInfo = new WorldData
+            {
+                Time = (int)Main.time
+            };
             BitsByte bb3 = 0;
             bb3[0] = Main.dayTime;
             bb3[1] = Main.bloodMoon;
@@ -88,20 +89,20 @@ namespace BossPlugin
             worldInfo.HellBackStyle = (byte)Main.hellBackStyle;
             worldInfo.WindSpeedSet = Main.windSpeedCurrent;
             worldInfo.CloudNumber = (byte)Main.numClouds;
-            worldInfo.Tree1 = Main.treeX[1];
-            worldInfo.Tree2 = Main.treeX[2];
-            worldInfo.Tree3 = Main.treeX[3];
-            worldInfo.TreeStyle1 = (byte)Main.treeStyle[1];
-            worldInfo.TreeStyle2 = (byte)Main.treeStyle[2];
-            worldInfo.TreeStyle3 = (byte)Main.treeStyle[3];
-            worldInfo.TreeStyle4 = (byte)Main.treeStyle[4];
-            worldInfo.CaveBack1 = (byte)Main.caveBackX[1];
-            worldInfo.CaveBack2 = (byte)Main.caveBackX[2];
-            worldInfo.CaveBack3 = (byte)Main.caveBackX[3];
-            worldInfo.CaveBackStyle1 = (byte)Main.caveBackStyle[1];
-            worldInfo.CaveBackStyle2 = (byte)Main.caveBackStyle[2];
-            worldInfo.CaveBackStyle3 = (byte)Main.caveBackStyle[3];
-            worldInfo.CaveBackStyle4 = (byte)Main.caveBackStyle[4];
+            worldInfo.Tree1 = Main.treeX[0];
+            worldInfo.Tree2 = Main.treeX[1];
+            worldInfo.Tree3 = Main.treeX[2];
+            worldInfo.TreeStyle1 = (byte)Main.treeStyle[0];
+            worldInfo.TreeStyle2 = (byte)Main.treeStyle[1];
+            worldInfo.TreeStyle3 = (byte)Main.treeStyle[2];
+            worldInfo.TreeStyle4 = (byte)Main.treeStyle[3];
+            worldInfo.CaveBack1 = (byte)Main.caveBackX[0];
+            worldInfo.CaveBack2 = (byte)Main.caveBackX[1];
+            worldInfo.CaveBack3 = (byte)Main.caveBackX[2];
+            worldInfo.CaveBackStyle1 = (byte)Main.caveBackStyle[0];
+            worldInfo.CaveBackStyle2 = (byte)Main.caveBackStyle[1];
+            worldInfo.CaveBackStyle3 = (byte)Main.caveBackStyle[2];
+            worldInfo.CaveBackStyle4 = (byte)Main.caveBackStyle[3];
             if (!Main.raining)
             {
                 worldInfo.Rain = 0;

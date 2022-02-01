@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -70,7 +70,7 @@ namespace TShockAPI.DB
                 );
             var creator = new SqlTableCreator(db,
                 db.GetSqlType() == SqlType.Sqlite
-                    ? (IQueryBuilder)new SqliteQueryCreator()
+                    ? new SqliteQueryCreator()
                     : new MysqlQueryCreator());
             try
             {
@@ -78,7 +78,7 @@ namespace TShockAPI.DB
             }
             catch (DllNotFoundException)
             {
-                System.Console.WriteLine("Possible problem with your database - is Sqlite3.dll present?");
+                Console.WriteLine("Possible problem with your database - is Sqlite3.dll present?");
                 throw new Exception("Could not find a database library (probably Sqlite3.dll)");
             }
 

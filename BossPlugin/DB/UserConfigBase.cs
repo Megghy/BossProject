@@ -23,8 +23,8 @@ namespace BossPlugin.DB
             {
                 return TShock.DB.GetSqlType() switch
                 {
-                    SqlType.Mysql => new MySqlDataProvider(string.Empty),
-                    SqlType.Sqlite => new SQLiteDataProvider(string.Empty),
+                    SqlType.Mysql => new MySqlDataProvider("MySqlConnector"),
+                    SqlType.Sqlite => new SQLiteDataProvider("Microsoft.Data.Sqlite"),
                     _ => null,
                 };
             }

@@ -80,7 +80,10 @@ public class BackGammon : IMiniGame
         }, null), null);
         //创建棋盘
         ISize[] Checkerboard = new ISize[BOARD_SIZE];
-        BOARD_SIZE.ForEach(i => Checkerboard[i] = new Absolute(2)); //生成棋盘内网格
+        for (int i = 0; i < BOARD_SIZE; i++)
+        {
+            Checkerboard[i] = new Absolute(2); //生成棋盘内网格
+        }
         node.SetupGrid(Checkerboard, Checkerboard);
         //创建棋盘点击事件传递
         node.Add(new VisualObject(0, 0, WIDTH, HEIGHT, new UIConfiguration() { UseBegin = true }, null, OnCheckerboardClick), null);
@@ -409,7 +412,7 @@ public class BackGammon : IMiniGame
                 return;
             }
             CD = ROUND_TIME * MiniGameManager.UPDATE_PRE_SECEND; //重置倒计时
-            //判断是否胜利
+                                                                 //判断是否胜利
             Settlement(x, y);
             CountdownLabel.UpdateText(CD / MiniGameManager.UPDATE_PRE_SECEND);
             //切换下一位落子者

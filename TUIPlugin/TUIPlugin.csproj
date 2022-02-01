@@ -11,8 +11,8 @@
     <ProjectReference Include="..\TUI\TUI.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y $(TargetPath) $(SolutionDir)OutPut\" />
-  </Target>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)Output\ServerPlugins\" />
+	</Target>
 
 </Project>

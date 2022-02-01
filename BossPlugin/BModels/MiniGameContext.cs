@@ -25,7 +25,7 @@ namespace BossPlugin.BModels
         /// <summary>
         /// 游玩的玩家
         /// </summary>
-        public List<BPlayer> Players { get; }
+        public List<BPlayer> Players { get; } = new();
 
         public string Name => Game.Names.First();
 
@@ -52,7 +52,7 @@ namespace BossPlugin.BModels
         }
         public override string ToString()
         {
-            return $"{Name}:{GID}<{Players.Count}>";
+            return $"{Name}:{GID}<{Players?.Count}>";
         }
         #endregion
     }

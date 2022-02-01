@@ -1049,6 +1049,8 @@ namespace TerrariaUI.Base
             {
                 int value;
                 ISize size = sizes[i];
+                if (size == null)
+                    continue;
                 if (size.IsDynamic)
                 {
                     int max = 0;
