@@ -36,9 +36,9 @@ namespace WorldEdit
 
         public static readonly HandlerCollection<CanEditEventArgs> CanEdit;
 
-        public override string Author => "Nyx Studios, massive upgrade by Anzhelika, Megghy";
-        private readonly CancellationTokenSource _cancel = new CancellationTokenSource();
-        private readonly BlockingCollection<WECommand> _commandQueue = new BlockingCollection<WECommand>();
+        public override string Author => "Nyx Studios, massive upgrade by Anzhelika";
+        private readonly CancellationTokenSource _cancel = new();
+        private readonly BlockingCollection<WECommand> _commandQueue = new();
         public override string Description => "Adds commands for mass editing of blocks.";
         public override string Name => "WorldEdit";
         public override Version Version => Assembly.GetExecutingAssembly().GetName().Version;
@@ -239,7 +239,7 @@ namespace WorldEdit
                                         int y = Math.Min(startY, endY);
                                         int width = Math.Max(startX, endX) - x;
                                         int height = Math.Max(startY, endY) - y;
-                                        Rectangle rect = new Rectangle(x, y, width, height);
+                                        Rectangle rect = new(x, y, width, height);
                                         List<Region> regions = TShock.Regions.Regions.FindAll(r => rect.Intersects(r.Area));
                                         if (regions.Count == 0)
                                         {
@@ -580,7 +580,7 @@ namespace WorldEdit
                 }
 
                 var name = TShockAPI.Localization.EnglishLanguage.GetItemNameById(i);
-                Colors.Add(name.Substring(0, name.Length - 6).ToLowerInvariant(), item.paint);
+                Colors.Add(name[0..^6].ToLowerInvariant(), item.paint);
             }
             #endregion
             #region Selections
@@ -628,7 +628,7 @@ namespace WorldEdit
                 for (int i = 0; i < name.Length; i++)
                 {
                     if (char.IsUpper(name[i]))
-                        sb.Append(" ").Append(char.ToLower(name[i]));
+                        sb.Append(' ').Append(char.ToLower(name[i]));
                     else
                         sb.Append(name[i]);
                 }
@@ -650,7 +650,7 @@ namespace WorldEdit
                 for (int i = 0; i < name.Length; i++)
                 {
                     if (char.IsUpper(name[i]))
-                        sb.Append(" ").Append(char.ToLower(name[i]));
+                        sb.Append(' ').Append(char.ToLower(name[i]));
                     else
                         sb.Append(name[i]);
                 }
@@ -1010,7 +1010,10 @@ namespace WorldEdit
                     return;
                 }
             }
-            else { Parser.TryParseTree(new string[] { "=>", "!t" }, out expression); }
+            else
+            {
+                Parser.TryParseTree(new string[] { "=>", "!t" }, out expression);
+            }
 
             _commandQueue.Add(new Set(info.X, info.Y, info.X2, info.Y2, info.MagicWand, e.Player, tiles[0], expression));
         }
@@ -1295,8 +1298,7 @@ namespace WorldEdit
                 return;
             }
 
-            int radius;
-            if (!int.TryParse(e.Parameters[0], out radius) || radius <= 0)
+            if (!int.TryParse(e.Parameters[0], out int radius) || radius <= 0)
             {
                 e.Player.SendErrorMessage("Invalid radius '{0}'!", e.Parameters[0]);
                 return;
@@ -1590,7 +1592,7 @@ namespace WorldEdit
                         Skip++;
                     }
 
-                    List<string> InvalidFlags = new List<string>();
+                    List<string> InvalidFlags = new();
                     while ((e.Parameters.Count > Skip) && (e.Parameters[Skip] != "=>"))
                     {
                         switch (e.Parameters[Skip].ToLower())
@@ -1640,9 +1642,8 @@ namespace WorldEdit
                 return;
             }
 
-            int x, y;
-            if (!int.TryParse(e.Parameters[0], out x) || x < 0 || x >= Main.maxTilesX
-                || !int.TryParse(e.Parameters[1], out y) || y < 0 || y >= Main.maxTilesY)
+            if (!int.TryParse(e.Parameters[0], out int x) || x < 0 || x >= Main.maxTilesX
+                || !int.TryParse(e.Parameters[1], out int y) || y < 0 || y >= Main.maxTilesY)
             {
                 e.Player.SendErrorMessage("Invalid coordinates.");
                 return;
@@ -1673,9 +1674,8 @@ namespace WorldEdit
                 return;
             }
 
-            int x, y;
-            if (!int.TryParse(e.Parameters[0], out x) || x < 0 || x >= Main.maxTilesX
-                || !int.TryParse(e.Parameters[1], out y) || y < 0 || y >= Main.maxTilesY)
+            if (!int.TryParse(e.Parameters[0], out int x) || x < 0 || x >= Main.maxTilesX
+                || !int.TryParse(e.Parameters[1], out int y) || y < 0 || y >= Main.maxTilesY)
             {
                 e.Player.SendErrorMessage("Invalid coordinates '({0}, {1})'!", e.Parameters[0], e.Parameters[1]);
                 return;
@@ -1872,8 +1872,7 @@ namespace WorldEdit
                 return;
             }
 
-            int amount;
-            if (!int.TryParse(e.Parameters[1], out amount))
+            if (!int.TryParse(e.Parameters[1], out int amount))
             {
                 e.Player.SendErrorMessage("Invalid resize amount '{0}'!", e.Parameters[0]);
                 return;
@@ -1936,8 +1935,7 @@ namespace WorldEdit
                 return;
             }
 
-            int degrees;
-            if (!int.TryParse(e.Parameters[0], out degrees) || degrees % 90 != 0)
+            if (!int.TryParse(e.Parameters[0], out int degrees) || degrees % 90 != 0)
                 e.Player.SendErrorMessage("Invalid angle '{0}'!", e.Parameters[0]);
             else
                 _commandQueue.Add(new Rotate(e.Player, degrees));
@@ -2010,12 +2008,11 @@ namespace WorldEdit
                             return;
                         }
 
-                        int pageNumber;
-                        if (!PaginationTools.TryParsePageNumber(e.Parameters, 1, e.Player, out pageNumber))
+                        if (!PaginationTools.TryParsePageNumber(e.Parameters, 1, e.Player, out int pageNumber))
                             return;
 
                         var schematics = from s in Directory.EnumerateFiles(Config.SchematicFolderPath, string.Format(fileFormat, "*"))
-                                         select Path.GetFileNameWithoutExtension(s).Substring(10);
+                                         select Path.GetFileNameWithoutExtension(s)[10..];
 
                         PaginationTools.SendPage(e.Player, pageNumber, PaginationTools.BuildLinesFromTerms(schematics),
                             new PaginationTools.Settings
@@ -2395,7 +2392,7 @@ namespace WorldEdit
                 return;
             }
 
-            if (!Biomes.Keys.Contains(e.Parameters[0].ToLowerInvariant()) || (e.Parameters[0].ToLowerInvariant() == "snow"))
+            if (!Biomes.ContainsKey(e.Parameters[0].ToLowerInvariant()) || (e.Parameters[0].ToLowerInvariant() == "snow"))
             {
                 e.Player.SendErrorMessage("Invalid grass '{0}'!", e.Parameters[0]);
                 return;
@@ -2428,8 +2425,7 @@ namespace WorldEdit
                 return;
             }
 
-            int wire;
-            if (!int.TryParse(e.Parameters[0], out wire) || wire < 1 || wire > 4)
+            if (!int.TryParse(e.Parameters[0], out int wire) || wire < 1 || wire > 4)
             {
                 e.Player.SendErrorMessage("Invalid wire '{0}'!", e.Parameters[0]);
                 return;
@@ -2459,7 +2455,7 @@ namespace WorldEdit
         private void Shape(CommandArgs e)
         {
             bool wall = false, filled = false;
-            switch (e.Message.Split(' ')[0].Substring(6).ToLower())
+            switch (e.Message.Split(' ')[0][6..].ToLower())
             {
                 case "f":
                 case "fill":
@@ -2895,42 +2891,43 @@ namespace WorldEdit
                 return;
             }
 
-            int amount;
-            if (!int.TryParse(e.Parameters[1], out amount) || amount < 0)
+            if (!int.TryParse(e.Parameters[1], out int amount) || amount < 0)
             {
                 e.Player.SendErrorMessage("Invalid shift amount '{0}'!", e.Parameters[0]);
                 return;
             }
-
-            foreach (char c in e.Parameters[0].ToLowerInvariant())
+            else
             {
-                if (c == 'd')
+                foreach (char c in e.Parameters[0].ToLowerInvariant())
                 {
-                    info.Y += amount;
-                    info.Y2 += amount;
+                    if (c == 'd')
+                    {
+                        info.Y += amount;
+                        info.Y2 += amount;
+                    }
+                    else if (c == 'l')
+                    {
+                        info.X -= amount;
+                        info.X2 -= amount;
+                    }
+                    else if (c == 'r')
+                    {
+                        info.X += amount;
+                        info.X2 += amount;
+                    }
+                    else if (c == 'u')
+                    {
+                        info.Y -= amount;
+                        info.Y2 -= amount;
+                    }
+                    else
+                    {
+                        e.Player.SendErrorMessage("Invalid direction '{0}'!", c);
+                        return;
+                    }
                 }
-                else if (c == 'l')
-                {
-                    info.X -= amount;
-                    info.X2 -= amount;
-                }
-                else if (c == 'r')
-                {
-                    info.X += amount;
-                    info.X2 += amount;
-                }
-                else if (c == 'u')
-                {
-                    info.Y -= amount;
-                    info.Y2 -= amount;
-                }
-                else
-                {
-                    e.Player.SendErrorMessage("Invalid direction '{0}'!", c);
-                    return;
-                }
+                e.Player.SendSuccessMessage("Shifted selection.");
             }
-            e.Player.SendSuccessMessage("Shifted selection.");
         }
 
         private void Text(CommandArgs e)
@@ -2953,7 +2950,7 @@ namespace WorldEdit
                 return;
             }
 
-            _commandQueue.Add(new Text(info.X, info.Y, info.X2, info.Y2, e.Player, e.Message.Substring(5).TrimStart()));
+            _commandQueue.Add(new Text(info.X, info.Y, info.X2, info.Y2, e.Player, e.Message[5..].TrimStart()));
         }
 
         private void Undo(CommandArgs e)

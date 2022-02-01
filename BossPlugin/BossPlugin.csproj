@@ -18,7 +18,6 @@
   <ItemGroup>
     <PackageReference Include="CS-Script" Version="4.3.0" />
     <PackageReference Include="linq2db.MySql" Version="4.0.0-preview.9-fixed" />
-    <PackageReference Include="OTAPI.Upcoming" Version="3.0.30-alpha" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BossServer\BossServer.csproj" />

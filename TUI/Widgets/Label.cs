@@ -136,7 +136,7 @@ namespace TerrariaUI.Widgets
                 StatuePlaceStyle = new List<int>();
                 string text = Regex.Replace(RawText, ItemPattern, match =>
                 {
-                    GetPlaceStyleArgs args = new GetPlaceStyleArgs(int.Parse(match.Groups["id"].Value));
+                    GetPlaceStyleArgs args = new(int.Parse(match.Groups["id"].Value));
                     TUI.Hooks.GetPlaceStyle.Invoke(args);
                     StatuePlaceStyle.Add(args.PlaceStyle);
                     return ReservedCharacter.ToString();
@@ -240,7 +240,7 @@ namespace TerrariaUI.Widgets
                                 if (statueY < 2)
                                     tile.color(color);
                                 if (statueY == 2)
-                                    tile.color(style.TextUnderlineColor.HasValue ? style.TextUnderlineColor.Value : color);
+                                    tile.color(style.TextUnderlineColor ?? color);
                                 tile.inActive(style.InActive ?? false);
                             }
                         DrawWithSection = true;
@@ -315,11 +315,11 @@ namespace TerrariaUI.Widgets
         {
             if (width < 2)
                 return (new List<(string, int)>(), 0);
-            List<(string, int)> result = new List<(string, int)>();
+            List<(string, int)> result = new();
             int maxX = 0;
             // #result * (lineH + linesIndentation) - linesIndentation <= h
             int maxLines = (int)Math.Floor((double)(height + linesIndentation) / (lineH + linesIndentation));
-            using (StringReader reader = new StringReader(text))
+            using (StringReader reader = new(text))
             {
                 string line = string.Empty;
                 do
@@ -353,7 +353,7 @@ namespace TerrariaUI.Widgets
             {
                 if (j >= lineLen)
                 {
-                    result.Add((line.Substring(i, j - i), width));
+                    result.Add((line[i..j], width));
                     if (width > maxWidth)
                         maxWidth = width;
                     break;
@@ -421,63 +421,29 @@ namespace TerrariaUI.Widgets
 
         public static byte PaintIDByName(string name)
         {
-            switch (name.ToLower())
+            return name.ToLower() switch
             {
-                case "red":
-                case "deepred":
-                    return PaintID2.DeepRed;
-                case "orange":
-                case "deeporange":
-                    return PaintID2.DeepOrange;
-                case "yellow":
-                case "deepyellow":
-                    return PaintID2.DeepYellow;
-                case "lime":
-                case "deeplime":
-                    return PaintID2.DeepLime;
-                case "green":
-                case "deepgreen":
-                    return PaintID2.DeepGreen;
-                case "teal":
-                case "deepteal":
-                    return PaintID2.DeepTeal;
-                case "cyan":
-                case "deepcyan":
-                    return PaintID2.DeepCyan;
-                case "sky":
-                case "sky blue":
-                case "deepsky":
-                case "deep sky blue":
-                    return PaintID2.DeepSkyBlue;
-                case "blue":
-                case "deepblue":
-                    return PaintID2.DeepBlue;
-                case "purple":
-                case "deeppurple":
-                    return PaintID2.DeepPurple;
-                case "violet":
-                case "deepviolet":
-                    return PaintID2.DeepViolet;
-                case "pink":
-                case "deeppink":
-                    return PaintID2.DeepPink;
-                case "black":
-                    return PaintID2.Black;
-                case "white":
-                    return PaintID2.White;
-                case "gray":
-                    return PaintID2.Gray;
-                case "brown":
-                    return PaintID2.Brown;
-                case "shadow":
-                    return PaintID2.Shadow;
-                case "negative":
-                    return PaintID2.Negative;
-                case "illuminant":
-                    return PaintID2.Illuminant;
-                default:
-                    return PaintID2.None;
-            }
+                "red" or "deepred" => PaintID2.DeepRed,
+                "orange" or "deeporange" => PaintID2.DeepOrange,
+                "yellow" or "deepyellow" => PaintID2.DeepYellow,
+                "lime" or "deeplime" => PaintID2.DeepLime,
+                "green" or "deepgreen" => PaintID2.DeepGreen,
+                "teal" or "deepteal" => PaintID2.DeepTeal,
+                "cyan" or "deepcyan" => PaintID2.DeepCyan,
+                "sky" or "sky blue" or "deepsky" or "deep sky blue" => PaintID2.DeepSkyBlue,
+                "blue" or "deepblue" => PaintID2.DeepBlue,
+                "purple" or "deeppurple" => PaintID2.DeepPurple,
+                "violet" or "deepviolet" => PaintID2.DeepViolet,
+                "pink" or "deeppink" => PaintID2.DeepPink,
+                "black" => PaintID2.Black,
+                "white" => PaintID2.White,
+                "gray" => PaintID2.Gray,
+                "brown" => PaintID2.Brown,
+                "shadow" => PaintID2.Shadow,
+                "negative" => PaintID2.Negative,
+                "illuminant" => PaintID2.Illuminant,
+                _ => PaintID2.None,
+            };
         }
 
         #endregion

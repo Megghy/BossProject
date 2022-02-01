@@ -12,7 +12,7 @@ namespace TerrariaUI.Base
         /// <summary>
         /// Unsafe List of child objects.
         /// </summary>
-        protected List<VisualObject> _Child { get; private set; } = new List<VisualObject>();
+        protected List<VisualObject> _Child { get; private set; } = new();
         /// <summary>
         /// Safe list of child objects;
         /// </summary>
@@ -152,7 +152,7 @@ namespace TerrariaUI.Base
         {
             get
             {
-                Stack<VisualObject> stack = new Stack<VisualObject>();
+                Stack<VisualObject> stack = new();
                 VisualObject current = this as VisualObject;
                 while (current != null)
                 {
@@ -350,7 +350,7 @@ namespace TerrariaUI.Base
             where U : VisualObject
         {
             VisualObject node = Parent;
-            while (node != null && !(node is U))
+            while (node != null && node is not U)
                 node = node.Parent;
             return node as U;
         }
@@ -419,7 +419,7 @@ namespace TerrariaUI.Base
 
         public IEnumerable<VisualObject> TreeDFS(bool forward = true)
         {
-            List<VisualObject> list = new List<VisualObject>();
+            List<VisualObject> list = new();
             DFS(list, forward);
             return list;
         }
@@ -429,8 +429,10 @@ namespace TerrariaUI.Base
 
         public IEnumerable<VisualObject> TreeBFS(bool forward = true)
         {
-            List<VisualObject> list = new List<VisualObject>();
-            list.Add(this as VisualObject);
+            List<VisualObject> list = new()
+            {
+                this as VisualObject
+            };
             int index = 0;
             while (index < list.Count)
             {
@@ -693,8 +695,7 @@ namespace TerrariaUI.Base
         {
             get
             {
-                object value = null;
-                if (Shortcuts?.TryGetValue(key, out value) == true)
+                if (Shortcuts?.TryGetValue(key, out object value) == true)
                     return value;
                 return null;
             }
