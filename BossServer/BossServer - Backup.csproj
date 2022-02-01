@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<AssemblyName>TerrariaServer</AssemblyName>
+		<TargetFramework>net6.0</TargetFramework>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+		<RunPostBuildEvent>Always</RunPostBuildEvent>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>		
+		<Version>1.4.3.2-0.1.0</Version>
+		<AssemblyTitle>Terraria</AssemblyTitle>
+		<Product></Product>
+		<Company>Boss Team</Company>
+		<Copyright></Copyright>
+		<Authors>Boss</Authors>
+		<PackageId>BossServer.Ref</PackageId>
+		<Description>boss服 开发引用文件</Description>
+		<RepositoryUrl>https://github.com/Megghy/BossProject/</RepositoryUrl>
+		<BaseIntermediateOutputPath />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
+		<PackageReference Include="CS-Script" Version="4.3.0" />
+		<PackageReference Include="Lib.Harmony" Version="2.2.0" />
+		<PackageReference Include="linq2db.MySqlConnector" Version="4.0.0-preview.9-fixed" />
+		<PackageReference Include="linq2db.SQLite.MS" Version="4.0.0-preview.10" />
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.1" />
+		<PackageReference Include="MySqlConnector" Version="2.1.5" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="OTAPI.Upcoming" Version="3.0.30-alpha" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="HttpServer">
+	    <HintPath>..\Lib\HttpServer.dll</HintPath>
+	  </Reference>
+	  <Reference Include="TrProtocol">
+	    <HintPath>..\Lib\TrProtocol.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="xcopy /Y $(TargetDir)*.dll $(SolutionDir)Output\Lib\" />
+	</Target>
+</Project>

@@ -13,6 +13,6 @@
 		<ProjectReference Include="..\Philosophyz\Philosophyz.csproj" />
 	</ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="copy /Y $(TargetPath) $(SolutionDir)Output\" />
+		<Exec Command="copy /Y $(TargetPath) $(SolutionDir)Output\ServerPlugins\" />
 	</Target>
 </Project>

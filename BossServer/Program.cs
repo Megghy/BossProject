@@ -80,6 +80,7 @@ namespace TerrariaApi.Server
         public static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += UnhandledException;
+            AppDomain.CurrentDomain.AssemblyResolve += ServerApi.CurrentDomain_AssemblyResolve;
             try
             {
                 InitialiseInternals();

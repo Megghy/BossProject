@@ -1,10 +1,10 @@
 ﻿using BossPlugin.BAttributes;
+using CSScripting;
 using CSScriptLib;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace BossPlugin.BCore
 {
@@ -15,7 +15,6 @@ namespace BossPlugin.BCore
     {
         public static string ScriptRootPath => Path.Combine(BInfo.FilePath, "Scripts");
         public static string MiniGameScriptPath => Path.Combine(ScriptRootPath, "MiniGames");
-        private static Assembly _currentAssembly => AppDomain.CurrentDomain.GetAssemblies().First(a => a.FullName.StartsWith("BossPlugin"));
         /// <summary>
         /// 加载指定脚本文件
         /// </summary>
@@ -29,15 +28,26 @@ namespace BossPlugin.BCore
                 throw new FileNotFoundException($"脚本文件 {filePath} 不存在");
             try
             {
-                var code = File.ReadAllText(filePath);
-                return CSScript.Evaluator.ReferenceAssembliesFromCode(code)
-                    .LoadCode<T>(code);
+                return CSScript.Evaluator.LoadCode<T>(File.ReadAllText(filePath));
             }
             catch (Exception ex)
             {
                 BLog.Error($"脚本加载失败: {ex}");
                 return null;
             }
+        }
+        private static IEvaluator ReferenceAppDomainAssemblies()
+        {
+            IEvaluator evaluator = CSScript.Evaluator;
+            foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies().Distinct())
+            {
+                if (string.IsNullOrEmpty(asm.Location()))
+                {
+                    continue;//we need a location
+                }
+                evaluator = evaluator.ReferenceAssembly(asm);
+            }
+            return evaluator;
         }
         /// <summary>
         /// 加载指定路径下的所有脚本文件
