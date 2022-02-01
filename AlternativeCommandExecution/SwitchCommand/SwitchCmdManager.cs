@@ -23,6 +23,7 @@ namespace AlternativeCommandExecution.SwitchCommand
                 new SqlColumn("Command", MySqlDbType.Text),
                 new SqlColumn("IgnorePermission", MySqlDbType.Int32),
                 new SqlColumn("AllPlayerCdSecond", MySqlDbType.Int32),
+                new SqlColumn("Wait", MySqlDbType.Int32),
                 new SqlColumn("WorldId", MySqlDbType.Int32) { Unique = true }
             );
 
@@ -69,6 +70,27 @@ namespace AlternativeCommandExecution.SwitchCommand
             TShock.Log.ConsoleInfo("移除了{0}个无效开关指令数据。", total);
         }
 
+        public int getWaitTime(int x, int y)
+        {
+            int time = -1;
+            try
+            {
+                using (var reader = _database.QueryReader("SELECT WAIT FROM SwitchCommands WHERE X=@0 AND Y=@1 AND WorldId=@2;",
+                     x, y, Main.worldID))
+                {
+                    while (reader != null && reader.Read())
+                    {
+                        time =  reader.Get<int>("WAIT");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                TShock.Log.Error(ex.ToString());
+            }
+            return time;    
+        }
+
         public void Add(int x, int y, string command)
         {
             var ex = SwitchCmds.FirstOrDefault(sc => sc.X == x && sc.Y == y);
@@ -86,10 +108,24 @@ namespace AlternativeCommandExecution.SwitchCommand
                     X = x,
                     Y = y,
                     IgnorePermission = false,
-                    AllPlayerCdSecond = 0
+                    AllPlayerCdSecond = 0,
+                    WaitTime = 0
                 };
                 Insert(ex);
                 SwitchCmds.Add(ex);
+            }
+        }
+
+        public void wait(int x, int y ,string sec)
+        {
+            try
+            {
+                _database.Query("UPDATE SwitchCommands SET wait=@0 WHERE X=@1 AND Y=@2 AND WorldId=@3;",
+                    int.Parse(sec),x, y, Main.worldID);
+            }
+            catch (Exception ex)
+            {
+                TShock.Log.Error(ex.ToString());
             }
         }
 

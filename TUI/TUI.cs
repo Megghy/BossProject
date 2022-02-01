@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Timers;
 using TerrariaUI.Base;
 using TerrariaUI.Hooks;
