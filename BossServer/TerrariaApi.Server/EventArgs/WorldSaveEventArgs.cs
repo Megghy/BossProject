@@ -10,4 +10,12 @@ namespace TerrariaApi.Server
             internal set;
         }
     }
+    public class WorldPostSaveEventArgs : HandledEventArgs
+    {
+        public bool ResetTime
+        {
+            get;
+            internal set;
+        }
+    }
 }

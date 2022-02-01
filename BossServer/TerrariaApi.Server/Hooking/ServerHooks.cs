@@ -5,9 +5,9 @@ using Terraria;
 
 namespace TerrariaApi.Server.Hooking
 {
-    internal static class ServerHooks
+    public static class ServerHooks
     {
-        private static HookManager _hookManager;
+        public static HookManager _hookManager;
 
         /// <summary>
         /// Attaches any of the OTAPI Server hooks to the existing <see cref="HookManager"/> implementation

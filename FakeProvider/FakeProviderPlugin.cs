@@ -1,6 +1,7 @@
 ﻿#region Using
 using Microsoft.Xna.Framework;
 using OTAPI;
+using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -118,7 +119,7 @@ namespace FakeProvider
 
             #endregion
 
-#warning TODO: rockLevel, surfaceLevel, cavernLevel or whatever
+            //TODO: rockLevel, surfaceLevel, cavernLevel or whatever
 
             // WARNING: has not been heavily tested
             FastWorldLoad = args.Any(x => (x.ToLower() == "-fastworldload"));
@@ -140,8 +141,8 @@ namespace FakeProvider
             for (int i = 0; i < Main.maxPlayers; i++)
                 AllPlayers[i] = i;
 
-            On.Terraria.IO.WorldFile.LoadWorld += OnPreLoadWorld;
-            On.Terraria.IO.WorldFile.SaveWorld_bool_bool += OnPreSaveWorld;
+            ServerApi.Hooks.WorldLoad.Register(this, OnPreLoadWorld);
+            ServerApi.Hooks.WorldSave.Register(this, OnPreSaveWorld);
             ServerApi.Hooks.NetSendData.Register(this, OnSendData, Int32.MaxValue);
             ServerApi.Hooks.ServerLeave.Register(this, OnServerLeave);
 
@@ -155,11 +156,8 @@ namespace FakeProvider
         {
             if (Disposing)
             {
-                //Hooks.World.IO.PreLoadWorld -= OnPreLoadWorld;
-                //Hooks.World.IO.PostLoadWorld -= OnPostLoadWorld;
-                //Hooks.World.IO.PreSaveWorld -= OnPreSaveWorld;
-                On.Terraria.IO.WorldFile.LoadWorld -= OnPreLoadWorld;
-                On.Terraria.IO.WorldFile.SaveWorld_bool_bool -= OnPreSaveWorld;
+                ServerApi.Hooks.WorldLoad.Deregister(this, OnPreLoadWorld);
+                ServerApi.Hooks.WorldSave.Deregister(this, OnPreSaveWorld);
                 ServerApi.Hooks.NetSendData.Deregister(this, OnSendData);
                 ServerApi.Hooks.ServerLeave.Deregister(this, OnServerLeave);
             }
@@ -170,14 +168,15 @@ namespace FakeProvider
 
         #region OnPreLoadWorld
 
-        private static void OnPreLoadWorld(On.Terraria.IO.WorldFile.orig_LoadWorld orig, bool loadFromCloud)
+        private static void OnPreLoadWorld(HandledEventArgs args)
         {
+            args.Handled = true;
             if (FastWorldLoad)
                 LoadWorldFast();
             else 
-                LoadWorldDirect(loadFromCloud);
-            OnPostLoadWorld(loadFromCloud);
-            //Hooks.World.IO.PostLoadWorld?.Invoke(loadFromCloud);
+                LoadWorldDirect(false);
+            OnPostLoadWorld(false);
+            TerrariaApi.Server.Hooking.WorldHooks._hookManager.InvokePostWorldLoad();
         }
 
         #endregion
@@ -220,14 +219,14 @@ namespace FakeProvider
         #endregion
         #region OnPreSaveWorld
 
-        private static void OnPreSaveWorld(On.Terraria.IO.WorldFile.orig_SaveWorld_bool_bool orig, bool useCloudSaving, bool resetTime)
+        private static void OnPreSaveWorld(WorldSaveEventArgs args)
         {
             if (FakeProviderAPI.World == null)
                 return;
 
             try
             {
-                SaveWorld(ref useCloudSaving, ref resetTime);
+                SaveWorld(false, args.ResetTime);
                 Console.WriteLine("[FakeProvier] World saved.");
             }
             catch (Exception e)
@@ -492,7 +491,7 @@ Entities: {provider.Entities.Count}");
 
         #region SaveWorld
 
-        private static void SaveWorld(ref bool Cloud, ref bool ResetTime)
+        private static void SaveWorld(bool Cloud, bool ResetTime)
         {
             SaveWorldDirect(Cloud, ResetTime);
             SaveWorldEnd(Cloud, ResetTime);
@@ -556,7 +555,6 @@ Entities: {provider.Entities.Count}");
                 {
                     Monitor.Exit(WorldFile.IOLock);
                 }
-                return;
             }
         }
 
@@ -650,9 +648,9 @@ Custom valid : {ValidateWorldData(array, num)}";
             FileUtilities.Write(Main.worldPathName, array, num, useCloudSaving);
             array = FileUtilities.ReadAllBytes(Main.worldPathName, useCloudSaving);
             string text = null;
-            using (MemoryStream memoryStream2 = new MemoryStream(array, 0, num, false))
+            using (MemoryStream memoryStream2 = new(array, 0, num, false))
             {
-                using (BinaryReader binaryReader = new BinaryReader(memoryStream2))
+                using (BinaryReader binaryReader = new(memoryStream2))
                 {
                     bool valid;
                     try
@@ -661,6 +659,7 @@ Custom valid : {ValidateWorldData(array, num)}";
                     }
                     catch (Exception e)
                     {
+                        Console.WriteLine(e);
                         valid = false;
                     }
                     if (valid)
@@ -701,6 +700,7 @@ Custom valid : {ValidateWorldData(array, num)}";
                     }
                     catch (Exception e)
                     {
+                        Console.WriteLine(e);
                         valid = false;
                     }
                     return valid;
@@ -3172,8 +3172,8 @@ Custom valid : {ValidateWorldData(array, num)}";
                     reader.Close();
                     if (loadWorldRet != 0)
                     {
-                        throw (new Exception("LoadWorldRet != 0"));
                         WorldGen.loadFailed = true;
+                        throw (new Exception("LoadWorldRet != 0"));
                     }
                     else
                     {

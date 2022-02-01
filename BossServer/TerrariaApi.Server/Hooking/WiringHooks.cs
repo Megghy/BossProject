@@ -3,9 +3,9 @@ using Terraria;
 
 namespace TerrariaApi.Server.Hooking
 {
-    internal static class WiringHooks
+    public static class WiringHooks
     {
-        private static HookManager _hookManager;
+        public static HookManager _hookManager;
 
         /// <summary>
         /// Attaches any of the OTAPI Wiring hooks to the existing <see cref="HookManager"/> implementation

@@ -563,7 +563,7 @@ namespace TShockAPI
         /// <summary>
         /// When the player sends a tile square
         /// </summary>
-        public static HandlerList<SendTileRectEventArgs> SendTileRect = new HandlerList<SendTileRectEventArgs>();
+        public static HandlerList<SendTileRectEventArgs> SendTileRect = new();
         private static bool OnSendTileRect(TSPlayer player, MemoryStream data, short tilex, short tiley, byte width, byte length, TileChangeType changeType = TileChangeType.None)
         {
             if (SendTileRect == null)

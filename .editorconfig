@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS0164: 这个标签尚未被引用
+dotnet_diagnostic.CS0164.severity = none

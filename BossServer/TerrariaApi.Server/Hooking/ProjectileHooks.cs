@@ -2,9 +2,9 @@
 
 namespace TerrariaApi.Server.Hooking
 {
-    internal static class ProjectileHooks
+    public static class ProjectileHooks
     {
-        private static HookManager _hookManager;
+        public static HookManager _hookManager;
 
         /// <summary>
         /// Attaches any of the OTAPI Projectile hooks to the existing <see cref="HookManager"/> implementation

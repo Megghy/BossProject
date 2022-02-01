@@ -4,9 +4,9 @@ using Terraria;
 
 namespace TerrariaApi.Server.Hooking
 {
-    internal static class NpcHooks
+    public static class NpcHooks
     {
-        private static HookManager _hookManager;
+        public static HookManager _hookManager;
 
         /// <summary>
         /// Attaches any of the OTAPI Npc hooks to the existing <see cref="HookManager"/> implementation

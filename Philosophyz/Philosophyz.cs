@@ -3,7 +3,6 @@ using BossPlugin.BNet;
 using Philosophyz.Hooks;
 using System.Reflection;
 using Terraria;
-using Terraria.Localization;
 using TerrariaApi.Server;
 using TrProtocol.Packets;
 using TShockAPI;
@@ -44,7 +43,7 @@ namespace Philosophyz
 
             PacketHandler.RegisteSendPacketHandler(PacketTypes.WorldInfo, OnSendWorldInfo);
 
-            On.Terraria.NetMessage.SendData += OnOtapiSendData;
+            ServerApi.Hooks.NetSendData.Register(this, OnOtapiSendData);
         }
 
         protected override void Dispose(bool disposing)
@@ -58,7 +57,7 @@ namespace Philosophyz
 
                 PacketHandler.DeregistePacketHandler(OnSendWorldInfo);
 
-                On.Terraria.NetMessage.SendData -= OnOtapiSendData;
+                ServerApi.Hooks.NetSendData.Deregister(this, OnOtapiSendData);
             }
             base.Dispose(disposing);
         }
@@ -124,24 +123,26 @@ namespace Philosophyz
             _lastCheck = DateTime.UtcNow;
         }
 
-        private void OnOtapiSendData(On.Terraria.NetMessage.orig_SendData orig, int msgType, int remoteClient, int ignoreClient, NetworkText text, int number, float number2, float number3, float number4, int number5, int number6, int number7)
+        private void OnOtapiSendData(SendDataEventArgs args)
         {
-            if (msgType != (int)PacketTypes.WorldInfo)
+            if (args.MsgId != PacketTypes.WorldInfo)
             {
                 return;
             }
-
+            var remoteClient = args.remoteClient;
             if (remoteClient == -1)
             {
                 var onData = PackInfo(true);
                 var offData = PackInfo(false);
 
-                foreach (var tsPlayer in TShock.Players.Where(p => p?.Active == true))
+                foreach (var tsPlayer in TShock.Players.Where(p => p?.Active ?? false))
                 {
-                    if (!SendDataHooks.InvokePreSendData(remoteClient, tsPlayer.Index)) continue;
+                    if (!SendDataHooks.InvokePreSendData(remoteClient, tsPlayer.Index))
+                        continue;
                     try
                     {
                         tsPlayer.SendRawData(PlayerInfo.GetPlayerInfo(tsPlayer).FakeSscStatus ?? DefaultFakeSscStatus ? onData : offData);
+                        args.Handled = true;
                     }
                     catch
                     {
@@ -164,9 +165,9 @@ namespace Philosophyz
 					 * 需要 fake ssc = false 并发送
 					 */
                     SendInfo(remoteClient, info.FakeSscStatus ?? DefaultFakeSscStatus);
+                    args.Handled = true;
                 }
             }
-            orig(msgType, remoteClient, ignoreClient, text, number, number2, number3, number4, number5, number6, number7);
         }
 
         private void OnPostInit(EventArgs args)

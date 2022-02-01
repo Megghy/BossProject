@@ -7,9 +7,9 @@ using Terraria.Net;
 
 namespace TerrariaApi.Server.Hooking
 {
-    internal class NetHooks
+    public class NetHooks
     {
-        private static HookManager _hookManager;
+        public static HookManager _hookManager;
 
         public static readonly object syncRoot = new object();
 

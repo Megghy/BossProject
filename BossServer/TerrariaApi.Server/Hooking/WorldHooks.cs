@@ -3,9 +3,9 @@ using Terraria;
 
 namespace TerrariaApi.Server.Hooking
 {
-    internal static class WorldHooks
+    public static class WorldHooks
     {
-        private static HookManager _hookManager;
+        public static HookManager _hookManager;
 
         /// <summary>
         /// Attaches any of the OTAPI World hooks to the existing <see cref="HookManager"/> implementation
@@ -15,6 +15,7 @@ namespace TerrariaApi.Server.Hooking
         {
             _hookManager = hookManager;
 
+            On.Terraria.IO.WorldFile.LoadWorld += OnLoadWorld;
             On.Terraria.IO.WorldFile.SaveWorld_bool_bool += WorldFile_SaveWorld;
             On.Terraria.WorldGen.StartHardmode += WorldGen_StartHardmode;
             On.Terraria.WorldGen.SpreadGrass += WorldGen_SpreadGrass;
@@ -25,7 +26,17 @@ namespace TerrariaApi.Server.Hooking
             Hooks.WorldGen.Meteor += OnDropMeteor;
         }
 
-        static void OnPressurePlate(object sender, Hooks.Collision.PressurePlateEventArgs e)
+        public static void OnLoadWorld(On.Terraria.IO.WorldFile.orig_LoadWorld orig, bool loadFromCloud)
+        {
+            if (_hookManager.InvokeWorldLoad())
+                return;
+
+            orig(loadFromCloud);
+
+            _hookManager.InvokePostWorldLoad();
+        }
+
+        public static void OnPressurePlate(object sender, Hooks.Collision.PressurePlateEventArgs e)
         {
             if (e.Entity is NPC npc)
             {
@@ -44,15 +55,17 @@ namespace TerrariaApi.Server.Hooking
             }
         }
 
-        static void WorldFile_SaveWorld(On.Terraria.IO.WorldFile.orig_SaveWorld_bool_bool orig, bool useCloudSaving, bool resetTime)
+        public static void WorldFile_SaveWorld(On.Terraria.IO.WorldFile.orig_SaveWorld_bool_bool orig, bool useCloudSaving, bool resetTime)
         {
             if (_hookManager.InvokeWorldSave(resetTime))
                 return;
 
             orig(useCloudSaving, resetTime);
+
+            _hookManager.InvokePostWorldSave(resetTime);
         }
 
-        private static void WorldGen_StartHardmode(On.Terraria.WorldGen.orig_StartHardmode orig)
+        public static void WorldGen_StartHardmode(On.Terraria.WorldGen.orig_StartHardmode orig)
         {
             if (_hookManager.InvokeWorldStartHardMode())
                 return;
@@ -60,7 +73,7 @@ namespace TerrariaApi.Server.Hooking
             orig();
         }
 
-        static void OnDropMeteor(object sender, Hooks.WorldGen.MeteorEventArgs e)
+        public static void OnDropMeteor(object sender, Hooks.WorldGen.MeteorEventArgs e)
         {
             if (_hookManager.InvokeWorldMeteorDrop(e.X, e.Y))
             {
@@ -68,7 +81,7 @@ namespace TerrariaApi.Server.Hooking
             }
         }
 
-        private static void Main_checkXMas(On.Terraria.Main.orig_checkXMas orig)
+        public static void Main_checkXMas(On.Terraria.Main.orig_checkXMas orig)
         {
             if (_hookManager.InvokeWorldChristmasCheck(ref Terraria.Main.xMas))
                 return;
@@ -76,7 +89,7 @@ namespace TerrariaApi.Server.Hooking
             orig();
         }
 
-        private static void Main_checkHalloween(On.Terraria.Main.orig_checkHalloween orig)
+        public static void Main_checkHalloween(On.Terraria.Main.orig_checkHalloween orig)
         {
             if (_hookManager.InvokeWorldHalloweenCheck(ref Main.halloween))
                 return;
@@ -84,7 +97,7 @@ namespace TerrariaApi.Server.Hooking
             orig();
         }
 
-        private static void WorldGen_SpreadGrass(On.Terraria.WorldGen.orig_SpreadGrass orig, int i, int j, int dirt, int grass, bool repeat, byte color)
+        public static void WorldGen_SpreadGrass(On.Terraria.WorldGen.orig_SpreadGrass orig, int i, int j, int dirt, int grass, bool repeat, byte color)
         {
             if (_hookManager.InvokeWorldGrassSpread(i, j, dirt, grass, repeat, color))
                 return;
