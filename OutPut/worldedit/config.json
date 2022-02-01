@@ -1,7 +1,0 @@
-{
-  "MagicWandTileLimit": 10000,
-  "MaxUndoCount": 50,
-  "DisableUndoSystemForUnrealPlayers": false,
-  "StartSchematicNamesWithCreatorUserID": false,
-  "SchematicFolderPath": "schematics"
-}
