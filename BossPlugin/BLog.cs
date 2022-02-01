@@ -29,7 +29,8 @@ namespace BossPlugin
         private static void LogDirect(object message, string prefix = "Log", ConsoleColor color = ConsoleColor.Gray, bool save = true)
         {
             var caller = new StackFrame(2).GetMethod();
-            var log = $"[BossPlugin] <{prefix}> {(prefix == "Error" ? $"- {caller.DeclaringType.Namespace}.{caller.Name} - " : "")}{message}";
+            var from = $"{caller.DeclaringType.Name}.{caller.Name}";
+            var log = $"[{from}] <{prefix}> {message}";
             Console.ForegroundColor = color;
             Console.WriteLine(log);
             Console.ResetColor();

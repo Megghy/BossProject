@@ -409,10 +409,10 @@ namespace TShockAPI
                 ServerApi.Hooks.NetNameCollision.Register(this, NetHooks_NameCollision);
                 ServerApi.Hooks.ItemForceIntoChest.Register(this, OnItemForceIntoChest);
                 ServerApi.Hooks.WorldGrassSpread.Register(this, OnWorldGrassSpread);
-                Hooks.PlayerHooks.PlayerPreLogin += OnPlayerPreLogin;
-                Hooks.PlayerHooks.PlayerPostLogin += OnPlayerLogin;
-                Hooks.AccountHooks.AccountDelete += OnAccountDelete;
-                Hooks.AccountHooks.AccountCreate += OnAccountCreate;
+                PlayerHooks.PlayerPreLogin += OnPlayerPreLogin;
+                PlayerHooks.PlayerPostLogin += OnPlayerLogin;
+                AccountHooks.AccountDelete += OnAccountDelete;
+                AccountHooks.AccountCreate += OnAccountCreate;
 
                 GetDataHandlers.InitGetDataHandler();
                 Commands.InitCommands();
@@ -482,7 +482,7 @@ namespace TShockAPI
                 ServerApi.Hooks.NetNameCollision.Deregister(this, NetHooks_NameCollision);
                 ServerApi.Hooks.ItemForceIntoChest.Deregister(this, OnItemForceIntoChest);
                 ServerApi.Hooks.WorldGrassSpread.Deregister(this, OnWorldGrassSpread);
-                TShockAPI.Hooks.PlayerHooks.PlayerPostLogin -= OnPlayerLogin;
+                PlayerHooks.PlayerPostLogin -= OnPlayerLogin;
 
                 if (File.Exists(Path.Combine(SavePath, "tshock.pid")))
                 {
@@ -501,10 +501,10 @@ namespace TShockAPI
         /// <param name="args">args - The PlayerPostLoginEventArgs object.</param>
         private void OnPlayerLogin(PlayerPostLoginEventArgs args)
         {
-            List<String> KnownIps = new List<string>();
+            List<string> KnownIps = new();
             if (!string.IsNullOrWhiteSpace(args.Player.Account.KnownIps))
             {
-                KnownIps = JsonConvert.DeserializeObject<List<String>>(args.Player.Account.KnownIps);
+                KnownIps = JsonConvert.DeserializeObject<List<string>>(args.Player.Account.KnownIps);
             }
 
             if (KnownIps.Count == 0)
@@ -533,7 +533,7 @@ namespace TShockAPI
 
         /// <summary>OnAccountDelete - Internal hook fired on account delete.</summary>
         /// <param name="args">args - The AccountDeleteEventArgs object.</param>
-        private void OnAccountDelete(Hooks.AccountDeleteEventArgs args)
+        private void OnAccountDelete(AccountDeleteEventArgs args)
         {
             CharacterDB.RemovePlayer(args.Account.ID);
         }

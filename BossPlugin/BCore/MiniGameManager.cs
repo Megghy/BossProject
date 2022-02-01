@@ -12,7 +12,7 @@ namespace BossPlugin.BCore
         /// <summary>
         /// 每秒更新次数
         /// </summary>
-        public static readonly int UPDATE_PRE_SECEND = 10; //netfx的css好像用常量有点问题
+        public const int UPDATE_PRE_SECEND = 10;
         /// <summary>
         /// 储存所有小游戏初始实例
         /// 别直接用这里头的, 先克隆一个
@@ -45,14 +45,15 @@ namespace BossPlugin.BCore
         {
             return Games.FirstOrDefault(g => g.Names.Any(n => n.ToLower() == name.ToLower() || n.StartsWith(name)));
         }
-        public static MiniGameContext CreateGame(IMiniGame game, BPlayer creator = null)
+        public static MiniGameContext CreateGame(IMiniGame game, BPlayer creator = null, bool init = true)
         {
             if (RunningGames.Where(g => g.Name == game.Names.First()).Count() < game.MaxCount)
             {
                 var context = new MiniGameContext(game.CreateGameInstance()); //创建新实例
-                context.Game.Init(creator);
+                if (init)
+                    context.Init(creator);
                 RunningGames.Add(context);
-                BLog.Info($"创建新小游戏实例: {context}");
+                BLog.Info($"创建新小游戏实例 [{context}]");
                 return context;
             }
             else

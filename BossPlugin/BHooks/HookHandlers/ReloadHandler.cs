@@ -2,7 +2,7 @@
 using System.Reflection;
 using TShockAPI.Hooks;
 
-namespace BossPlugin.BNet.HookHandlers
+namespace BossPlugin.BHooks.HookHandlers
 {
     public static class ReloadHandler
     {

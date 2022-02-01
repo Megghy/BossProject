@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using BossPlugin.BAttributes;
+using Newtonsoft.Json;
 using System.IO;
 
 namespace BossPlugin
@@ -10,18 +11,18 @@ namespace BossPlugin
         public static string ConfigPath => Path.Combine(BInfo.FilePath, "Config.json");
         public static BConfig Load()
         {
+            BConfig config;
             if (File.Exists(ConfigPath))
-            {
-                var config = JsonConvert.DeserializeObject<BConfig>(File.ReadAllText(ConfigPath));
-                config.Save();
-                return config;
-            }
+                config = JsonConvert.DeserializeObject<BConfig>(File.ReadAllText(ConfigPath));
             else
-            {
-                var config = new BConfig();
-                config.Save();
-                return config;
-            }
+                config = new BConfig();
+            config.Save();
+            return config;
+        }
+        [AutoInit]
+        private static void DoSth()
+        {
+            FakeProvider.FakeProviderPlugin.FastWorldLoad = Instance.FastLoadWorld;
         }
         public static void Reload()
         {
@@ -31,5 +32,7 @@ namespace BossPlugin
         {
             File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
+
+        public bool FastLoadWorld { get; set; } = true;
     }
 }

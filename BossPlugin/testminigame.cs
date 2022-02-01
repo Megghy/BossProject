@@ -6,6 +6,7 @@ using FakeProvider;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Terraria;
 using Terraria.ID;
 using TerrariaUI;
@@ -69,6 +70,9 @@ public class BackGammon : IMiniGame
     /// <param name="creator">创建者</param>
     public void Init(BPlayer creator = null)
     {
+        Pieces?.Clear();
+        Pieces = new();
+
         var x = creator.TsPlayer.TileX - (WIDTH / 2);
         var y = creator.TsPlayer.TileY - (HEIGHT / 2);
         FakePanel = FakeProviderAPI.CreateTileProvider(PanelID, x, y, WIDTH, HEIGHT + TITLE_HEIGHT);
@@ -157,7 +161,7 @@ public class BackGammon : IMiniGame
     }
     public void Update(long gameTime)
     {
-        CD -= MiniGameManager.UPDATE_PRE_SECEND;
+        CD--;
         if (State == MiniGameState.Playing)
         {
             if (CD < 0)
@@ -183,16 +187,16 @@ public class BackGammon : IMiniGame
             }
 
         }
-        else if (CD < 0)
+        else if (CD == 0)
         {
             Black?.SendInfoEX($"没有玩家加入, 对局取消");
             Stop();
-            return;
         }
 
-        if (CD % MiniGameManager.UPDATE_PRE_SECEND == 0)
+        if (CD % (MiniGameManager.UPDATE_PRE_SECEND * 2) == 0)
             BossPlugin.Utils.SendCombatMessage($"状态: {(State == MiniGameState.Playing ? $"进行中. [{Black}] VS [{White}]" : "等待中...")}", (BGPanel.X + (BGPanel.Width / 2)) * 16, BGPanel.Y * 16 + 45, Color.White, false);
-        CountdownLabel.UpdateText(CD / MiniGameManager.UPDATE_PRE_SECEND);
+        if(CD % MiniGameManager.UPDATE_PRE_SECEND == 0)
+            CountdownLabel.UpdateText((CD / MiniGameManager.UPDATE_PRE_SECEND).ToString("00"));
     }
     /// <summary>
     /// 玩家加入游戏

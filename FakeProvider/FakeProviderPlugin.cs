@@ -42,7 +42,7 @@ namespace FakeProvider
         public static int OffsetY { get; private set; } // Not supported
         public static int VisibleWidth { get; private set; }
         public static int VisibleHeight { get; private set; }
-        public static bool FastWorldLoad { get; private set; }
+        public static bool FastWorldLoad = true;
 
         internal static List<TileProvider> ProvidersToAdd = new();
         internal static bool ProvidersLoaded = false;
@@ -120,7 +120,7 @@ namespace FakeProvider
             //TODO: rockLevel, surfaceLevel, cavernLevel or whatever
 
             // WARNING: has not been heavily tested
-            FastWorldLoad = args.Any(x => (x.ToLower() == "-fastworldload"));
+            //FastWorldLoad = args.Any(x => (x.ToLower() == "-fastworldload"));
         }
 
         #endregion
@@ -165,15 +165,15 @@ namespace FakeProvider
             if (FastWorldLoad)
                 LoadWorldFast();
             else 
-                LoadWorldDirect(false);
-            OnPostLoadWorld(false);
+                LoadWorldDirect();
+            OnPostLoadWorld();
             TerrariaApi.Server.Hooking.WorldHooks._hookManager.InvokePostWorldLoad();
         }
 
         #endregion
         #region OnPostLoadWorld
 
-        private static void OnPostLoadWorld(bool FromCloud)
+        private static void OnPostLoadWorld()
         {
             FakeProviderAPI.Tile.OffsetX = OffsetX;
             FakeProviderAPI.Tile.OffsetY = OffsetY;
@@ -219,6 +219,7 @@ namespace FakeProvider
             {
                 SaveWorld(false, args.ResetTime);
                 Console.WriteLine("[FakeProvier] World saved.");
+                args.Handled = true;
             }
             catch (Exception e)
             {
@@ -1235,16 +1236,16 @@ Custom valid : {ValidateWorldData(array, num)}";
         #endregion
         #region LoadWorldDirect
 
-        private static void LoadWorldDirect(bool loadFromCloud)
+        private static void LoadWorldDirect()
         {
             Main.lockMenuBGChange = true;
-            WorldFile._isWorldOnCloud = loadFromCloud;
+            WorldFile._isWorldOnCloud = false;
             Main.checkXMas();
             Main.checkHalloween();
-            bool flag = loadFromCloud && SocialAPI.Cloud != null;
-            if (!FileUtilities.Exists(Main.worldPathName, flag) && Main.autoGen)
+            bool cloud = false;
+            if (!FileUtilities.Exists(Main.worldPathName, cloud) && Main.autoGen)
             {
-                if (!flag)
+                if (!cloud)
                 {
                     for (int i = Main.worldPathName.Length - 1; i >= 0; i--)
                     {
@@ -1256,7 +1257,7 @@ Custom valid : {ValidateWorldData(array, num)}";
                     }
                 }
                 WorldGen.clearWorld();
-                Main.ActiveWorldFileData = WorldFile.CreateMetadata((Main.worldName == "") ? "World" : Main.worldName, flag, Main.GameMode);
+                Main.ActiveWorldFileData = WorldFile.CreateMetadata((Main.worldName == "") ? "World" : Main.worldName, cloud, Main.GameMode);
                 string text = (Main.AutogenSeedName ?? "").Trim();
                 if (text.Length == 0)
                 {
@@ -1269,7 +1270,7 @@ Custom valid : {ValidateWorldData(array, num)}";
                 WorldGen.GenerateWorld(Main.ActiveWorldFileData.Seed, Main.AutogenProgress);
                 WorldFile.SaveWorld();
             }
-            using (MemoryStream memoryStream = new MemoryStream(FileUtilities.ReadAllBytes(Main.worldPathName, flag)))
+            using (MemoryStream memoryStream = new MemoryStream(FileUtilities.ReadAllBytes(Main.worldPathName, cloud)))
             {
                 using (BinaryReader binaryReader = new BinaryReader(memoryStream))
                 {
@@ -1289,7 +1290,7 @@ Custom valid : {ValidateWorldData(array, num)}";
                         }
                         if (num < 141)
                         {
-                            if (!loadFromCloud)
+                            if (!cloud)
                             {
                                 Main.ActiveWorldFileData.CreationTime = File.GetCreationTime(Main.worldPathName);
                             }
@@ -3684,6 +3685,7 @@ Custom valid : {ValidateWorldData(array, num)}";
                     NPC.SetWorldSpecificMonstersByWorldID();
                     sw.Stop();
                     Console.Write($"[FakeProvider] Loaded world in {sw.Elapsed}");
+                    Thread.Sleep(500);
                 }
                 catch (Exception lastThrownLoadException)
                 {
@@ -3693,7 +3695,7 @@ Custom valid : {ValidateWorldData(array, num)}";
                     try
                     {
                         Console.WriteLine($"Error on FastLoadWorld: Falling back to vanilla LoadWorld");
-                        LoadWorldDirect(false);
+                        LoadWorldDirect();
                         reader.Close();
                     }
                     catch
@@ -3706,7 +3708,7 @@ Custom valid : {ValidateWorldData(array, num)}";
             {
                 Console.WriteLine($"{ex.Message}: {ex.StackTrace}");
                 Console.WriteLine($"Error on FastLoadWorld: Falling back to vanilla LoadWorld");
-                LoadWorldDirect(false);
+                LoadWorldDirect();
             }
 
         }

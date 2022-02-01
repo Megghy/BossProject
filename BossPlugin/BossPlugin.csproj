@@ -34,9 +34,6 @@
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="BHooks\" />
-  </ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)Output\ServerPlugins\" />
 	</Target>

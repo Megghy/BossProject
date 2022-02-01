@@ -2,7 +2,7 @@
 using TerrariaApi.Server;
 using TShockAPI;
 
-namespace BossPlugin.BNet.HookHandlers
+namespace BossPlugin.BHooks.HookHandlers
 {
     public static class PlayerGreetHandler
     {

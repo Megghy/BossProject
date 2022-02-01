@@ -60,9 +60,10 @@ namespace BossPlugin
         [AutoInit("挂载所有Hook")]
         private void HandleHooks()
         {
-            GeneralHooks.ReloadEvent += BNet.HookHandlers.ReloadHandler.OnReload;
+            GeneralHooks.ReloadEvent += BHooks.HookHandlers.ReloadHandler.OnReload;
 
-            ServerApi.Hooks.NetGreetPlayer.Register(this, BNet.HookHandlers.PlayerGreetHandler.OnGreetPlayer);
+            ServerApi.Hooks.NetGreetPlayer.Register(this, BHooks.HookHandlers.PlayerGreetHandler.OnGreetPlayer);
+            ServerApi.Hooks.ServerLeave.Register(this, BHooks.HookHandlers.PlayerLeaveHandler.OnPlayerLeave);
 
             ServerApi.Hooks.NetGetData.Register(this, BNet.PacketHandler.OnGetData);
         }

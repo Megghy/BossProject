@@ -2,3 +2,6 @@
 
 # CS0164: 这个标签尚未被引用
 dotnet_diagnostic.CS0164.severity = none
+
+# IDE1006: 命名样式
+dotnet_diagnostic.IDE1006.severity = none
