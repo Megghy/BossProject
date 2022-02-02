@@ -17,8 +17,8 @@
     <Nullable>annotations</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BossServer\BossServer.csproj" />
     <ProjectReference Include="..\FakeProvider\FakeProvider.csproj" />
+    <ProjectReference Include="..\TShockAPI\TShockAPI.csproj" />
     <ProjectReference Include="..\TUI\TUI.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -29,7 +29,6 @@
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)Output\ServerPlugins\" />
-	</Target>
+
+  <Import Project="$(SolutionDir)Plugin.Common.props" />
 </Project>

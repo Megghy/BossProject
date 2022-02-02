@@ -12,6 +12,7 @@ namespace BossPlugin
     public class BPlugin : TerrariaPlugin
     {
         public static BPlugin Instance { get; private set; }
+
         public BPlugin(Main game) : base(game)
         {
             Instance = this;

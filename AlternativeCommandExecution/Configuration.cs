@@ -102,14 +102,9 @@ namespace AlternativeCommandExecution
 
         public void Write()
         {
-            using (var fs = new FileStream(ConfigPath, FileMode.Create, FileAccess.Write, FileShare.Write))
-            {
-                var str = JsonConvert.SerializeObject(this, Formatting.Indented);
-                using (var sw = new StreamWriter(fs))
-                {
-                    sw.Write(str);
-                }
-            }
+            Directory.CreateDirectory(Directory.GetParent(ConfigPath).FullName);
+            var str = JsonConvert.SerializeObject(this, Formatting.Indented);
+            File.WriteAllText(ConfigPath, str);
         }
 
         private static readonly string ConfigPath = Path.Combine(TShock.SavePath, "ace.json");

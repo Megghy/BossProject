@@ -1,0 +1,8 @@
+﻿<Project>
+    <PropertyGroup>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+        <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
+        <OutputPath>$(SolutionDir)\Output\$(Configuration)\ServerPlugins\</OutputPath>
+    </PropertyGroup>
+</Project>

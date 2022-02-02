@@ -7,9 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BossServer\BossServer.csproj" />
+    <ProjectReference Include="..\TShockAPI\TShockAPI.csproj" />
   </ItemGroup>
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)Output\ServerPlugins\" />
-	</Target>
+
+  <Import Project="$(SolutionDir)Plugin.Common.props" />
 </Project>

@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BossPlugin\BossPlugin.csproj" />
-    <ProjectReference Include="..\BossServer\BossServer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,7 +15,6 @@
       <HintPath>..\Lib\TrProtocol.dll</HintPath>
     </Reference>
   </ItemGroup>
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)Output\ServerPlugins\" />
-	</Target>
+
+  <Import Project="$(SolutionDir)Plugin.Common.props"/>
 </Project>

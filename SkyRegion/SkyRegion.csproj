@@ -6,13 +6,9 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\BossServer\BossServer.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\Philosophyz\Philosophyz.csproj" />
-	</ItemGroup>
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="copy /Y $(TargetPath) $(SolutionDir)Output\ServerPlugins\" />
-	</Target>
+  <ItemGroup>
+    <ProjectReference Include="..\Philosophyz\Philosophyz.csproj" Private="true" />
+  </ItemGroup>
+
+  <Import Project="$(SolutionDir)Plugin.Common.props"/>
 </Project>
