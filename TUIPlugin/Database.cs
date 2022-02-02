@@ -1,6 +1,6 @@
-﻿using Microsoft.Data.Sqlite;
-using MySqlConnector;
+﻿using MySqlConnector;
 using System.Data;
+using System.Data.SQLite;
 using TerrariaUI;
 using TShockAPI;
 using TShockAPI.DB;
@@ -29,7 +29,7 @@ namespace TUIPlugin
         public static void ConnectDB()
         {
             if (TShock.Config.Settings.StorageType.ToLower() == "sqlite")
-                db = new SqliteConnection(string.Format("uri=file://{0},Version=3",
+                db = new SQLiteConnection(string.Format("uri=file://{0},Version=3",
                     Path.Combine(TShock.SavePath, "tshock.sqlite")));
             else if (TShock.Config.Settings.StorageType.ToLower() == "mysql")
             {

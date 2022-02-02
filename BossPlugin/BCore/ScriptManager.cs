@@ -36,19 +36,6 @@ namespace BossPlugin.BCore
                 return null;
             }
         }
-        private static IEvaluator ReferenceAppDomainAssemblies()
-        {
-            IEvaluator evaluator = CSScript.Evaluator;
-            foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies().Distinct())
-            {
-                if (string.IsNullOrEmpty(asm.Location()))
-                {
-                    continue;//we need a location
-                }
-                evaluator = evaluator.ReferenceAssembly(asm);
-            }
-            return evaluator;
-        }
         /// <summary>
         /// 加载指定路径下的所有脚本文件
         /// </summary>

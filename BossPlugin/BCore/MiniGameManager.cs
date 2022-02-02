@@ -45,7 +45,7 @@ namespace BossPlugin.BCore
         {
             return Games.FirstOrDefault(g => g.Names.Any(n => n.ToLower() == name.ToLower() || n.StartsWith(name)));
         }
-        public static MiniGameContext CreateGame(IMiniGame game, BPlayer creator = null, bool init = true)
+        public static MiniGameContext CreateGame(IMiniGame game, BPlayer creator, bool init = true)
         {
             if (RunningGames.Where(g => g.Name == game.Names.First()).Count() < game.MaxCount)
             {

@@ -24,7 +24,7 @@ namespace BossPlugin.DB
                 return TShock.DB.GetSqlType() switch
                 {
                     SqlType.Mysql => new MySqlDataProvider("MySqlConnector"),
-                    SqlType.Sqlite => new SQLiteDataProvider("Microsoft.Data.Sqlite"),
+                    SqlType.Sqlite => new SQLiteDataProvider(string.Empty),
                     _ => null,
                 };
             }
