@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyRegion", "SkyRegion\SkyR
 		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B} = {F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegionTrigger", "RegionTrigger\RegionTrigger.csproj", "{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -119,6 +121,14 @@ Global
 		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Release|x86.ActiveCfg = Release|Any CPU
 		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Release|x86.Build.0 = Release|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Debug|x86.Build.0 = Debug|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Release|x86.ActiveCfg = Release|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

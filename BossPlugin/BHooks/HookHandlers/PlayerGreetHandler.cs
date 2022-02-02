@@ -15,8 +15,8 @@ namespace BossPlugin.BHooks.HookHandlers
                 var bPlr = DB.DBTools.GetSingle<BPlayer>(account.ID.ToString());
                 bPlr.TsPlayer = tsPlr;
                 tsPlr.SetData("BossPlugin.BPlayer", bPlr);
-                if(BCore.MiniGameManager.Games.FirstOrDefault() is { } game)
-                BCore.MiniGameManager.CreateGame(game, bPlr).Join(bPlr); //测试
+                if (BCore.MiniGameManager.Games.FirstOrDefault() is { } game)
+                    BCore.MiniGameManager.CreateGame(game, bPlr).Join(bPlr); //测试
             }
         }
     }

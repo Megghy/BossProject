@@ -11,6 +11,11 @@ namespace BossPlugin.BModels
     /// </summary>
     public class MiniGameContext : IDisposable
     {
+        /// <summary>
+        /// <para>小游戏上下文构造函数</para>
+        /// <para>如非必要尽量从 <see cref="BCore.MiniGameManager.CreateGame(IMiniGame, BPlayer, bool)" /> 创建实例</para>
+        /// </summary>
+        /// <param name="game"></param>
         public MiniGameContext(IMiniGame game)
         {
             _game = game;
@@ -33,11 +38,17 @@ namespace BossPlugin.BModels
         /// 游玩的玩家
         /// </summary>
         public List<BPlayer> Players { get; } = new();
-
+        /// <summary>
+        /// 表示是否已调用过 <see cref="Init" />
+        /// </summary>
         public bool IsInitialized { get; private set; } = false;
-
+        /// <summary>
+        /// 进行过的更新次数
+        /// </summary>
         public long GameTime { get; private set; } = 0;
-
+        /// <summary>
+        /// 游戏提供的游戏名称, 此处返回第一个
+        /// </summary>
         public string Name => _game.Names.First();
 
         #region 方法
@@ -48,7 +59,12 @@ namespace BossPlugin.BModels
             _game.Update(GameTime);
             GameTime++;
         }
-        public MiniGameContext Init(BPlayer creator = null)
+        /// <summary>
+        /// 初始化游戏
+        /// </summary>
+        /// <param name="creator">游戏创建者</param>
+        /// <returns></returns>
+        public MiniGameContext Init(BPlayer creator)
         {
             if (!IsInitialized)
             {
