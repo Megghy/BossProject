@@ -10,7 +10,6 @@
 		<RunPostBuildEvent>Always</RunPostBuildEvent>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-		<OutputPath>$(SolutionDir)\Output\$(Configuration)\</OutputPath>
 		<Version>1.4.3.2-0.1.0</Version>
 		<AssemblyTitle>Terraria</AssemblyTitle>
 		<Product></Product>
@@ -41,4 +40,6 @@
 			<HintPath>..\Lib\TrProtocol.dll</HintPath>
 		</Reference>
 	</ItemGroup>
+
+	<Import Project="$(SolutionDir)Lib.Common.props" />
 </Project>

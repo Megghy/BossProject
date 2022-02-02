@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BossServer\BossServer.csproj" />
-    <ProjectReference Include="..\TShockAPI\TShockAPI.csproj" />
   </ItemGroup>
 
   <Import Project="$(SolutionDir)Plugin.Common.props" />

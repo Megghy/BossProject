@@ -6,9 +6,5 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TShockAPI\TShockAPI.csproj" />
-  </ItemGroup>
-
   <Import Project="$(SolutionDir)Plugin.Common.props" />
 </Project>

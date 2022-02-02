@@ -3,6 +3,9 @@
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
         <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
-        <OutputPath>$(SolutionDir)\Output\$(Configuration)\ServerPlugins\</OutputPath>
     </PropertyGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="xcopy /Y $(TargetDir)*.dll $(SolutionDir)Output\Lib\&#xD;&#xA;xcopy /Y $(TargetDir)*.json $(SolutionDir)Output\&#xD;&#xA;xcopy /Y $(TargetDir)TerrariaServer.dll $(SolutionDir)Output\&#xD;&#xA;xcopy /Y $(TargetDir)TerrariaServer.exe $(SolutionDir)Output\" />
+    </Target>
 </Project>

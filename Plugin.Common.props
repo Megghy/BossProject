@@ -3,10 +3,13 @@
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
         <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
-        <OutputPath>$(SolutionDir)\Output\$(Configuration)\ServerPlugins\</OutputPath>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\BossServer\BossServer.csproj"/>
     </ItemGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)Output\ServerPlugins\" />
+    </Target>
 </Project>

@@ -255,202 +255,209 @@ namespace TerrariaApi.Server
             }
         }
 
-		internal static void LoadPlugins()
-		{
-			string ignoredPluginsFilePath = Path.Combine(ServerPluginsDirectoryPath, "ignoredplugins.txt");
+        internal static void LoadPlugins()
+        {
+            string ignoredPluginsFilePath = Path.Combine(ServerPluginsDirectoryPath, "ignoredplugins.txt");
 
-			DangerousPluginDetector detector = new DangerousPluginDetector();
+            DangerousPluginDetector detector = new DangerousPluginDetector();
 
-			List<string> ignoredFiles = new List<string>();
-			if (File.Exists(ignoredPluginsFilePath))
-				ignoredFiles.AddRange(File.ReadAllLines(ignoredPluginsFilePath));
+            List<string> ignoredFiles = new List<string>();
+            if (File.Exists(ignoredPluginsFilePath))
+                ignoredFiles.AddRange(File.ReadAllLines(ignoredPluginsFilePath));
 
-			List<FileInfo> fileInfos = new DirectoryInfo(ServerPluginsDirectoryPath).GetFiles("*.dll").ToList();
-			fileInfos.AddRange(new DirectoryInfo(ServerPluginsDirectoryPath).GetFiles("*.dll-plugin"));
+            List<FileInfo> fileInfos = new DirectoryInfo(ServerPluginsDirectoryPath).GetFiles("*.dll").ToList();
+            fileInfos.AddRange(new DirectoryInfo(ServerPluginsDirectoryPath).GetFiles("*.dll-plugin"));
 
-			Dictionary<TerrariaPlugin, Stopwatch> pluginInitWatches = new Dictionary<TerrariaPlugin, Stopwatch>();
-			foreach (FileInfo fileInfo in fileInfos)
-			{
-				string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileInfo.Name);
-				if (ignoredFiles.Contains(fileNameWithoutExtension))
-				{
-					LogWriter.ServerWriteLine(
-						string.Format("{0} was ignored from being loaded.", fileNameWithoutExtension), TraceLevel.Verbose);
+            Dictionary<TerrariaPlugin, Stopwatch> pluginInitWatches = new Dictionary<TerrariaPlugin, Stopwatch>();
 
-					continue;
-				}
+            var ts = new PluginContainer((TerrariaPlugin)Activator.CreateInstance(typeof(TShockAPI.TShock), game));
+            plugins.Add(ts); //默认加载ts
+            pluginInitWatches.Add(ts.Plugin, new());
 
-				try
-				{
-					Assembly assembly;
-					PluginLoadContext context = null;
-					var assemblyName = AssemblyName.GetAssemblyName(fileInfo.FullName);
-					try
-					{
-						context = new PluginLoadContext(fileInfo.FullName);
-						assembly = context.LoadFromAssemblyName(assemblyName);
-					}
-					catch (BadImageFormatException)
-					{
-						continue;
-					}
+            foreach (FileInfo fileInfo in fileInfos)
+            {
+                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileInfo.Name);
+                if (ignoredFiles.Contains(fileNameWithoutExtension))
+                {
+                    LogWriter.ServerWriteLine(
+                        string.Format("{0} was ignored from being loaded.", fileNameWithoutExtension), TraceLevel.Verbose);
 
-					if (!InvalidateAssembly(assembly, fileInfo.Name))
-						continue;
+                    continue;
+                }
 
-					if (detector.MaliciousAssembly(assembly))
-					{
-						LogWriter.ServerWriteLine(string.Format("Assembly {0} {1} has been identified to the TShock Team as a dangerous plugin and needs to be removed.", assembly.GetName().Name, assembly.GetName().Version), TraceLevel.Error);
-						LogWriter.ServerWriteLine(string.Format("Continuing to use {0} may damage your server, your data, or your computer. For your safety, this plugin has been disabled.", assembly.GetName().Name), TraceLevel.Error);
-						continue;
-					}
+                try
+                {
+                    Assembly assembly;
+                    // The plugin assembly might have been resolved by another plugin assembly already, so no use to
+                    // load it again, but we do still have to verify it and create plugin instances.
+                    if (!loadedAssemblies.TryGetValue(fileNameWithoutExtension, out assembly))
+                    {
+                        try
+                        {
+                            assembly = Assembly.LoadFrom(fileInfo.FullName);
+                        }
+                        catch (BadImageFormatException)
+                        {
+                            continue;
+                        }
+                        loadedAssemblies.Add(fileNameWithoutExtension, assembly);
+                    }
 
-					foreach (Type type in assembly.GetExportedTypes())
-					{
-						if (!type.IsSubclassOf(typeof(TerrariaPlugin)) || !type.IsPublic || type.IsAbstract)
-							continue;
-						object[] customAttributes = type.GetCustomAttributes(typeof(ApiVersionAttribute), false);
-						if (customAttributes.Length == 0)
-							continue;
+                    foreach (Type type in assembly.GetExportedTypes())
+                    {
+                        if (!type.IsSubclassOf(typeof(TerrariaPlugin)) || !type.IsPublic || type.IsAbstract)
+                            continue;
+                        object[] customAttributes = type.GetCustomAttributes(typeof(ApiVersionAttribute), false);
+                        if (customAttributes.Length == 0)
+                            continue;
 
-						if (!IgnoreVersion)
-						{
-							var apiVersionAttribute = (ApiVersionAttribute)customAttributes[0];
-							Version apiVersion = apiVersionAttribute.ApiVersion;
-							if (apiVersion.Major != ApiVersion.Major || apiVersion.Minor != ApiVersion.Minor)
-							{
-								LogWriter.ServerWriteLine(
-									string.Format("Plugin \"{0}\" is designed for a different Server API version ({1}) and was ignored.",
-									type.FullName, apiVersion.ToString(2)), TraceLevel.Warning);
+                        if (!IgnoreVersion)
+                        {
+                            var apiVersionAttribute = (ApiVersionAttribute)customAttributes[0];
+                            Version apiVersion = apiVersionAttribute.ApiVersion;
+                            if (apiVersion.Major != ApiVersion.Major || apiVersion.Minor != ApiVersion.Minor)
+                            {
+                                LogWriter.ServerWriteLine(
+                                    string.Format("Plugin \"{0}\" is designed for a different Server API version ({1}) and was ignored.",
+                                    type.FullName, apiVersion.ToString(2)), TraceLevel.Warning);
 
-								continue;
-							}
-						}
+                                continue;
+                            }
+                        }
 
-						TerrariaPlugin pluginInstance;
-						try
-						{
-							Stopwatch initTimeWatch = new Stopwatch();
-							initTimeWatch.Start();
+                        TerrariaPlugin pluginInstance;
+                        try
+                        {
+                            Stopwatch initTimeWatch = new Stopwatch();
+                            initTimeWatch.Start();
 
-							pluginInstance = (TerrariaPlugin)Activator.CreateInstance(type, game);
+                            pluginInstance = (TerrariaPlugin)Activator.CreateInstance(type, game);
 
-							initTimeWatch.Stop();
-							pluginInitWatches.Add(pluginInstance, initTimeWatch);
-						}
-						catch (Exception ex)
-						{
-							// Broken plugins better stop the entire server init.
-							throw new InvalidOperationException(
-								string.Format("Could not create an instance of plugin class \"{0}\".", type.FullName), ex);
-						}
-						plugins.Add(new PluginContainer(pluginInstance));
-					}
-				}
-				catch (Exception ex)
-				{
-					// Broken assemblies / plugins better stop the entire server init.
-					throw new InvalidOperationException(
-						string.Format("Failed to load assembly \"{0}\".", fileInfo.Name), ex);
-				}
-			}
-			IOrderedEnumerable<PluginContainer> orderedPluginSelector =
-				from x in Plugins
-				orderby x.Plugin.Order, x.Plugin.Name
-				select x;
+                            initTimeWatch.Stop();
+                            pluginInitWatches.Add(pluginInstance, initTimeWatch);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Broken plugins better stop the entire server init.
+                            throw new InvalidOperationException(
+                                string.Format("Could not create an instance of plugin class \"{0}\".", type.FullName), ex);
+                        }
+                        plugins.Add(new PluginContainer(pluginInstance));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Broken assemblies / plugins better stop the entire server init.
+                    throw new InvalidOperationException(
+                        string.Format("Failed to load assembly \"{0}\".", fileInfo.Name), ex);
+                }
+            }
+            IOrderedEnumerable<PluginContainer> orderedPluginSelector =
+                from x in Plugins
+                orderby x.Plugin.Order, x.Plugin.Name
+                select x;
 
-			foreach (PluginContainer current in orderedPluginSelector)
-			{
-				Stopwatch initTimeWatch = pluginInitWatches[current.Plugin];
-				initTimeWatch.Start();
+            foreach (PluginContainer current in orderedPluginSelector)
+            {
+                Stopwatch initTimeWatch = pluginInitWatches[current.Plugin];
+                initTimeWatch.Start();
 
-				try
-				{
-					current.Initialize();
-				}
-				catch (Exception ex)
-				{
-					// Broken plugins better stop the entire server init.
-					throw new InvalidOperationException(string.Format(
-						"Plugin \"{0}\" has thrown an exception during initialization.", current.Plugin.Name), ex);
-				}
+                try
+                {
+                    current.Initialize();
+                }
+                catch (Exception ex)
+                {
+                    // Broken plugins better stop the entire server init.
+                    throw new InvalidOperationException(string.Format(
+                        "Plugin \"{0}\" has thrown an exception during initialization.", current.Plugin.Name), ex);
+                }
 
-				initTimeWatch.Stop();
-				LogWriter.ServerWriteLine(string.Format(
-					"Plugin {0} v{1} (by {2}) initiated.", current.Plugin.Name, current.Plugin.Version, current.Plugin.Author),
-					TraceLevel.Info);
-			}
+                initTimeWatch.Stop();
+                LogWriter.ServerWriteLine(string.Format(
+                    "Plugin {0} v{1} (by {2}) initiated.", current.Plugin.Name, current.Plugin.Version, current.Plugin.Author),
+                    TraceLevel.Info);
+            }
 
-			if (Profiler.WrappedProfiler != null)
-			{
-				foreach (var pluginWatchPair in pluginInitWatches)
-				{
-					TerrariaPlugin plugin = pluginWatchPair.Key;
-					Stopwatch initTimeWatch = pluginWatchPair.Value;
+            if (Profiler.WrappedProfiler != null)
+            {
+                foreach (var pluginWatchPair in pluginInitWatches)
+                {
+                    TerrariaPlugin plugin = pluginWatchPair.Key;
+                    Stopwatch initTimeWatch = pluginWatchPair.Value;
 
-					Profiler.InputPluginInitTime(plugin, initTimeWatch.Elapsed);
-				}
-			}
-		}
+                    Profiler.InputPluginInitTime(plugin, initTimeWatch.Elapsed);
+                }
+            }
+        }
 
-		internal static void UnloadPlugins()
-		{
-			var pluginUnloadWatches = new Dictionary<PluginContainer, Stopwatch>();
-			foreach (PluginContainer pluginContainer in plugins)
-			{
-				Stopwatch unloadWatch = new Stopwatch();
-				unloadWatch.Start();
+        internal static void UnloadPlugins()
+        {
+            var pluginUnloadWatches = new Dictionary<PluginContainer, Stopwatch>();
+            foreach (PluginContainer pluginContainer in plugins)
+            {
+                Stopwatch unloadWatch = new Stopwatch();
+                unloadWatch.Start();
 
-				try
-				{
-					pluginContainer.DeInitialize();
-				}
-				catch (Exception ex)
-				{
-					LogWriter.ServerWriteLine(string.Format(
-						"Plugin \"{0}\" has thrown an exception while being deinitialized:\n{1}", pluginContainer.Plugin.Name, ex),
-						TraceLevel.Error);
-				}
+                try
+                {
+                    pluginContainer.DeInitialize();
+                }
+                catch (Exception ex)
+                {
+                    LogWriter.ServerWriteLine(string.Format(
+                        "Plugin \"{0}\" has thrown an exception while being deinitialized:\n{1}", pluginContainer.Plugin.Name, ex),
+                        TraceLevel.Error);
+                }
 
-				unloadWatch.Stop();
-				pluginUnloadWatches.Add(pluginContainer, unloadWatch);
-			}
+                unloadWatch.Stop();
+                pluginUnloadWatches.Add(pluginContainer, unloadWatch);
+            }
 
-			foreach (PluginContainer pluginContainer in plugins)
-			{
-				Stopwatch unloadWatch = pluginUnloadWatches[pluginContainer];
-				unloadWatch.Start();
+            foreach (PluginContainer pluginContainer in plugins)
+            {
+                Stopwatch unloadWatch = pluginUnloadWatches[pluginContainer];
+                unloadWatch.Start();
 
-				try
-				{
-					pluginContainer.Dispose();
-				}
-				catch (Exception ex)
-				{
-					LogWriter.ServerWriteLine(string.Format(
-						"Plugin \"{0}\" has thrown an exception while being disposed:\n{1}", pluginContainer.Plugin.Name, ex),
-						TraceLevel.Error);
-				}
+                try
+                {
+                    pluginContainer.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    LogWriter.ServerWriteLine(string.Format(
+                        "Plugin \"{0}\" has thrown an exception while being disposed:\n{1}", pluginContainer.Plugin.Name, ex),
+                        TraceLevel.Error);
+                }
 
-				unloadWatch.Stop();
-				Profiler.InputPluginUnloadTime(pluginContainer.Plugin, unloadWatch.Elapsed);
-			}
-		}
+                unloadWatch.Stop();
+                Profiler.InputPluginUnloadTime(pluginContainer.Plugin, unloadWatch.Elapsed);
+            }
+        }
 
-		private static bool InvalidateAssembly(Assembly assembly, string fileName)
-		{
-			AssemblyName[] referencedAssemblies = assembly.GetReferencedAssemblies();
-			AssemblyName terrariaServerReference = referencedAssemblies.FirstOrDefault(an => an.Name == "TerrariaServer");
-			if (terrariaServerReference != null && terrariaServerReference.Version == new Version(0, 0, 0, 0))
-			{
-				LogWriter.ServerWriteLine(
-					string.Format("Plugin assembly \"{0}\" was compiled for a Server API version prior 1.14 and was ignored.",
-						fileName), TraceLevel.Warning);
+        internal static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            string fileName = args.Name.Split(',')[0];
+            if (loadedAssemblies?.TryGetValue(fileName, out var target) == true)
+                return target;
+            try
+            {
 
-				return false;
-			}
+                string path = Path.Combine(ServerPluginsDirectoryPath, fileName + ".dll");
+                if (!File.Exists(path))
+                    path = Path.Combine(Environment.CurrentDirectory, "Lib", fileName + ".dll");
 
-			return true;
-		}
+                var assembly = Assembly.LoadFrom(path);
+                loadedAssemblies?.Add(fileName, assembly);
+                return assembly;
+            }
+            catch (Exception ex)
+            {
+                LogWriter.ServerWriteLine(
+                    string.Format("Error on resolving assembly \"{0}.dll\":\n{1}", fileName, ex),
+                    TraceLevel.Error);
+            }
+            return null;
+        }
     }
 }
