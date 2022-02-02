@@ -52,6 +52,12 @@ namespace BossPlugin
                 action(i);
             }
         }
+        public static bool IsSimilarWith(this string text, string othor)
+        {
+            text = text.ToLower();
+            othor = othor.ToLower();
+            return text == othor || text.StartsWith(othor);
+        }
 
         public static WorldData GetCurrentWorldData(bool? ssc = null)
         {
@@ -163,10 +169,10 @@ namespace BossPlugin
         public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("BossPlugin.BPlayer");
         public static byte[] Serialize(this Packet p) => PacketHandler.Serializer.Serialize(p);
 
-        public static void SendEX(this TSPlayer plr, object msg, Color color = default)
+        public static void SendEX(this TSPlayer? plr, object msg, Color color = default)
         {
             color = color == default ? Color.White : color;
-            plr.SendMessage(msg.ToString(), color); //todo 根据玩家状态改变前缀
+            plr?.SendMessage(msg.ToString(), color); //todo 根据玩家状态改变前缀
         }
         public static void SendCombatMessage(string msg, float x, float y, Color color = default, bool randomPosition = true)
         {

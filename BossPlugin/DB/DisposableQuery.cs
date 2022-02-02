@@ -10,7 +10,9 @@ namespace BossPlugin.DB
         private readonly IQueryable<T> _query;
         private readonly IDisposable _disposable;
 
+#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
         public DisposableQuery(IQueryable<T> query, IDisposable disposable)
+#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
         {
             _query = query;
             _disposable = disposable;

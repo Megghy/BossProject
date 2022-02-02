@@ -18,7 +18,7 @@ namespace BossPlugin.BAttributes
             Names = name;
         }
         public string[] Names { get; set; }
-        public string Permission { get; set; }
-        public MethodInfo Method { get; set; }
+        public string? Permission { get; set; }
+        public MethodInfo? Method { get; set; }
     }
 }

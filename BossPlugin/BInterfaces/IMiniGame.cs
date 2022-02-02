@@ -24,7 +24,7 @@ namespace BossPlugin.BInterfaces
         /// 初始化小游戏
         /// </summary>
         /// <param name="creator">创建者</param>
-        public void Init(BPlayer creator = null);
+        public void Init(BPlayer creator);
         /// <summary>
         /// 开始
         /// </summary>

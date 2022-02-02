@@ -6,14 +6,14 @@ namespace BossPlugin
 {
     public class BConfig
     {
-        private static BConfig _instance;
+        private static BConfig? _instance;
         public static BConfig Instance { get { _instance ??= Load(); return _instance; } }
         public static string ConfigPath => Path.Combine(BInfo.FilePath, "Config.json");
         public static BConfig Load()
         {
             BConfig config;
             if (File.Exists(ConfigPath))
-                config = JsonConvert.DeserializeObject<BConfig>(File.ReadAllText(ConfigPath));
+                config = JsonConvert.DeserializeObject<BConfig>(File.ReadAllText(ConfigPath))!;
             else
                 config = new BConfig();
             config.Save();
@@ -34,5 +34,6 @@ namespace BossPlugin
         }
 
         public bool FastLoadWorld { get; set; } = true;
+        public bool DebugInfo { get; set; } = true;
     }
 }

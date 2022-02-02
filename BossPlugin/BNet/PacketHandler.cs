@@ -28,8 +28,8 @@ namespace BossPlugin.BNet
                         {
                             if (t.BaseType?.Name == "PacketHandlerBase`1")
                                 Handlers.Add(
-                                    (PacketTypes)((Packet)Activator.CreateInstance(t.BaseType.GetGenericArguments().First())).Type,
-                                    (IPacketHandler)Activator.CreateInstance(t, Array.Empty<object>()));
+                                    (PacketTypes)((Packet)Activator.CreateInstance(t.BaseType.GetGenericArguments().First())!).Type,
+                                    (IPacketHandler)Activator.CreateInstance(t, Array.Empty<object>())!);
                         });
         }
         public static void OnGetData(GetDataEventArgs args)
@@ -40,7 +40,7 @@ namespace BossPlugin.BNet
                 return;
             }
             var type = args.MsgID;
-            var plr = TShock.Players[args.Msg.whoAmI]?.GetBPlayer();
+            var plr = TShock.Players[args.Msg.whoAmI]?.GetBPlayer() ?? new(TShock.Players[args.Msg.whoAmI]);
             var reader = args.Msg.reader;
             if (Handlers.TryGetValue(type, out var handler))
             {

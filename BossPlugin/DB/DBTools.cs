@@ -9,9 +9,9 @@ namespace BossPlugin.DB
     /// </summary>
     public static class DBTools
     {
-        public static UserConfigBase<T>.Context UserContext<T>(string tableName = null) where T : UserConfigBase<T> => UserConfigBase<T>.GetContext(tableName);
-        public static ConfigBase<T>.Context Context<T>(string tableName = null) where T : ConfigBase<T> => ConfigBase<T>.GetContext(tableName);
-        public static T Insert<T>(T target, string tableName = null) where T : UserConfigBase<T>
+        public static UserConfigBase<T>.Context UserContext<T>(string? tableName = null) where T : UserConfigBase<T> => UserConfigBase<T>.GetContext(tableName);
+        public static ConfigBase<T>.Context Context<T>(string? tableName = null) where T : ConfigBase<T> => ConfigBase<T>.GetContext(tableName);
+        public static T Insert<T>(T target, string? tableName = null) where T : UserConfigBase<T>
         {
             tableName ??= typeof(T).Name;
             try
@@ -24,7 +24,7 @@ namespace BossPlugin.DB
             }
             return target;
         }
-        public static int Delete<T>(T target, string tableName = null) where T : UserConfigBase<T>
+        public static int Delete<T>(T target, string? tableName = null) where T : UserConfigBase<T>
         {
             tableName ??= typeof(T).Name;
             try
@@ -37,9 +37,9 @@ namespace BossPlugin.DB
                 return -1;
             }
         }
-        public static DisposableQuery<T> Get<T>(int id, string tableName = null) where T : UserConfigBase<T>
+        public static DisposableQuery<T> Get<T>(int id, string? tableName = null) where T : UserConfigBase<T>
             => Get<T>(id.ToString(), tableName);
-        public static DisposableQuery<T> GetNonInsert<T>(string id, string tableName = null) where T : UserConfigBase<T>
+        public static DisposableQuery<T>? GetNonInsert<T>(string id, string? tableName = null) where T : UserConfigBase<T>
         {
             try
             {
@@ -52,14 +52,14 @@ namespace BossPlugin.DB
                 return null;
             }
         }
-        public static T GetSingleNonInsert<T>(string id, string tableName = null) where T : UserConfigBase<T>
-            => GetNonInsert<T>(id, tableName).FirstOrDefault();
-        public static DisposableQuery<T> Get<T>(string id, string tableName = null) where T : UserConfigBase<T>
+        public static T? GetSingleNonInsert<T>(string id, string? tableName = null) where T : UserConfigBase<T>
+            => GetNonInsert<T>(id, tableName)?.FirstOrDefault();
+        public static DisposableQuery<T> Get<T>(string id, string? tableName = null) where T : UserConfigBase<T>
         {
             var context = UserConfigBase<T>.GetContext(tableName ?? typeof(T).Name);
             return new DisposableQuery<T>(context.Get(id.ToString()), context);
         }
-        public static T GetSingle<T>(string id, string tableName = null) where T : UserConfigBase<T>
-            => Get<T>(id, tableName).FirstOrDefault();
+        public static T GetSingle<T>(string id, string? tableName = null) where T : UserConfigBase<T>
+            => Get<T>(id, tableName).First();
     }
 }

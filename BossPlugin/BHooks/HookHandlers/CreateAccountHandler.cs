@@ -10,9 +10,12 @@ namespace BossPlugin.BHooks.HookHandlers
         public static void OnCreateAccount(AccountCreateEventArgs args)
         {
             var tsPlr = TShock.Players.FirstOrDefault(p => p?.Account?.Name == args.Account.Name);
-            var bPlr = new BPlayer(tsPlr);
-            DB.DBTools.Insert(bPlr);
-            tsPlr?.SetData("BossPlugin.BPlayer", bPlr);
+            if (tsPlr != null)
+            {
+                var bPlr = new BPlayer(tsPlr);
+                DB.DBTools.Insert(bPlr);
+                tsPlr.SetData("BossPlugin.BPlayer", bPlr);
+            }
         }
     }
 }

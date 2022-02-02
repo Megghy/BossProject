@@ -21,9 +21,10 @@ namespace BossPlugin.BModels
         public CommandArgs OriginArg { get; private set; }
         public string CommandName { get; private set; }
         public string SubCommandName { get; private set; }
-        public string FullCommand { get; private set; }
         public BPlayer BPlayer { get; private set; }
-        public string this[int index] => Param.Length > index && index >= 0 ? Param[index] : null;
+        public string FullCommand => OriginArg.Message;
+        public TSPlayer? TsPlayer => BPlayer?.TsPlayer;
+        public string? this[int index] => Param.Length > index && index >= 0 ? Param[index] : null;
         public string[] Param { get; internal set; }
 
         public IEnumerator<string> GetEnumerator()

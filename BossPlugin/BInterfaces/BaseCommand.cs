@@ -12,7 +12,7 @@ namespace BossPlugin.BInterfaces
     public abstract class BaseCommand : ICommand
     {
         public abstract string[] Names { get; }
-        public IReadOnlyList<SubCommandAttribute> SubCommands { get; set; }
+        public IReadOnlyList<SubCommandAttribute> SubCommands { get; set; } = new List<SubCommandAttribute>();
         public bool HasDefaultCommand => SubCommands.Any(s => !s.Names?.Any() ?? true);
         public void RegisterAllSubCommands()
         {

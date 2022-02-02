@@ -9,7 +9,7 @@ namespace BossPlugin.BModels
     /// <summary> 
     /// 小游戏的运行时容器
     /// </summary>
-    public class MiniGameContext : IDisposable
+    public sealed class MiniGameContext : IDisposable
     {
         /// <summary>
         /// <para>小游戏上下文构造函数</para>
@@ -28,7 +28,7 @@ namespace BossPlugin.BModels
         /// <summary>
         /// 游戏实例
         /// </summary>
-        private IMiniGame _game;
+        private IMiniGame? _game;
         private Timer _updateTimer { get; set; } = new()
         {
             Interval = 1000 / BCore.MiniGameManager.UPDATE_PRE_SECEND,
@@ -49,14 +49,15 @@ namespace BossPlugin.BModels
         /// <summary>
         /// 游戏提供的游戏名称, 此处返回第一个
         /// </summary>
-        public string Name => _game.Names.First();
+        public string Name => _game?.Names.First() ?? "Unknown";
+        public MiniGameState GameState => _game?.State ?? MiniGameState.End;
 
         #region 方法
-        private void UpdateTimerCallBack(object sender, ElapsedEventArgs e)
+        private void UpdateTimerCallBack(object? sender, ElapsedEventArgs e)
         {
-            if (_game.State == MiniGameState.End)
+            if (_game?.State == MiniGameState.End)
                 Dispose();
-            _game.Update(GameTime);
+            _game?.Update(GameTime);
             GameTime++;
         }
         /// <summary>
@@ -68,7 +69,7 @@ namespace BossPlugin.BModels
         {
             if (!IsInitialized)
             {
-                _game.Init(creator);
+                _game?.Init(creator);
                 _updateTimer.Start();
                 IsInitialized = true;
             }
@@ -79,12 +80,12 @@ namespace BossPlugin.BModels
         /// </summary>
         public MiniGameContext Start()
         {
-            _game.Start();
+            _game?.Start();
             return this;
         }
         public bool Join(BPlayer plr)
         {
-            if (_game.Join(plr))
+            if (_game?.Join(plr) == true)
             {
                 Players.Add(plr);
                 plr.PlayingGame = this;
@@ -98,8 +99,9 @@ namespace BossPlugin.BModels
             if (Players.Contains(plr))
             {
                 Players.Remove(plr);
-                plr.PlayingGame = null;
-                _game.Leave(plr);
+                _game?.Leave(plr);
+                if (plr.PlayingGame == this)
+                    plr.PlayingGame = null;
             }
         }
         public override string ToString()
@@ -109,8 +111,14 @@ namespace BossPlugin.BModels
 
         public void Dispose()
         {
+            Players.ForEach(p =>
+            {
+                if (p.PlayingGame == this)
+                    p.PlayingGame = null;
+            });
+            _updateTimer.Dispose();
             _game?.Stop();
-            _updateTimer.Stop();
+            _game = null;
             Players.Clear();
             BLog.Info($"小游戏实例 [{this}] 已销毁");
         }

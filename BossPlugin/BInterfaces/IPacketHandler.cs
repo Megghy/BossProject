@@ -1,11 +1,12 @@
 ﻿using BossPlugin.BModels;
 using TrProtocol;
+using TShockAPI;
 
 namespace BossPlugin.BInterfaces
 {
     public interface IPacketHandler
     {
-        public PacketTypes Type { get; }
+        public abstract PacketTypes Type { get; }
         public bool GetPacket(BPlayer plr, Packet packet);
         public bool SendPacket(BPlayer plr, Packet packet);
     }

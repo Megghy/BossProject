@@ -30,30 +30,39 @@ namespace BossPlugin.BCore
             Games = ScriptManager.LoadScripts<IMiniGame>(ScriptManager.MiniGameScriptPath);
             BLog.Success($"成功加载 {Games.Length} 个小游戏");
         }
+        public static bool TryFindGamesByName(string name, out IMiniGame[] games)
+        {
+            games = Games.Where(g => g.Names.Any(n => n.IsSimilarWith(name))).ToArray();
+            return games.Any();
+        }
+        public static bool TryFindSingleGameByName(string name, out IMiniGame? game)
+        {
+            if (TryFindGamesByName(name, out var games))
+            {
+                game = games.FirstOrDefault();
+                return true;
+            }
+            else
+            {
+                game = null;
+                return false;
+            }
+        }
         /// <summary>
         /// 创建一个新小游戏实例
         /// </summary>
         /// <param name="game"></param>
         /// <returns></returns>
-        public static IMiniGame CreateGameInstance(this IMiniGame game) => (IMiniGame)Activator.CreateInstance(game.GetType());
-        /// <summary>
-        /// 通过名字寻找小游戏
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns>没有则为null</returns>
-        public static IMiniGame TryFindByName(string name)
-        {
-            return Games.FirstOrDefault(g => g.Names.Any(n => n.ToLower() == name.ToLower() || n.StartsWith(name)));
-        }
-        public static MiniGameContext CreateGame(IMiniGame game, BPlayer creator, bool init = true)
+        public static IMiniGame NewGameInstance(this IMiniGame game) => (IMiniGame)Activator.CreateInstance(game.GetType())!;
+        public static MiniGameContext? CreateGame(IMiniGame game, BPlayer creator, bool init = true)
         {
             if (RunningGames.Where(g => g.Name == game.Names.First()).Count() < game.MaxCount)
             {
-                var context = new MiniGameContext(game.CreateGameInstance()); //创建新实例
+                var context = new MiniGameContext(game.NewGameInstance()); //创建新实例
                 if (init)
                     context.Init(creator);
                 RunningGames.Add(context);
-                BLog.Info($"创建新小游戏实例 [{context}]");
+                BLog.DEBUG($"创建新小游戏实例 [{context}]");
                 return context;
             }
             else
@@ -68,14 +77,14 @@ namespace BossPlugin.BCore
         /// 玩家是否在游戏中
         /// </summary>
         /// <param name="plr"></param>
-        /// <param name="name">可选 游戏名</param>
+        /// <param name="gameName">可选 游戏名</param>
         /// <returns></returns>
-        public static bool IsInGame(this BPlayer plr, string name = null)
+        public static bool IsInGame(this BPlayer plr, string? gameName = null)
         {
-            if (string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(gameName))
                 return plr.PlayingGame != null;
             else
-                return plr.PlayingGame?.Name == name;
+                return plr.PlayingGame?.Name == gameName;
         }
 
         /// <summary>
@@ -88,7 +97,7 @@ namespace BossPlugin.BCore
                 if (game.Join(plr))
                 {
                     plr.PlayingGame = game;
-                    BLog.Success($"[{plr}] 加入小游戏 <{game}>");
+                    BLog.DEBUG($"[{plr}] 加入小游戏 <{game}>");
                     return true;
                 }
                 else
@@ -96,8 +105,7 @@ namespace BossPlugin.BCore
             }
             else
             {
-                plr.TsPlayer.SendInfoMessage($"你已处于一局游戏中");
-                BLog.Log($"[{plr}] 尝试加入 <{game}> 失败: 已处于一场游戏中");
+                BLog.DEBUG($"[{plr}] 尝试加入 <{game}> 失败: 已处于一场游戏中");
                 return false;
             }
         }

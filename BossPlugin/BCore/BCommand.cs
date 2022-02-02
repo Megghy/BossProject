@@ -1,5 +1,4 @@
 ﻿using BossPlugin.BAttributes;
-using BossPlugin.BCore;
 using BossPlugin.BInterfaces;
 using BossPlugin.BModels;
 using System;
@@ -10,10 +9,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using TShockAPI;
 
-namespace BossPlugin.BModules
+namespace BossPlugin.BCore
 {
     public class BCommand
     {
+        #region 命令提示
+        public const string InvalidInput = "无效的命令格式";
+        #endregion
         public static string ScriptCmdPath => Path.Combine(ScriptManager.ScriptRootPath, "Cmds");
         public static readonly List<BaseCommand> Cmds = new();
         private static readonly List<Command> _tsCmds = new();
@@ -29,7 +31,7 @@ namespace BossPlugin.BModules
                     .Where(t => t.BaseType == typeof(BaseCommand))
                     .ForEach(t =>
                     {
-                        var tempCMD = (BaseCommand)Activator.CreateInstance(t);
+                        var tempCMD = (BaseCommand)Activator.CreateInstance(t)!;
                         tempCMD.RegisterAllSubCommands();
                         Cmds.Add(tempCMD);
                         RegisteToTS(tempCMD);
@@ -71,6 +73,11 @@ namespace BossPlugin.BModules
         /// <param name="args"></param>
         private static void OnCmd(CommandArgs args)
         {
+            if (args.Player.Account is null)
+            {
+                args.Player.SendInfoMessage($"尚未登陆, 无法使用此命令");
+                return;
+            }
             var cmdName = args.Message.Contains(" ") ? args.Message.Split(' ')[0] : args.Message;
             if (Cmds.FirstOrDefault(c => c.Names.Any(c => c.ToLower() == cmdName.ToLower())) is { } cmd)
             {
@@ -101,21 +108,21 @@ namespace BossPlugin.BModules
                 else
                 {
                     var subArg = new SubCommandArgs(args, cmdName);
-                    var isAwaitable = subCmd.Method.ReturnType.GetMethod(nameof(Task.GetAwaiter)) != null;
-                    var invokeArg = subCmd.Method.GetParameters().Any() ? new object[] { subArg } : new object[] { };
+                    var isAwaitable = subCmd.Method?.ReturnType.GetMethod(nameof(Task.GetAwaiter)) != null;
+                    var invokeArg = subCmd.Method?.GetParameters().Any() == true ? new object[] { subArg } : new object[] { };
                     if (isAwaitable)
                     {
-                        if (subCmd.Method.ReturnType.IsGenericType)
+                        if (subCmd.Method?.ReturnType.IsGenericType == true)
                         {
                             await (dynamic)(subCmd.Method.Invoke(baseCmd, invokeArg) ?? Task.Delay(1));
                         }
                         else
                         {
-                            await (Task)(subCmd.Method.Invoke(baseCmd, invokeArg) ?? Task.Delay(1));
+                            await (Task)(subCmd.Method?.Invoke(baseCmd, invokeArg) ?? Task.Delay(1));
                         }
                     }
                     else
-                        subCmd.Method.Invoke(baseCmd, invokeArg);
+                        subCmd.Method?.Invoke(baseCmd, invokeArg);
                 }
             }
             catch (Exception ex)

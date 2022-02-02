@@ -13,7 +13,7 @@ namespace BossPlugin.BCore
         {
             if (plr?.TsPlayer?.CurrentRegion is { } region)
             {
-                BInfo.OnlinePlayers.Where(p => p != plr && p.TsPlayer.CurrentRegion == region)
+                BInfo.OnlinePlayers.Where(p => p != plr && p.TsPlayer?.CurrentRegion == region)
                     .ForEach(p => p.SendPacket(proj));
                 return true;
             }

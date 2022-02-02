@@ -19,7 +19,7 @@ namespace BossPlugin.DB
         {
             public ITable<T> Config => GetTable<T>();
 
-            private static IDataProvider GetProvider()
+            private static IDataProvider? GetProvider()
             {
                 return TShock.DB.GetSqlType() switch
                 {
@@ -29,18 +29,19 @@ namespace BossPlugin.DB
                 };
             }
 
-            public Context(string tableName) : base(GetProvider(), TShock.DB.ConnectionString)
+            public Context(string? tableName) : base(GetProvider()!, TShock.DB.ConnectionString)
             {
                 this.CreateTable<T>(tableName, tableOptions: TableOptions.CreateIfNotExists);
             }
         }
-        internal static Context GetContext(string tableName) => new(tableName);
+        internal static Context GetContext(string? tableName) => new(tableName);
     }
     public abstract class UserConfigBase<T> : ConfigBase<T> where T : UserConfigBase<T>
     {
         public UserConfigBase()
         {
-
+            ID = "-1";
+            LastUpdate = DateTime.MinValue;
         }
         public new class Context : ConfigBase<T>.Context
         {
@@ -66,12 +67,12 @@ namespace BossPlugin.DB
                 result.ForEach(r => r.Init());
                 return result;
             }
-            public Context(string tableName) : base(tableName)
+            public Context(string? tableName) : base(tableName)
             {
             }
         }
 
-        internal new static Context GetContext(string tableName) => new(tableName);
+        internal new static Context GetContext(string? tableName) => new(tableName);
 
         public virtual void Init()
         {
@@ -82,13 +83,13 @@ namespace BossPlugin.DB
             var prop = extract.Body
                 .GetType()
                 .GetProperties()
-                .FirstOrDefault(p => p.Name.Contains("Member"))
+                .FirstOrDefault(p => p.Name.Contains("Member"))?
                 .GetValue(extract.Body) as PropertyInfo;
             try
             {
                 using var query = GetContext(typeof(T).Name);
                 if (updateProp)
-                    prop.SetValue(this, value);
+                    prop?.SetValue(this, value);
                 using var temp = new DisposableQuery<T>(query.Get(ID), query);
                 temp.Set(extract, value)
                     .Set(b => b.LastUpdate, DateTime.Now)
@@ -96,7 +97,7 @@ namespace BossPlugin.DB
             }
             catch (Exception ex)
             {
-                BLog.Error($"未能更新字段 {prop.Name}: {value} => \r\n{ex}");
+                BLog.Error($"未能更新字段 {prop?.Name}: {value} => \r\n{ex}");
             }
         }
         public void Update<TV>(Expression<Func<T, TV>> extract)
@@ -107,9 +108,9 @@ namespace BossPlugin.DB
                 var target = query.Get(ID);
                 var prop = extract.Body.GetType()
                     .GetProperties().FirstOrDefault(p => p.Name.Contains("Member"));
-                var t = prop.GetValue(extract.Body) as PropertyInfo;
+                var t = prop!.GetValue(extract.Body) as PropertyInfo;
                 using var temp = new DisposableQuery<T>(query.Get(ID), query);
-                temp.Set(extract, (TV)t.GetValue(this))
+                temp.Set(extract, (TV)t?.GetValue(this)!)
                     .Set(b => b.LastUpdate, DateTime.Now)
                     .Update();
             }

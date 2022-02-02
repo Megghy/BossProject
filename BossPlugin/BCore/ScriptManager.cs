@@ -1,10 +1,8 @@
 ﻿using BossPlugin.BAttributes;
-using CSScripting;
 using CSScriptLib;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace BossPlugin.BCore
 {
@@ -22,7 +20,7 @@ namespace BossPlugin.BCore
         /// <param name="filePath">文件路径</param>
         /// <returns></returns>
         /// <exception cref="FileNotFoundException"></exception>
-        public static T LoadSingleScript<T>(string filePath) where T : class
+        public static T? LoadSingleScript<T>(string filePath) where T : class
         {
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"脚本文件 {filePath} 不存在");
@@ -52,7 +50,8 @@ namespace BossPlugin.BCore
             {
                 try
                 {
-                    scripts.Add(LoadSingleScript<T>(f));
+                    if (LoadSingleScript<T>(f) is { } script)
+                        scripts.Add(script);
                 }
                 catch (Exception ex)
                 {

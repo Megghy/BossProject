@@ -11,7 +11,7 @@ namespace BossPlugin
     [ApiVersion(2, 1)]
     public class BPlugin : TerrariaPlugin
     {
-        public static BPlugin Instance { get; private set; }
+        public static BPlugin? Instance { get; private set; }
 
         public BPlugin(Main game) : base(game)
         {
@@ -21,7 +21,7 @@ namespace BossPlugin
         public override string Name => "BossPlugin";
         public override string Author => "Megghy";
         public override string Description => "写给boss服务器的插件";
-        public override Version Version => Assembly.GetExecutingAssembly().GetName().Version;
+        public override Version Version => Assembly.GetExecutingAssembly().GetName().Version!;
 
         #region 初始化
         public override void Initialize()
@@ -52,7 +52,7 @@ namespace BossPlugin
                 }
                 catch (Exception ex)
                 {
-                    BLog.Error($"加载 [{kv.Key.DeclaringType.Name}.{kv.Key.Name}] 时发生错误{Environment.NewLine}{ex}");
+                    BLog.Error($"加载 [{kv.Key.DeclaringType!.Name}.{kv.Key.Name}] 时发生错误{Environment.NewLine}{ex}");
                 }
             });
             BLog.Success($"BossPlugin 加载完成");

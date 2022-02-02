@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using TShockAPI;
 
 namespace BossPlugin
@@ -26,10 +27,21 @@ namespace BossPlugin
         {
             LogDirect(text, "Success", ConsoleColor.Green, save);
         }
+
+        public static void DEBUG(object text)
+        {
+            var caller = new StackFrame(1).GetMethod();
+            var debugText = $"[{caller!.DeclaringType!.Name}.{caller.Name}] <DEBUG> {text}";
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine(debugText);
+            Console.ResetColor();
+            BInfo.OnlinePlayers.Where(p => p.TsPlayer?.HasPermission("bossplugin.admin.debug") == true)
+                .ForEach(p => Utils.SendEX(p.TsPlayer, debugText, new(130, 200, 200)));
+        }
         private static void LogDirect(object message, string prefix = "Log", ConsoleColor color = ConsoleColor.Gray, bool save = true)
         {
             var caller = new StackFrame(2).GetMethod();
-            var from = $"{caller.DeclaringType.Name}.{caller.Name}";
+            var from = $"{caller!.DeclaringType!.Name}.{caller.Name}";
             var log = $"[{from}] <{prefix}> {message}";
             Console.ForegroundColor = color;
             Console.WriteLine(log);
