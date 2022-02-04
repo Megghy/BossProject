@@ -14,6 +14,14 @@ namespace BossPlugin.BInterfaces
         /// </summary>
         public string[] Names { get; }
         /// <summary>
+        /// 作者
+        /// </summary>
+        public string Author { get; }
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string Description { get; }
+        /// <summary>
         /// 状态
         /// </summary>
         public MiniGameState State { get; set; }
