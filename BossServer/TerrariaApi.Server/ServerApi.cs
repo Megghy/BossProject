@@ -273,6 +273,9 @@ namespace TerrariaApi.Server
             var ts = new PluginContainer((TerrariaPlugin)Activator.CreateInstance(typeof(TShockAPI.TShock), game));
             plugins.Add(ts); //默认加载ts
             pluginInitWatches.Add(ts.Plugin, new());
+            var boss = new PluginContainer((TerrariaPlugin)Activator.CreateInstance(typeof(BossFramework.BPlugin), game));
+            plugins.Add(boss); //默认加载ts
+            pluginInitWatches.Add(boss.Plugin, new());
 
             foreach (FileInfo fileInfo in fileInfos)
             {

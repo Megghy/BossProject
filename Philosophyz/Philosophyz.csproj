@@ -7,14 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BossPlugin\BossPlugin.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="TrProtocol">
       <HintPath>..\Lib\TrProtocol.dll</HintPath>
     </Reference>
   </ItemGroup>
 
-  <Import Project="$(SolutionDir)Plugin.Common.props"/>
+  <Import Project="$(SolutionDir)Plugin.Common.props" />
 </Project>

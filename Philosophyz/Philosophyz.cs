@@ -1,5 +1,5 @@
-﻿using BossPlugin;
-using BossPlugin.BNet;
+﻿using BossFramework;
+using BossFramework.BNet;
 using Philosophyz.Hooks;
 using System.Reflection;
 using Terraria;
@@ -7,7 +7,7 @@ using TerrariaApi.Server;
 using TrProtocol.Packets;
 using TShockAPI;
 using TShockAPI.Hooks;
-using static BossPlugin.BModels.EventArgs;
+using static BossFramework.BModels.EventArgs;
 
 namespace Philosophyz
 {
@@ -453,7 +453,7 @@ namespace Philosophyz
         }
         private static byte[] PackInfo(bool ssc)
         {
-            return BossPlugin.Utils.GetCurrentWorldData(ssc).Serialize();
+            return BossFramework.Utils.GetCurrentWorldData(ssc).Serialize();
         }
         internal static void SendInfo(int remoteClient, bool ssc)
         {

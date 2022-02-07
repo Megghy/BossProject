@@ -1,4 +1,6 @@
-﻿namespace TerrariaUI.Base
+﻿using TShockAPI;
+
+namespace TerrariaUI.Base
 {
     public enum TouchState
     {
@@ -68,6 +70,7 @@
         public DateTime Time { get; private set; }
 
         public int PlayerIndex => Session.PlayerIndex;
+        public TSPlayer Player => TShock.Players[PlayerIndex];
         /// <summary>
         /// Whether this touch has red wire turned on. Actual only when State is TouchState.End.
         /// </summary>
