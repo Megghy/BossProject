@@ -5398,17 +5398,20 @@ namespace TShockAPI
             else
             {
                 var plr = players[0];
-                if (plr == args.Player)
-                {
-                    args.Player.SendErrorMessage("You cannot whisper to yourself.");
-                    return;
-                }
+           
                 if (!plr.AcceptingWhispers)
                 {
                     args.Player.SendErrorMessage($"{plr.Name} is not accepting whispers.");
                     return;
                 }
+                
                 var msg = string.Join(" ", args.Parameters.ToArray(), 1, args.Parameters.Count - 1);
+                //旁白
+                if (plr == args.Player)
+                {
+                    args.Player.SendMessage($"[旁白] {msg}", Color.MediumPurple);
+                    return;
+                }
                 plr.SendMessage($"<From {args.Player.Name}> {msg}", Color.MediumPurple);
                 args.Player.SendMessage($"<To {plr.Name}> {msg}", Color.MediumPurple);
                 plr.LastWhisper = args.Player;

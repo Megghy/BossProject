@@ -1,10 +1,16 @@
 {
-  "profiles":{
+  "profiles": {
     "Boss_Megghy": {
       "commandName": "Executable",
       "executablePath": "D:\\Code\\BossPlugin\\Output\\BossServer.exe",
       "commandLineArgs": "-language zh-Hans -ip 127.0.0.1 -port 7777 -maxplayers 8 -world C:/Users/Megghy/Documents/My Games/Terraria/Worlds/茑萝地表.wld",
       "workingDirectory": "D:\\Code\\BossPlugin\\Output\\"
+    },
+    "Boss_Jeoi": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\Jeoi\\source\\repos\\BossProject\\Output\\BossServer.exe",
+      "commandLineArgs": "-language zh-Hans -ip 127.0.0.1 -port 7777 -maxplayers 8 -world C:/Users/Jeoi/Documents/My Games/Terraria/Worlds/BOSS工作室.wld",
+      "workingDirectory": "C:\\Users\\Jeoi\\source\\repos\\BossProject\\Output"
     }
   }
 }
