@@ -38,6 +38,7 @@ namespace BossFramework.BCore
             });
 
             RegionHooks.RegionEntered += OnEnterRegion;
+            RegionHooks.RegionLeft += OnLeaveRegion;
             RegionHooks.RegionCreated += OnRegionCreate;
             RegionHooks.RegionDeleted += OnRegionDelete;
         }
@@ -52,6 +53,15 @@ namespace BossFramework.BCore
             if (region is null)
                 return null;
             return AllBRegion.FirstOrDefault(r => r.ID == $"{region.Name}_{region.WorldID}");
+        }
+        /// <summary>
+        /// 返回指定领地中的所有玩家, 提供参数为null时返回所有未在领地中的玩家
+        /// </summary>
+        /// <param name="region"></param>
+        /// <returns></returns>
+        public static BPlayer[] GetAllPlayerInRegion(this BRegion region)
+        {
+            return BInfo.OnlinePlayers.Where(p => p.CurrentRegion == region).ToArray();
         }
 
         public static void OnRegionCreate(RegionHooks.RegionCreatedEventArgs args)
@@ -79,22 +89,23 @@ namespace BossFramework.BCore
         {
             if (FindBRegionForRegion(args.Region) is { } bregion)
             {
-                CallEnterBRegion(bregion, args.Player.GetBPlayer(), true);
+                CallBRegionEvent(bregion, args.Player.GetBPlayer(), true);
             }
         }
         public static void OnLeaveRegion(RegionHooks.RegionLeftEventArgs args)
         {
             if (FindBRegionForRegion(args.Region) is { } bregion)
             {
-                CallEnterBRegion(bregion, args.Player.GetBPlayer(), false);
+                CallBRegionEvent(bregion, args.Player.GetBPlayer(), false);
             }
         }
-        private static void CallEnterBRegion(BRegion region, BPlayer plr, bool isEnter)
+        private static void CallBRegionEvent(BRegion region, BPlayer plr, bool isEnter)
         {
             if (region.Parent is { } parent)
-                CallEnterBRegion(parent, plr, isEnter);
+                CallBRegionEvent(parent, plr, isEnter);
             else
             {
+                BLog.DEBUG($"区域事件: [{(isEnter ? "进入" : "离开")}] - {region.ID} : {plr}");
                 var args = new BRegionEventArgs(region, plr);
                 if (isEnter)
                 {

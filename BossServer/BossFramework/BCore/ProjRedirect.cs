@@ -2,12 +2,9 @@
 using BossFramework.BModels;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TerrariaApi.Server;
 using TrProtocol.Packets;
-using TShockAPI.Hooks;
 
 namespace BossFramework.BCore
 {
@@ -25,24 +22,22 @@ namespace BossFramework.BCore
             DefaultProjContext = new(null);
 
             BRegionSystem.EnterBRegion += OnEnterRegion;
+            BRegionSystem.LeaveBRegion += OnLeaveRegion;
 
             Task.Run(RedirectLoop);
         }
-        public static ConcurrentQueue<(BPlayer plr, SyncProjectile proj)> CreateProjsQueue { get; } = new();
-        public static async void RedirectLoop()
+        public static ConcurrentQueue<(BPlayer plr, SyncProjectile proj)> SyncProjsQueue { get; } = new();
+        public static void RedirectLoop()
         {
             while (!Terraria.Netplay.Disconnect)
             {
                 try
                 {
-                    if(CreateProjsQueue.TryDequeue(out var projInfo) && projInfo.plr?.IsRealPlayer == true)
+                    if (SyncProjsQueue.TryDequeue(out var projInfo) && projInfo.plr?.IsRealPlayer == true)
                     {
                         var proj = projInfo.proj;
                         var plr = projInfo.plr;
-                        if(plr.CurrentRegion is { } region)
-                        {
-                            region.ProjContext.
-                        }
+                        (plr.CurrentRegion ?? BRegion.Default).ProjContext.CreateOrSyncProj(plr, proj);
                     }
                 }
                 catch (Exception ex)
@@ -52,21 +47,20 @@ namespace BossFramework.BCore
                 Task.Delay(1).Wait();
             }
         }
-
-        public static bool OnProjCreate(BPlayer plr, SyncProjectile proj)
+        public static void OnProjDestory(BPlayer plr, KillProjectile killProj)
         {
-            if (plr?.TsPlayer?.CurrentRegion is { } region)
-            {
-                BInfo.OnlinePlayers.Where(p => p != plr && p.TsPlayer?.CurrentRegion == region)
-                    .ForEach(p => p.SendPacket(proj));
-                return true;
-            }
-            else
-                return false;
+            (plr.CurrentRegion ?? BRegion.Default).ProjContext.DestroyProj(killProj);
         }
         public static void OnEnterRegion(BRegionSystem.BRegionEventArgs args)
         {
-             
+            Task.Run(() => args.Region.ProjContext.Projs
+                .Where(p => p != null)
+                .ForEach(p => args.Player.SendPacket(p))); //同步当前区域弹幕
+        }
+        public static void OnLeaveRegion(BRegionSystem.BRegionEventArgs args)
+        {
+            Task.Run(() => args.Region.ProjContext.Projs.Where(p => p != null)
+                .ForEach(p => args.Region.ProjContext.DestroyProj(p, false))); //移除所有之前区域的弹幕
         }
     }
 }

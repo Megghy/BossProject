@@ -8,17 +8,19 @@ namespace BossFramework.BModels
 {
     public class BRegion : UserConfigBase<BRegion>
     {
+        public const string DefaultRegionName = "DefaultBRegion";
         public static BRegion Default { get; } = new(null);
-        public BRegion() { ID = "DefaultBRegion"; }
+        public BRegion() { ID = DefaultRegionName; }
         public BRegion(Region region)
         {
             OriginRegion = region;
-            ID = $"{region.Name}_{region.WorldID}";
+            ID = region is null ? DefaultRegionName : $"{region.Name}_{region.WorldID}";
             Init();
         }
         public override void Init()
         {
-            OriginRegion ??= TShockAPI.TShock.Regions.Regions.FirstOrDefault(r => $"{r.Name}_{r.WorldID}" == ID);
+            if (ID != DefaultRegionName)
+                OriginRegion ??= TShockAPI.TShock.Regions.Regions.FirstOrDefault(r => $"{r.Name}_{r.WorldID}" == ID);
             ProjContext = new(this);
         }
 
@@ -82,7 +84,7 @@ namespace BossFramework.BModels
         }
         public void SetParent(BRegion region)
         {
-            if(region is null)
+            if (region is null)
             {
                 Update(r => r.ParentName, "");
                 _parent = null;
@@ -94,5 +96,17 @@ namespace BossFramework.BModels
             }
         }
         #endregion
+
+        public override bool Equals(object obj)
+        {
+            if (obj is BRegion region)
+                return region.ID == ID;
+            return false;
+        }
+        public override string ToString()
+            => ID;
+
+        public override int GetHashCode()
+            => base.GetHashCode();
     }
 }
