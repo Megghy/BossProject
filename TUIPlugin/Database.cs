@@ -59,16 +59,16 @@ namespace TUIPlugin
             {
                 db.Query(
                     $@"CREATE TABLE IF NOT EXISTS TUIKeyValue(
-                        `Identifier` {(IsMySql ? "VARCHAR(256)" : "TEXT")} UNIQUE NOT NULL,
+                        `Identifier` {(IsMySql ? "VARCHAR(255)" : "TEXT")} UNIQUE NOT NULL,
                         `Value` BLOB NOT NULL);
                     CREATE TABLE IF NOT EXISTS TUIUserNumber(
                         `User` INTEGER NOT NULL,
-                        `Identifier` {(IsMySql ? "VARCHAR(256)" : "TEXT")} NOT NULL,
+                        `Identifier` {(IsMySql ? "VARCHAR(255)" : "TEXT")} NOT NULL,
                         `Number` INTEGER NOT NULL,
                         UNIQUE{(IsMySql ? " KEY" : "")} (`User`, `Identifier`));
                     CREATE TABLE IF NOT EXISTS TUIUserKeyValue(
                         `User` INTEGER NOT NULL,
-                        `Identifier` {(IsMySql ? "VARCHAR(256)" : "TEXT")} NOT NULL,
+                        `Identifier` {(IsMySql ? "VARCHAR(255)" : "TEXT")} NOT NULL,
                         `Value` BLOB NOT NULL,
                         UNIQUE{(IsMySql ? " KEY" : "")} (`User`, `Identifier`))");
             }
