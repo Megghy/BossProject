@@ -27,6 +27,8 @@ namespace BossFramework.BModels
         public byte Index => (byte)(TsPlayer?.Index ?? -1);
         public bool IsRealPlayer => TsPlayer?.RealPlayer ?? false;
 
+        public BRegion CurrentRegion { get; internal set; }
+
         #region 小游戏部分
         public long Point { get; set; }
         /// <summary>

@@ -14,12 +14,15 @@ namespace BossFramework.BModels
         {
             OriginRegion = region;
             ID = $"{region.Name}_{region.WorldID}";
+            Init();
         }
         public override void Init()
         {
             OriginRegion ??= TShockAPI.TShock.Regions.Regions.FirstOrDefault(r => $"{r.Name}_{r.WorldID}" == ID);
+            ProjContext = new(this);
         }
 
+        #region 自身变量
         public Region OriginRegion { get; private set; }
         public string ParentName { get; private set; }
         private BRegion _parent;
@@ -38,7 +41,7 @@ namespace BossFramework.BModels
         {
             get
             {
-                if(_childRegion is null)
+                if (_childRegion is null)
                 {
                     var regions = BUtils.DeserializeJson<string[]>(ChildName);
                     _childRegion = new();
@@ -52,6 +55,11 @@ namespace BossFramework.BModels
                 return _childRegion;
             }
         }
+        #endregion
+
+        #region 弹幕重定向
+        public ProjRedirectContext ProjContext { get; private set; }
+        #endregion
 
         #region 方法
         public void AddChild(BRegion region)
