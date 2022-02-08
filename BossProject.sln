@@ -33,9 +33,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegionTrigger", "RegionTrig
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BadgeSystem", "BadgeSystem\BadgeSystem.csproj", "{9B75CF10-07F9-4295-8A06-D1840F9F7880}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Colosseo", "Colosseo\Colosseo.csproj", "{9D8644C1-F0C0-4443-AE76-F70A2C96824F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Colosseo", "Colosseo\Colosseo.csproj", "{9D8644C1-F0C0-4443-AE76-F70A2C96824F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Permabuffs", "Permabuffs\Permabuffs.csproj", "{7DA0C32E-9AF3-4189-BF99-4CECEF43E261}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Permabuffs", "Permabuffs\Permabuffs.csproj", "{7DA0C32E-9AF3-4189-BF99-4CECEF43E261}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeleportRestriction", "TeleportRestriction\TeleportRestriction.csproj", "{CA2849FC-5712-418B-BC54-35FB93114621}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scattering", "Scattering\Scattering.csproj", "{58F5C480-0455-49C9-B21B-0C45303A9B22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageSender", "MessageSender\MessageSender.csproj", "{BC1A604E-B9E5-4EA2-8701-C73F06687040}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -149,6 +155,30 @@ Global
 		{7DA0C32E-9AF3-4189-BF99-4CECEF43E261}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7DA0C32E-9AF3-4189-BF99-4CECEF43E261}.Release|x86.ActiveCfg = Release|Any CPU
 		{7DA0C32E-9AF3-4189-BF99-4CECEF43E261}.Release|x86.Build.0 = Release|Any CPU
+		{CA2849FC-5712-418B-BC54-35FB93114621}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA2849FC-5712-418B-BC54-35FB93114621}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA2849FC-5712-418B-BC54-35FB93114621}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CA2849FC-5712-418B-BC54-35FB93114621}.Debug|x86.Build.0 = Debug|Any CPU
+		{CA2849FC-5712-418B-BC54-35FB93114621}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA2849FC-5712-418B-BC54-35FB93114621}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA2849FC-5712-418B-BC54-35FB93114621}.Release|x86.ActiveCfg = Release|Any CPU
+		{CA2849FC-5712-418B-BC54-35FB93114621}.Release|x86.Build.0 = Release|Any CPU
+		{58F5C480-0455-49C9-B21B-0C45303A9B22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58F5C480-0455-49C9-B21B-0C45303A9B22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58F5C480-0455-49C9-B21B-0C45303A9B22}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{58F5C480-0455-49C9-B21B-0C45303A9B22}.Debug|x86.Build.0 = Debug|Any CPU
+		{58F5C480-0455-49C9-B21B-0C45303A9B22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58F5C480-0455-49C9-B21B-0C45303A9B22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58F5C480-0455-49C9-B21B-0C45303A9B22}.Release|x86.ActiveCfg = Release|Any CPU
+		{58F5C480-0455-49C9-B21B-0C45303A9B22}.Release|x86.Build.0 = Release|Any CPU
+		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Debug|x86.Build.0 = Debug|Any CPU
+		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Release|x86.ActiveCfg = Release|Any CPU
+		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
