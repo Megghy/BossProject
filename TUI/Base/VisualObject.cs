@@ -1813,5 +1813,17 @@ namespace TerrariaUI.Base
         #endregion
 
         #endregion
+
+        public void UpdateSelf() => Update().Apply().Draw();
+        public void UpdateTileColor(byte id)
+        {
+            Style.TileColor = id;
+            UpdateSelf();
+        }
+        public void UpdateWallColor(byte id)
+        {
+            Style.WallColor = id;
+            UpdateSelf();
+        }
     }
 }

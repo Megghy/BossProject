@@ -362,9 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-Output/tshock
-Output/worldedit
-Output/x64
-Output/Logs
-Output/schematics
-Output/ServerLog.txt
+Output/

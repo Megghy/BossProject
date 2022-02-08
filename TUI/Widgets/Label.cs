@@ -447,5 +447,16 @@ namespace TerrariaUI.Widgets
         }
 
         #endregion
+
+        public void UpdateText(object text)
+        {
+            SetText(text.ToString());
+            UpdateSelf();
+        }
+        public void UpdateTextColor(byte id)
+        {
+            LabelStyle.TextColor = id;
+            UpdateSelf();
+        }
     }
 }

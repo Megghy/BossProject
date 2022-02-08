@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using MaxMind;
-using Microsoft.Data.Sqlite;
 using Microsoft.Xna.Framework;
 using MySqlConnector;
 using Newtonsoft.Json;
@@ -26,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -256,7 +256,7 @@ namespace TShockAPI
             };
             // if sqlite.interop cannot be found, try and search the runtimes folder. this usually happens when debugging tsapi
             // since it does not have the dependency installed directly
-            NativeLibrary.SetDllImportResolver(typeof(SqliteConnection).Assembly, ResolveNativeDep);
+            NativeLibrary.SetDllImportResolver(typeof(SQLiteConnection).Assembly, ResolveNativeDep);
 
             Main.SettingsUnlock_WorldEvil = true;
 
@@ -317,7 +317,7 @@ namespace TShockAPI
                 {
                     string sql = Path.Combine(SavePath, Config.Settings.SqliteDBPath);
                     Directory.CreateDirectory(Path.GetDirectoryName(sql));
-                    DB = new SqliteConnection(string.Format("Data Source={0},Version=3", sql));
+                    DB = new SQLiteConnection(string.Format("uri=file://{0},Version=3", sql));
                 }
                 else if (Config.Settings.StorageType.ToLower() == "mysql")
                 {

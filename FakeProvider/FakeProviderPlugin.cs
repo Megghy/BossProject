@@ -579,31 +579,31 @@ Entities: {provider.Entities.Count}");
             int num;
 
 #if DEBUG
-			byte[] defaultArray;
-			int defaultSize;
-			using (MemoryStream memoryStream = new MemoryStream(7000000))
-			{
-				using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
-				{
-					Main.maxTilesX = FakeProviderAPI.World.Width;
-					Main.maxTilesY = FakeProviderAPI.World.Height;
-					Main.worldSurface -= OffsetY;
-					Main.rockLayer -= OffsetY;
-					Main.tile = FakeProviderAPI.World;
-					FakeProviderAPI.Tile.HideEntities();
+            byte[] defaultArray;
+            int defaultSize;
+            using (MemoryStream memoryStream = new MemoryStream(7000000))
+            {
+                using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
+                {
+                    Main.maxTilesX = FakeProviderAPI.World.Width;
+                    Main.maxTilesY = FakeProviderAPI.World.Height;
+                    Main.worldSurface -= OffsetY;
+                    Main.rockLayer -= OffsetY;
+                    Main.tile = FakeProviderAPI.World;
+                    FakeProviderAPI.Tile.HideEntities();
 
-					WorldFile.SaveWorld_Version2(binaryWriter);
+                    WorldFile.SaveWorld_Version2(binaryWriter);
 
-					Main.maxTilesX = VisibleWidth;
-					Main.maxTilesY = VisibleHeight;
-					Main.worldSurface += OffsetY;
-					Main.rockLayer += OffsetY;
-					Main.tile = FakeProviderAPI.Tile;
-					FakeProviderAPI.Tile.UpdateEntities();
-				}
-				defaultArray = memoryStream.ToArray();
-				defaultSize = defaultArray.Length;
-			}
+                    Main.maxTilesX = VisibleWidth;
+                    Main.maxTilesY = VisibleHeight;
+                    Main.worldSurface += OffsetY;
+                    Main.rockLayer += OffsetY;
+                    Main.tile = FakeProviderAPI.Tile;
+                    FakeProviderAPI.Tile.UpdateEntities();
+                }
+                defaultArray = memoryStream.ToArray();
+                defaultSize = defaultArray.Length;
+            }
 
 #endif
 
@@ -618,16 +618,16 @@ Entities: {provider.Entities.Count}");
             }
 
 #if DEBUG
-			Debug = $@"World: {Main.worldPathName}
+            Debug = $@"World: {Main.worldPathName}
 Load size       : {LoadWorldSize}
 Default ave size: {defaultSize}
 Custom save size: {num}
 Default valid: {ValidateWorldData(defaultArray, defaultSize)}
 Custom valid : {ValidateWorldData(array, num)}";
 
-			Console.WriteLine("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-			Console.WriteLine(Debug);
-			Console.WriteLine("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine(Debug);
+            Console.WriteLine("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
 
 #endif
 

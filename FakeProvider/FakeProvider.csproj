@@ -10,7 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\BossServer\BossServer.csproj" />
   </ItemGroup>
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)Output\ServerPlugins\" />
-	</Target>
+
+  <Import Project="$(SolutionDir)Plugin.Common.props" />
 </Project>

@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32113.165
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BossPlugin", "BossPlugin\BossPlugin.csproj", "{F102EB6A-D757-4F60-A2C1-29DC045A2396}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BossServer", "BossServer\BossServer.csproj", "{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldEdit", "WorldEdit\WorldEdit.csproj", "{7F3A8B7C-AC77-424C-BB5A-ED99F24BEAE4}"
@@ -31,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyRegion", "SkyRegion\SkyR
 		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B} = {F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegionTrigger", "RegionTrigger\RegionTrigger.csproj", "{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BadgeSystem", "BadgeSystem\BadgeSystem.csproj", "{9B75CF10-07F9-4295-8A06-D1840F9F7880}"
 EndProject
 Global
@@ -41,14 +41,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F102EB6A-D757-4F60-A2C1-29DC045A2396}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F102EB6A-D757-4F60-A2C1-29DC045A2396}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F102EB6A-D757-4F60-A2C1-29DC045A2396}.Debug|x86.ActiveCfg = Debug|x86
-		{F102EB6A-D757-4F60-A2C1-29DC045A2396}.Debug|x86.Build.0 = Debug|x86
-		{F102EB6A-D757-4F60-A2C1-29DC045A2396}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F102EB6A-D757-4F60-A2C1-29DC045A2396}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F102EB6A-D757-4F60-A2C1-29DC045A2396}.Release|x86.ActiveCfg = Release|x86
-		{F102EB6A-D757-4F60-A2C1-29DC045A2396}.Release|x86.Build.0 = Release|x86
 		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -121,6 +113,16 @@ Global
 		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Release|x86.ActiveCfg = Release|Any CPU
 		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Release|x86.Build.0 = Release|Any CPU
+
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Debug|x86.Build.0 = Debug|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Release|x86.ActiveCfg = Release|Any CPU
+		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Release|x86.Build.0 = Release|Any CPU
+
 		{9B75CF10-07F9-4295-8A06-D1840F9F7880}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9B75CF10-07F9-4295-8A06-D1840F9F7880}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B75CF10-07F9-4295-8A06-D1840F9F7880}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -129,6 +131,7 @@ Global
 		{9B75CF10-07F9-4295-8A06-D1840F9F7880}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9B75CF10-07F9-4295-8A06-D1840F9F7880}.Release|x86.ActiveCfg = Release|Any CPU
 		{9B75CF10-07F9-4295-8A06-D1840F9F7880}.Release|x86.Build.0 = Release|Any CPU
+    
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
