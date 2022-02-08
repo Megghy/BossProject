@@ -1,9 +1,6 @@
 {
-  "profiles": {
-    "TerrariaServerAPI": {
-      "commandName": "Project"
-    },
-    "Local": {
+  "profiles":{
+    "Boss_Megghy": {
       "commandName": "Executable",
       "executablePath": "C:\\Users\\Jeoi\\source\\repos\\BossProject\\Output\\TerrariaServer.exe",
       "commandLineArgs": "-language zh-Hans -ip 127.0.0.1 -port 7777 -maxplayers 8 -world C:\\Users\\Jeoi\\Documents\\My Games\\Terraria\\Worlds/BOSS工作室.wld",
