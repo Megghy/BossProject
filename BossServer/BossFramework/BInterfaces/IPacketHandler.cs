@@ -6,7 +6,6 @@ namespace BossFramework.BInterfaces
 {
     public interface IPacketHandler
     {
-        public abstract PacketTypes Type { get; }
         public bool GetPacket(BPlayer plr, Packet packet);
         public bool SendPacket(BPlayer plr, Packet packet);
     }
@@ -15,8 +14,6 @@ namespace BossFramework.BInterfaces
         public bool GetPacket(BPlayer plr, Packet packet) => OnGetPacket(plr, (T)packet);
 
         public bool SendPacket(BPlayer plr, Packet packet) => OnGetPacket(plr, (T)packet);
-
-        public abstract PacketTypes Type { get; }
         /// <summary>
         /// 接收到数据包
         /// </summary>

@@ -47,7 +47,6 @@ namespace BossFramework.BCore
         public delegate void OnLeaveBRegion(BRegionEventArgs args);
         public static event OnLeaveBRegion LeaveBRegion;
 
-
         public static BRegion FindBRegionForRegion(Region region)
         {
             if (region is null)
@@ -98,9 +97,16 @@ namespace BossFramework.BCore
             {
                 var args = new BRegionEventArgs(region, plr);
                 if (isEnter)
+                {
                     EnterBRegion?.Invoke(args);
+                    plr.CurrentRegion = region;
+                }
                 else
+                {
                     LeaveBRegion?.Invoke(args);
+                    if (plr.CurrentRegion == region)
+                        plr.CurrentRegion = null;
+                }
             }
         }
     }

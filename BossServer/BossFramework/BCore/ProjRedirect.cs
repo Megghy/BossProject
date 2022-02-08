@@ -1,6 +1,11 @@
 ﻿using BossFramework.BAttributes;
 using BossFramework.BModels;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using TerrariaApi.Server;
 using TrProtocol.Packets;
 using TShockAPI.Hooks;
 
@@ -13,14 +18,39 @@ namespace BossFramework.BCore
     {
         public static ProjRedirectContext DefaultProjContext { get; private set; }
 
-        [AutoInit]
+        [AutoInit(order: 200)]
         public static void InitProjRedirect()
         {
             BLog.DEBUG("初始化弹幕重定向");
             DefaultProjContext = new(null);
 
-            RegionHooks.RegionEntered += OnEnterRegion;
-            RegionHooks.RegionCreated += OnRegionCreate;
+            BRegionSystem.EnterBRegion += OnEnterRegion;
+
+            Task.Run(RedirectLoop);
+        }
+        public static ConcurrentQueue<(BPlayer plr, SyncProjectile proj)> CreateProjsQueue { get; } = new();
+        public static async void RedirectLoop()
+        {
+            while (!Terraria.Netplay.Disconnect)
+            {
+                try
+                {
+                    if(CreateProjsQueue.TryDequeue(out var projInfo) && projInfo.plr?.IsRealPlayer == true)
+                    {
+                        var proj = projInfo.proj;
+                        var plr = projInfo.plr;
+                        if(plr.CurrentRegion is { } region)
+                        {
+                            region.ProjContext.
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    BLog.Error(ex);
+                }
+                Task.Delay(1).Wait();
+            }
         }
 
         public static bool OnProjCreate(BPlayer plr, SyncProjectile proj)
@@ -34,17 +64,9 @@ namespace BossFramework.BCore
             else
                 return false;
         }
-        public static void OnRegionCreate(RegionHooks.RegionCreatedEventArgs args)
+        public static void OnEnterRegion(BRegionSystem.BRegionEventArgs args)
         {
-
-        }
-        public static void OnRegionDelete(RegionHooks.RegionCreatedEventArgs args)
-        {
-
-        }
-        public static void OnEnterRegion(RegionHooks.RegionEnteredEventArgs args)
-        {
-
+             
         }
     }
 }

@@ -6,8 +6,6 @@ namespace BossFramework.BNet.PacketHandlers
 {
     public class PlayerDeathHandler : PacketHandlerBase<PlayerDeathV2>
     {
-        public override PacketTypes Type => PacketTypes.PlayerDeathV2;
-
         public override bool OnGetPacket(BPlayer plr, PlayerDeathV2 packet)
         {
             if (plr.TsPlayer?.TPlayer.hostile == true)
