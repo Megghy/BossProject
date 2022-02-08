@@ -449,7 +449,10 @@ namespace TerrariaApi.Server
                 string path = Path.Combine(ServerPluginsDirectoryPath, fileName + ".dll");
                 if (!File.Exists(path))
                     path = Path.Combine(Environment.CurrentDirectory, "Lib", fileName + ".dll");
-
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
                 var assembly = Assembly.LoadFrom(path);
                 loadedAssemblies?.Add(fileName, assembly);
                 return assembly;

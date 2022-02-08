@@ -453,7 +453,7 @@ namespace Philosophyz
         }
         private static byte[] PackInfo(bool ssc)
         {
-            return BossFramework.Utils.GetCurrentWorldData(ssc).Serialize();
+            return BUtils.GetCurrentWorldData(ssc).SerializePacket();
         }
         internal static void SendInfo(int remoteClient, bool ssc)
         {

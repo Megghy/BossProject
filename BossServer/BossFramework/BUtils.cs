@@ -1,5 +1,6 @@
 ﻿using BossFramework.BModels;
 using BossFramework.BNet;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace BossFramework
 {
-    public static class Utils
+    public static class BUtils
     {
         public static void ForEach<T>(this IEnumerable<T> source, Action<T, int> action)
         {
@@ -57,6 +58,30 @@ namespace BossFramework
             return text == othor || text.StartsWith(othor);
         }
 
+        public static T DeserializeJson<T>(this string text)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(text);
+            }
+            catch (Exception ex)
+            {
+                BLog.Error(ex);
+                return default;
+            }
+        }
+        public static string SerializeToJson(this object obj)
+        {
+            try
+            {
+                return JsonConvert.SerializeObject(obj);
+            }
+            catch (Exception ex)
+            {
+                BLog.Error(ex);
+                return default;
+            }
+        }
         public static WorldData GetCurrentWorldData(bool? ssc = null)
         {
             var worldInfo = new WorldData
@@ -165,8 +190,12 @@ namespace BossFramework
             return worldInfo;
         }
         public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("Boss.BPlayer");
-        public static byte[] Serialize(this Packet p) => PacketHandler.Serializer.Serialize(p);
+        public static byte[] SerializePacket(this Packet p) => PacketHandler.Serializer.Serialize(p);
 
+        public static void SendPacketToAll(this BPlayer _, Packet packet)
+        {
+            BInfo.OnlinePlayers.ForEach(p => p.SendPacket(packet));
+        }
         public static void SendEX(this TSPlayer plr, object msg, Color color = default)
         {
             color = color == default ? Color.White : color;

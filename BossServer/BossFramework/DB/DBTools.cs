@@ -11,6 +11,12 @@ namespace BossFramework.DB
     {
         public static UserConfigBase<T>.Context UserContext<T>(string tableName = null) where T : UserConfigBase<T> => UserConfigBase<T>.GetContext(tableName);
         public static ConfigBase<T>.Context Context<T>(string tableName = null) where T : ConfigBase<T> => ConfigBase<T>.GetContext(tableName);
+        public static T[] GetAll<T>() where T : UserConfigBase<T>
+        {
+            var result = Context<T>().Config.ToArray();
+            result.ForEach(r => r.Init());
+            return result;
+        }
         public static T Insert<T>(T target, string tableName = null) where T : UserConfigBase<T>
         {
             tableName ??= typeof(T).Name;

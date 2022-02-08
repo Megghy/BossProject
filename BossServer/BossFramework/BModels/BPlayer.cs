@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TrProtocol;
+using TrProtocol.Packets;
 using TShockAPI;
 
 namespace BossFramework.BModels
@@ -23,6 +24,8 @@ namespace BossFramework.BModels
         #region 变量
         public TSPlayer TsPlayer { get; internal set; }
         public string Name => TsPlayer?.Name ?? "unknown";
+        public byte Index => (byte)(TsPlayer?.Index ?? -1);
+        public bool IsRealPlayer => TsPlayer?.RealPlayer ?? false;
 
         #region 小游戏部分
         public long Point { get; set; }
@@ -42,7 +45,7 @@ namespace BossFramework.BModels
         /// <param name="p"></param>
         public void SendPacket(Packet p)
         {
-            TsPlayer?.SendRawData(p.Serialize());
+            TsPlayer?.SendRawData(p.SerializePacket());
         }
         public void SendCombatMessage(string msg, Color color = default, bool randomPosition = true)
         {
@@ -82,6 +85,33 @@ namespace BossFramework.BModels
             TsPlayer?.SendErrorMessage("Use \"my query\" for items with spaces.");
             TsPlayer?.SendErrorMessage("Use tsi:[number] or tsn:[username] to distinguish between user IDs and usernames.");
         }
+
+        #region 玩家状态
+        /// <summary>
+        /// 增加或减少玩家魔法值, 如果不足的话返回 false
+        /// </summary>
+        /// <param name="value">减少为 - </param>
+        public bool ChangeMana(int value)
+        {
+            if (IsRealPlayer)
+                return false;
+            if (TsPlayer.TPlayer.statMana + value < 0)
+                return false;
+            TsPlayer.TPlayer.statMana += value;
+            SendPacket(new PlayerMana()
+            {
+                PlayerSlot = Index,
+                StatMana = (short)TsPlayer.TPlayer.statMana,
+                StatManaMax = (short)TsPlayer.TPlayer.statLifeMax2
+            });
+            this.SendPacketToAll(new ManaEffect()
+            {
+                PlayerSlot = Index,
+                Amount = (short)(value < 0 ? -value : value)
+            });
+            return true;
+        }
+        #endregion
         #endregion
     }
 }

@@ -2,7 +2,7 @@
   "profiles":{
     "Boss_Megghy": {
       "commandName": "Executable",
-      "executablePath": "D:\\Code\\BossPlugin\\Output\\TerrariaServer.exe",
+      "executablePath": "D:\\Code\\BossPlugin\\Output\\BossServer.exe",
       "commandLineArgs": "-language zh-Hans -ip 127.0.0.1 -port 7777 -maxplayers 8 -world C:/Users/Megghy/Documents/My Games/Terraria/Worlds/茑萝地表.wld",
       "workingDirectory": "D:\\Code\\BossPlugin\\Output\\"
     }
