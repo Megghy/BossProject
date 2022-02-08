@@ -120,7 +120,7 @@ namespace BossFramework.BModels
             _game?.Stop();
             _game = null;
             Players.Clear();
-            BLog.Info($"小游戏实例 [{this}] 已销毁");
+            BLog.DEBUG($"小游戏实例 [{this}] 已销毁");
         }
         #endregion
     }

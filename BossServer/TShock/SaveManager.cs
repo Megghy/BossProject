@@ -73,6 +73,8 @@ namespace TShockAPI
         /// <param name="direct">use the realsaveWorld method instead of saveWorld event (default: false)</param>
         public void SaveWorld(bool wait = true, bool resetTime = false, bool direct = false)
         {
+            if (ServerApi.Hooks.InvokeWorldSave(false))
+                return;
             EnqueueTask(new SaveTask(resetTime, direct));
             if (!wait)
                 return;

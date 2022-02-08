@@ -16,7 +16,8 @@ namespace TerrariaApi.Server.Hooking
             _hookManager = hookManager;
 
             On.Terraria.IO.WorldFile.LoadWorld += OnLoadWorld;
-            On.Terraria.IO.WorldFile.SaveWorld_bool_bool += WorldFile_SaveWorld;
+            On.Terraria.IO.WorldFile.SaveWorld += WorldFile_SaveWorld;
+            On.Terraria.IO.WorldFile.SaveWorld_bool_bool += WorldFile_SaveWorld2;
             On.Terraria.WorldGen.StartHardmode += WorldGen_StartHardmode;
             On.Terraria.WorldGen.SpreadGrass += WorldGen_SpreadGrass;
             On.Terraria.Main.checkXMas += Main_checkXMas;
@@ -54,8 +55,16 @@ namespace TerrariaApi.Server.Hooking
                     e.Result = HookResult.Cancel;
             }
         }
+        public static void WorldFile_SaveWorld(On.Terraria.IO.WorldFile.orig_SaveWorld orig)
+        {
+            if (_hookManager.InvokeWorldSave(false))
+                return;
 
-        public static void WorldFile_SaveWorld(On.Terraria.IO.WorldFile.orig_SaveWorld_bool_bool orig, bool useCloudSaving, bool resetTime)
+            orig();
+
+            _hookManager.InvokePostWorldSave(false);
+        }
+        public static void WorldFile_SaveWorld2(On.Terraria.IO.WorldFile.orig_SaveWorld_bool_bool orig, bool useCloudSaving, bool resetTime)
         {
             if (_hookManager.InvokeWorldSave(resetTime))
                 return;

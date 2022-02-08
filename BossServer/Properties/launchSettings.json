@@ -1,8 +1,5 @@
 {
-  "profiles": {
-    "TerrariaServerAPI": {
-      "commandName": "Project"
-    },
+  "profiles":{
     "Boss_Megghy": {
       "commandName": "Executable",
       "executablePath": "D:\\Code\\BossPlugin\\Output\\TerrariaServer.exe",
