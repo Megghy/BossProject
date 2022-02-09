@@ -32,6 +32,28 @@ namespace BossFramework.BNet
                                     (IPacketHandler)Activator.CreateInstance(t, Array.Empty<object>())!);
                         });
         }
+        public static void OnSendData(SendBytesEventArgs args)
+        {
+            var type = (PacketTypes)args.Buffer[2];
+            var plr = TShock.Players[args.Socket.Id]?.GetBPlayer() ?? new(TShock.Players[args.Socket.Id]);
+            using var reader = new BinaryReader(new MemoryStream(args.Buffer));
+            if (Handlers.TryGetValue(type, out var handler))
+            {
+                try
+                {
+                    reader.BaseStream.Position = 0L;
+                    args.Handled = handler.GetPacket(plr, Serializer.Deserialize(reader));
+                }
+                catch (Exception ex)
+                {
+                    BLog.Error($"数据包处理失败{Environment.NewLine}{ex}");
+                }
+            }
+            else
+            {
+                args.Handled = OnSendPacket(plr, type, reader);
+            }
+        }
         public static void OnGetData(GetDataEventArgs args)
         {
             if (Netplay.Clients[args.Msg.whoAmI].State < 10 && args.MsgID == PacketTypes.ItemOwner)

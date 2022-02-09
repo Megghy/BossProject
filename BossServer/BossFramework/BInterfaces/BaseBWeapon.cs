@@ -113,7 +113,11 @@ namespace BossFramework.BInterfaces
 
         public override bool Equals(object obj)
         {
-            if (obj is Terraria.Item item)
+            if (obj is null)
+                return false;
+            else if(obj is SyncEquipment syncItem)
+                return syncItem.ItemType == ItemID && syncItem.Prefix == Prefix && syncItem.Stack == Stack;
+            else if (obj is Terraria.Item item)
                 return item.type == ItemID && item.prefix == Prefix && item.stack == Stack;
             else if (obj is NetItem netItem)
                 return netItem.NetId == ItemID && netItem.PrefixId == Prefix && netItem.Stack == Stack;

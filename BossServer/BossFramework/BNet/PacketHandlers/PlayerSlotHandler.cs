@@ -8,21 +8,17 @@ namespace BossFramework.BNet.PacketHandlers
     {
         public override bool OnGetPacket(BPlayer plr, SyncEquipment packet)
         {
-            if (packet.ItemSlot == 58)
+            if(packet.ItemSlot == 58)
                 plr.ItemInHand = new(packet.ItemType, packet.Stack, packet.Prefix);
-            BCore.BWeaponSystem.CheckIncomeItem(plr, packet);
-            if(packet.ItemSlot < 59)
-            {
-                plr.TrPlayer.inventory[packet.ItemSlot] ??= new();
-                plr.TrPlayer.inventory[packet.ItemSlot].SetDefaults(packet.ItemType);
-                plr.TrPlayer.inventory[packet.ItemSlot].stack = packet.Stack;
-                plr.TrPlayer.inventory[packet.ItemSlot].prefix = packet.Prefix;
-            }    
+            if (BCore.BWeaponSystem.CheckIncomeItem(plr, packet))
+                return true;
             return false;
         }
 
         public override bool OnSendPacket(BPlayer plr, SyncEquipment packet)
         {
+            if (plr.IsChangingWeapon)
+                return true;
             return false;
         }
     }

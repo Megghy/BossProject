@@ -112,6 +112,7 @@ namespace BossFramework.BModels
         };
         public void RemoveItem(int slot)
         {
+            Console.WriteLine($"移除 {slot}");
             TrPlayer.inventory[slot]?.SetDefaults();
             _emptyItemPacket.ItemSlot = (short)slot;
             _emptyItemPacket.PlayerSlot = Index;
