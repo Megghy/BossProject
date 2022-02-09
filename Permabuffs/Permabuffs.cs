@@ -73,9 +73,17 @@ namespace Permabuffs
 			Commands.ChatCommands.Add(new Command("pb.give", PBGive, "gpermabuff") { HelpText = "Gives a player the specified permabuff." });
 			Commands.ChatCommands.Add(new Command("pb.region", PBRegion, "regionbuff"));
 			Commands.ChatCommands.Add(new Command("pb.global", PBGlobal, "globalbuff"));
-			Commands.ChatCommands.Add(new Command("pb.use", PBClear, "clearbuffs") { HelpText = "Removes all permabuffs." });
+            Commands.ChatCommands.Add(new Command("pb.use", PBClear, "clearbuffs") { HelpText = "Removes all permabuffs." });
+			Commands.ChatCommands.Add(new Command("pb.pass", PBPass, "pbtoggle") { HelpText = "ignore region buff" });
 		}
 
+		private void PBPass(CommandArgs args)
+		{
+			var info = PlayerInfo.GetPlayerInfo(args.Player);
+
+			info.BypassChange = !info.BypassChange;
+			args.Player.SendSuccessMessage("{0}  无视区域BUFF", info.BypassChange ? "开启" : "关闭");
+		}
 		public void OnGreet(GreetPlayerEventArgs args)
 		{
 			if (TShock.Players[args.Who] == null)
@@ -185,7 +193,11 @@ namespace Permabuffs
 				if (TShock.Players[i].CurrentRegion != null)
 				{
 					RegionBuff rb = config.regionbuffs.FirstOrDefault(p => TShock.Players[i].CurrentRegion.Name == p.regionName && p.buffs.Count > 0);
-
+					var info = PlayerInfo.GetPlayerInfo(TShock.Players[i]);
+					if (info.BypassChange)
+					{
+						return;
+					}
 					if (rb != null)
 					{
 						foreach (KeyValuePair<int, int> kvp in rb.buffs)
