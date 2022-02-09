@@ -4,14 +4,14 @@ using TrProtocol.Packets;
 
 namespace BossFramework.BNet.PacketHandlers
 {
-    public class PlayerUpdateHandler : PacketHandlerBase<PlayerControls>
+    public class PlayerInfoHandler : PacketHandlerBase<SyncPlayer>
     {
-        public override bool OnGetPacket(BPlayer plr, PlayerControls packet)
+        public override bool OnGetPacket(BPlayer plr, SyncPlayer packet)
         {
             return false;
         }
 
-        public override bool OnSendPacket(BPlayer plr, PlayerControls packet)
+        public override bool OnSendPacket(BPlayer plr, SyncPlayer packet)
         {
             return false;
         }

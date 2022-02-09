@@ -8,7 +8,7 @@ namespace BossFramework.BNet.PacketHandlers
     {
         public override bool OnGetPacket(BPlayer plr, SyncEquipment packet)
         {
-            if(packet.ItemSlot == 58)
+            if (packet.ItemSlot == 58)
                 plr.ItemInHand = new(packet.ItemType, packet.Stack, packet.Prefix);
             if (BCore.BWeaponSystem.CheckIncomeItem(plr, packet))
                 return true;

@@ -1,4 +1,5 @@
 ﻿using BossFramework.BInterfaces;
+using System;
 using TrProtocol.Packets;
 
 namespace BossFramework.BModels
@@ -22,7 +23,9 @@ namespace BossFramework.BModels
             this.ProjType = proj.ProjType;
             this.UUID = proj.UUID;
             FromWeapon = fromWeapon;
+            CreateTime = DateTime.Now.Ticks;
         }
         public BaseBWeapon FromWeapon { get; private set; }
+        public long CreateTime { get; init; }
     }
 }

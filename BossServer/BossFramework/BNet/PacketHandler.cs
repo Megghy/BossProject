@@ -10,7 +10,7 @@ using Terraria;
 using TerrariaApi.Server;
 using TrProtocol;
 using TShockAPI;
-using static BossFramework.BModels.EventArgs;
+using static BossFramework.BModels.BEventArgs;
 
 namespace BossFramework.BNet
 {

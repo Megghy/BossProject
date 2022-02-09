@@ -7,7 +7,7 @@ using TerrariaApi.Server;
 using TrProtocol.Packets;
 using TShockAPI;
 using TShockAPI.Hooks;
-using static BossFramework.BModels.EventArgs;
+using static BossFramework.BModels.BEventArgs;
 
 namespace Philosophyz
 {

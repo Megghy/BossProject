@@ -27,6 +27,9 @@ namespace BossFramework.BCore
             LoadWeapon();
 
             ServerApi.Hooks.GameUpdate.Register(BPlugin.Instance, OnGameUpdate);
+
+            ProjRedirect.ProjCreate += OnProjCreate;
+            ProjRedirect.ProjDestroy += OnProjDestroy;
         }
         [Reloadable]
         private static void LoadWeapon()
@@ -36,7 +39,9 @@ namespace BossFramework.BCore
         }
 
         public static BaseBWeapon[] BWeapons { get; private set; }
-        public static void OnGameUpdate(System.EventArgs args)
+
+        #region 事件
+        public static void OnGameUpdate(EventArgs args)
         {
             BInfo.OnlinePlayers.Where(p => p.IsCustomWeaponMode)
                 .ForEach(p =>
@@ -52,7 +57,6 @@ namespace BossFramework.BCore
                 return true;
             if (item.ItemSlot > 50 || item.ItemType == 0) //空格子或者拿手上则忽略
                 return false;
-            BLog.DEBUG($"type: {item.ItemType}, prefix: {item.Prefix}, slot: {item.ItemSlot}");
             if (plr.Weapons?.Where(w => w.Equals(item)).FirstOrDefault() is { } bweapon)
             {
                 var targetItem = plr.TsPlayer.TPlayer.inventory[item.ItemSlot];
@@ -76,9 +80,9 @@ namespace BossFramework.BCore
             {
                 var targetPlayer = TShock.Players[packet.OtherPlayerSlot]?.GetBPlayer();
                 var deathReason = packet.Reason;
-                if (plr.ProjContext.Projs.Where(p => p is BWeaponRelesedProj tempProj && tempProj.ProjSlot == deathReason._sourceProjectileIndex).FirstOrDefault() is BWeaponRelesedProj projInfo)
+                if (plr.RelesedProjs.Where(p => p.proj.ProjSlot == deathReason._sourceProjectileIndex).FirstOrDefault() is { } projInfo)
                 {
-                    projInfo.FromWeapon.OnProjHit(plr, targetPlayer, projInfo, packet.Damage, packet.HitDirection, (byte)packet.CoolDown);
+                    projInfo.fromWeapon.OnProjHit(plr, targetPlayer, projInfo.proj, packet.Damage, packet.HitDirection, (byte)packet.CoolDown);
                 }
                 else if (plr.Weapons.Where(w => w.ItemID == deathReason._sourceItemType && w.Prefix == deathReason._sourceItemPrefix).FirstOrDefault() is { } weapon)
                 {
@@ -86,6 +90,30 @@ namespace BossFramework.BCore
                 }
             }
         }
+        public static void OnProjCreate(BEventArgs.ProjCreateEventArgs args)
+        {
+            if (!args.Player.IsCustomWeaponMode)
+                return;
+            if (args.Player.Weapons.Where(w => w.Equals(args.Player.TsPlayer.SelectedItem)).FirstOrDefault() is { } weapon)
+            {
+                var selectItem = args.Player.TsPlayer.SelectedItem;
+                if (weapon.OnShootProj(args.Player, args.Proj, new(args.Proj.Velocity.X, args.Proj.Velocity.Y), (weapon.ShootProj ?? selectItem.shoot) == args.Proj.ProjType)) //如果返回true则关闭客户端对应弹幕
+                {
+                    args.Handled = true;
+                    args.Proj.ProjType = 0;
+                    args.Player.SendPacket(args.Proj);
+                }
+            }
+        }
+        public static void OnProjDestroy(BEventArgs.ProjDestroyEventArgs args)
+        {
+            if (args.Player.RelesedProjs.Where(p => p.proj.ProjSlot == args.KillProj.ProjSlot).FirstOrDefault() is { } projInfo)
+            {
+                args.Player.RelesedProjs.Remove(projInfo);
+                projInfo.fromWeapon.OnProjDestroy(args.Player, args.KillProj);
+            }
+        }
+        #endregion
 
         #region 物品操作
         private static void FillInventory(this BPlayer plr)
@@ -119,7 +147,6 @@ namespace BossFramework.BCore
         }
         private static void SpawnBWeapon(this BPlayer plr, BaseBWeapon weapon, int slot)
         {
-            Console.WriteLine($"生成 {slot}");
             var item = TShock.Utils.GetItemById(weapon.ItemID);
             item.prefix = (byte)weapon.Prefix;
             item.stack = weapon.Stack;

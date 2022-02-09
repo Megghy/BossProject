@@ -4,21 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using TShockAPI.DB;
 using TShockAPI.Hooks;
+using static BossFramework.BModels.BEventArgs;
 
 namespace BossFramework.BCore
 {
     public static class BRegionSystem
     {
-        public class BRegionEventArgs
-        {
-            public BRegionEventArgs(BRegion region, BPlayer plr)
-            {
-                Region = region;
-                Player = plr;
-            }
-            public BRegion Region { get; set; }
-            public BPlayer Player { get; set; }
-        }
         public static List<BRegion> AllBRegion { get; private set; }
 
         [AutoPostInit]

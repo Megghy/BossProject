@@ -11,7 +11,7 @@ namespace BossFramework.BModels
         {
             BindingRegion = bindingRegion;
         }
-        public SyncProjectile[] Projs { get; private set; } = new SyncProjectile[1000];
+        public SyncProjectile[] Projs { get; private set; } = new SyncProjectile[1001];
         public BRegion BindingRegion { get; private set; }
 
         /// <summary>
@@ -24,25 +24,31 @@ namespace BossFramework.BModels
         {
             try
             {
-                int slot = proj.ProjSlot;
-                if (slot == 1000) //创建弹幕
+                lock (Projs)
                 {
-                    for (int i = 0; i < 1000; i++)
+                    int slot = proj.ProjSlot;
+
+                    if (slot >= 1000) //创建弹幕
                     {
-                        if (Projs[slot] is null)
+                        for (int i = 0; i < 1000; i++)
                         {
-                            slot = i;
-                            break;
+                            if (Projs[i] is null)
+                            {
+                                slot = i;
+                                break;
+                            }
                         }
+                        if (slot >= 1000)
+                            slot = 0;
+                        proj.ProjSlot = (short)slot;
                     }
-                    if (slot == 1000)
-                        slot = 0;
-                    proj.ProjSlot = (short)slot;
+                    BLog.DEBUG($"弹幕同步: {BindingRegion}:[{proj.ProjSlot}] {Projs.Where(p => p != null).Count()}");
+                    Projs[slot] = proj;
+                    var rawData = proj.SerializePacket();
+                    var all = BindingRegion.GetAllPlayerInRegion();
+                    (sendToSelf ? all : all.Where(p => p != from))
+                        .ForEach(p => p.TsPlayer?.SendRawData(rawData));
                 }
-                BLog.DEBUG($"弹幕同步: {BindingRegion}:[{proj.ProjSlot}]");
-                Projs[slot] = proj;
-                var rawData = proj.SerializePacket();
-                var all = BindingRegion.GetAllPlayerInRegion();
             }
             catch (Exception ex)
             {

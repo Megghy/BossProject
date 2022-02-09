@@ -46,6 +46,8 @@ namespace BossFramework.BModels
         public bool IsChangingWeapon { get; internal set; } = false;
         public NetItem ItemInHand { get; internal set; } = new(0, 0, 0);
 
+        public List<(SyncProjectile proj, BaseBWeapon fromWeapon, long CreateTime)> RelesedProjs { get; } = new();
+
         #region 小游戏部分
         public long Point { get; set; }
         /// <summary>
@@ -112,7 +114,6 @@ namespace BossFramework.BModels
         };
         public void RemoveItem(int slot)
         {
-            Console.WriteLine($"移除 {slot}");
             TrPlayer.inventory[slot]?.SetDefaults();
             _emptyItemPacket.ItemSlot = (short)slot;
             _emptyItemPacket.PlayerSlot = Index;

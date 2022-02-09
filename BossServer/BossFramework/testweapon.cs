@@ -16,9 +16,21 @@ public class testweapon : BaseBWeapon
     public override void OnUseItem(BPlayer plr, long gameTime)
     {
         if (gameTime - lastUse > 60) //距离上一次使用超过1秒
+        {
             CreateProj(plr, 168, plr.TrPlayer.position, new Microsoft.Xna.Framework.Vector2(1, 1));
+            plr.SendInfoEX("思考");
+            lastUse = gameTime;
+        }
     }
-
+    public override bool OnShootProj(BPlayer plr, SyncProjectile proj, Microsoft.Xna.Framework.Vector2 velocity, bool isDefaultProj)
+    {
+        if (isDefaultProj)
+        {
+            CreateProj(plr, 168, plr.TrPlayer.position, velocity, 1);
+            return true;
+        }
+        return false;
+    }
     public override void OnHit(BPlayer from, BPlayer target, int damage, byte direction, byte coolDown)
     {
         Console.WriteLine($"{Name} - {from} 击中 {target}, {damage}, {direction}");
