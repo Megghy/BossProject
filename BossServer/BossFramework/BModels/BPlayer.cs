@@ -34,6 +34,11 @@ namespace BossFramework.BModels
         public string Name => TsPlayer?.Name ?? "unknown";
         public byte Index => (byte)(TsPlayer?.Index ?? -1);
         public bool IsRealPlayer => TsPlayer?.RealPlayer ?? false;
+        public float X => TsPlayer.X;
+        public float Y => TsPlayer.Y;
+        public int TileX => TsPlayer.TileX;
+        public int TileY => TsPlayer.TileY;
+
         public BaseBWeapon[] Weapons { get; internal set; }
         public BRegion CurrentRegion { get; internal set; } = BRegion.Default;
         public ProjRedirectContext ProjContext => CurrentRegion?.ProjContext;

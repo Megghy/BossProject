@@ -1,6 +1,7 @@
 ﻿using BossFramework.BInterfaces;
 using BossFramework.BModels;
 using System;
+using Terraria.ID;
 using TrProtocol.Packets;
 
 public class testweapon : BaseBWeapon
@@ -18,7 +19,7 @@ public class testweapon : BaseBWeapon
         if (gameTime - lastUse > 60) //距离上一次使用超过1秒
         {
             CreateProj(plr, 168, plr.TrPlayer.position, new Microsoft.Xna.Framework.Vector2(1, 1));
-            plr.SendInfoEX("思考");
+            plr.TsPlayer.Heal(10);
             lastUse = gameTime;
         }
     }
@@ -34,9 +35,11 @@ public class testweapon : BaseBWeapon
     public override void OnHit(BPlayer from, BPlayer target, int damage, byte direction, byte coolDown)
     {
         Console.WriteLine($"{Name} - {from} 击中 {target}, {damage}, {direction}");
+        target.TsPlayer.SetBuff(BuffID.ShadowDodge);
     }
     public override void OnProjHit(BPlayer from, BPlayer target, SyncProjectile proj, int damage, byte direction, byte coolDown)
     {
         Console.WriteLine($"{Name} - {from} 弹幕击中 {target}");
+        target.TsPlayer.Teleport(from.X, from.Y);
     }
 }

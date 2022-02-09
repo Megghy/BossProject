@@ -212,6 +212,21 @@ namespace BossFramework.BCore
                 plr.IsChangingWeapon = false;
             });
         }
+        private static void BackToNormalItem(this BPlayer plr)
+        {
+            plr.TrPlayer.inventory.ForEach((item, i) =>
+            {
+                if (BWeapons.Where(w => w.Equals(item)).Any())
+                    plr.SendPacket(new SyncEquipment()
+                    {
+                        ItemSlot = (short)i,
+                        ItemType = (short)item.type,
+                        PlayerSlot = plr.Index,
+                        Prefix = item.prefix,
+                        Stack = (short)item.stack
+                    });
+            });
+        }
         public static void ChangeCustomWeaponMode(this BPlayer plr, bool? enable = null)
         {
             var oldMode = plr.IsCustomWeaponMode;
@@ -225,6 +240,11 @@ namespace BossFramework.BCore
                 {
                     plr.Weapons = (from w in BWeapons select (BaseBWeapon)Activator.CreateInstance(w.GetType(), null)).ToArray(); //给玩家生成武器对象
                     plr.ChangeItemToBWeapon();
+                }
+                else
+                {
+                    plr.Weapons = null;
+                    plr.BackToNormalItem();
                 }
             }
         }

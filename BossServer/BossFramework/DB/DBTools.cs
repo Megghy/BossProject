@@ -29,7 +29,7 @@ namespace BossFramework.DB
         {
             try
             {
-                SQL.Insert(target);
+                SQL.Insert(target).ExecuteAffrows();
             }
             catch (Exception ex)
             {
