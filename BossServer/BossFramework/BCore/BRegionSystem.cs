@@ -22,7 +22,7 @@ namespace BossFramework.BCore
         public static List<BRegion> AllBRegion { get; private set; }
 
         [AutoPostInit]
-        public static void InitRegion()
+        private static void InitRegion()
         {
             BLog.DEBUG("初始化区域管理");
 

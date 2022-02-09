@@ -1,8 +1,10 @@
-﻿using BossFramework.DB;
+﻿using BossFramework.BInterfaces;
+using BossFramework.DB;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Terraria;
 using TrProtocol;
 using TrProtocol.Packets;
 using TShockAPI;
@@ -15,18 +17,31 @@ namespace BossFramework.BModels
         public BPlayer(TSPlayer plr)
         {
             TsPlayer = plr;
+            Init();
         }
         public override void Init()
         {
-            TsPlayer = TShock.Players.FirstOrDefault(p => p?.Account?.ID.ToString() == ID);
+            TsPlayer ??= TShock.Players.FirstOrDefault(p => p?.Account?.ID.ToString() == ID);
+            _emptyItemPacket = new()
+            {
+                ItemType = 0,
+                PlayerSlot = Index,
+                Prefix = 0,
+                Stack = 0
+            };
         }
 
         #region 变量
         public TSPlayer TsPlayer { get; internal set; }
+        public Player TrPlayer => TsPlayer?.TPlayer;
         public string Name => TsPlayer?.Name ?? "unknown";
         public byte Index => (byte)(TsPlayer?.Index ?? -1);
         public bool IsRealPlayer => TsPlayer?.RealPlayer ?? false;
-
+        /// <summary>
+        /// 是否处于使用自定义武器的状态, 修改需使用 <see cref="BCore.BWeaponSystem.ChangeCustomWeaponMode(BPlayer, bool?)"/>
+        /// </summary>
+        public bool IsCustomWeaponMode { get; internal set; } = false;
+        public BaseBWeapon[] Weapons { get; internal set; }
         public BRegion CurrentRegion { get; internal set; }
 
         #region 小游戏部分
@@ -87,6 +102,13 @@ namespace BossFramework.BModels
             TsPlayer?.SendErrorMessage("Use \"my query\" for items with spaces.");
             TsPlayer?.SendErrorMessage("Use tsi:[number] or tsn:[username] to distinguish between user IDs and usernames.");
         }
+        private SyncEquipment _emptyItemPacket;
+        public void RemoveItem(int slot)
+        {
+            TrPlayer.inventory[slot].SetDefaults();
+            _emptyItemPacket.ItemSlot = (short)slot;
+            SendPacket(_emptyItemPacket);
+        }
 
         #region 玩家状态
         /// <summary>
@@ -113,6 +135,7 @@ namespace BossFramework.BModels
             });
             return true;
         }
+        
         #endregion
         #endregion
     }

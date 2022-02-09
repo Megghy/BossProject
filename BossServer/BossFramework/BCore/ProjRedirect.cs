@@ -16,7 +16,7 @@ namespace BossFramework.BCore
         public static ProjRedirectContext DefaultProjContext { get; private set; }
 
         [AutoInit(order: 200)]
-        public static void InitProjRedirect()
+        private static void InitProjRedirect()
         {
             BLog.DEBUG("初始化弹幕重定向");
             DefaultProjContext = new(null);

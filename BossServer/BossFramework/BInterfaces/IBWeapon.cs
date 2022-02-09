@@ -1,10 +1,6 @@
 ﻿using BossFramework.BModels;
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TrProtocol.Packets;
 
 namespace BossFramework.BInterfaces
 {
@@ -18,36 +14,44 @@ namespace BossFramework.BInterfaces
         /// <summary>
         /// 武器物品ID
         /// </summary>
-        public int ID { get; }
+        public int ItemID { get; }
         /// <summary>
         /// 武器前缀, 用于区分自定义武器的标识符
         /// </summary>
         public int Prefix { get; }
+        public int? Stack { get; }
 
-        public int Width { get; }
-        public int Height { get; }
-        public Color Color { get; }
-        public int KnockBack { get; }
-        public int AnimationTime { get; }
-        public int UseTime { get; }
-        public int ShootProj { get; }
-        public int ShootSpeed { get; }
-        public int Size { get; }
-        public int Ammo { get; }
-        public int UseAmmo { get; }
-        public bool NoAmmo { get; }
+        public int? Width { get; }
+        public int? Height { get; }
+        public int? Damage { get; }
+        public Color? Color { get; }
+        public int? KnockBack { get; }
+        public int? AnimationTime { get; }
+        public int? UseTime { get; }
+        public int? ShootProj { get; }
+        public int? ShootSpeed { get; }
+        public int? Size { get; }
+        public int? Ammo { get; }
+        public int? UseAmmo { get; }
+        public bool? NoAmmo { get; }
 
         /// <summary>
-        /// 
+        /// 当玩家使用武器, 每帧调用
+        /// </summary>
+        public void OnUseItem(BPlayer plr, long gameTime);
+        /// <summary>
+        /// 武器本体击中玩家
         /// </summary>
         /// <param name="from"></param>
         /// <param name="target"></param>
-        /// <returns></returns>
-        public bool OnAttack(BPlayer from, BPlayer target);
+        public void OnHit(BPlayer from, BPlayer target);
 
-        public bool OnProjHit()
-        {
-            return false;
-        }
+        /// <summary>
+        /// 武器生成的弹幕击中玩家
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="target"></param>
+        /// <param name="proj"></param>
+        public void OnProjHit(BPlayer from, BPlayer target, SyncProjectile proj);
     }
 }
