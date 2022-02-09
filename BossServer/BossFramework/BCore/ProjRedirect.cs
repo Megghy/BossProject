@@ -37,7 +37,7 @@ namespace BossFramework.BCore
                     {
                         var proj = projInfo.proj;
                         var plr = projInfo.plr;
-                        (plr.CurrentRegion ?? BRegion.Default).ProjContext.CreateOrSyncProj(plr, proj);
+                        plr.CurrentRegion.ProjContext.CreateOrSyncProj(plr, proj);
                     }
                 }
                 catch (Exception ex)
@@ -49,7 +49,7 @@ namespace BossFramework.BCore
         }
         public static void OnProjDestory(BPlayer plr, KillProjectile killProj)
         {
-            (plr.CurrentRegion ?? BRegion.Default).ProjContext.DestroyProj(killProj);
+            plr.CurrentRegion.ProjContext.DestroyProj(killProj);
         }
         public static void OnEnterRegion(BRegionSystem.BRegionEventArgs args)
         {
@@ -59,7 +59,7 @@ namespace BossFramework.BCore
         }
         public static void OnLeaveRegion(BRegionSystem.BRegionEventArgs args)
         {
-            Task.Run(() => args.Region.ProjContext.Projs.Where(p => p != null)
+            Task.Run(() => args.Region.ProjContext.Projs.Where(p => p?.PlayerSlot == args.Player.Index)
                 .ForEach(p => args.Region.ProjContext.DestroyProj(p, false))); //移除所有之前区域的弹幕
         }
     }

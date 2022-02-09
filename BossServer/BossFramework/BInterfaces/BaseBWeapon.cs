@@ -1,6 +1,7 @@
 ﻿using BossFramework.BModels;
 using TrProtocol.Models;
 using TrProtocol.Packets;
+using TShockAPI;
 
 namespace BossFramework.BInterfaces
 {
@@ -51,7 +52,7 @@ namespace BossFramework.BInterfaces
         public abstract string Name { get; }
         public abstract int ItemID { get; }
         public abstract int Prefix { get; }
-        public virtual int? Stack { get; }
+        public abstract int Stack { get; }
 
         public virtual int? Width { get; }
         public virtual int? Height { get; }
@@ -67,11 +68,11 @@ namespace BossFramework.BInterfaces
         public virtual int? UseAmmo { get; }
         public virtual bool? NoAmmo { get; }
 
-        public virtual void OnHit(BPlayer from, BPlayer target)
+        public virtual void OnHit(BPlayer from, BPlayer target, int damage, byte direction, byte coolDown)
         {
         }
 
-        public virtual void OnProjHit(BPlayer from, BPlayer target, SyncProjectile proj)
+        public virtual void OnProjHit(BPlayer from, BPlayer target, SyncProjectile proj, int damage, byte direction, byte coolDown)
         {
         }
 
@@ -79,10 +80,43 @@ namespace BossFramework.BInterfaces
         {
 
         }
+
+        protected Terraria.Projectile _proj = new();
+        protected void CreateProj(BPlayer plr, int projID, Microsoft.Xna.Framework.Vector2 position, Microsoft.Xna.Framework.Vector2 velocity, int damage = -1, float knockBack = -1, float ai0 = -1, float ai1 = -1)
+            => CreateProj(plr, projID, new Vector2(position.X, position.Y), new Vector2(velocity.X, velocity.Y), damage, knockBack, ai0, ai1);
+        protected void CreateProj(BPlayer plr, int projID, Vector2 position, Vector2 velocity, int damage = -1, float knockBack = -1, float ai0 = -1, float ai1 = -1)
+        {
+            _proj.SetDefaults(projID);
+            var bb = new BitsByte();
+            bb[0] = ai0 != -1;
+            bb[1] = ai1 != -1;
+            bb[3] = true; //bannerid
+            bb[4] = damage != -1;
+            bb[5] = knockBack != -1;
+            bb[6] = true;
+            plr.ProjContext.CreateOrSyncProj(plr, new BWeaponRelesedProj(new()
+            {
+                Bit1 = bb,
+                AI1 = ai0 == -1 ? _proj.ai[0] : ai0,
+                AI2 = ai1 == -1 ? _proj.ai[1] : ai1,
+                Damange = (short)(damage == -1 ? _proj.damage : damage),
+                OriginalDamage = (ushort)_proj.originalDamage,
+                Knockback = knockBack == -1 ? _proj.knockBack : knockBack,
+                PlayerSlot = plr.Index,
+                Position = position,
+                Velocity = velocity,
+                ProjSlot = 1000,
+                ProjType = (short)projID,
+                BannerId = (ushort)_proj.bannerIdToRespondTo
+            }, this), true);
+        }
+
         public override bool Equals(object obj)
         {
             if (obj is Terraria.Item item)
-                return item.type == ItemID && item.prefix == Prefix;
+                return item.type == ItemID && item.prefix == Prefix && item.stack == Stack;
+            else if (obj is NetItem netItem)
+                return netItem.NetId == ItemID && netItem.PrefixId == Prefix && netItem.Stack == Stack;
             else
                 return false;
         }

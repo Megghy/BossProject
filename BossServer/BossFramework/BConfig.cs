@@ -1,5 +1,4 @@
-﻿using BossFramework.BAttributes;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.IO;
 
 namespace BossFramework

@@ -216,8 +216,11 @@ namespace FakeProvider
 
             try
             {
-                SaveWorld(false, args.ResetTime);
-                Console.WriteLine("[FakeProvier] World saved.");
+                Task.Run(() =>
+                {
+                    SaveWorld(false, args.ResetTime);
+                    Console.WriteLine("[FakeProvier] World saved.");
+                });
                 args.Handled = true;
             }
             catch (Exception e)
@@ -3684,7 +3687,6 @@ Custom valid : {ValidateWorldData(array, num)}";
                     NPC.SetWorldSpecificMonstersByWorldID();
                     sw.Stop();
                     Console.Write($"[FakeProvider] Loaded world in {sw.Elapsed}");
-                    Thread.Sleep(500);
                 }
                 catch (Exception lastThrownLoadException)
                 {

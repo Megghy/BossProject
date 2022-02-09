@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32113.165
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BossServer", "BossServer\BossServer.csproj", "{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldEdit", "WorldEdit\WorldEdit.csproj", "{7F3A8B7C-AC77-424C-BB5A-ED99F24BEAE4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlternativeCommandExecution", "AlternativeCommandExecution\AlternativeCommandExecution.csproj", "{F7578C4B-36C1-476E-A849-67613685BAD2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Philosophyz", "Philosophyz\Philosophyz.csproj", "{7540BB88-32BB-45A2-9612-76363C3F6206}"
@@ -25,9 +21,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyRegion", "SkyRegion\SkyRegion.csproj", "{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B} = {F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegionTrigger", "RegionTrigger\RegionTrigger.csproj", "{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}"
 EndProject
@@ -37,11 +30,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Colosseo", "Colosseo\Coloss
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Permabuffs", "Permabuffs\Permabuffs.csproj", "{7DA0C32E-9AF3-4189-BF99-4CECEF43E261}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeleportRestriction", "TeleportRestriction\TeleportRestriction.csproj", "{CA2849FC-5712-418B-BC54-35FB93114621}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeleportRestriction", "TeleportRestriction\TeleportRestriction.csproj", "{CA2849FC-5712-418B-BC54-35FB93114621}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scattering", "Scattering\Scattering.csproj", "{58F5C480-0455-49C9-B21B-0C45303A9B22}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scattering", "Scattering\Scattering.csproj", "{58F5C480-0455-49C9-B21B-0C45303A9B22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageSender", "MessageSender\MessageSender.csproj", "{BC1A604E-B9E5-4EA2-8701-C73F06687040}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSender", "MessageSender\MessageSender.csproj", "{BC1A604E-B9E5-4EA2-8701-C73F06687040}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BossServer", "BossServer\BossServer.csproj", "{66D95F3B-B506-4F1F-839D-04330D4BAFFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,22 +46,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}.Debug|x86.Build.0 = Debug|Any CPU
-		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}.Release|x86.ActiveCfg = Release|Any CPU
-		{F7D0488D-B3A3-4FED-9CD8-BB06DDFB2A9B}.Release|x86.Build.0 = Release|Any CPU
-		{7F3A8B7C-AC77-424C-BB5A-ED99F24BEAE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7F3A8B7C-AC77-424C-BB5A-ED99F24BEAE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7F3A8B7C-AC77-424C-BB5A-ED99F24BEAE4}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{7F3A8B7C-AC77-424C-BB5A-ED99F24BEAE4}.Debug|x86.Build.0 = Debug|Any CPU
-		{7F3A8B7C-AC77-424C-BB5A-ED99F24BEAE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7F3A8B7C-AC77-424C-BB5A-ED99F24BEAE4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7F3A8B7C-AC77-424C-BB5A-ED99F24BEAE4}.Release|x86.ActiveCfg = Release|Any CPU
-		{7F3A8B7C-AC77-424C-BB5A-ED99F24BEAE4}.Release|x86.Build.0 = Release|Any CPU
 		{F7578C4B-36C1-476E-A849-67613685BAD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F7578C4B-36C1-476E-A849-67613685BAD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7578C4B-36C1-476E-A849-67613685BAD2}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -179,6 +158,14 @@ Global
 		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Release|x86.ActiveCfg = Release|Any CPU
 		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Release|x86.Build.0 = Release|Any CPU
+		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Debug|x86.Build.0 = Debug|Any CPU
+		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Release|x86.ActiveCfg = Release|Any CPU
+		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

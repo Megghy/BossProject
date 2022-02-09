@@ -5398,13 +5398,13 @@ namespace TShockAPI
             else
             {
                 var plr = players[0];
-           
+
                 if (!plr.AcceptingWhispers)
                 {
                     args.Player.SendErrorMessage($"{plr.Name} is not accepting whispers.");
                     return;
                 }
-                
+
                 var msg = string.Join(" ", args.Parameters.ToArray(), 1, args.Parameters.Count - 1);
                 //旁白
                 if (plr == args.Player)

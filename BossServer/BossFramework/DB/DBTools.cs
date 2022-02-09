@@ -1,6 +1,6 @@
-﻿using LinqToDB;
+﻿using BossFramework.BAttributes;
+using FreeSql;
 using System;
-using System.Linq;
 
 namespace BossFramework.DB
 {
@@ -9,48 +9,51 @@ namespace BossFramework.DB
     /// </summary>
     public static class DBTools
     {
-        public static UserConfigBase<T>.Context UserContext<T>(string tableName = null) where T : UserConfigBase<T> => UserConfigBase<T>.GetContext(tableName);
-        public static ConfigBase<T>.Context Context<T>(string tableName = null) where T : ConfigBase<T> => ConfigBase<T>.GetContext(tableName);
+        public static IFreeSql SQL;
+        [AutoInit(order: 0)]
+        private static void InitDB()
+        {
+            SQL = new FreeSqlBuilder()
+            .UseConnectionString(DataType.MySql, TShockAPI.TShock.DB.ConnectionString)
+            .UseAutoSyncStructure(true)
+            .Build();
+            SQL.UseJsonMap();
+        }
         public static T[] GetAll<T>() where T : UserConfigBase<T>
         {
-            var result = Context<T>().Config.ToArray();
+            var result = SQL.Select<T>().ToList();
             result.ForEach(r => r.Init());
-            return result;
+            return result.ToArray();
         }
-        public static T Insert<T>(T target, string tableName = null) where T : UserConfigBase<T>
+        public static T Insert<T>(T target) where T : UserConfigBase<T>
         {
-            tableName ??= typeof(T).Name;
             try
             {
-                UserConfigBase<T>.GetContext(tableName).InsertDirect(target);
+                SQL.Insert(target);
             }
             catch (Exception ex)
             {
-                BLog.Error($"未能向表 {tableName} 中添加 {target.ID}: {ex}");
+                BLog.Error($"未能向表 {typeof(T).Name} 中添加 {target.ID}: {ex}");
             }
             return target;
         }
-        public static int Delete<T>(T target, string tableName = null) where T : UserConfigBase<T>
+        public static int Delete<T>(T target) where T : UserConfigBase<T>
         {
-            tableName ??= typeof(T).Name;
             try
             {
-                return UserConfigBase<T>.GetContext(tableName).Delete(target);
+                return SQL.Delete<T>(target).ExecuteDeleted().Count;
             }
             catch (Exception ex)
             {
-                BLog.Error($"未能从表 {tableName} 中移除 {target.ID}: {ex}");
+                BLog.Error($"未能从表 {typeof(T).Name} 中移除 {target.ID}: {ex}");
                 return -1;
             }
         }
-        public static DisposableQuery<T> Get<T>(int id, string tableName = null) where T : UserConfigBase<T>
-            => Get<T>(id.ToString(), tableName);
-        public static DisposableQuery<T> GetNonInsert<T>(string id, string tableName = null) where T : UserConfigBase<T>
+        public static T GetNonInsert<T>(string id) where T : UserConfigBase<T>
         {
             try
             {
-                var context = UserConfigBase<T>.GetContext(tableName ?? typeof(T).Name);
-                return new DisposableQuery<T>(context.GetNonInsert(id.ToString()), context);
+                return SQL.Select<T>().Where(r => r.Id == id).First();
             }
             catch (Exception ex)
             {
@@ -58,14 +61,22 @@ namespace BossFramework.DB
                 return null;
             }
         }
-        public static T GetSingleNonInsert<T>(string id, string tableName = null) where T : UserConfigBase<T>
-            => GetNonInsert<T>(id, tableName)?.FirstOrDefault();
-        public static DisposableQuery<T> Get<T>(string id, string tableName = null) where T : UserConfigBase<T>
+        public static T Get<T>(string id) where T : UserConfigBase<T>
         {
-            var context = UserConfigBase<T>.GetContext(tableName ?? typeof(T).Name);
-            return new DisposableQuery<T>(context.Get(id.ToString()), context);
+            var result = GetNonInsert<T>(id);
+            if (result == null)
+            {
+                var r = Activator.CreateInstance<T>();
+                r.ID = id;
+                r.Init();
+                Insert(r);
+                return r;
+            }
+            else
+            {
+                result.Init();
+                return result;
+            }
         }
-        public static T GetSingle<T>(string id, string tableName = null) where T : UserConfigBase<T>
-            => Get<T>(id, tableName).First();
     }
 }

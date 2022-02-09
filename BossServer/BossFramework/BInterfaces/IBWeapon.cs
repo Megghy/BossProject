@@ -19,7 +19,7 @@ namespace BossFramework.BInterfaces
         /// 武器前缀, 用于区分自定义武器的标识符
         /// </summary>
         public int Prefix { get; }
-        public int? Stack { get; }
+        public int Stack { get; }
 
         public int? Width { get; }
         public int? Height { get; }
@@ -44,7 +44,7 @@ namespace BossFramework.BInterfaces
         /// </summary>
         /// <param name="from"></param>
         /// <param name="target"></param>
-        public void OnHit(BPlayer from, BPlayer target);
+        public void OnHit(BPlayer from, BPlayer target, int damage, byte direction, byte coolDown);
 
         /// <summary>
         /// 武器生成的弹幕击中玩家
@@ -52,6 +52,6 @@ namespace BossFramework.BInterfaces
         /// <param name="from"></param>
         /// <param name="target"></param>
         /// <param name="proj"></param>
-        public void OnProjHit(BPlayer from, BPlayer target, SyncProjectile proj);
+        public void OnProjHit(BPlayer from, BPlayer target, SyncProjectile proj, int damage, byte direction, byte coolDown);
     }
 }

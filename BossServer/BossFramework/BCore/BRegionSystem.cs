@@ -116,7 +116,7 @@ namespace BossFramework.BCore
                 {
                     LeaveBRegion?.Invoke(args);
                     if (plr.CurrentRegion == region)
-                        plr.CurrentRegion = null;
+                        plr.CurrentRegion = BRegion.Default;
                 }
             }
         }
