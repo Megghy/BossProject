@@ -25,7 +25,7 @@ namespace BossFramework.BCore
 
         [AutoInit("加载小游戏")]
         [Reloadable]
-        public static void LoadAllMiniGames()
+        private static void LoadAllMiniGames()
         {
             Games = ScriptManager.LoadScripts<IMiniGame>(ScriptManager.MiniGameScriptPath);
             BLog.Success($"成功加载 {Games.Length} 个小游戏");
