@@ -13,6 +13,7 @@ namespace BossFramework.BCore
     /// </summary>
     public static class ProjRedirect
     {
+
         public static ProjRedirectContext DefaultProjContext { get; private set; }
 
         [AutoInit(order: 200)]
@@ -26,6 +27,10 @@ namespace BossFramework.BCore
 
             Task.Run(RedirectLoop);
         }
+        public delegate void OnProjCreate(BEventArgs.ProjCreateEventArgs args);
+        public static event OnProjCreate ProjCreate;
+        public delegate void OnProjDestroy(BEventArgs.ProjDestroyEventArgs args);
+        public static event OnProjDestroy ProjDestroy;
         public static ConcurrentQueue<(BPlayer plr, SyncProjectile proj)> SyncProjsQueue { get; } = new();
         public static void RedirectLoop()
         {
@@ -37,7 +42,12 @@ namespace BossFramework.BCore
                     {
                         var proj = projInfo.proj;
                         var plr = projInfo.plr;
-                        (plr.CurrentRegion ?? BRegion.Default).ProjContext.CreateOrSyncProj(plr, proj);
+                        var args = new BEventArgs.ProjCreateEventArgs(proj, plr);
+                        ProjCreate?.Invoke(args);
+                        if (!args.Handled)
+                        {
+                            plr.CurrentRegion.ProjContext.CreateOrSyncProj(plr, proj);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -49,17 +59,18 @@ namespace BossFramework.BCore
         }
         public static void OnProjDestory(BPlayer plr, KillProjectile killProj)
         {
-            (plr.CurrentRegion ?? BRegion.Default).ProjContext.DestroyProj(killProj);
+            ProjDestroy?.Invoke(new(killProj, plr));
+            plr.CurrentRegion.ProjContext.DestroyProj(killProj);
         }
-        public static void OnEnterRegion(BRegionSystem.BRegionEventArgs args)
+        public static void OnEnterRegion(BEventArgs.BRegionEventArgs args)
         {
             Task.Run(() => args.Region.ProjContext.Projs
                 .Where(p => p != null)
                 .ForEach(p => args.Player.SendPacket(p))); //同步当前区域弹幕
         }
-        public static void OnLeaveRegion(BRegionSystem.BRegionEventArgs args)
+        public static void OnLeaveRegion(BEventArgs.BRegionEventArgs args)
         {
-            Task.Run(() => args.Region.ProjContext.Projs.Where(p => p != null)
+            Task.Run(() => args.Region.ProjContext.Projs.Where(p => p?.PlayerSlot == args.Player.Index)
                 .ForEach(p => args.Region.ProjContext.DestroyProj(p, false))); //移除所有之前区域的弹幕
         }
     }

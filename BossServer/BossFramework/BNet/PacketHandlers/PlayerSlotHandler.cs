@@ -1,10 +1,5 @@
 ﻿using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TrProtocol.Packets;
 
 namespace BossFramework.BNet.PacketHandlers
@@ -13,11 +8,17 @@ namespace BossFramework.BNet.PacketHandlers
     {
         public override bool OnGetPacket(BPlayer plr, SyncEquipment packet)
         {
-            BCore.BWeaponSystem.CheckIncomeItem(plr, packet);
+            if (packet.ItemSlot == 58)
+                plr.ItemInHand = new(packet.ItemType, packet.Stack, packet.Prefix);
+            if (BCore.BWeaponSystem.CheckIncomeItem(plr, packet))
+                return true;
+            return false;
         }
 
         public override bool OnSendPacket(BPlayer plr, SyncEquipment packet)
         {
+            if (plr.IsChangingWeapon)
+                return true;
             return false;
         }
     }

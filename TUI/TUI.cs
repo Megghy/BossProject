@@ -4,8 +4,6 @@ using System.Timers;
 using TerrariaUI.Base;
 using TerrariaUI.Hooks;
 using TerrariaUI.Hooks.Args;
-using TerrariaUI.Widgets;
-using TShockAPI;
 using Timer = System.Timers.Timer;
 
 namespace TerrariaUI

@@ -57,6 +57,8 @@ namespace BossFramework
             othor = othor.ToLower();
             return text == othor || text.StartsWith(othor);
         }
+        public static Microsoft.Xna.Framework.Vector2 ToXNA(this TrProtocol.Models.Vector2 vector) => new(vector.X, vector.Y);
+        public static TrProtocol.Models.Vector2 ToTrProtocol(this Microsoft.Xna.Framework.Vector2 vector) => new(vector.X, vector.Y);
 
         public static T DeserializeJson<T>(this string text)
         {

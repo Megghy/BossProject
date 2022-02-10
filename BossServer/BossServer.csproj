@@ -7,13 +7,15 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<RunPostBuildEvent>Always</RunPostBuildEvent>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<RootNamespace />
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
-		<PackageReference Include="linq2db.MySqlConnector" Version="4.0.0-preview.9-fixed" />
+		<PackageReference Include="FreeSql.Extensions.BaseEntity" Version="3.0.100" />
+		<PackageReference Include="FreeSql.Extensions.JsonMap" Version="3.0.100" />
+		<PackageReference Include="FreeSql.Extensions.Linq" Version="3.0.100" />
+		<PackageReference Include="FreeSql.Provider.MySqlConnector" Version="3.0.100" />
 		<PackageReference Include="System.Data.SQLite.Core" Version="1.0.115.5" />
 		<PackageReference Include="SQLite" Version="3.13.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

@@ -1,6 +1,5 @@
 ﻿using BossFramework.BModels;
 using TrProtocol;
-using TShockAPI;
 
 namespace BossFramework.BInterfaces
 {

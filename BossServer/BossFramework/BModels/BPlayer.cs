@@ -1,5 +1,6 @@
 ﻿using BossFramework.BInterfaces;
 using BossFramework.DB;
+using FreeSql.DataAnnotations;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -22,13 +23,9 @@ namespace BossFramework.BModels
         public override void Init()
         {
             TsPlayer ??= TShock.Players.FirstOrDefault(p => p?.Account?.ID.ToString() == ID);
-            _emptyItemPacket = new()
-            {
-                ItemType = 0,
-                PlayerSlot = Index,
-                Prefix = 0,
-                Stack = 0
-            };
+
+            IsCustomWeaponMode = false;
+            IsChangingWeapon = false;
         }
 
         #region 变量
@@ -37,12 +34,24 @@ namespace BossFramework.BModels
         public string Name => TsPlayer?.Name ?? "unknown";
         public byte Index => (byte)(TsPlayer?.Index ?? -1);
         public bool IsRealPlayer => TsPlayer?.RealPlayer ?? false;
+        public float X => TsPlayer.X;
+        public float Y => TsPlayer.Y;
+        public int TileX => TsPlayer.TileX;
+        public int TileY => TsPlayer.TileY;
+
+        public BaseBWeapon[] Weapons { get; internal set; }
+        public BRegion CurrentRegion { get; internal set; } = BRegion.Default;
+        public ProjRedirectContext ProjContext => CurrentRegion?.ProjContext;
         /// <summary>
         /// 是否处于使用自定义武器的状态, 修改需使用 <see cref="BCore.BWeaponSystem.ChangeCustomWeaponMode(BPlayer, bool?)"/>
         /// </summary>
+        [Column(IsIgnore = true)]
         public bool IsCustomWeaponMode { get; internal set; } = false;
-        public BaseBWeapon[] Weapons { get; internal set; }
-        public BRegion CurrentRegion { get; internal set; }
+        [Column(IsIgnore = true)]
+        public bool IsChangingWeapon { get; internal set; } = false;
+        public NetItem ItemInHand { get; internal set; } = new(0, 0, 0);
+
+        public List<(SyncProjectile proj, BaseBWeapon fromWeapon, long CreateTime)> RelesedProjs { get; } = new();
 
         #region 小游戏部分
         public long Point { get; set; }
@@ -102,11 +111,17 @@ namespace BossFramework.BModels
             TsPlayer?.SendErrorMessage("Use \"my query\" for items with spaces.");
             TsPlayer?.SendErrorMessage("Use tsi:[number] or tsn:[username] to distinguish between user IDs and usernames.");
         }
-        private SyncEquipment _emptyItemPacket;
+        private SyncEquipment _emptyItemPacket = new()
+        {
+            ItemType = 0,
+            Prefix = 0,
+            Stack = 0
+        };
         public void RemoveItem(int slot)
         {
-            TrPlayer.inventory[slot].SetDefaults();
+            TrPlayer.inventory[slot]?.SetDefaults();
             _emptyItemPacket.ItemSlot = (short)slot;
+            _emptyItemPacket.PlayerSlot = Index;
             SendPacket(_emptyItemPacket);
         }
 
@@ -135,7 +150,7 @@ namespace BossFramework.BModels
             });
             return true;
         }
-        
+
         #endregion
         #endregion
     }
