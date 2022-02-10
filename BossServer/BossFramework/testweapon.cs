@@ -3,6 +3,7 @@ using BossFramework.BModels;
 using System;
 using Terraria.ID;
 using TrProtocol.Packets;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 public class testweapon : BaseBWeapon
 {
@@ -11,37 +12,28 @@ public class testweapon : BaseBWeapon
     public override int Prefix => 0;
     public override int Stack => 1;
 
-    public override int? Damage => 1000;
-    public override int? UseTime => 5;
+    public override int? Damage => 10;
 
     public long lastUse = 0;
     public override void OnUseItem(BPlayer plr, long gameTime)
     {
-        if (gameTime - lastUse > 60) //距离上一次使用超过1秒
-        {
-            CreateProj(plr, 168, plr.TrPlayer.position, new Microsoft.Xna.Framework.Vector2(1, 1));
-            plr.TsPlayer.Heal(10);
-            lastUse = gameTime;
-        }
     }
-    public override bool OnShootProj(BPlayer plr, SyncProjectile proj, Microsoft.Xna.Framework.Vector2 velocity, bool isDefaultProj)
+    public override bool OnShootProj(BPlayer plr, SyncProjectile proj, Vector2 velocity, bool isDefaultProj)
     {
         if (isDefaultProj)
         {
-            plr.SendInfoMsg($"原版弹幕发射 {proj.ProjType}");
-            CreateProj(plr, 168, plr.TrPlayer.position, velocity, 1);
+            CreateProj(plr, 950, plr.TrPlayer.position, velocity, 0);
             return true;
         }
         return false;
     }
-    public override void OnHit(BPlayer from, BPlayer target, int damage, byte direction, byte coolDown)
+    public override bool OnHit(BPlayer from, BPlayer target, int damage, byte direction, byte coolDown)
     {
-        Console.WriteLine($"{Name} - {from} 击中 {target}, {damage}, {direction}");
-        target.TsPlayer.SetBuff(BuffID.ShadowDodge);
+        return false;
     }
-    public override void OnProjHit(BPlayer from, BPlayer target, SyncProjectile proj, int damage, byte direction, byte coolDown)
+    public override bool OnProjHit(BPlayer from, BPlayer target, SyncProjectile proj, int damage, byte direction, byte coolDown)
     {
-        Console.WriteLine($"{Name} - {from} 弹幕击中 {target}");
-        target.TsPlayer.Teleport(from.X, from.Y);
+        target.TsPlayer.Heal(10);
+        return false;
     }
 }

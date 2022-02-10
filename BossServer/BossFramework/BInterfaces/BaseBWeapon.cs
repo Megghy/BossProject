@@ -73,10 +73,19 @@ namespace BossFramework.BInterfaces
         public virtual int? UseAmmo { get; }
         public virtual bool? NotAmmo { get; }
 
-        public virtual void OnHit(BPlayer from, BPlayer target, int damage, byte direction, byte coolDown)
+        /// <summary>
+        /// 武器本体击中其他玩家时
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="target"></param>
+        /// <param name="damage"></param>
+        /// <param name="direction"></param>
+        /// <param name="coolDown"></param>
+        /// <returns></returns>
+        public virtual bool OnHit(BPlayer from, BPlayer target, int damage, byte direction, byte coolDown)
         {
+            return false;
         }
-
         /// <summary>
         /// 武器自身发射弹幕时调用
         /// </summary>
@@ -92,8 +101,9 @@ namespace BossFramework.BInterfaces
         {
         }
 
-        public virtual void OnProjHit(BPlayer from, BPlayer target, SyncProjectile proj, int damage, byte direction, byte coolDown)
+        public virtual bool OnProjHit(BPlayer from, BPlayer target, SyncProjectile proj, int damage, byte direction, byte coolDown)
         {
+            return false;
         }
 
         public virtual void OnUseItem(BPlayer plr, long gameTime)

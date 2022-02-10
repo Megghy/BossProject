@@ -30,6 +30,8 @@ namespace BossFramework.BCore
 
             ProjRedirector.ProjCreate += OnProjCreate;
             ProjRedirector.ProjDestroy += OnProjDestroy;
+
+            BNet.PacketHandlers.PlayerDamageHandler.PlayerDamage += OnPlayerHurt;
         }
         [Reloadable]
         private static void LoadWeapon()
@@ -93,20 +95,29 @@ namespace BossFramework.BCore
             }
             return false;
         }
-        public static void OnPlayerHurt(BPlayer plr, PlayerHurtV2 packet)
+        public static void OnPlayerHurt(BEventArgs.PlayerDamageEventArgs args)
         {
+            var plr = args.Player;
             if (plr.IsCustomWeaponMode)
             {
-                var targetPlayer = TShock.Players[packet.OtherPlayerSlot]?.GetBPlayer();
-                var deathReason = packet.Reason;
+                var hurt = args.Hurt;
+                var targetPlayer = TShock.Players[hurt.OtherPlayerSlot]?.GetBPlayer();
+                var deathReason = hurt.Reason;
                 if (plr.RelesedProjs.Where(p => p.Proj.ProjSlot == deathReason._sourceProjectileIndex).FirstOrDefault() is { } projInfo)
                 {
-                    projInfo.FromWeapon.OnProjHit(plr, targetPlayer, projInfo.Proj, packet.Damage, packet.HitDirection, (byte)packet.CoolDown);
+                    args.Handled = projInfo.FromWeapon.OnProjHit(plr, targetPlayer, projInfo.Proj, hurt.Damage, hurt.HitDirection, (byte)hurt.CoolDown);
                 }
                 else if (plr.Weapons.Where(w => w.ItemID == deathReason._sourceItemType && w.Prefix == deathReason._sourceItemPrefix).FirstOrDefault() is { } weapon)
                 {
-                    weapon.OnHit(plr, targetPlayer, packet.Damage, packet.HitDirection, (byte)packet.CoolDown);
+                    args.Handled = weapon.OnHit(plr, targetPlayer, hurt.Damage, hurt.HitDirection, (byte)hurt.CoolDown);
                 }
+                if (args.Handled) //伤害handle后向造成伤害的玩家同步真实血量
+                    plr.SendPacket(new PlayerHealth()
+                    {
+                        PlayerSlot = targetPlayer.Index,
+                        StatLife = (short)targetPlayer.TrPlayer.statLife,
+                        StatLifeMax = (short)targetPlayer.TrPlayer.statLifeMax2
+                    });
             }
         }
         public static void OnProjCreate(BEventArgs.ProjCreateEventArgs args)
