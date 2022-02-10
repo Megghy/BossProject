@@ -8,7 +8,7 @@ namespace BossFramework.BNet.PacketHandlers
     {
         public override bool OnGetPacket(BPlayer plr, KillProjectile packet)
         {
-            BCore.ProjRedirect.OnProjDestory(plr, packet);
+            BCore.ProjRedirector.OnProjDestory(plr, packet);
             return true;
         }
 

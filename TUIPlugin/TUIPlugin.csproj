@@ -10,5 +10,11 @@
     <ProjectReference Include="..\TUI\TUI.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="TrProtocol">
+      <HintPath>..\Lib\TrProtocol.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <Import Project="$(SolutionDir)Plugin.Common.props" />
 </Project>

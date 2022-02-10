@@ -12,6 +12,7 @@ public class testweapon : BaseBWeapon
     public override int Stack => 1;
 
     public override int? Damage => 1000;
+    public override int? UseTime => 5;
 
     public long lastUse = 0;
     public override void OnUseItem(BPlayer plr, long gameTime)
@@ -27,6 +28,7 @@ public class testweapon : BaseBWeapon
     {
         if (isDefaultProj)
         {
+            plr.SendInfoMsg($"原版弹幕发射 {proj.ProjType}");
             CreateProj(plr, 168, plr.TrPlayer.position, velocity, 1);
             return true;
         }

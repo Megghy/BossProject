@@ -11,7 +11,7 @@ namespace BossFramework.BCore
     /// <summary>
     /// 弹幕重定向
     /// </summary>
-    public static class ProjRedirect
+    public static class ProjRedirector
     {
 
         public static ProjRedirectContext DefaultProjContext { get; private set; }

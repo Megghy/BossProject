@@ -51,7 +51,7 @@ namespace BossFramework.BModels
         public bool IsChangingWeapon { get; internal set; } = false;
         public NetItem ItemInHand { get; internal set; } = new(0, 0, 0);
 
-        public List<(SyncProjectile proj, BaseBWeapon fromWeapon, long CreateTime)> RelesedProjs { get; } = new();
+        public List<BWeaponRelesedProj> RelesedProjs { get; } = new();
 
         #region 小游戏部分
         public long Point { get; set; }
@@ -84,22 +84,22 @@ namespace BossFramework.BModels
             color = color == default ? Color.White : color;
             TsPlayer!.SendData(PacketTypes.CreateCombatTextExtended, msg, (int)color.PackedValue, p.X, p.Y);
         }
-        public void SendSuccessEX(object text)
+        public void SendSuccessMsg(object text)
         {
-            TsPlayer?.SendEX(text, new Color(120, 194, 96));
+            TsPlayer?.SendMsg(text, new Color(120, 194, 96));
         }
 
-        public void SendInfoEX(object text)
+        public void SendInfoMsg(object text)
         {
-            TsPlayer?.SendEX(text, new Color(216, 212, 82));
+            TsPlayer?.SendMsg(text, new Color(216, 212, 82));
         }
-        public void SendErrorEX(object text)
+        public void SendErrorMsg(object text)
         {
-            TsPlayer?.SendEX(text, new Color(195, 83, 83));
+            TsPlayer?.SendMsg(text, new Color(195, 83, 83));
         }
-        public void SendEX(object text, Color color = default)
+        public void SendMsg(object text, Color color = default)
         {
-            TsPlayer?.SendEX(text, color);
+            TsPlayer?.SendMsg(text, color);
         }
         public void SendMultipleMatchError(IEnumerable<object> matches)
         {
@@ -117,9 +117,10 @@ namespace BossFramework.BModels
             Prefix = 0,
             Stack = 0
         };
-        public void RemoveItem(int slot)
+        public void RemoveItem(int slot, bool turnToAir = true)
         {
-            TrPlayer.inventory[slot]?.SetDefaults();
+            if(turnToAir)
+                TrPlayer.inventory[slot]?.SetDefaults();
             _emptyItemPacket.ItemSlot = (short)slot;
             _emptyItemPacket.PlayerSlot = Index;
             SendPacket(_emptyItemPacket);

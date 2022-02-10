@@ -30,7 +30,7 @@ namespace BossFramework.BCore
             }
             catch (Exception ex)
             {
-                BLog.Error($"脚本加载失败: {ex}");
+                BLog.Error($"脚本加载失败 {filePath}{Environment.NewLine}{ex}");
                 return null;
             }
         }

@@ -1,10 +1,12 @@
 ﻿using BossFramework.BAttributes;
+using BossFramework.BModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
+using TrProtocol.Packets;
 
 namespace BossFramework
 {

@@ -193,12 +193,31 @@ namespace BossFramework
         }
         public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("Boss.BPlayer");
         public static byte[] SerializePacket(this Packet p) => PacketHandler.Serializer.Serialize(p);
+        public static void Kill(this SyncProjectile proj)
+        {
+            var plr = TShock.Players[proj.PlayerSlot]?.GetBPlayer();
+            plr.SendPacket(new KillProjectile()
+            {
+                ProjSlot = proj.ProjSlot,
+                PlayerSlot = proj.PlayerSlot
+            });
+        }
+        public static void Inactive(this SyncProjectile proj)
+        {
+            var plr = TShock.Players[proj.PlayerSlot]?.GetBPlayer();
+            var oldType = proj.ProjType;
+            proj.ProjType = 0;
+            plr.SendPacket(proj);
+            proj.ProjType = oldType;
+        }
+        public static void SendTo(this Packet packet, BPlayer plr)
+            => plr.SendPacket(packet);
 
         public static void SendPacketToAll(this BPlayer _, Packet packet)
         {
             BInfo.OnlinePlayers.ForEach(p => p.SendPacket(packet));
         }
-        public static void SendEX(this TSPlayer plr, object msg, Color color = default)
+        public static void SendMsg(this TSPlayer plr, object msg, Color color = default)
         {
             color = color == default ? Color.White : color;
             plr?.SendMessage(msg.ToString(), color); //todo 根据玩家状态改变前缀
