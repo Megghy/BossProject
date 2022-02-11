@@ -2438,7 +2438,7 @@ namespace TShockAPI
             if (OnPlayerInfo(args.Player, args.Data, playerid, hair, skinVariant, difficulty, name))
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandlePlayerInfo rejected plugin phase {0}", name);
-                args.Player.Kick("A plugin on this server stopped your login.", true, true);
+                args.Player.Kick("服务器上的插件阻止了你登录", true, true);
                 return true;
             }
 
@@ -2452,7 +2452,7 @@ namespace TShockAPI
             if (name.Trim().StartsWith("tsi:") || name.Trim().StartsWith("tsn:"))
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / rejecting player for name prefix starting with tsi: or tsn:.");
-                args.Player.Kick("Illegal name: prefixes tsi: and tsn: are forbidden.", true, true);
+                args.Player.Kick("非法名称：禁止使用前缀tsi:和tsn:", true, true);
                 return true;
             }
 
@@ -2489,19 +2489,19 @@ namespace TShockAPI
             if (TShock.Config.Settings.SoftcoreOnly && difficulty != 0)
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandlePlayerInfo rejected softcore required");
-                args.Player.Kick("You need to join with a softcore player.", true, true);
+                args.Player.Kick("您需要使用软核账号加入", true, true);
                 return true;
             }
             if (TShock.Config.Settings.MediumcoreOnly && difficulty < 1)
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandlePlayerInfo rejected mediumcore required");
-                args.Player.Kick("You need to join with a mediumcore player or higher.", true, true);
+                args.Player.Kick("您需要使用中核或更高级别的账好才能登录", true, true);
                 return true;
             }
             if (TShock.Config.Settings.HardcoreOnly && difficulty < 2)
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandlePlayerInfo rejected hardcore required");
-                args.Player.Kick("You need to join with a hardcore player.", true, true);
+                args.Player.Kick("您需要使用硬核账号才能登录", true, true);
                 return true;
             }
             args.Player.Difficulty = difficulty;
@@ -2597,9 +2597,9 @@ namespace TShockAPI
                         {
                             if (args.Player.PlayerData.exists && TShock.ServerSideCharacterConfig.Settings.WarnPlayersAboutBypassPermission)
                             {
-                                args.Player.SendWarningMessage("Bypass SSC is enabled for your account. SSC data will not be loaded or saved.");
-                                TShock.Log.ConsoleInfo(args.Player.Name + " has SSC data in the database, but has the tshock.ignore.ssc permission. This means their SSC data is being ignored.");
-                                TShock.Log.ConsoleInfo("You may wish to consider removing the tshock.ignore.ssc permission or negating it for this player.");
+                                args.Player.SendWarningMessage("你已启用跳过SSC. SSC 数据不会被加载或保存.");
+                                TShock.Log.ConsoleInfo(args.Player.Name + " 在数据库中存在SSC数据, 但拥有 tshock.ignore.ssc 权限. 这意味着SSC数据会被忽略.");
+                                TShock.Log.ConsoleInfo("你或许可以考虑移除 tshock.ignore.ssc 权限 或 否定该权限.");
                             }
                             args.Player.PlayerData.CopyCharacter(args.Player);
                             TShock.CharacterDB.InsertPlayerData(args.Player);
@@ -2614,8 +2614,8 @@ namespace TShockAPI
                     if (args.Player.HasPermission(Permissions.usebanneditem))
                         args.Player.IsDisabledForBannedWearable = false;
 
-                    args.Player.SendSuccessMessage("Authenticated as " + account.Name + " successfully.");
-                    TShock.Log.ConsoleInfo(args.Player.Name + " authenticated successfully as user " + args.Player.Name + ".");
+                    args.Player.SendSuccessMessage("认证 " + account.Name + " 成功.");
+                    TShock.Log.ConsoleInfo(args.Player.Name + " 成功认证为 " + args.Player.Name + ".");
                     Hooks.PlayerHooks.OnPlayerPostLogin(args.Player);
                     return true;
                 }
@@ -2756,7 +2756,7 @@ namespace TShockAPI
             if (max > TShock.Config.Settings.MaxHP && !args.Player.HasPermission(Permissions.ignorehp))
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandlePlayerHp rejected over max hp {0}", args.Player.Name);
-                args.Player.Disable("Maximum HP beyond limit", DisableFlags.WriteToLogAndConsole);
+                args.Player.Disable("最大HP超出限制", DisableFlags.WriteToLogAndConsole);
                 return true;
             }
 
@@ -2938,7 +2938,7 @@ namespace TShockAPI
 
             if (Main.npc[id].townNPC && !args.Player.HasPermission(Permissions.hurttownnpc))
             {
-                args.Player.SendErrorMessage("You do not have permission to hurt Town NPCs.");
+                args.Player.SendErrorMessage("您无权伤害城镇NPC");
                 args.Player.SendData(PacketTypes.NpcUpdate, "", id);
                 TShock.Log.ConsoleDebug($"GetDataHandlers / HandleNpcStrike rejected npc strike {args.Player.Name}");
                 return true;
@@ -2948,24 +2948,24 @@ namespace TShockAPI
             {
                 if (!args.Player.HasPermission(Permissions.summonboss))
                 {
-                    args.Player.SendErrorMessage("You do not have permission to summon the Empress of Light.");
+                    args.Player.SendErrorMessage("你没有权限召唤光之女皇");
                     args.Player.SendData(PacketTypes.NpcUpdate, "", id);
                     TShock.Log.ConsoleDebug($"GetDataHandlers / HandleNpcStrike rejected EoL summon from {args.Player.Name}");
                     return true;
                 }
                 else if (!TShock.Config.Settings.AnonymousBossInvasions)
                 {
-                    TShock.Utils.Broadcast(string.Format($"{args.Player.Name} summoned the Empress of Light!"), 175, 75, 255);
+                    TShock.Utils.Broadcast(string.Format($"{args.Player.Name} 召唤了光之女皇"), 175, 75, 255);
                 }
                 else
-                    TShock.Utils.SendLogs(string.Format($"{args.Player.Name} summoned the Empress of Light!"), Color.PaleVioletRed, args.Player);
+                    TShock.Utils.SendLogs(string.Format($"{args.Player.Name} 召唤了光之女皇"), Color.PaleVioletRed, args.Player);
             }
 
             if (Main.npc[id].netID == NPCID.CultistDevote || Main.npc[id].netID == NPCID.CultistArcherBlue)
             {
                 if (!args.Player.HasPermission(Permissions.summonboss))
                 {
-                    args.Player.SendErrorMessage("You do not have permission to summon the Lunatic Cultist!");
+                    args.Player.SendErrorMessage("你无权召唤拜月教邪教徒");
                     args.Player.SendData(PacketTypes.NpcUpdate, "", id);
                     TShock.Log.ConsoleDebug($"GetDataHandlers / HandleNpcStrike rejected Cultist summon from {args.Player.Name}");
                     return true;
@@ -3004,7 +3004,7 @@ namespace TShockAPI
                 if (type == ProjectileID.Bomb || type == ProjectileID.DeathLaser)
                 {
                     TShock.Log.ConsoleDebug("GetDataHandlers / HandleProjectileKill permitted skeletron prime exemption {0}", args.Player.Name);
-                    TShock.Log.ConsoleDebug("If this was not skeletron prime related, please report to TShock what happened.");
+                    TShock.Log.ConsoleDebug("如果这与skeletron素数无关，请向TShock报告发生了什么。");
                     return false;
                 }
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandleProjectileKill rejected banned projectile {0}", args.Player.Name);
@@ -3189,13 +3189,13 @@ namespace TShockAPI
                         args.Player.IsDisabledForBannedWearable = false;
 
 
-                    args.Player.SendMessage("Authenticated as " + args.Player.Name + " successfully.", Color.LimeGreen);
-                    TShock.Log.ConsoleInfo(args.Player.Name + " authenticated successfully as user " + args.Player.Name + ".");
+                    args.Player.SendMessage("认证 " + args.Player.Name + " 成功", Color.LimeGreen);
+                    TShock.Log.ConsoleInfo(args.Player.Name + " 成功认证为 " + args.Player.Name + ".");
                     TShock.UserAccounts.SetUserAccountUUID(account, args.Player.UUID);
                     Hooks.PlayerHooks.OnPlayerPostLogin(args.Player);
                     return true;
                 }
-                args.Player.Kick("Your password did not match this character's password.", true, true);
+                args.Player.Kick("您的密码不匹配", true, true);
                 return true;
             }
 
@@ -3209,11 +3209,11 @@ namespace TShockAPI
                     NetMessage.SendData((int)PacketTypes.WorldInfo, args.Player.Index);
                     return true;
                 }
-                args.Player.Kick("Invalid server password.", true, true);
+                args.Player.Kick("无效的密码", true, true);
                 return true;
             }
 
-            args.Player.Kick("You have been Bounced.", true, true);
+            args.Player.Kick("您已被驱逐", true, true);
             return true;
         }
 
@@ -3268,7 +3268,7 @@ namespace TShockAPI
             if (max > TShock.Config.Settings.MaxMP && !args.Player.HasPermission(Permissions.ignoremp))
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandlePlayerMana rejected max mana {0} {1}/{2}", args.Player.Name, max, TShock.Config.Settings.MaxMP);
-                args.Player.Disable("Maximum MP beyond limit", DisableFlags.WriteToLogAndConsole);
+                args.Player.Disable("最大MP超出限制", DisableFlags.WriteToLogAndConsole);
                 return true;
             }
 
@@ -3405,7 +3405,7 @@ namespace TShockAPI
             if (type == 1 && TShock.Config.Settings.DisableDungeonGuardian)
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandleSpecial rejected type 1 for {0}", args.Player.Name);
-                args.Player.SendMessage("The Dungeon Guardian returned you to your spawn point.", Color.Purple);
+                args.Player.SendMessage("地牢守护者送您回到了生成点", Color.Purple);
                 args.Player.Spawn(PlayerSpawnContext.RecallFromItem);
                 return true;
             }
@@ -3415,7 +3415,7 @@ namespace TShockAPI
                 if (!args.Player.HasPermission(Permissions.usesundial))
                 {
                     TShock.Log.ConsoleDebug($"GetDataHandlers / HandleSpecial rejected enchanted sundial permission {args.Player.Name}");
-                    args.Player.SendErrorMessage("You do not have permission to use the Enchanted Sundial.");
+                    args.Player.SendErrorMessage("您无权使用 魔法日晷");
                     return true;
                 }
                 else if (TShock.Config.Settings.ForceTime != "normal")
@@ -3423,10 +3423,10 @@ namespace TShockAPI
                     TShock.Log.ConsoleDebug($"GetDataHandlers / HandleSpecial rejected enchanted sundial permission (ForceTime) {args.Player.Name}");
                     if (!args.Player.HasPermission(Permissions.cfgreload))
                     {
-                        args.Player.SendErrorMessage("You cannot use the Enchanted Sundial because time is stopped.");
+                        args.Player.SendErrorMessage("你无法使用魔法日晷,因为时间被暂停了");
                     }
                     else
-                        args.Player.SendErrorMessage("You must set ForceTime to normal via config to use the Enchanted Sundial.");
+                        args.Player.SendErrorMessage("要使用魔法日晷，必须通过配置将ForceTime设置为normal。");
                     return true;
                 }
             }
@@ -3472,7 +3472,7 @@ namespace TShockAPI
             if (!args.Player.HasPermission(Permissions.movenpc))
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / UpdateNPCHome rejected no permission {0}", args.Player.Name);
-                args.Player.SendErrorMessage("You do not have permission to relocate Town NPCs.");
+                args.Player.SendErrorMessage("您无权移动城镇NPC");
                 args.Player.SendData(PacketTypes.UpdateNPCHome, "", id, Main.npc[id].homeTileX, Main.npc[id].homeTileY,
                     Convert.ToByte(Main.npc[id].homeless));
                 return true;
@@ -3499,21 +3499,21 @@ namespace TShockAPI
             if (bosses.Contains(thingType) && !args.Player.HasPermission(Permissions.summonboss))
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandleSpawnBoss rejected boss {0} {1}", args.Player.Name, thingType);
-                args.Player.SendErrorMessage("You do not have permission to summon bosses.");
+                args.Player.SendErrorMessage("您无权召唤BOSS");
                 return true;
             }
 
             if (invasions.Contains(thingType) && !args.Player.HasPermission(Permissions.startinvasion))
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandleSpawnBoss rejected invasion {0} {1}", args.Player.Name, thingType);
-                args.Player.SendErrorMessage("You do not have permission to start invasions.");
+                args.Player.SendErrorMessage("您无权开始入侵");
                 return true;
             }
 
             if (pets.Contains(thingType) && !args.Player.HasPermission(Permissions.spawnpets))
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandleSpawnBoss rejected pet {0} {1}", args.Player.Name, thingType);
-                args.Player.SendErrorMessage("You do not have permission to spawn pets.");
+                args.Player.SendErrorMessage("您无权召唤宠物");
                 return true;
             }
 
@@ -3524,46 +3524,46 @@ namespace TShockAPI
             switch (thingType)
             {
                 case -14:
-                    thing = "has sent a request to the bunny delivery service";
+                    thing = "发送了送出<宠物兔兔>的请求";
                     break;
                 case -13:
-                    thing = "has sent a request to the dog delivery service";
+                    thing = "发送了送出<宠物狗狗>的请求";
                     break;
                 case -12:
-                    thing = "has sent a request to the cat delivery service";
+                    thing = "发送了送出<宠物猫猫>的请求";
                     break;
                 case -11:
-                    thing = "applied advanced combat techniques";
+                    thing = "应用高科技战斗方案";
                     break;
                 case -10:
-                    thing = "summoned a Blood Moon";
+                    thing = "召唤了血月";
                     break;
                 case -8:
-                    thing = "summoned a Moon Lord";
+                    thing = "召唤了月亮领主";
                     break;
                 case -7:
-                    thing = "summoned a Martian invasion";
+                    thing = "传唤了火星人入侵";
                     break;
                 case -6:
-                    thing = "summoned an eclipse";
+                    thing = "召唤了日食";
                     break;
                 case -5:
-                    thing = "summoned a frost moon";
+                    thing = "召唤了霜月";
                     break;
                 case -4:
-                    thing = "summoned a pumpkin moon";
+                    thing = "召唤了南瓜月";
                     break;
                 case -3:
-                    thing = "summoned the Pirates";
+                    thing = "传唤海盗";
                     break;
                 case -2:
-                    thing = "summoned the Snow Legion";
+                    thing = "召唤雪军团";
                     break;
                 case -1:
-                    thing = "summoned a Goblin Invasion";
+                    thing = "召唤了哥布林入侵";
                     break;
                 default:
-                    thing = String.Format("summoned the {0}", npc.FullName);
+                    thing = String.Format("召唤了 {0}", npc.FullName);
                     break;
             }
             if (TShock.Config.Settings.AnonymousBossInvasions)
@@ -3709,7 +3709,7 @@ namespace TShockAPI
             if (type == 0 && !args.Player.HasPermission(Permissions.rod))
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandleTeleport rejected rod type {0} {1}", args.Player.Name, type);
-                args.Player.SendErrorMessage("You do not have permission to teleport using items."); // Was going to write using RoD but Hook of Disonnance and Potion of Return both use the same teleport packet as RoD. 
+                args.Player.SendErrorMessage("您无权使用物品进行传送");
                 args.Player.Teleport(args.TPlayer.position.X, args.TPlayer.position.Y); // Suggest renaming rod permission unless someone plans to add separate perms for the other 2 tp items.
                 return true;
             }
@@ -3733,7 +3733,7 @@ namespace TShockAPI
                 if (!args.Player.HasPermission(Permissions.wormhole))
                 {
                     TShock.Log.ConsoleDebug("GetDataHandlers / HandleTeleport rejected p2p wormhole permission {0} {1}", args.Player.Name, type);
-                    args.Player.SendErrorMessage("You do not have permission to teleport using Wormhole Potions.");
+                    args.Player.SendErrorMessage("您无权使用虫洞药水进行传送");
                     args.Player.Teleport(args.TPlayer.position.X, args.TPlayer.position.Y);
                     return true;
                 }
@@ -3885,7 +3885,7 @@ namespace TShockAPI
             if (TShock.TileBans.TileIsBanned((short)TileID.LogicSensor, args.Player))
             {
                 args.Player.SendTileSquare(x, y, 1);
-                args.Player.SendErrorMessage("You do not have permission to place Logic Sensors.");
+                args.Player.SendErrorMessage("您无权放置逻辑传感器");
                 return true;
             }
 
@@ -4045,7 +4045,7 @@ namespace TShockAPI
             if (args.Player != null && !args.Player.HasPermission(Permissions.toggleparty))
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandleToggleParty rejected no party {0}", args.Player.Name);
-                args.Player.SendErrorMessage("You do not have permission to start a party.");
+                args.Player.SendErrorMessage("您无权参加派对");
                 return true;
             }
 
@@ -4063,14 +4063,14 @@ namespace TShockAPI
             if (!args.Player.HasPermission(Permissions.startdd2))
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandleOldOnesArmy rejected permissions {0}", args.Player.Name);
-                args.Player.SendErrorMessage("You do not have permission to start the Old One's Army.");
+                args.Player.SendErrorMessage("您无权召唤旧日军团");
                 return true;
             }
 
             if (TShock.Config.Settings.AnonymousBossInvasions)
-                TShock.Utils.SendLogs(string.Format("{0} started the Old One's Army event!", args.Player.Name), Color.PaleVioletRed, args.Player);
+                TShock.Utils.SendLogs(string.Format("{0} 召唤了旧日军团!", args.Player.Name), Color.PaleVioletRed, args.Player);
             else
-                TShock.Utils.Broadcast(string.Format("{0} started the Old One's Army event!", args.Player.Name), 175, 75, 255);
+                TShock.Utils.Broadcast(string.Format("{0} 召唤了旧日军团!", args.Player.Name), 175, 75, 255);
             return false;
         }
 
@@ -4129,7 +4129,7 @@ namespace TShockAPI
                     if (!args.Player.Ban(banReason, false, "TShock"))
                     {
                         TShock.Log.ConsoleDebug("GetDataHandlers / HandlePlayerKillMeV2 kicked with difficulty {0} {1}", args.Player.Name, args.TPlayer.difficulty);
-                        args.Player.Kick("You died! Normally, you'd be banned.", true, true);
+                        args.Player.Kick("你死掉了，通常来说你已经被封禁了", force: true, silent: true);
                     }
                 }
                 else if (shouldKick)
@@ -4144,7 +4144,7 @@ namespace TShockAPI
                 if (TShock.CharacterDB.RemovePlayer(args.Player.Account.ID))
                 {
                     TShock.Log.ConsoleDebug("GetDataHandlers / HandlePlayerKillMeV2 ssc delete {0} {1}", args.Player.Name, args.TPlayer.difficulty);
-                    args.Player.SendErrorMessage("You have fallen in hardcore mode, and your items have been lost forever.");
+                    args.Player.SendErrorMessage("您处于硬核模式，并且您的物品将永远丢失了");
                     TShock.CharacterDB.SeedInitialData(args.Player.Account);
                 }
             }

@@ -133,7 +133,7 @@ namespace TShockAPI
         {
             TSPlayer.All.SendMessage(msg, red, green, blue);
             TSPlayer.Server.SendMessage(msg, red, green, blue);
-            TShock.Log.Info(string.Format("Broadcast: {0}", msg));
+            TShock.Log.Info($"广播:{msg}");
         }
 
         /// <summary>>Broadcast - Broadcasts a message to all players on the server, as well as the server console, and the logs.</summary>
@@ -156,7 +156,7 @@ namespace TShockAPI
         {
             TSPlayer.All.SendMessageFromPlayer(msg, red, green, blue, ply);
             TSPlayer.Server.SendMessage(Main.player[ply].name + ": " + msg, red, green, blue);
-            TShock.Log.Info(string.Format("Broadcast: {0}", Main.player[ply].name + ": " + msg));
+            TShock.Log.Info(string.Format("广播:{0}", Main.player[ply].name + ": " + msg));
         }
 
         /// <summary>
