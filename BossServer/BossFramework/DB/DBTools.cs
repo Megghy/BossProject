@@ -1,6 +1,7 @@
 ﻿using BossFramework.BAttributes;
 using FreeSql;
 using System;
+using System.Linq.Expressions;
 
 namespace BossFramework.DB
 {
@@ -25,6 +26,12 @@ namespace BossFramework.DB
             result.ForEach(r => r.Init());
             return result.ToArray();
         }
+        public static T Get<T>(Expression<Func<T, bool>> extract) where T : UserConfigBase<T>
+        {
+            var result = SQL.Select<T>().Where(extract).First();
+            result.Init();
+            return result;
+        }
         public static T Insert<T>(T target) where T : UserConfigBase<T>
         {
             try
@@ -33,7 +40,7 @@ namespace BossFramework.DB
             }
             catch (Exception ex)
             {
-                BLog.Error($"未能向表 {typeof(T).Name} 中添加 {target.ID}: {ex}");
+                BLog.Error($"未能向表 {typeof(T).Name} 中添加 {target.Id}: {ex}");
             }
             return target;
         }
@@ -45,7 +52,7 @@ namespace BossFramework.DB
             }
             catch (Exception ex)
             {
-                BLog.Error($"未能从表 {typeof(T).Name} 中移除 {target.ID}: {ex}");
+                BLog.Error($"未能从表 {typeof(T).Name} 中移除 {target.Id}: {ex}");
                 return -1;
             }
         }
@@ -67,7 +74,6 @@ namespace BossFramework.DB
             if (result == null)
             {
                 var r = Activator.CreateInstance<T>();
-                r.ID = id;
                 r.Init();
                 Insert(r);
                 return r;

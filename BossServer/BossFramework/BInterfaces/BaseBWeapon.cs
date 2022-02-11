@@ -76,11 +76,11 @@ namespace BossFramework.BInterfaces
         /// <summary>
         /// 武器本体击中其他玩家时
         /// </summary>
-        /// <param name="from"></param>
-        /// <param name="target"></param>
-        /// <param name="damage"></param>
-        /// <param name="direction"></param>
-        /// <param name="coolDown"></param>
+        /// <param name="from">攻击者</param>
+        /// <param name="target">被攻击者</param>
+        /// <param name="damage">伤害</param>
+        /// <param name="direction">方向</param>
+        /// <param name="coolDown">无敌帧</param>
         /// <returns></returns>
         public virtual bool OnHit(BPlayer from, BPlayer target, int damage, byte direction, byte coolDown)
         {
@@ -97,15 +97,34 @@ namespace BossFramework.BInterfaces
         {
             return false;
         }
+        /// <summary>
+        /// 武器发出的弹幕消失时调用
+        /// </summary>
+        /// <param name="plr">攻击者</param>
+        /// <param name="killProj">消失的弹幕的信息</param>
         public virtual void OnProjDestroy(BPlayer plr, KillProjectile killProj)
         {
         }
-
+        /// <summary>
+        /// 发出的弹幕击中其他玩家时调用
+        /// </summary>
+        /// <param name="from">攻击者</param>
+        /// <param name="target">被攻击者</param>
+        /// <param name="proj">弹幕信息</param>
+        /// <param name="damage">本次伤害</param>
+        /// <param name="direction">方向</param>
+        /// <param name="coolDown">无敌时间</param>
+        /// <see cref="CreateProj(BPlayer, int, Vector2, Vector2, int, float, float, float)"/>
+        /// <returns></returns>
         public virtual bool OnProjHit(BPlayer from, BPlayer target, SyncProjectile proj, int damage, byte direction, byte coolDown)
         {
             return false;
         }
-
+        /// <summary>
+        /// 当按住左键时调用, 每游戏帧一次, 每秒60次
+        /// </summary>
+        /// <param name="plr">攻击者</param>
+        /// <param name="gameTime">游戏总时间</param>
         public virtual void OnUseItem(BPlayer plr, long gameTime)
         {
 
