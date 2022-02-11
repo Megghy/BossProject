@@ -60,7 +60,7 @@ namespace RegionTrigger
             }
             catch (Exception e)
             {
-                TShock.Log.ConsoleError("[RegionTrigger] Load regions failed. Check log for more information.");
+                TShock.Log.ConsoleError("[RegionTrigger] 载入区域失效. 查看日志获取更多信息.");
                 TShock.Log.Error(e.ToString());
             }
         }
@@ -84,7 +84,7 @@ namespace RegionTrigger
                         Regions.Add(rt);
                     }
                     else
-                        throw new Exception("Database error: No affected rows.");
+                        throw new Exception("数据区错误: 没有有效行.");
                 }
             }
             catch (Exception e)
