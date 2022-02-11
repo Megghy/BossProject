@@ -19,7 +19,6 @@ namespace PlotMarker
 		public override Version Version => Assembly.GetExecutingAssembly().GetName().Version;
 
 		internal static Configuration Config;
-		internal static PlotManager Plots;
 
 		public PlotMarker(Main game) : base(game) { }
 
@@ -51,10 +50,10 @@ namespace PlotMarker
 			if (string.IsNullOrWhiteSpace(name))
 				return;
 
-			var cells = Plots.GetCellsOfPlayer(name);
+			var cells = PlotManager.GetCellsOfPlayer(name);
 			foreach (var c in cells)
 			{
-				Plots.UpdateLastAccess(c);
+				PlotManager.UpdateLastAccess(c);
 			}
 		}
 
@@ -62,7 +61,6 @@ namespace PlotMarker
 		{
 			Config = Configuration.Read(Configuration.ConfigPath);
 			Config.Write(Configuration.ConfigPath);
-			Plots = new PlotManager(TShock.DB);
 
 			Commands.ChatCommands.Add(new Command("pm.admin.areamanage", AreaManage, "areamanage", "属地区域", "am")
 			{
@@ -91,7 +89,7 @@ namespace PlotMarker
 
 		private static void OnPostInitialize(EventArgs args)
 		{
-			Plots.Reload();
+			PlotManager.Reload();
 		}
 
 		private static void OnGreet(GreetPlayerEventArgs args)
@@ -160,9 +158,9 @@ namespace PlotMarker
 							args.Player.SendErrorMessage("你需要先选择区域.");
 							return;
 						}
-						if (Plots.AddPlot(info.X, info.Y, info.X2 - info.X, info.Y2 - info.Y,
+						if (PlotManager.AddPlot(info.X, info.Y, info.X2 - info.X, info.Y2 - info.Y,
 							args.Parameters[1], args.Player.Name,
-							Main.worldID.ToString(), Config.PlotStyle))
+							Main.worldID, Config.PlotStyle))
 						{
 							args.Player.SendSuccessMessage("添加属地 {0} 完毕.", args.Parameters[1]);
 						}
@@ -182,13 +180,13 @@ namespace PlotMarker
 							return;
 						}
 						var name = args.Parameters[1];
-						var plot = Plots.GetPlotByName(name);
+						var plot = PlotManager.GetPlotByName(name);
 						if (plot == null)
 						{
 							args.Player.SendErrorMessage("未找到属地!");
 							return;
 						}
-						if (Plots.DelPlot(plot))
+						if (PlotManager.DelPlot(plot))
 						{
 							args.Player.SendSuccessMessage("成功删除属地.");
 							return;
@@ -205,7 +203,7 @@ namespace PlotMarker
 							return;
 						}
 						var name = args.Parameters[1];
-						var plot = Plots.GetPlotByName(name);
+						var plot = PlotManager.GetPlotByName(name);
 						if (plot == null)
 						{
 							args.Player.SendErrorMessage("未找到属地!");
@@ -238,7 +236,7 @@ namespace PlotMarker
 							return;
 						}
 						var name = args.Parameters[1];
-						var plot = Plots.GetPlotByName(name);
+						var plot = PlotManager.GetPlotByName(name);
 						if (plot == null)
 						{
 							args.Player.SendErrorMessage("未找到属地!");
@@ -272,7 +270,7 @@ namespace PlotMarker
 							return;
 						}
 
-						var plots = Plots.Plots.Select(p => p.Name);
+						var plots = PlotManager.Plots.Select(p => p.Name);
 
 						PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(plots),
 							new PaginationTools.Settings
@@ -286,7 +284,7 @@ namespace PlotMarker
 				case "重载":
 				case "reload":
 					{
-						Plots.Reload();
+						PlotManager.Reload();
 						Config = Configuration.Read(Configuration.ConfigPath);
 						Config.Write(Configuration.ConfigPath);
 						args.Player.SendSuccessMessage("重载完毕.");
@@ -350,7 +348,7 @@ namespace PlotMarker
 							return;
 						}
 
-						var count = Plots.GetTotalCells(args.Player.Account.Name);
+						var count = PlotManager.GetTotalCells(args.Player.Account.Name);
 						var max = args.Player.GetMaxCells();
 						if (max != -1 && count >= args.Player.GetMaxCells())
 						{
@@ -361,7 +359,7 @@ namespace PlotMarker
 						info.OnGetPoint = InternalApply;
 						args.Player.SendInfoMessage("在空白属地内放置任意物块, 来确定你的属地位置.");
 
-						void InternalApply(int x, int y, TSPlayer receiver) => Plots.ApplyForCell(receiver, x, y);
+						void InternalApply(int x, int y, TSPlayer receiver) => PlotManager.ApplyForCell(receiver, x, y);
 					}
 					break;
 				case "自动获取":
@@ -373,7 +371,7 @@ namespace PlotMarker
 							return;
 						}
 
-						var count = Plots.GetTotalCells(args.Player.Account.Name);
+						var count = PlotManager.GetTotalCells(args.Player.Account.Name);
 						var max = args.Player.GetMaxCells();
 						if (max != -1 && count >= args.Player.GetMaxCells())
 						{
@@ -381,7 +379,7 @@ namespace PlotMarker
 							return;
 						}
 
-						Plots.ApplyForCell(args.Player);
+						PlotManager.ApplyForCell(args.Player);
 					}
 					break;
 				case "允许":
@@ -394,14 +392,14 @@ namespace PlotMarker
 							return;
 						}
 
-						var count = Plots.GetTotalCells(args.Player.Account.Name);
+						var count = PlotManager.GetTotalCells(args.Player.Account.Name);
 						switch (count)
 						{
 							case 0:
 								args.Player.SendErrorMessage("你没有属地!");
 								break;
 							case 1:
-								var cell = Plots.GetOnlyCellOfPlayer(args.Player.Account.Name);
+								var cell = PlotManager.GetOnlyCellOfPlayer(args.Player.Account.Name);
 								if (cell == null)
 								{
 									args.Player.SendErrorMessage("载入属地失败! 请联系管理 (不唯一或缺少)");
@@ -419,7 +417,7 @@ namespace PlotMarker
 								break;
 						}
 
-						void InternalSetUserWithPoint(int x, int y, TSPlayer receiver) => InternalSetUser(args.Parameters, receiver, Plots.GetCellByPosition(x, y), true);
+						void InternalSetUserWithPoint(int x, int y, TSPlayer receiver) => InternalSetUser(args.Parameters, receiver, PlotManager.GetCellByPosition(x, y), true);
 					}
 					break;
 				case "禁止":
@@ -432,14 +430,14 @@ namespace PlotMarker
 							return;
 						}
 
-						var count = Plots.GetTotalCells(args.Player.Account.Name);
+						var count = PlotManager.GetTotalCells(args.Player.Account.Name);
 						switch (count)
 						{
 							case 0:
 								args.Player.SendErrorMessage("你没有属地!");
 								break;
 							case 1:
-								var cell = Plots.GetOnlyCellOfPlayer(args.Player.Account.Name);
+								var cell = PlotManager.GetOnlyCellOfPlayer(args.Player.Account.Name);
 								if (cell == null)
 								{
 									args.Player.SendErrorMessage("载入属地失败! 请联系管理 (不唯一或缺少)");
@@ -457,7 +455,7 @@ namespace PlotMarker
 								break;
 						}
 
-						void InternalSetUserWithPoint(int x, int y, TSPlayer receiver) => InternalSetUser(args.Parameters, receiver, Plots.GetCellByPosition(x, y), false);
+						void InternalSetUserWithPoint(int x, int y, TSPlayer receiver) => InternalSetUser(args.Parameters, receiver, PlotManager.GetCellByPosition(x, y), false);
 					}
 					break;
 				case "信息":
@@ -475,7 +473,7 @@ namespace PlotMarker
 
 						void InternalGetInfo(int tileX, int tileY, TSPlayer player)
 						{
-							var cell = Plots.GetCellByPosition(tileX, tileY);
+							var cell = PlotManager.GetCellByPosition(tileX, tileY);
 							if (cell != null)
 							{
 								if (cell.Owner != player.Account.Name && !player.HasPermission("pm.admin.editall"))
@@ -544,14 +542,14 @@ namespace PlotMarker
 
 					if (allow)
 					{
-						if (Plots.AddCellUser(target, user))
+						if (PlotManager.AddCellUser(target, user))
 							player.SendInfoMessage("添加用户 " + playerName + " 完毕.");
 						else
 							player.SendErrorMessage("添加用户时出现问题.");
 					}
 					else
 					{
-						if (Plots.RemoveCellUser(target, user))
+						if (PlotManager.RemoveCellUser(target, user))
 							player.SendInfoMessage("移除用户 " + playerName + " 完毕.");
 						else
 							player.SendErrorMessage("移除用户时出现问题.");
@@ -590,10 +588,10 @@ namespace PlotMarker
 
 						void InternalFuckCell(int tileX, int tileY, TSPlayer player)
 						{
-							var cell = Plots.GetCellByPosition(tileX, tileY);
+							var cell = PlotManager.GetCellByPosition(tileX, tileY);
 							if (cell != null)
 							{
-								Plots.FuckCell(cell);
+								PlotManager.FuckCell(cell);
 								player.SendSuccessMessage("愉悦, 艹完了.");
 								return;
 							}
@@ -614,7 +612,7 @@ namespace PlotMarker
 
 						void InternalCellInfo(int tileX, int tileY, TSPlayer player)
 						{
-							var cell = Plots.GetCellByPosition(tileX, tileY);
+							var cell = PlotManager.GetCellByPosition(tileX, tileY);
 							if (cell != null)
 							{
 								cell.GetInfo(player);
@@ -636,7 +634,7 @@ namespace PlotMarker
 						info.OnGetPoint = InternalChownWithPoint;
 						args.Player.SendInfoMessage("在你的属地内放置物块来更换领主.");
 
-						void InternalChownWithPoint(int x, int y, TSPlayer receiver) => InternalChown(args.Parameters, receiver, Plots.GetCellByPosition(x, y));
+						void InternalChownWithPoint(int x, int y, TSPlayer receiver) => InternalChown(args.Parameters, receiver, PlotManager.GetCellByPosition(x, y));
 
 						void InternalChown(IEnumerable<string> parameters, TSPlayer player, Cell target)
 						{
@@ -657,7 +655,7 @@ namespace PlotMarker
 									return;
 								}
 
-								Plots.ChangeOwner(target, user);
+								PlotManager.ChangeOwner(target, user);
 								player.SendSuccessMessage("完成更换主人.");
 							}
 							else
@@ -700,10 +698,10 @@ namespace PlotMarker
 
 		private static void ReturnCell(CommandArgs args)
 		{
-			var count = Plots.GetTotalCells(args.Player.Account.Name);
+			var count = PlotManager.GetTotalCells(args.Player.Account.Name);
 			if (count == 1)
 			{
-				var cell = Plots.GetOnlyCellOfPlayer(args.Player.Name);
+				var cell = PlotManager.GetOnlyCellOfPlayer(args.Player.Name);
 				if (args.Player.Teleport(cell.Center.X * 16, cell.Center.Y * 16))
 					args.Player.SendSuccessMessage("已经传送到你的属地.");
 
@@ -741,7 +739,7 @@ namespace PlotMarker
 				return true;
 			}
 
-			var plot = Plots.Plots.FirstOrDefault(p => p.Contains(tileX, tileY));
+			var plot = PlotManager.Plots.FirstOrDefault(p => p.Contains(tileX, tileY));
 			if (plot == null)
 			{
 				return false;

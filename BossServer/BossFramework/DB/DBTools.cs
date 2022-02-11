@@ -38,42 +38,20 @@ namespace BossFramework.DB
             result.Init();
             return result;
         }
-        public static T Insert<T>(T target) where T : UserConfigBase<T>
-        {
-            try
-            {
-                SQL.Insert(target).ExecuteAffrows();
-            }
-            catch (Exception ex)
-            {
-                BLog.Error($"未能向表 {typeof(T).Name} 中添加 {target.Id}: {ex}");
-            }
-            return target;
-        }
+        public static int Insert<T>(T target) where T : UserConfigBase<T>
+            => SQL.Insert(target).ExecuteAffrows();
+
         public static int Delete<T>(T target) where T : UserConfigBase<T>
-        {
-            try
-            {
-                return SQL.Delete<T>(target).ExecuteDeleted().Count;
-            }
-            catch (Exception ex)
-            {
-                BLog.Error($"未能从表 {typeof(T).Name} 中移除 {target.Id}: {ex}");
-                return -1;
-            }
-        }
+            => SQL.Delete<T>(target).ExecuteAffrows();
+        public static int Delete<T>(int id) where T : UserConfigBase<T>
+            => SQL.Delete<T>().Where(t => t.Id == id).ExecuteAffrows();
+        public static int Delete<T>(Expression<Func<T, bool>> extract) where T : UserConfigBase<T>
+            => SQL.Delete<T>().Where(extract).ExecuteAffrows();
+
+        public static bool Exist<T>(Expression<Func<T, bool>> extract) where T : UserConfigBase<T>
+            => SQL.Select<T>().Any(extract);
         public static T GetNonInsert<T>(int id) where T : UserConfigBase<T>
-        {
-            try
-            {
-                return SQL.Select<T>().Where(r => r.Id == id).First();
-            }
-            catch (Exception ex)
-            {
-                BLog.Error($"未能从数据库获取对象: {ex}");
-                return null;
-            }
-        }
+            => SQL.Select<T>().Where(r => r.Id == id).First();
         public static T Get<T>(int id) where T : UserConfigBase<T>
         {
             var result = GetNonInsert<T>(id);

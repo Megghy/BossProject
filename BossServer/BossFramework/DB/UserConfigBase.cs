@@ -12,7 +12,8 @@ namespace BossFramework.DB
         {
 
         }
-        public void Update<TV>(Expression<Func<T, TV>> extract, TV value, bool updateProp = true)
+        public bool InsertToDB() => DBTools.Insert((T)this) > 0;
+        public int UpdateSingle<TV>(Expression<Func<T, TV>> extract, TV value, bool updateProp = true)
         {
             var prop = extract.Body
                 .GetType()
@@ -23,7 +24,7 @@ namespace BossFramework.DB
             {
                 if (updateProp)
                     prop?.SetValue(this, value);
-                DBTools.SQL.Update<T>(this)
+                return DBTools.SQL.Update<T>(this)
                     .Set(extract, value)
                     .Set(t => t.UpdateTime, DateTime.Now)
                     .ExecuteAffrows();
@@ -32,15 +33,16 @@ namespace BossFramework.DB
             {
                 BLog.Error($"未能更新字段 {prop?.Name}: {value} => \r\n{ex}");
             }
+            return 0;
         }
-        public void Update<TV>(Expression<Func<T, TV>> extract)
+        public int UpdateSingle<TV>(Expression<Func<T, TV>> extract)
         {
             try
             {
                 var prop = extract.Body.GetType()
                     .GetProperties().FirstOrDefault(p => p.Name.Contains("Member"));
                 var t = prop!.GetValue(extract.Body) as PropertyInfo;
-                DBTools.SQL.Update<T>(this)
+                return DBTools.SQL.Update<T>(this)
                     .Set(extract, (TV)t?.GetValue(this)!)
                     .Set(t => t.UpdateTime, DateTime.Now)
                     .ExecuteAffrows();
@@ -49,6 +51,7 @@ namespace BossFramework.DB
             {
                 BLog.Error($"未能更新字段\r\n{ex}");
             }
+            return 0;
         }
     }
 }

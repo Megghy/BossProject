@@ -70,7 +70,7 @@ namespace BossFramework.BModels
                 return;
             _childRegion.Add(region);
             ChildsId.Add(region.Id);
-            Update(r => r.ChildsId);
+            UpdateSingle(r => r.ChildsId);
         }
         public void RemoveChild(BRegion region)
         {
@@ -78,19 +78,19 @@ namespace BossFramework.BModels
                 return;
             _childRegion.Remove(region);
             ChildsId.Remove(region.Id);
-            Update(r => r.ChildsId);
+            UpdateSingle(r => r.ChildsId);
         }
         public void SetParent(BRegion region)
         {
             if (region is null)
             {
-                Update(r => r.ParentId, -1);
+                UpdateSingle(r => r.ParentId, -1);
                 _parent = null;
             }
             else
             {
                 _parent = region;
-                Update(r => r.ParentId, _parent.Id);
+                UpdateSingle(r => r.ParentId, _parent.Id);
             }
         }
         #endregion

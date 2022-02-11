@@ -1,5 +1,4 @@
 ﻿using BossFramework.DB;
-using MySqlConnector;
 using System.Data;
 using System.Diagnostics;
 using Terraria;
@@ -8,58 +7,17 @@ using TShockAPI.DB;
 
 namespace PlotMarker
 {
-    internal sealed class PlotManager
+    internal static class PlotManager
     {
-        public List<Plot> Plots = new List<Plot>();
+        public static List<Plot> Plots = new();
 
-        private readonly IDbConnection _database;
+        private static readonly object _addCellLock = new();
 
-        private readonly object _addCellLock = new object();
-
-        public PlotManager(IDbConnection connection)
-        {
-            _database = connection;
-
-            var plotTable = new SqlTable("Plots",
-                new SqlColumn("Id", MySqlDbType.Int32) { AutoIncrement = true, Primary = true },
-                new SqlColumn("Name", MySqlDbType.VarChar, 10) { NotNull = true, Unique = true },
-                new SqlColumn("X", MySqlDbType.Int32),
-                new SqlColumn("Y", MySqlDbType.Int32),
-                new SqlColumn("Width", MySqlDbType.Int32),
-                new SqlColumn("Height", MySqlDbType.Int32),
-                new SqlColumn("CellWidth", MySqlDbType.Int32),
-                new SqlColumn("CellHeight", MySqlDbType.Int32),
-                new SqlColumn("WorldId", MySqlDbType.VarChar, 50),
-                new SqlColumn("Owner", MySqlDbType.VarChar, 50)
-            );
-
-            var cellTable = new SqlTable("Cells",
-                new SqlColumn("PlotId", MySqlDbType.Int32) { Unique = true },
-                new SqlColumn("CellId", MySqlDbType.Int32) { Unique = true },
-                new SqlColumn("X", MySqlDbType.Int32),
-                new SqlColumn("Y", MySqlDbType.Int32),
-                new SqlColumn("Owner", MySqlDbType.VarChar, 50),
-                new SqlColumn("UserIds", MySqlDbType.Text),
-                new SqlColumn("GetTime", MySqlDbType.Text),
-                new SqlColumn("LastAccess", MySqlDbType.Text)
-            );
-
-            var creator = new SqlTableCreator(_database,
-                                              _database.GetSqlType() == SqlType.Sqlite
-                                                  ? (IQueryBuilder)new SqliteQueryCreator()
-                                                  : new MysqlQueryCreator());
-
-            creator.EnsureTableStructure(plotTable);
-            creator.EnsureTableStructure(cellTable);
-        }
-
-        public void Reload()
+        public static void Reload()
         {
             Plots.Clear();
 
-            DBTools.SQL.Select<Plot>()
-                        .Where(p => p.WorldId == Main.worldID)
-                        .ToList()
+            DBTools.GetAll<Plot>(p => p.WorldId == Main.worldID)
                         .ForEach(plot =>
                         {
                             plot.Cells = LoadCells(plot);
@@ -67,113 +25,51 @@ namespace PlotMarker
                         });
         }
 
-        public Cell[] LoadCells(Plot parent)
+        public static Cell[] LoadCells(Plot parent)
+            => DBTools.GetAll<Cell>(c => c.PlotId == parent.Id);
+
+        public  static bool AddPlot(int x, int y, int width, int height, string name, string owner, long worldid, Style style)
         {
-            var list = new List<Cell>();
-            using (var reader = _database.QueryReader("SELECT * FROM `cells` WHERE `cells`.`PlotId` = @0 ORDER BY `cells`.`CellId` ASC",
-                parent.Id))
-            {
-                while (reader.Read())
-                {
-                    DBTools.SQL.Select<Cell>()
-                        .Where(c => c.PlotId == parent.Id)
-                        .ToList()
-                        .ForEach(cell => list.Add(cell));
-                    var cell = new Cell
-                    {
-                        Parent = parent,
-                        Id = reader.Get<int>("CellId"),
-                        X = reader.Get<int>("X"),
-                        Y = reader.Get<int>("Y"),
-                        Owner = reader.Get<string>("Owner"),
-                        GetTime = DateTime.TryParse(reader.Get<string>("GetTime"), out DateTime dt) ? dt : default(DateTime),
-                        LastAccess = DateTime.TryParse(reader.Get<string>("LastAccess"), out dt) ? dt : default(DateTime),
-                        AllowedIDs = new List<int>()
-                    };
-                }
-            }
-            return list.ToArray();
-        }
-
-        public bool AddPlot(int x, int y, int width, int height, string name, string owner, string worldid, Style style)
-        {
-            try
-            {
-                if (GetPlotByName(name) != null)
-                {
-                    return false;
-                }
-
-                _database.Query(
-                    "INSERT INTO Plots (Name, X, Y, Width, Height, CellWidth, CellHeight, WorldId, Owner) VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8);",
-                    name, x, y, width, height, style.CellWidth, style.CellHeight, worldid, owner);
-
-                using (var res = _database.QueryReader("SELECT Id FROM Plots WHERE Name = @0 AND WorldId = @1",
-                    name, worldid))
-                {
-                    if (res.Read())
-                    {
-                        Plots.Add(new Plot
-                        {
-                            Id = res.Get<int>("Id"),
-                            Name = name,
-                            X = x,
-                            Y = y,
-                            Width = width,
-                            Height = height,
-                            CellHeight = style.CellHeight,
-                            CellWidth = style.CellWidth,
-                            Owner = owner
-                        });
-
-                        return true;
-                    }
-                    return false;
-                }
-            }
-            catch (MySqlException ex)
-            {
-                if (ex.Number == (int)MySqlErrorCode.DuplicateKeyEntry)
-                {
-                    return false;
-                }
-                TShock.Log.Error(ex.ToString());
-            }
-            catch (Exception ex)
-            {
-                TShock.Log.Error(ex.ToString());
-            }
-            return false;
-        }
-
-        public bool DelPlot(Plot plot)
-        {
-            if (plot == null || !Plots.Contains(plot))
+            if (GetPlotByName(name) != null)
             {
                 return false;
             }
-            try
+
+            var plot = new Plot()
             {
-                Plots.Remove(plot);
-                _database.Query("DELETE FROM Cells WHERE PlotId=@0", plot.Id);
-                _database.Query("DELETE FROM Plots WHERE Id = @0", plot.Id);
+                Name = name,
+                Owner = owner,
+                WorldId = worldid,
+                X = x,
+                Y = y,
+                Width = style.CellWidth,
+                Height = style.CellHeight
+            };
+            if (!DBTools.Exist<Plot>(p => p.Name == name && p.WorldId == worldid))
+            {
+                DBTools.Insert(plot);
+                Plots.Add(plot);
                 return true;
             }
-            catch (Exception e)
-            {
-                TShock.Log.ConsoleError("[PlotMarker] 删除属地期间出现异常.");
-                TShock.Log.Error(e.ToString());
-            }
-            return false;
+            else
+                return false;
         }
 
-        public void AddCells(Plot plot)
+        public static bool DelPlot(Plot plot)
+        {
+            Plots.Remove(plot);
+            DBTools.Delete<Cell>(c => c.PlotId == plot.Id);
+            DBTools.Delete<Plot>(plot.Id);
+            return true;
+        }
+
+        public static void AddCells(Plot plot)
         {
             Task.Run(() =>
             {
                 lock (_addCellLock)
                 {
-                    _database.Query("DELETE FROM Cells WHERE PlotId=@0", plot.Id);
+                    DBTools.Delete<Cell>(c => c.Id == plot.Id);
                     var stopwatch = new Stopwatch();
                     stopwatch.Start();
                     var count = 0;
@@ -188,13 +84,19 @@ namespace PlotMarker
             });
         }
 
-        public void AddCell(Cell cell)
+        public static void AddCell(Cell cell)
         {
             try
             {
-                if (_database.Query(
-                    "INSERT INTO Cells (PlotId, CellId, X, Y, UserIds, Owner, GetTime, LastAccess) VALUES (@0, @1, @2, @3, @4, @5, @6, @7);",
-                    cell.Parent.Id, cell.Id, cell.X, cell.Y, string.Empty, string.Empty, string.Empty, string.Empty) == 1)
+                if (DBTools.Insert(new Cell()
+                {
+                    Id = cell.Id,
+                    PlotId = cell.PlotId,
+                    X = cell.X,
+                    Y = cell.Y,
+                    AllowedIDs = cell.AllowedIDs,
+                    Owner = cell.Owner
+                }) == 1)
                     return;
                 throw new Exception("No affected rows.");
             }
@@ -205,7 +107,7 @@ namespace PlotMarker
             }
         }
 
-        public async void ApplyForCell(TSPlayer player)
+        public static async void ApplyForCell(TSPlayer player)
         {
             try
             {
@@ -231,7 +133,7 @@ namespace PlotMarker
             }
         }
 
-        public void ApplyForCell(TSPlayer player, int tileX, int tileY)
+        public static void ApplyForCell(TSPlayer player, int tileX, int tileY)
         {
             var cell = GetCellByPosition(tileX, tileY);
             if (cell == null)
@@ -247,54 +149,29 @@ namespace PlotMarker
             Apply(player, cell);
         }
 
-        private void Apply(TSPlayer player, Cell cell)
+        private static void Apply(TSPlayer player, Cell cell)
         {
             cell.Owner = player.Name;
             cell.GetTime = DateTime.Now;
 
-            _database.Query("UPDATE `cells` SET `Owner` = @0, `GetTime` = @1 WHERE `cells`.`CellId` = @2 AND `cells`.`PlotId` = @3;",
-                player.Account.Name,
-                DateTime.Now.ToString("s"),
-                cell.Id,
-                cell.Parent.Id);
+            DBTools.SQL.Update<Cell>(cell)
+                .Set(c => c.Owner)
+                .Set(c => c.GetTime)
+                .ExecuteAffrows();
 
             player.SendSuccessMessage("系统已经分配给你一块地.");
         }
 
-        public bool AddCellUser(Cell cell, UserAccount user)
+        public static bool AddCellUser(Cell cell, UserAccount user)
         {
-            try
-            {
-                var mergedIDs = string.Empty;
-                using (
-                    var reader = _database.QueryReader("SELECT UserIds FROM Cells WHERE PlotId=@0 AND CellId=@1",
-                                                      cell.Parent.Id, cell.Id))
-                {
-                    if (reader.Read())
-                        mergedIDs = reader.Get<string>("UserIds");
-                }
+            var realCell = DBTools.Get<Cell>(c => c.Id == cell.Id);
+            realCell.AllowedIDs.Add(user.ID);
+            cell.AllowedIDs = realCell.AllowedIDs;
 
-                var ids = mergedIDs.Split(',');
-                var userId = user.ID.ToString();
-
-                if (ids.Contains(userId))
-                    return true;
-
-                mergedIDs = string.IsNullOrEmpty(mergedIDs) ? userId : string.Concat(mergedIDs, ",", userId);
-
-                var q = _database.Query("UPDATE Cells SET UserIds=@0 WHERE PlotId=@1 AND CellId=@2",
-                    mergedIDs, cell.Parent.Id, cell.Id);
-                cell.SetAllowedIDs(mergedIDs);
-                return q != 0;
-            }
-            catch (Exception ex)
-            {
-                TShock.Log.Error(ex.ToString());
-            }
-            return false;
+            return cell.UpdateSingle(c => c.AllowedIDs) == 1;
         }
 
-        public bool RemoveCellUser(Cell cell, UserAccount user)
+        public static bool RemoveCellUser(Cell cell, UserAccount user)
         {
             if (cell != null)
             {
@@ -303,33 +180,17 @@ namespace PlotMarker
                     return false;
                 }
 
-                var ids = string.Join(",", cell.AllowedIDs);
-                return _database.Query("UPDATE Cells SET UserIds=@0 WHERE WHERE PlotId=@1 AND CellId=@2", ids,
-                    cell.Parent.Id, cell.Id) > 0;
+                cell.AllowedIDs.Remove(user.ID);
+                return cell.UpdateSingle(c => c.AllowedIDs) == 1;
             }
 
             return false;
         }
 
-        public void UpdateLastAccess(Cell cell)
-        {
-            Task.Run(() =>
-            {
-                try
-                {
-                    _database.Query("UPDATE Cells SET LastAccess=@0 WHERE PlotId=@1 AND CellId=@2",
-                        cell.LastAccess.ToString("s"),
-                        cell.Parent.Id,
-                        cell.Id);
-                }
-                catch (Exception ex)
-                {
-                    TShock.Log.Error(ex.ToString());
-                }
-            });
-        }
+        public static void UpdateLastAccess(Cell cell)
+            => Task.Run(() => cell.UpdateSingle(c => c.LastAccess, DateTime.Now));
 
-        public async Task<Cell> GetClearedCell()
+        public static async Task<Cell> GetClearedCell()
         {
             return await Task.Run(() =>
             {
@@ -350,7 +211,7 @@ namespace PlotMarker
             });
         }
 
-        public Cell GetCellByPosition(int tileX, int tileY)
+        public static Cell GetCellByPosition(int tileX, int tileY)
         {
             var plot = Plots.FirstOrDefault(p => p.Contains(tileX, tileY));
             if (plot == null)
@@ -369,46 +230,38 @@ namespace PlotMarker
             return null;
         }
 
-        public Plot GetPlotByName(string plotname)
+        public static Plot GetPlotByName(string plotname)
         {
             return Plots.FirstOrDefault(p => p.Name.Equals(plotname, StringComparison.Ordinal));
         }
 
-        public void FuckCell(Cell cell)
+        public static void FuckCell(Cell cell)
         {
-            _database.Query("UPDATE `cells` SET `GetTime` = @0, `Owner` = @1, `UserIds` = @2, `LastAccess` = @3 WHERE `cells`.`PlotId` = @4 AND `cells`.`CellId` = @5;",
-                string.Empty, string.Empty, string.Empty, string.Empty,
-                cell.Parent.Id,
-                cell.Id);
             cell.Owner = string.Empty;
-            cell.GetTime = default(DateTime);
-            cell.LastAccess = default(DateTime);
+            cell.GetTime = default;
+            cell.LastAccess = default;
             cell.AllowedIDs.Clear();
             cell.ClearTiles();
+
+            DBTools.SQL.Update<Cell>(cell)
+                .Set(c => c.Owner)
+                .Set(c => c.GetTime)
+                .Set(c => c.LastAccess)
+                .Set(c => c.AllowedIDs)
+                .ExecuteAffrows();
         }
 
-        public int GetTotalCells(string playerName)
-        {
-            const string query = @"SELECT COUNT(*) FROM `cells`, `plots`
-WHERE `plots`.`WorldId` = @0
-AND `cells`.`PlotId` = `plots`.`Id`
-AND `cells`.`Owner` = @1";
-            using (var reader = _database.QueryReader(query, Main.worldID.ToString(), playerName))
-            {
-                if (reader.Read())
-                {
-                    return reader.Get<int>("COUNT(*)");
-                }
-            }
-            throw new Exception("数据库错误");
-        }
+        public static int GetTotalCells(string playerName)
+            => (int)DBTools.SQL.Select<Cell>()
+                .Where(c => c.Owner == playerName)
+                .Count();
 
-        public Cell GetOnlyCellOfPlayer(string name)
+        public static Cell GetOnlyCellOfPlayer(string name)
         {
             return GetCellsOfPlayer(name).SingleOrDefault();
         }
 
-        public Cell[] GetCellsOfPlayer(string name)
+        public static Cell[] GetCellsOfPlayer(string name)
         {
             return (from plot in Plots
                     from cell in plot.Cells
@@ -416,16 +269,15 @@ AND `cells`.`Owner` = @1";
                     select cell).ToArray();
         }
 
-        public void ChangeOwner(Cell cell, UserAccount user)
+        public static void ChangeOwner(Cell cell, UserAccount user)
         {
             cell.Owner = user.Name;
             cell.GetTime = DateTime.Now;
 
-            _database.Query("UPDATE `cells` SET `Owner` = @0, `GetTime` = @1 WHERE `cells`.`PlotId` = @2 AND `cells`.`CellId` = @3;",
-                user.Name,
-                cell.GetTime.ToString("s"),
-                cell.Parent.Id,
-                cell.Id);
+            DBTools.SQL.Update<Cell>(cell)
+                .Set(c => c.Owner)
+                .Set(c => c.GetTime)
+                .ExecuteAffrows();
         }
     }
 }
