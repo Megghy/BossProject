@@ -105,8 +105,11 @@ namespace BossFramework.BModels
         }
         public override string ToString()
             => ID;
-
         public override int GetHashCode()
             => base.GetHashCode();
+        public static implicit operator Region(BRegion bregion)
+            => bregion.OriginRegion;
+        public static implicit operator BRegion(Region region)
+            => BRegionSystem.FindBRegionForRegion(region);
     }
 }

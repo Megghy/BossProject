@@ -51,5 +51,16 @@ namespace BossFramework.BModels
             public BRegion Region { get; set; }
             public BPlayer Player { get; set; }
         }
+        public class PlayerDamageEventArgs : IEventArgs
+        {
+            public PlayerDamageEventArgs(PlayerHurtV2 hurt, BPlayer plr)
+            {
+                Hurt = hurt;
+                Player = plr;
+            }
+            public PlayerHurtV2 Hurt { get; set; }
+            public BPlayer Player { get; set; }
+            public bool Handled { get; set; } = false;
+        }
     }
 }
