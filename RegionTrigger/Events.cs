@@ -72,52 +72,52 @@ namespace RegionTrigger
     [Flags]
     internal enum Event
     {
-        [Description("Represents a event that does nothing. It can't be added.")]
+        [Description("代表区域无事件（该事件无法被添加）")]
         None = 0,
 
-        [Description("Sends player a message when entering regions.")]
+        [Description("进入区域时发送消息。")]
         EnterMsg = 1 << 0,
 
-        [Description("Sends player a message when leaving regions.")]
+        [Description("离开区域时发送消息。")]
         LeaveMsg = 1 << 1,
 
-        [Description("Sends player in regions a message.")]
+        [Description("以特定间隔区域内玩家发送消息。")]
         Message = 1 << 2,
 
-        [Description("Alters players' tempgroups when they are in regions.")]
+        [Description("进入区域后玩家获得临时组。")]
         TempGroup = 1 << 3,
 
-        [Description("Disallows players in regions from using banned items.")]
+        [Description("区域内禁用特定物品。")]
         Itemban = 1 << 4,
 
-        [Description("Disallows players in regions from using banned projectiles.")]
+        [Description("区域内禁用特定弹幕。")]
         Projban = 1 << 5,
 
-        [Description("Disallows players in regions from using banned tiles.")]
+        [Description("区域内禁用特定物块。")]
         Tileban = 1 << 6,
 
-        [Description("Kills players in regions when they enter.")]
+        [Description("杀死进入区域的玩家。")]
         Kill = 1 << 7,
 
-        [Description("Turns players' godmode on when they are in regions.")]
+        [Description("区域内玩家获得无敌状态。")]
         Godmode = 1 << 8,
 
-        [Description("Turns players' PvP status on when they are in regions.")]
+        [Description("区域内强制开启PvP模式。")]
         Pvp = 1 << 9,
 
-        [Description("Disallows players from enabling their pvp mode.")]
+        [Description("区域内强制关闭PvP模式。")]
         NoPvp = 1 << 10,
 
-        [Description("Disallows players from changing their pvp mode.")]
+        [Description("区域内禁止改变PvP状态。")]
         InvariantPvp = 1 << 11,
 
-        [Description("Disallows players from entering regions.")]
+        [Description("禁止进入区域。")]
         Private = 1 << 12,
 
-        [Description("Temporary permissions for players in region.")]
+        [Description("区域内玩家获得临时权限。")]
         TempPermission = 1 << 13,
 
-        [Description("Disallows players from dropping items")]
+        [Description("禁止玩家丢东西。")]
         NoItem = 1 << 14
     }
 }

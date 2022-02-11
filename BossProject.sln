@@ -40,6 +40,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BossServer", "BossServer\Bo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlotMarker", "PlotMarker\PlotMarker.csproj", "{A3FFA622-9A63-4BD6-B60A-0F6B1ED71F36}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewBadgeSystem", "NewBadgeSystem\NewBadgeSystem.csproj", "{28B06A3E-90F5-4E31-AEED-E91ED319CBE7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -168,6 +170,14 @@ Global
 		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Release|x86.ActiveCfg = Release|Any CPU
 		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Release|x86.Build.0 = Release|Any CPU
+		{28B06A3E-90F5-4E31-AEED-E91ED319CBE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28B06A3E-90F5-4E31-AEED-E91ED319CBE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28B06A3E-90F5-4E31-AEED-E91ED319CBE7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{28B06A3E-90F5-4E31-AEED-E91ED319CBE7}.Debug|x86.Build.0 = Debug|Any CPU
+		{28B06A3E-90F5-4E31-AEED-E91ED319CBE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28B06A3E-90F5-4E31-AEED-E91ED319CBE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28B06A3E-90F5-4E31-AEED-E91ED319CBE7}.Release|x86.ActiveCfg = Release|Any CPU
+		{28B06A3E-90F5-4E31-AEED-E91ED319CBE7}.Release|x86.Build.0 = Release|Any CPU
 		{A3FFA622-9A63-4BD6-B60A-0F6B1ED71F36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A3FFA622-9A63-4BD6-B60A-0F6B1ED71F36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3FFA622-9A63-4BD6-B60A-0F6B1ED71F36}.Debug|x86.ActiveCfg = Debug|Any CPU

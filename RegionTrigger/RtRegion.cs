@@ -95,7 +95,7 @@ namespace RegionTrigger
             Id = id;
             Region = TShock.Regions.GetRegionByID(rid);
             if (Region == null)
-                throw new Exception("Invalid region Id!");
+                throw new Exception("无效区域ID");
         }
 
         public RtRegion(int id, int rid, Event ev) : this(id, rid)
@@ -181,7 +181,7 @@ namespace RegionTrigger
             };
 
             if (region.TempGroup == null && region.HasEvent(Event.TempGroup))
-                TShock.Log.ConsoleError("[RegionTrigger] TempGroup '{0}' of region '{1}' is invalid!", groupName, region.Region.Name);
+                TShock.Log.ConsoleError("[RegionTrigger] 临时组： '{0}'在 '{1}' 失效!", groupName, region.Region.Name);
 
             return region;
         }

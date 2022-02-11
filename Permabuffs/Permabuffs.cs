@@ -68,13 +68,13 @@ namespace Permabuffs
 			update = new System.Timers.Timer { Interval = 1000, AutoReset = true, Enabled = true };
 			update.Elapsed += OnElapsed;
 
-			Commands.ChatCommands.Add(new Command("pb.use", PBuffs, "permabuff") { AllowServer = false, HelpText = "Buffs yourself with a buff permanently." });
-			Commands.ChatCommands.Add(new Command("pb.check", PBCheck, "buffcheck") { HelpText = "Lists the active permabuffs of the specified player." });
-			Commands.ChatCommands.Add(new Command("pb.give", PBGive, "gpermabuff") { HelpText = "Gives a player the specified permabuff." });
+			Commands.ChatCommands.Add(new Command("pb.use", PBuffs, "permabuff") { AllowServer = false, HelpText = "获取一个永久buff." });
+			Commands.ChatCommands.Add(new Command("pb.check", PBCheck, "buffcheck") { HelpText = "列出指定玩家的永久buff" });
+			Commands.ChatCommands.Add(new Command("pb.give", PBGive, "gpermabuff") { HelpText = "给玩家指定的buff." });
 			Commands.ChatCommands.Add(new Command("pb.region", PBRegion, "regionbuff"));
 			Commands.ChatCommands.Add(new Command("pb.global", PBGlobal, "globalbuff"));
-            Commands.ChatCommands.Add(new Command("pb.use", PBClear, "clearbuffs") { HelpText = "Removes all permabuffs." });
-			Commands.ChatCommands.Add(new Command("pb.pass", PBPass, "pbtoggle") { HelpText = "ignore region buff" });
+            Commands.ChatCommands.Add(new Command("pb.use", PBClear, "clearbuffs") { HelpText = "移除所有永久buff." });
+			Commands.ChatCommands.Add(new Command("pb.pass", PBPass, "pbtoggle") { HelpText = "无视区域buff" });
 		}
 
 		private void PBPass(CommandArgs args)

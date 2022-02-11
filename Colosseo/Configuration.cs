@@ -67,7 +67,7 @@ namespace Colosseo
                 ClearRegion = TShock.Regions.GetRegionByName(Clear);
                 if (VenueRegion == null || ClearRegion == null)
                 {
-                    TShock.Log.ConsoleError("区域加载失败,请确认数据库和配置文件的区域匹配");
+                    TShock.Log.ConsoleError("[Colosseo] 区域加载失败,请确认数据库和配置文件的区域匹配");
                     InitSuccess = false;
                 }
                 else
