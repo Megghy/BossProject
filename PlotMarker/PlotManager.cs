@@ -67,7 +67,7 @@ namespace PlotMarker
         #region 子属地可见性操作
         public static int FindUseableArea(int count)
         {
-
+            return 1;
         }
         public static void ShowCell(Cell cell)
         {

@@ -10,5 +10,6 @@
     <ProjectReference Include="..\BossServer\BossServer.csproj" />
     <ProjectReference Include="..\FakeProvider\FakeProvider.csproj" />
   </ItemGroup>
-
+	
+	<Import Project="$(SolutionDir)Plugin.Common.props" />
 </Project>

@@ -17,11 +17,11 @@ namespace BossFramework.BCore
         [AutoPostInit]
         private static void InitSign()
         {
-            BLog.DEBUG("初始化区域管理");
+            BLog.DEBUG("初始化标牌重定向");
 
             Signs = DB.DBTools.GetAll<BSign>().Where(r => r.WorldId == Terraria.Main.worldID).ToList();
 
-            Terraria.Main.sign.ForEach(s =>
+            Terraria.Main.sign.Where(s => s != null).ForEach(s =>
             {
                 if (!Signs.Exists(sign => sign.X == s.x && sign.Y == s.y))
                 {
@@ -78,6 +78,7 @@ namespace BossFramework.BCore
         }
         public static BSign CreateSign(int tileX, int tileY, string text, BPlayer plr = null)
         {
+
             var sign = new BSign()
             {
                 X = tileX,
@@ -86,8 +87,9 @@ namespace BossFramework.BCore
                 Owner = plr?.Index ?? -1,
                 LastUpdateUser = plr?.Index ?? -1
             };
-            sign.Insert();
+            DB.DBTools.Insert(sign);
             Signs.Add(sign);
+            BLog.Info($"创建标牌数据于 {sign.X} - {sign.Y}");
             return sign;
         }
 

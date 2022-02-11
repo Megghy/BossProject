@@ -1,4 +1,5 @@
 ﻿using FreeSql;
+using FreeSql.DataAnnotations;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -8,6 +9,8 @@ namespace BossFramework.DB
 {
     public abstract class UserConfigBase<T> : BaseEntity<UserConfigBase<T>, long> where T : UserConfigBase<T>
     {
+        [Column(IsPrimary = true, IsIdentity = true)]
+        public override long Id { get => base.Id; set => base.Id = value; }
         public virtual void Init()
         {
 
