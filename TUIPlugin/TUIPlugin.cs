@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BossFramework.BModels;
+using Microsoft.Xna.Framework;
 using System.Timers;
 using Terraria;
 using Terraria.ID;
@@ -76,9 +77,13 @@ namespace TUIPlugin
                 ServerApi.Hooks.GamePostInitialize.Register(this, OnGamePostInitialize, Int32.MinValue);
                 ServerApi.Hooks.ServerConnect.Register(this, OnServerConnect);
                 ServerApi.Hooks.ServerLeave.Register(this, OnServerLeave);
-                ServerApi.Hooks.NetGetData.Register(this, OnGetData, 100);
+
+                ServerApi.Hooks.NetGetData.Register(this, OnGetData, 100); //所有弹幕需要重新注册
+                BossFramework.BCore.ProjRedirector.ProjDestroy += OnProjDestroy;
+                BossFramework.BCore.ProjRedirector.ProjCreate += OnNewProjectile;
+
                 PlayerHooks.PlayerLogout += OnPlayerLogout;
-                GetDataHandlers.NewProjectile += OnNewProjectile;
+                
                 if (FakesEnabled)
                     ServerApi.Hooks.PostWorldSave.Register(this, OnPostSaveWorld);
                 TUI.Hooks.LoadRoot.Event += OnLoadRoot;
@@ -122,8 +127,10 @@ namespace TUIPlugin
                     ServerApi.Hooks.ServerConnect.Deregister(this, OnServerConnect);
                     ServerApi.Hooks.ServerLeave.Deregister(this, OnServerLeave);
                     ServerApi.Hooks.NetGetData.Deregister(this, OnGetData);
+                    BossFramework.BCore.ProjRedirector.ProjDestroy -= OnProjDestroy;
+                    BossFramework.BCore.ProjRedirector.ProjCreate += OnNewProjectile;
+
                     PlayerHooks.PlayerLogout -= OnPlayerLogout;
-                    GetDataHandlers.NewProjectile -= OnNewProjectile;
                     if (FakesEnabled)
                         ServerApi.Hooks.PostWorldSave.Deregister(this, OnPostSaveWorld);
                     TUI.Hooks.LoadRoot.Event -= OnLoadRoot;
@@ -218,8 +225,8 @@ namespace TUIPlugin
 
                 if (args.MsgID == PacketTypes.MassWireOperation)
                 {
-                    using (MemoryStream ms = new MemoryStream(args.Msg.readBuffer, args.Index, args.Length))
-                    using (BinaryReader br = new BinaryReader(ms))
+                    using (MemoryStream ms = new(args.Msg.readBuffer, args.Index, args.Length))
+                    using (BinaryReader br = new(ms))
                     {
                         short sx = br.ReadInt16();
                         short sy = br.ReadInt16();
@@ -239,32 +246,24 @@ namespace TUIPlugin
                         playerDesignState[player.Index] = DesignState.Waiting;
                     }
                 }
-                else if (args.MsgID == PacketTypes.ProjectileDestroy)
-                {
-                    using (MemoryStream ms = new MemoryStream(args.Msg.readBuffer, args.Index, args.Length))
-                    using (BinaryReader br = new BinaryReader(ms))
-                    {
-                        short projectileID = br.ReadInt16();
-                        byte owner = br.ReadByte();
-                        if (owner != args.Msg.whoAmI)
-                            return;
-                        Touch previousTouch = TUI.Session[owner].PreviousTouch;
-                        if (TUI.Session[owner].ProjectileID == projectileID && previousTouch != null && previousTouch.State != TouchState.End)
-                        {
-                            Touch simulatedEndTouch = previousTouch.SimulatedEndTouch();
-                            simulatedEndTouch.Undo = true;
-                            TUI.Touched(owner, simulatedEndTouch);
-                            playerDesignState[owner] = DesignState.Waiting;
-                        }
-                    }
-                }
             }
             catch (Exception e)
             {
                 TUI.HandleException(e);
             }
         }
-
+        private static void OnProjDestroy(BEventArgs.ProjDestroyEventArgs args)
+        {
+            var owner = args.Player.Index;
+            Touch previousTouch = TUI.Session[owner].PreviousTouch;
+            if (TUI.Session[owner].ProjectileID == args.KillProj.ProjSlot && previousTouch != null && previousTouch.State != TouchState.End)
+            {
+                Touch simulatedEndTouch = previousTouch.SimulatedEndTouch();
+                simulatedEndTouch.Undo = true;
+                TUI.Touched(owner, simulatedEndTouch);
+                playerDesignState[owner] = DesignState.Waiting;
+            }
+        }
         #endregion
         #region OnPlayerLogout
 
@@ -284,12 +283,12 @@ namespace TUIPlugin
         #endregion
         #region OnNewProjectile
 
-        private static void OnNewProjectile(object sender, GetDataHandlers.NewProjectileEventArgs args)
+        private static void OnNewProjectile(BEventArgs.ProjCreateEventArgs args)
         {
             try
             {
-                TSPlayer player = TShock.Players[args.Owner];
-                if (args.Handled || args.Type != 651 || player?.TPlayer == null)
+                TSPlayer player = args.Player.TsPlayer;
+                if (args.Handled || args.Proj.ProjType != 651 || player?.TPlayer == null)
                     return;
 
                 byte prefix;
@@ -299,24 +298,24 @@ namespace TUIPlugin
                 else
                     return; // This means player is holding another item.Obtains by hacks.
 
-                if (playerDesignState[args.Owner] == DesignState.Waiting)
-                    playerDesignState[args.Owner] = DesignState.Begin;
-                else if (playerDesignState[args.Owner] == DesignState.Begin)
+                if (playerDesignState[player.Index] == DesignState.Waiting)
+                    playerDesignState[player.Index] = DesignState.Begin;
+                else if (playerDesignState[player.Index] == DesignState.Begin)
                 {
-                    int tileX = (int)Math.Floor((args.Position.X + 5) / 16);
-                    int tileY = (int)Math.Floor((args.Position.Y + 5) / 16);
+                    int tileX = (int)Math.Floor((args.Player.X + 5) / 16);
+                    int tileY = (int)Math.Floor((args.Player.Y + 5) / 16);
 
-                    if (TUI.Touched(args.Owner, new Touch(tileX, tileY, TouchState.Begin,
+                    if (TUI.Touched(player.Index, new Touch(tileX, tileY, TouchState.Begin,
                             player.HasPermission(TUI.ControlPermission), prefix, 0)))
-                        TUI.Session[args.Owner].ProjectileID = args.Identity;
-                    playerDesignState[args.Owner] = DesignState.Moving;
+                        TUI.Session[player.Index].ProjectileID = args.Proj.ProjSlot;
+                    playerDesignState[player.Index] = DesignState.Moving;
                     //args.Handled = true;
                 }
                 else
                 {
-                    int tileX = (int)Math.Floor((args.Position.X + 5) / 16);
-                    int tileY = (int)Math.Floor((args.Position.Y + 5) / 16);
-                    TUI.Touched(args.Owner, new Touch(tileX, tileY, TouchState.Moving,
+                    int tileX = (int)Math.Floor((args.Player.X + 5) / 16);
+                    int tileY = (int)Math.Floor((args.Player.Y + 5) / 16);
+                    TUI.Touched(player.Index, new Touch(tileX, tileY, TouchState.Moving,
                         player.HasPermission(TUI.ControlPermission), prefix, 0));
                 }
             }

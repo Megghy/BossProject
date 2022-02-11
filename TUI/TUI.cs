@@ -217,11 +217,11 @@ namespace TerrariaUI
             Touch previous = session.PreviousTouch;
             if (touch.State == TouchState.Begin && previous != null
                     && (previous.State == TouchState.Begin || previous.State == TouchState.Moving))
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("Begin");
 
             if ((touch.State == TouchState.Moving || touch.State == TouchState.End)
                     && (previous == null || previous.State == TouchState.End))
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"Moving, Previous State: {previous.State}");
 
             if (touch.State == TouchState.Moving && touch.AbsoluteX == previous.AbsoluteX && touch.AbsoluteY == previous.AbsoluteY)
                 return session.Used;
@@ -251,7 +251,7 @@ namespace TerrariaUI
             if (touch.State == TouchState.End)
             {
                 session.TouchSessionIndex++;
-                session.EndTouchHandled = touch.InsideUI || session.BeginTouch.InsideUI;
+                session.EndTouchHandled = touch.InsideUI || session.BeginTouch?.InsideUI == true;
             }
 
 #if DEBUG

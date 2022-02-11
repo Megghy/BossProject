@@ -26,7 +26,7 @@ namespace BossFramework.BCore.Cmds
         {
             if (args.BPlayer.IsInGame())
             {
-                args.BPlayer.SendErrorEX(AlreadyInGame_Exception);
+                args.BPlayer.SendErrorMsg(AlreadyInGame_Exception);
                 return;
             }
             if (args.Any())
@@ -40,18 +40,18 @@ namespace BossFramework.BCore.Cmds
                         else if (MiniGameManager.CreateGame(games.First(), args.BPlayer) is { } game)
                         {
                             game.Join(args.BPlayer);
-                            args.BPlayer.SendSuccessEX($"成功创建小游戏 [{game.Name}]");
+                            args.BPlayer.SendSuccessMsg($"成功创建小游戏 [{game.Name}]");
                             BLog.Success($"[{args.BPlayer}] 申请创建小游戏 => [{game}]");
                         }
                         else
-                            args.BPlayer.SendErrorEX($"当前无法创建小游戏 [{games.First().Names.First()}]");
+                            args.BPlayer.SendErrorMsg($"当前无法创建小游戏 [{games.First().Names.First()}]");
                     }
                 }
                 else
-                    args.BPlayer.SendErrorEX($"未找到名称中包含 [{args.First()}] 的小游戏");
+                    args.BPlayer.SendErrorMsg($"未找到名称中包含 [{args.First()}] 的小游戏");
             }
             else
-                args.BPlayer.SendErrorEX($"{BCommand.InvalidInput} /{args.CommandName} {args.SubCommandName} <要创建的小游戏名称>");
+                args.BPlayer.SendErrorMsg($"{BCommand.InvalidInput} /{args.CommandName} {args.SubCommandName} <要创建的小游戏名称>");
         }
         #endregion
 

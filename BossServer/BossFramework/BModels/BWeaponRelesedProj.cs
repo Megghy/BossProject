@@ -4,28 +4,24 @@ using TrProtocol.Packets;
 
 namespace BossFramework.BModels
 {
-    public class BWeaponRelesedProj : SyncProjectile
+    public sealed record BWeaponRelesedProj
     {
-        public BWeaponRelesedProj(SyncProjectile proj, BaseBWeapon fromWeapon)
+        public BWeaponRelesedProj(BPlayer owner, SyncProjectile proj, BaseBWeapon fromWeapon, BRegion region = null)
         {
-            this.Bit1 = proj.Bit1;
-            this.AI1 = proj.AI1;
-            this.AI2 = proj.AI2;
-            this.BannerId = proj.BannerId;
-            this.Damange = proj.Damange;
-            this.Knockback = proj.Knockback;
-            this.OriginalDamage = proj.OriginalDamage;
-            this.PlayerSlot = proj.PlayerSlot;
-            this.ProjSlot = proj.ProjSlot;
-            this.BannerId = proj.BannerId;
-            this.Position = proj.Position;
-            this.Velocity = proj.Velocity;
-            this.ProjType = proj.ProjType;
-            this.UUID = proj.UUID;
+            Owner = owner;
+            Proj = proj;
             FromWeapon = fromWeapon;
-            CreateTime = DateTime.Now.Ticks;
+            Region = region;
+            CreateTime = DateTimeOffset.Now.ToUnixTimeSeconds();
         }
-        public BaseBWeapon FromWeapon { get; private set; }
+        public BPlayer Owner { get; init; }
+        public SyncProjectile Proj { get; init; }
+        public BaseBWeapon FromWeapon { get; init; }
+        public BRegion Region { get; init; }
         public long CreateTime { get; init; }
+        public void KillProj()
+        {
+            Region?.ProjContext.DestroyProj(Proj, false);
+        }
     }
 }
