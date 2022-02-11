@@ -10,17 +10,17 @@ namespace BossFramework.BModels
     {
         public const string DefaultRegionName = "DefaultBRegion";
         public static BRegion Default { get; } = new(null);
-        public BRegion() { ID = DefaultRegionName; }
+        public BRegion() { Id = DefaultRegionName; }
         public BRegion(Region region)
         {
             OriginRegion = region;
-            ID = region is null ? DefaultRegionName : $"{region.Name}_{region.WorldID}";
+            Id = region is null ? DefaultRegionName : $"{region.Name}_{region.WorldID}";
             Init();
         }
         public override void Init()
         {
-            if (ID != DefaultRegionName)
-                OriginRegion ??= TShockAPI.TShock.Regions.Regions.FirstOrDefault(r => $"{r.Name}_{r.WorldID}" == ID);
+            if (Id != DefaultRegionName)
+                OriginRegion ??= TShockAPI.TShock.Regions.Regions.FirstOrDefault(r => $"{r.Name}_{r.WorldID}" == Id);
             ProjContext = new(this);
         }
 
@@ -32,7 +32,7 @@ namespace BossFramework.BModels
         {
             get
             {
-                _parent ??= BRegionSystem.AllBRegion.FirstOrDefault(r => r.ID == ParentName);
+                _parent ??= BRegionSystem.AllBRegion.FirstOrDefault(r => r.Id == ParentName);
                 return _parent;
             }
         }
@@ -50,7 +50,7 @@ namespace BossFramework.BModels
                     BUtils.DeserializeJson<string[]>(ChildName)
                         .ForEach(r =>
                         {
-                            if (BRegionSystem.AllBRegion.FirstOrDefault(r => r.ID == r.ID) is { } child)
+                            if (BRegionSystem.AllBRegion.FirstOrDefault(r => r.Id == r.Id) is { } child)
                                 _childRegion.Add(child);
                         });
                 }
@@ -70,7 +70,7 @@ namespace BossFramework.BModels
                 return;
             _childRegion.Add(region);
             var childs = ChildName.DeserializeJson<List<string>>();
-            childs.Add(region.ID);
+            childs.Add(region.Id);
             Update(r => r.ChildName, childs.SerializeToJson());
         }
         public void RemoveChild(BRegion region)
@@ -79,7 +79,7 @@ namespace BossFramework.BModels
                 return;
             _childRegion.Remove(region);
             var childs = ChildName.DeserializeJson<List<string>>();
-            childs.Remove(region.ID);
+            childs.Remove(region.Id);
             Update(r => r.ChildName, childs.SerializeToJson());
         }
         public void SetParent(BRegion region)
@@ -92,7 +92,7 @@ namespace BossFramework.BModels
             else
             {
                 _parent = region;
-                Update(r => r.ParentName, _parent.ID);
+                Update(r => r.ParentName, _parent.Id);
             }
         }
         #endregion
@@ -100,11 +100,11 @@ namespace BossFramework.BModels
         public override bool Equals(object obj)
         {
             if (obj is BRegion region)
-                return region.ID == ID;
+                return region.Id == Id;
             return false;
         }
         public override string ToString()
-            => ID;
+            => Id;
         public override int GetHashCode()
             => base.GetHashCode();
         public static implicit operator Region(BRegion bregion)

@@ -36,4 +36,8 @@ public class testweapon : BaseBWeapon
         target.TsPlayer.Heal(10);
         return false;
     }
+    public override void OnProjDestroy(BPlayer plr, KillProjectile killProj)
+    {
+        
+    }
 }

@@ -23,7 +23,7 @@ namespace BossFramework.DB
             {
                 if (updateProp)
                     prop?.SetValue(this, value);
-                DBTools.SQL.Update<T>()
+                DBTools.SQL.Update<T>(this)
                     .Set(extract, value)
                     .Set(t => t.UpdateTime, DateTime.Now)
                     .ExecuteAffrows();
@@ -40,8 +40,9 @@ namespace BossFramework.DB
                 var prop = extract.Body.GetType()
                     .GetProperties().FirstOrDefault(p => p.Name.Contains("Member"));
                 var t = prop!.GetValue(extract.Body) as PropertyInfo;
-                DBTools.SQL.Update<T>()
+                DBTools.SQL.Update<T>(this)
                     .Set(extract, (TV)t?.GetValue(this)!)
+                    .Set(t => t.UpdateTime, DateTime.Now)
                     .ExecuteAffrows();
             }
             catch (Exception ex)
@@ -49,6 +50,5 @@ namespace BossFramework.DB
                 BLog.Error($"未能更新字段\r\n{ex}");
             }
         }
-        public string ID { get; set; }
     }
 }

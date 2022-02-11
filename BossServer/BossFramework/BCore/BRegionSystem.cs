@@ -18,7 +18,7 @@ namespace BossFramework.BCore
             BLog.DEBUG("初始化区域管理");
 
             var s = DB.DBTools.GetAll<BRegion>();
-            AllBRegion = DB.DBTools.GetAll<BRegion>().Where(r => r.ID.EndsWith(Terraria.Main.worldID.ToString())).ToList();
+            AllBRegion = DB.DBTools.GetAll<BRegion>().Where(r => r.Id.EndsWith(Terraria.Main.worldID.ToString())).ToList();
 
             TShockAPI.TShock.Regions.Regions.ForEach(r =>
             {
@@ -43,7 +43,7 @@ namespace BossFramework.BCore
         {
             if (region is null)
                 return null;
-            return AllBRegion.FirstOrDefault(r => r.ID == $"{region.Name}_{region.WorldID}");
+            return AllBRegion.FirstOrDefault(r => r.Id == $"{region.Name}_{region.WorldID}");
         }
         /// <summary>
         /// 返回指定领地中的所有玩家, 提供参数为null时返回所有未在领地中的玩家
@@ -60,7 +60,7 @@ namespace BossFramework.BCore
             var bregion = new BRegion(args.Region);
             AllBRegion.Add(bregion);
             DB.DBTools.Insert(bregion);
-            BLog.DEBUG($"区域事件: [创建] - {bregion.ID}");
+            BLog.DEBUG($"区域事件: [创建] - {bregion.Id}");
         }
         public static void OnRegionDelete(RegionHooks.RegionDeletedEventArgs args)
         {
@@ -73,7 +73,7 @@ namespace BossFramework.BCore
                     if (r.ChildRegion.Contains(r))
                         r.RemoveChild(r);
                 });
-                BLog.DEBUG($"区域事件: [移除] - {bregion.ID}");
+                BLog.DEBUG($"区域事件: [移除] - {bregion.Id}");
             }
         }
         public static void OnEnterRegion(RegionHooks.RegionEnteredEventArgs args)
@@ -96,7 +96,7 @@ namespace BossFramework.BCore
                 CallBRegionEvent(parent, plr, isEnter);
             else
             {
-                BLog.DEBUG($"区域事件: [{(isEnter ? "进入" : "离开")}] - {region.ID} : {plr}");
+                BLog.DEBUG($"区域事件: [{(isEnter ? "进入" : "离开")}] - {region.Id} : {plr}");
                 var args = new BRegionEventArgs(region, plr);
                 if (isEnter)
                 {
