@@ -53,7 +53,7 @@ namespace BadgeSystem
 			{
 
 				Tuple<IEnumerable<string>, IEnumerable<string>>[] tuples = BadgeSystem.Badges.Load(player.Account.ID);
-				TShock.Log.ConsoleInfo(tuples.Count().ToString());
+				//TShock.Log.ConsoleInfo(tuples.Count().ToString());
 				IEnumerable<Content> TotalBrackets = LoadContent(tuples[0].Item1);
 				IEnumerable<Content> CurrentBrackets = LoadContent(tuples[0].Item2);
 				IEnumerable<Content> TotalPrefix = LoadContent(tuples[1].Item1);
@@ -214,8 +214,8 @@ namespace BadgeSystem
 			}
       
 			string[] bracket = bracketsContent.ContentValue.Split(',');
-			TShock.Log.ConsoleInfo("count: "+_currentPrefix.Count().ToString() +"   "+ prefixContent.ContentValue);
-			TShock.Log.ConsoleInfo("count: "+_currentSuffix.Count().ToString() + "   " + suffixContent.ContentValue);
+			//TShock.Log.ConsoleInfo("count: "+_currentPrefix.Count().ToString() +"   "+ prefixContent.ContentValue);
+			//TShock.Log.ConsoleInfo("count: "+_currentSuffix.Count().ToString() + "   " + suffixContent.ContentValue);
 			string startBracket =  "[c/" + bracketsContent.ColorHex + ":" + bracket[0] + "]";
 			string endBracket =		"[c/" + bracketsContent.ColorHex + ":" + bracket[1] + "]";
 			string prefix = prefixContent.ContentValue;

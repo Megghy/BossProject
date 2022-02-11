@@ -193,13 +193,12 @@ namespace BadgeSystem
 				return;
 			}
 			PlayerData playerData = PlayerData.GetPlayerData(tSPlayer);
-			TShock.Log.ConsoleInfo(playerData.Any.ToString());
+			
 			//if (!playerData.Any)
 			//{
 			//	return;
 			//}
 			args.Handled = true;
-			TShock.Log.ConsoleInfo("a");
 			string tshockText = args.Text;
 			foreach (KeyValuePair<LocalizedText, ChatCommandId> localizedCommand in ChatManager.Commands._localizedCommands)
 			{
@@ -209,7 +208,6 @@ namespace BadgeSystem
 					break;
 				}
 			}
-			TShock.Log.ConsoleInfo("b");
 			if ((tshockText.StartsWith(TShock.Config.Settings.CommandSpecifier) || tshockText.StartsWith(TShock.Config.Settings.CommandSilentSpecifier)) && !string.IsNullOrWhiteSpace(tshockText.Substring(1)))
 			{
 				args.Handled = true;
@@ -221,7 +219,6 @@ namespace BadgeSystem
 			}
 			if (!tSPlayer.HasPermission(Permissions.canchat))
 			{
-				TShock.Log.ConsoleInfo("c");
 				args.Handled = true;
 				return;
 			}
@@ -233,7 +230,6 @@ namespace BadgeSystem
 			}
 			if (!TShock.Config.Settings.EnableChatAboveHeads)
 			{
-				TShock.Log.ConsoleInfo("d");
 				tshockText = string.Format(TShock.Config.Settings.ChatFormat, tSPlayer.Group.Name, playerData.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix, args.Text);
 				bool flag = PlayerHooks.OnPlayerChat(tSPlayer, args.Text, ref tshockText);
 				args.Handled = true;
@@ -248,10 +244,8 @@ namespace BadgeSystem
 			player.name = string.Format(TShock.Config.Settings.ChatAboveHeadsFormat, tSPlayer.Group.Name, tSPlayer.Group.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix);
 			NetMessage.SendData(4, -1, -1, NetworkText.FromLiteral(player.name), args.Who);
 			player.name = name;
-			TShock.Log.ConsoleInfo("e");
 			if (PlayerHooks.OnPlayerChat(tSPlayer, args.Text, ref tshockText))
 			{
-				TShock.Log.ConsoleInfo("f");
 				args.Handled = true;
 				return;
 			}
@@ -263,7 +257,6 @@ namespace BadgeSystem
 			TSPlayer.Server.SendMessage(text, tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B);
 			TShock.Log.Info("Broadcast: {0}", text);
 			args.Handled = true;
-			TShock.Log.ConsoleInfo("g");
 		}
 
 		private static void BadgeInfo(CommandArgs args)
@@ -320,7 +313,6 @@ namespace BadgeSystem
 				TSPlayer player = list.Single();
 				//string str = string.Join(" ", args.Parameters.Skip(1));
 				string str = args.Parameters[2];
-				TShock.Log.ConsoleInfo(str);
 				if (!ContentConfig.TryParse(str, out Content b, type))
 				{
 					args.Player.SendErrorMessage("识别号错误。");
@@ -358,9 +350,7 @@ namespace BadgeSystem
 			else if (args.Parameters.Count > 2)//3
 			{
 				string content = args.Parameters[1];
-				TShock.Log.ConsoleInfo(content);
 				string id = args.Parameters[2];
-				TShock.Log.ConsoleInfo(id);
 				string text = "";
 				if (type == "brackets")//4
                 {
@@ -369,7 +359,6 @@ namespace BadgeSystem
 						args.Player.SendErrorMessage("创建括号错误！正确语法 ：newbrackets <内容> <识别号> <颜色>");
 					}
 					text = args.Parameters[3];
-					TShock.Log.ConsoleInfo(text);
 					if (!Content.TryParse(text, out var _))
 					{
 						args.Player.SendErrorMessage("颜色代码错误");
