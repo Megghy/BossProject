@@ -40,7 +40,7 @@ namespace BossFramework.BModels
             }
         }
         [JsonMap]
-        public List<int> ChildsId { get; private set; }
+        public List<long> ChildsId { get; private set; }
         private List<BRegion> _childRegion;
         public List<BRegion> ChildRegion
         {

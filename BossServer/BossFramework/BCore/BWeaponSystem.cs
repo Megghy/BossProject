@@ -193,9 +193,11 @@ namespace BossFramework.BCore
                 Stack = (short)weapon.Stack,
                 Velocity = default
             }); //生成普通物品
+
             var packet = weapon.TweakePacket;
             packet.ItemSlot = (short)itemID;
             plr.SendPacket(packet); //转换为自定义物品
+
             plr.RemoveItem(slot, false); //移除旧的物品
         }
         private static void ChangeSingleItemToBWeapon(this BPlayer plr, BaseBWeapon weapon, int slot)
@@ -223,6 +225,7 @@ namespace BossFramework.BCore
                 var item = plr.TsPlayer?.TPlayer?.inventory[i];
                 if (BWeapons.Where(w => w.Equals(item)).FirstOrDefault() is { } bweapon)
                     plr.SpawnBWeapon(bweapon, i);
+                Task.Delay(10).Wait();
             }
             plr.RemoveFillItems(); //清理占位物品
 

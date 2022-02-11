@@ -17,7 +17,6 @@ namespace BossFramework.BCore
         {
             BLog.DEBUG("初始化区域管理");
 
-            var s = DB.DBTools.GetAll<BRegion>();
             AllBRegion = DB.DBTools.GetAll<BRegion>().Where(r => r.WorldId == Terraria.Main.worldID).ToList();
 
             TShockAPI.TShock.Regions.Regions.ForEach(r =>

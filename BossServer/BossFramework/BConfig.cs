@@ -29,5 +29,6 @@ namespace BossFramework
 
         public bool FastLoadWorld { get; set; } = true;
         public bool DebugInfo { get; set; } = true;
+        public int SignRefreshRadius { get; set; } = 200;
     }
 }

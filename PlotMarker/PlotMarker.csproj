@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BossServer\BossServer.csproj" />
+    <ProjectReference Include="..\FakeProvider\FakeProvider.csproj" />
   </ItemGroup>
 
 </Project>

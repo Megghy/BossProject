@@ -53,6 +53,9 @@ namespace BossFramework.BModels
 
         public List<BWeaponRelesedProj> RelesedProjs { get; } = new();
 
+        public BSign WatchingSign { get; internal set; }
+        public int LastWatchingSignIndex { get; set; } = -1;
+
         #region 小游戏部分
         public long Point { get; set; }
         /// <summary>
