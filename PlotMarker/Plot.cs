@@ -159,6 +159,10 @@ namespace PlotMarker
 
 	internal sealed class Cell
 	{
+		/// <summary>
+		/// 所属区域
+		/// </summary>
+		public int PlotId { get; set; }
 		/// <summary> Cell在 <see cref="Plot.Cells"/> 的索引 </summary>
 		public int Id { get; set; }
 

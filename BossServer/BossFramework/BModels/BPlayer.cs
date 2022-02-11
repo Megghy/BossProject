@@ -22,7 +22,7 @@ namespace BossFramework.BModels
         }
         public override void Init()
         {
-            TsPlayer ??= TShock.Players.FirstOrDefault(p => p?.Account?.ID.ToString() == Id);
+            TsPlayer ??= TShock.Players.FirstOrDefault(p => p?.Account?.ID == Id);
 
             IsCustomWeaponMode = false;
             IsChangingWeapon = false;

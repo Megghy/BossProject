@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace BossFramework.DB
 {
-    public abstract class UserConfigBase<T> : BaseEntity<UserConfigBase<T>, string> where T : UserConfigBase<T>
+    public abstract class UserConfigBase<T> : BaseEntity<UserConfigBase<T>, int> where T : UserConfigBase<T>
     {
         public virtual void Init()
         {

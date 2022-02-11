@@ -18,7 +18,7 @@ namespace BossFramework.BCore
             BLog.DEBUG("初始化区域管理");
 
             var s = DB.DBTools.GetAll<BRegion>();
-            AllBRegion = DB.DBTools.GetAll<BRegion>().Where(r => r.Id.EndsWith(Terraria.Main.worldID.ToString())).ToList();
+            AllBRegion = DB.DBTools.GetAll<BRegion>().Where(r => r.WorldId == Terraria.Main.worldID).ToList();
 
             TShockAPI.TShock.Regions.Regions.ForEach(r =>
             {
@@ -43,7 +43,7 @@ namespace BossFramework.BCore
         {
             if (region is null)
                 return null;
-            return AllBRegion.FirstOrDefault(r => r.Id == $"{region.Name}_{region.WorldID}");
+            return AllBRegion.FirstOrDefault(r => r.Name == region.Name && r.WorldId.ToString() == region.WorldID);
         }
         /// <summary>
         /// 返回指定领地中的所有玩家, 提供参数为null时返回所有未在领地中的玩家

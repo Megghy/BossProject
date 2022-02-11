@@ -75,6 +75,10 @@ namespace PlotMarker
             {
                 while (reader.Read())
                 {
+                    DBTools.SQL.Select<Cell>()
+                        .Where(c => c.PlotId == parent.Id)
+                        .ToList()
+                        .ForEach(cell => list.Add(cell));
                     var cell = new Cell
                     {
                         Parent = parent,
@@ -86,16 +90,6 @@ namespace PlotMarker
                         LastAccess = DateTime.TryParse(reader.Get<string>("LastAccess"), out dt) ? dt : default(DateTime),
                         AllowedIDs = new List<int>()
                     };
-                    var mergedids = reader.Get<string>("UserIds") ?? "";
-                    var splitids = mergedids.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var t in splitids)
-                    {
-                        if (int.TryParse(t, out int userid))
-                            cell.AllowedIDs.Add(userid);
-                        else
-                            TShock.Log.Warn("UserIDs 有一列不可用数据: " + t);
-                    }
-                    list.Add(cell);
                 }
             }
             return list.ToArray();

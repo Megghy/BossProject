@@ -26,6 +26,12 @@ namespace BossFramework.DB
             result.ForEach(r => r.Init());
             return result.ToArray();
         }
+        public static T[] GetAll<T>(Expression<Func<T, bool>> extract) where T : UserConfigBase<T>
+        {
+            var result = SQL.Select<T>().Where(extract).ToList();
+            result.ForEach(r => r.Init());
+            return result.ToArray();
+        }
         public static T Get<T>(Expression<Func<T, bool>> extract) where T : UserConfigBase<T>
         {
             var result = SQL.Select<T>().Where(extract).First();
@@ -56,7 +62,7 @@ namespace BossFramework.DB
                 return -1;
             }
         }
-        public static T GetNonInsert<T>(string id) where T : UserConfigBase<T>
+        public static T GetNonInsert<T>(int id) where T : UserConfigBase<T>
         {
             try
             {
@@ -68,7 +74,7 @@ namespace BossFramework.DB
                 return null;
             }
         }
-        public static T Get<T>(string id) where T : UserConfigBase<T>
+        public static T Get<T>(int id) where T : UserConfigBase<T>
         {
             var result = GetNonInsert<T>(id);
             if (result == null)
