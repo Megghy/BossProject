@@ -1,4 +1,5 @@
 ﻿using BossFramework.DB;
+using FakeProvider;
 using FreeSql.DataAnnotations;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
@@ -41,7 +42,14 @@ namespace PlotMarker
         /// 小块区域的引用. 其中数组索引就是 <see cref="Cell.Id"/> ,
         /// 而顺序(数组索引)是按照 <see cref="GenerateCells"/> 中添加列表的顺序来
         /// </summary>
-        public Cell[] Cells { get; internal set; }
+        public List<Cell> Cells { get; internal set; }
+
+        public StructTile[,] TileData { get; set; }
+        /// <summary>
+        /// 区域的坐标信息
+        /// </summary>
+        [JsonMap]
+        public CellPosition[] CellsPosition { get; set; }
 
         /// <summary>
         /// 生成格子并记录格子数值到数据库.
@@ -90,24 +98,22 @@ namespace PlotMarker
 
             TileHelper.ResetSection(X, Y, Width, Height);
 
-            var cells = new List<Cell>();
+            var cellsPos = new List<CellPosition>();
             for (var x = 0; x < numX; x++)
             {
                 for (var y = 0; y < numY; y++)
                 {
-                    var cell = new Cell
+                    cellsPos.Add(new()
                     {
-                        Id = cells.Count,
-                        Parent = this,
                         X = X + x * cellX + style.LineWidth,
                         Y = Y + y * cellY + style.LineWidth,
-                        AllowedIDs = new List<int>()
-                    };
-                    cells.Add(cell);
+                        Width = Width,
+                        Height = Height
+                    });
                 }
             }
-            Cells = cells.ToArray();
-            PlotManager.AddCells(this);
+            CellsPosition = cellsPos.ToArray();
+            PlotManager.UpdateCellsPos(this);
         }
 
         public void Generate(bool clear = true)
@@ -126,23 +132,13 @@ namespace PlotMarker
         /// <param name="tileX">物块X坐标(必须在属地内)</param>
         /// <param name="tileY">物块Y坐标(必须在属地内)</param>
         /// <returns><see cref="Cells"/>索引</returns>
-        public int FindCell(int tileX, int tileY)
+        public Cell FindCell(int tileX, int tileY)
         {
             if (!Contains(tileX, tileY))
             {
                 throw new ArgumentOutOfRangeException(nameof(tileX), "物块坐标必须在本属地内部!");
             }
-            var style = PlotMarker.Config.PlotStyle;
-            var cellX = CellWidth + style.LineWidth;
-            var cellY = CellHeight + style.LineWidth;
-            var numY = (Height - style.LineWidth) / cellY;
-            var x = tileX - X;
-            var y = tileY - Y;
-
-            // 从上至下再从左到右计数
-            return numY * (x / cellX) + y / cellY;
-            // 从左到右再从上到下计数
-            //return numX*(x/cellY) + y/cellX;
+            return PlotManager.CurrentPlot.Cells.FirstOrDefault(c => c.Contains(tileX, tileY));
         }
 
         public bool IsWall(int tileX, int tileY)
@@ -154,24 +150,38 @@ namespace PlotMarker
             return (tileX - X) % cellX < style.LineWidth || (tileY - Y) % cellY < style.LineWidth;
         }
     }
-
+    internal record CellPosition
+    {
+        /// <summary>
+        /// 相对坐标
+        /// </summary>
+        public int X { get; set; }
+        /// <summary>
+        /// 相对坐标
+        /// </summary>
+        public int Y { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
     internal sealed class Cell : UserConfigBase<Cell>
     {
         /// <summary>
         /// 所属区域
         /// </summary>
-        public int PlotId { get; set; }
-
+        public long PlotId { get; set; }
         /// <summary> Cell所属的 <see cref="Plot"/> 引用 </summary>
-        public Plot Parent { get; set; }
+        public Plot Parent => PlotManager.Plots.FirstOrDefault(p => p.Id == PlotId);
+        public bool IsVisiable => LastPositionIndex != -1;
 
-        /// <summary> Cell的起始X坐标 </summary>
-        public int X { get; set; }
+        public int X => LastPositionIndex == -1 ? -1 : Parent.CellsPosition[LastPositionIndex]?.X ?? -1;
+        public int Y => LastPositionIndex == -1 ? -1 : Parent.CellsPosition[LastPositionIndex]?.Y ?? -1;
 
-        /// <summary> Cell的起始X坐标 </summary>
-        public int Y { get; set; }
+        public int LastPositionIndex { get; set; } = 0;
 
-        public Point Center => new(X + Parent.CellWidth / 2, Y + Parent.CellHeight / 2);
+        public Point Center => new(X + (Parent.CellWidth / 2), Y + (Parent.Height / 2));
+
+        public int Width { get; set; }
+        public int Height { get; set; }
 
         /// <summary> 属地的主人 </summary>
         public string Owner { get; set; }
@@ -188,20 +198,11 @@ namespace PlotMarker
         [JsonMap]
         public List<int> AllowedIDs { get; set; } = new();
 
-        public bool Contains(int x, int y)
-        {
-            return X <= x && x < X + Parent.CellWidth && Y <= y && y < Y + Parent.CellHeight;
-        }
-
         /// <summary>
         /// Removes a user's access to the region
         /// </summary>
         /// <param name="id">User ID to remove</param>
         /// <returns>true if the user was found and removed from the region's allowed users</returns>
-        public bool RemoveId(int id)
-        {
-            return AllowedIDs.Remove(id);
-        }
 
         public void ClearTiles()
         {
@@ -214,11 +215,17 @@ namespace PlotMarker
             }
             TileHelper.ResetSection(X, Y, Parent.CellWidth, Parent.CellHeight);
         }
-
+        public bool Contains(int x, int y)
+        {
+            return X <= x && x < X + Parent.CellWidth && Y <= y && y < Y + Parent.CellHeight;
+        }
         public void GetInfo(TSPlayer receiver)
         {
-            receiver.SendInfoMessage("属地 {0} - 领主: {1} | 创建: {2} | 修改: {3}",
-                Id, string.IsNullOrWhiteSpace(Owner) ? "无" : Owner, GetTime.ToString("g"), LastAccess.ToString("g"));
+            receiver.SendInfoMessage($"属地 {Id} - " +
+                $"领主: {(string.IsNullOrWhiteSpace(Owner) ? "无" : Owner)}" +
+                $" | 创建: {GetTime:g}" +
+                $" | 修改: {LastAccess:g}" +
+                $" | 最后一次生成坐标: {X} - {Y}");
         }
     }
 

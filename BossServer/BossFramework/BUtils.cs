@@ -1,5 +1,6 @@
 ﻿using BossFramework.BModels;
 using BossFramework.BNet;
+using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -57,8 +58,40 @@ namespace BossFramework
             othor = othor.ToLower();
             return text == othor || text.StartsWith(othor);
         }
-        public static Microsoft.Xna.Framework.Vector2 ToXNA(this TrProtocol.Models.Vector2 vector) => new(vector.X, vector.Y);
-        public static TrProtocol.Models.Vector2 ToTrProtocol(this Microsoft.Xna.Framework.Vector2 vector) => new(vector.X, vector.Y);
+        public static Vector2 ToXNA(this TrProtocol.Models.Vector2 vector) => new(vector.X, vector.Y);
+        public static TrProtocol.Models.Vector2 ToTrProtocol(this Vector2 vector) => new(vector.X, vector.Y);
+        public static bool IsPointInCircle(int x, int y, int cx, int cy, double r)
+        {
+            //到圆心的距离 是否大于半径。半径是R  
+            //如O(x,y)点圆心，任意一点P（x1,y1） （x-x1）*(x-x1)+(y-y1)*(y-y1)>R*R 那么在圆外 反之在圆内
+
+            if (!((cx - x) * (cx - x) + (cy - y) * (cy - y) > r * r))
+            {
+                return true;        //当前点在圆内
+            }
+            else
+            {
+                return false;       //当前点在圆外
+            }
+        }
+        public class Circle//圆类
+        {
+            public Circle(Point point, double r)//构造函数
+            {
+                Center.X = point.X;
+                Center.X = point.Y;
+                this.R = r;
+            }
+            public int Is(Point point)//判断函数
+            {
+                double a = Math.Sqrt((Center.X - point.X) + (Center.Y - point.Y));//点到圆心的距离
+                if (a > R) return -1;
+                else if (a == R) return 0;
+                else return 1;
+            }
+            public Point Center;//圆心坐标
+            public double R;//圆半径
+        }
 
         public static T DeserializeJson<T>(this string text)
         {

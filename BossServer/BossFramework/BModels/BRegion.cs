@@ -11,11 +11,12 @@ namespace BossFramework.BModels
     {
         public const string DefaultRegionName = "DefaultBRegion";
         public static BRegion Default { get; } = new(null);
-        public BRegion() { Name = DefaultRegionName; Id = Terraria.Main.worldID; }
+        public BRegion() { Name = DefaultRegionName; WorldId = Terraria.Main.worldID; }
         public BRegion(Region region)
         {
             OriginRegion = region;
             Name = region is null ? DefaultRegionName : region.Name;
+            WorldId = Terraria.Main.worldID;
             Init();
         }
         public override void Init()
@@ -40,7 +41,7 @@ namespace BossFramework.BModels
             }
         }
         [JsonMap]
-        public List<int> ChildsId { get; private set; }
+        public List<long> ChildsId { get; private set; }
         private List<BRegion> _childRegion;
         public List<BRegion> ChildRegion
         {

@@ -38,12 +38,21 @@ namespace BossFramework.DB
             result.Init();
             return result;
         }
-        public static int Insert<T>(T target) where T : UserConfigBase<T>
-            => SQL.Insert(target).ExecuteAffrows();
+        /// <summary>
+        /// 返回自增值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static long Insert<T>(T target) where T : UserConfigBase<T>
+        {
+            target.Id = SQL.Insert(target).ExecuteIdentity();
+            return target.Id;
+        }
 
         public static int Delete<T>(T target) where T : UserConfigBase<T>
             => SQL.Delete<T>(target).ExecuteAffrows();
-        public static int Delete<T>(int id) where T : UserConfigBase<T>
+        public static int Delete<T>(long id) where T : UserConfigBase<T>
             => SQL.Delete<T>().Where(t => t.Id == id).ExecuteAffrows();
         public static int Delete<T>(Expression<Func<T, bool>> extract) where T : UserConfigBase<T>
             => SQL.Delete<T>().Where(extract).ExecuteAffrows();

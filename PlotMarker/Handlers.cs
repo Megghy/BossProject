@@ -14,7 +14,7 @@ namespace PlotMarker
 	internal static class Handlers
 	{
 		private static readonly Dictionary<PacketTypes, GetDataHandlerDelegate> GetDataHandlerDelegates
-			= new Dictionary<PacketTypes, GetDataHandlerDelegate> {
+			= new(){
 				{ PacketTypes.PaintTile, HandlePaintTile },
 				{ PacketTypes.PaintWall, HandlePaintWall },
 				{ PacketTypes.Tile, HandleTile },

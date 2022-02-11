@@ -1,6 +1,5 @@
 ﻿using BossFramework.DB;
 using System.Data;
-using System.Diagnostics;
 using Terraria;
 using TShockAPI;
 using TShockAPI.DB;
@@ -10,8 +9,7 @@ namespace PlotMarker
     internal static class PlotManager
     {
         public static List<Plot> Plots = new();
-
-        private static readonly object _addCellLock = new();
+        public static Plot CurrentPlot => Plots.FirstOrDefault(p => p.WorldId == Main.worldID);
 
         public static void Reload()
         {
@@ -25,10 +23,10 @@ namespace PlotMarker
                         });
         }
 
-        public static Cell[] LoadCells(Plot parent)
-            => DBTools.GetAll<Cell>(c => c.PlotId == parent.Id);
+        public static List<Cell> LoadCells(Plot parent)
+            => DBTools.GetAll<Cell>(c => c.PlotId == parent.Id).ToList();
 
-        public  static bool AddPlot(int x, int y, int width, int height, string name, string owner, long worldid, Style style)
+        public static bool AddPlot(int x, int y, int width, int height, string name, string owner, long worldid, Style style)
         {
             if (GetPlotByName(name) != null)
             {
@@ -63,66 +61,33 @@ namespace PlotMarker
             return true;
         }
 
-        public static void AddCells(Plot plot)
-        {
-            Task.Run(() =>
-            {
-                lock (_addCellLock)
-                {
-                    DBTools.Delete<Cell>(c => c.Id == plot.Id);
-                    var stopwatch = new Stopwatch();
-                    stopwatch.Start();
-                    var count = 0;
-                    foreach (var cell in plot.Cells)
-                    {
-                        AddCell(cell);
-                        count++;
-                    }
-                    stopwatch.Stop();
-                    TShock.Log.Info("记录完毕. 共有{0}个. ({1}ms)", count, stopwatch.ElapsedMilliseconds);
-                }
-            });
-        }
+        public static void UpdateCellsPos(Plot plot)
+            => Task.Run(() => plot.UpdateSingle(p => p.CellsPosition));
 
-        public static void AddCell(Cell cell)
+        #region 子属地可见性操作
+        public static int FindUseableArea(int count)
+        {
+            return 1;
+        }
+        public static void ShowCell(Cell cell)
+        {
+
+        }
+        #endregion
+
+        public static void CreateNewCell(TSPlayer player)
         {
             try
             {
-                if (DBTools.Insert(new Cell()
+                var cell = new Cell()
                 {
-                    Id = cell.Id,
-                    PlotId = cell.PlotId,
-                    X = cell.X,
-                    Y = cell.Y,
-                    AllowedIDs = cell.AllowedIDs,
-                    Owner = cell.Owner
-                }) == 1)
-                    return;
-                throw new Exception("No affected rows.");
-            }
-            catch (Exception e)
-            {
-                TShock.Log.ConsoleError("[PM] Cell数值导入数据库失败. ({0}: {1})", cell.Parent.Name, cell.Id);
-                TShock.Log.Error(e.ToString());
-            }
-        }
-
-        public static async void ApplyForCell(TSPlayer player)
-        {
-            try
-            {
-                var cell = Plots
-                                .SelectMany(plot => plot.Cells)
-                                .LastOrDefault(c => string.IsNullOrWhiteSpace(c.Owner));
-                if (cell == null)
-                {
-                    cell = await GetClearedCell();
-                    if (cell == null)
-                    {
-                        player.SendWarningMessage("现在没有可用属地了.. 请联系管理.");
-                        return;
-                    }
-                }
+                    Width = CurrentPlot.CellWidth,
+                    Height = CurrentPlot.CellHeight,
+                    CreateTime = DateTime.Now,
+                    PlotId = CurrentPlot.Id,
+                    AllowedIDs = new(),
+                    LastPositionIndex = -1
+                };
                 Apply(player, cell);
                 player.Teleport(cell.Center.X * 16, cell.Center.Y * 16);
             }
@@ -133,6 +98,7 @@ namespace PlotMarker
             }
         }
 
+        #region 子属地操作
         public static void ApplyForCell(TSPlayer player, int tileX, int tileY)
         {
             var cell = GetCellByPosition(tileX, tileY);
@@ -175,12 +141,11 @@ namespace PlotMarker
         {
             if (cell != null)
             {
-                if (!cell.RemoveId(user.ID))
+                if (!cell.AllowedIDs.Remove(user.ID))
                 {
                     return false;
                 }
 
-                cell.AllowedIDs.Remove(user.ID);
                 return cell.UpdateSingle(c => c.AllowedIDs) == 1;
             }
 
@@ -189,27 +154,6 @@ namespace PlotMarker
 
         public static void UpdateLastAccess(Cell cell)
             => Task.Run(() => cell.UpdateSingle(c => c.LastAccess, DateTime.Now));
-
-        public static async Task<Cell> GetClearedCell()
-        {
-            return await Task.Run(() =>
-            {
-                var cells =
-                    from p in Plots
-                    from c in p.Cells
-                    where (DateTime.Now - c.LastAccess).Days > 4
-                    orderby c.LastAccess
-                    select c;
-
-                var cell = cells.FirstOrDefault();
-                if (cell == null)
-                    return null;
-
-                FuckCell(cell);
-
-                return cell;
-            });
-        }
 
         public static Cell GetCellByPosition(int tileX, int tileY)
         {
@@ -222,19 +166,8 @@ namespace PlotMarker
             {
                 return null;
             }
-            var index = plot.FindCell(tileX, tileY);
-            if (index > -1 && index < plot.Cells.Length)
-            {
-                return plot.Cells[index];
-            }
-            return null;
+            return plot.FindCell(tileX, tileY);
         }
-
-        public static Plot GetPlotByName(string plotname)
-        {
-            return Plots.FirstOrDefault(p => p.Name.Equals(plotname, StringComparison.Ordinal));
-        }
-
         public static void FuckCell(Cell cell)
         {
             cell.Owner = string.Empty;
@@ -250,6 +183,14 @@ namespace PlotMarker
                 .Set(c => c.AllowedIDs)
                 .ExecuteAffrows();
         }
+        #endregion
+
+        public static Plot GetPlotByName(string plotname)
+        {
+            return Plots.FirstOrDefault(p => p.Name.Equals(plotname, StringComparison.Ordinal));
+        }
+
+        
 
         public static int GetTotalCells(string playerName)
             => (int)DBTools.SQL.Select<Cell>()

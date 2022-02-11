@@ -1,4 +1,5 @@
 ﻿using FreeSql;
+using FreeSql.DataAnnotations;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -6,13 +7,14 @@ using System.Reflection;
 
 namespace BossFramework.DB
 {
-    public abstract class UserConfigBase<T> : BaseEntity<UserConfigBase<T>, int> where T : UserConfigBase<T>
+    public abstract class UserConfigBase<T> : BaseEntity<UserConfigBase<T>, long> where T : UserConfigBase<T>
     {
+        [Column(IsPrimary = true, IsIdentity = true)]
+        public override long Id { get => base.Id; set => base.Id = value; }
         public virtual void Init()
         {
 
         }
-        public bool InsertToDB() => DBTools.Insert((T)this) > 0;
         public int UpdateSingle<TV>(Expression<Func<T, TV>> extract, TV value, bool updateProp = true)
         {
             var prop = extract.Body
@@ -52,6 +54,12 @@ namespace BossFramework.DB
                 BLog.Error($"未能更新字段\r\n{ex}");
             }
             return 0;
+        }
+        public int UpdateMany<TV>(params Expression<Func<T, TV>>[] extracts)
+        {
+            var u = DBTools.SQL.Update<T>(this);
+            extracts.ForEach(e => u.Set(e));
+            return u.ExecuteAffrows();
         }
     }
 }
