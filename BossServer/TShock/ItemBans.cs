@@ -85,7 +85,7 @@ namespace TShockAPI
                 if (DataModel.ItemIsBanned(EnglishLanguage.GetItemNameById(player.TPlayer.inventory[player.TPlayer.selectedItem].netID), player))
                 {
                     string itemName = player.TPlayer.inventory[player.TPlayer.selectedItem].Name;
-                    player.Disable($"holding banned item: {itemName}", disableFlags);
+                    player.Disable($"持有被禁止的物品: {itemName}", disableFlags);
                     SendCorrectiveMessage(player, itemName);
                 }
 
@@ -154,7 +154,7 @@ namespace TShockAPI
             if (DataModel.ItemIsBanned(EnglishLanguage.GetItemNameById(player.TPlayer.inventory[args.SelectedItem].netID), args.Player))
             {
                 player.TPlayer.controlUseItem = false;
-                player.Disable($"holding banned item: {itemName}", disableFlags);
+                player.Disable($"持有被禁止的物品: {itemName}", disableFlags);
 
                 SendCorrectiveMessage(player, itemName);
 
@@ -193,7 +193,7 @@ namespace TShockAPI
                 if (args.Player.TPlayer.autoActuator && DataModel.ItemIsBanned("Actuator", args.Player))
                 {
                     args.Player.SendTileSquare(args.X, args.Y, 1);
-                    args.Player.SendErrorMessage("You do not have permission to place actuators.");
+                    args.Player.SendErrorMessage("您无权放置执行器");
                     args.Handled = true;
                     return;
                 }
@@ -225,7 +225,7 @@ namespace TShockAPI
 
         private void SendCorrectiveMessage(TSPlayer player, string itemName)
         {
-            player.SendErrorMessage("{0} is banned! Remove it!", itemName);
+            player.SendErrorMessage("{0} 是被禁止的，请扔掉它!", itemName);
         }
     }
 }
