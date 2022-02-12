@@ -29,7 +29,7 @@ namespace BossFramework.BCore
                 Assembly.GetExecutingAssembly()
                     .GetTypes()
                     .Where(t => t.BaseType == typeof(BaseCommand))
-                    .ForEach(t =>
+                    .BForEach(t =>
                     {
                         var tempCMD = (BaseCommand)Activator.CreateInstance(t)!;
                         tempCMD.RegisterAllSubCommands();
@@ -39,7 +39,7 @@ namespace BossFramework.BCore
 
                 //加载脚本命令文件
                 ScriptManager.LoadScripts<BaseCommand>(ScriptCmdPath)?
-                    .ForEach(s =>
+                    .BForEach(s =>
                     {
                         s.RegisterAllSubCommands();
                         Cmds.Add(s);
@@ -85,7 +85,7 @@ namespace BossFramework.BCore
                 {
                     var subCmds = cmd.SubCommands.Where(s => s.Names?.Any(n => n.ToLower() == args.Parameters[0].ToLower()) ?? false).ToArray();
                     if (subCmds.Any())
-                        subCmds.ForEach(s =>
+                        subCmds.BForEach(s =>
                         {
                             ExcuteSubCmd(cmd, s, args, cmdName);
                         });

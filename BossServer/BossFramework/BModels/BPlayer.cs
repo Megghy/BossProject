@@ -76,6 +76,13 @@ namespace BossFramework.BModels
         {
             TsPlayer?.SendRawData(p.SerializePacket());
         }
+        public void SendPackets(IEnumerable<Packet> p)
+        {
+            List<byte> packetData = new();
+            p.ForEach(packet => packetData.AddRange(packet.SerializePacket()));
+            TsPlayer?.SendRawData(packetData.ToArray());
+        }
+        public void SendRawData(byte[] data) => TsPlayer?.SendRawData(data);
         public void SendCombatMessage(string msg, Color color = default, bool randomPosition = true)
         {
             color = color == default ? Color.White : color;

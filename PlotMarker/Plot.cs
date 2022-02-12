@@ -1,4 +1,5 @@
 ﻿using BossFramework.DB;
+using Bssom.Serializer;
 using FakeProvider;
 using FreeSql.DataAnnotations;
 using Microsoft.Xna.Framework;
@@ -30,10 +31,15 @@ namespace PlotMarker
         public int Height { get; set; }
 
         /// <summary> 小块区域的宽 </summary>
-        public int CellWidth { get; set; }
+        public int CellWidth => PlotStyle.CellWidth;
 
         /// <summary> 小块区域的高 </summary>
-        public int CellHeight { get; set; }
+        public int CellHeight => PlotStyle.CellHeight;
+
+        /// <summary>
+        /// 属地之间间隔宽度
+        /// </summary>
+        public int LineWidth => PlotStyle.LineWidth;
 
         /// <summary> 整片属地的拥有者 </summary>
         public string Owner { get; set; }
@@ -44,12 +50,29 @@ namespace PlotMarker
         /// </summary>
         public List<Cell> Cells { get; internal set; }
 
-        public StructTile[,] TileData { get; set; }
         /// <summary>
         /// 区域的坐标信息
         /// </summary>
         [JsonMap]
         public CellPosition[] CellsPosition { get; set; }
+        private CellPosition[,] _cellsPosition2D;
+        public CellPosition[,] CellsPosition2D
+        {
+            get
+            {
+                if (CellsPosition is null)
+                    return null;
+                if (_cellsPosition2D is null)
+                {
+                    _cellsPosition2D = new CellPosition[CellsPosition.Max(c => c.IndexX) + 1, CellsPosition.Max(c => c.IndexY) + 1];
+                    CellsPosition.ForEach(c => _cellsPosition2D[c.IndexX, c.IndexY] = c);
+                }
+                return _cellsPosition2D;
+            }
+        }
+
+        [JsonMap]
+        public Style PlotStyle { get; set; }
 
         /// <summary>
         /// 生成格子并记录格子数值到数据库.
@@ -69,16 +92,47 @@ namespace PlotMarker
             var numY = (Height - style.LineWidth) / cellY;
             Width = numX * cellX + style.LineWidth;
             Height = numY * cellY + style.LineWidth;
+            ReDrawLines(false);
 
+            TileHelper.ResetSection(X, Y, Width, Height);
+
+            var cellsPos = new List<CellPosition>();
+            var index = 0;
+            for (var x = 0; x < numX; x++)
+            {
+                for (var y = 0; y < numY; y++)
+                {
+                    cellsPos.Add(new()
+                    {
+                        TileX = X + x * cellX + style.LineWidth,
+                        TileY = Y + y * cellY + style.LineWidth,
+                        Width = Width,
+                        Height = Height,
+                        IndexX = x,
+                        IndexY = y,
+                        Index = index
+                    });
+                    index++;
+                }
+            }
+            CellsPosition = cellsPos.ToArray();
+            PlotManager.UpdateCellsPos(this);
+        }
+        public void ReDrawLines(bool sendSection = true)
+        {
+            var cellX = CellWidth + PlotStyle.LineWidth;
+            var cellY = CellHeight + PlotStyle.LineWidth;
+            var numX = (Width - PlotStyle.LineWidth) / cellX;
+            var numY = (Height - PlotStyle.LineWidth) / cellY;
             //draw horizental line
             for (var y = 0; y <= numY; y++)
             {
                 for (var x = 0; x < Width; x++)
                 {
-                    for (var t = 0; t < style.LineWidth; t++)
+                    for (var t = 0; t < PlotStyle.LineWidth; t++)
                     {
-                        TileHelper.SetTile(X + x, Y + y * cellY + t, style.TileId, style.TilePaint);
-                        TileHelper.SetWall(X + x, Y + y * cellY + t, style.WallId, style.WallPaint);
+                        TileHelper.SetTile(X + x, Y + y * cellY + t, PlotStyle.TileId, PlotStyle.TilePaint);
+                        TileHelper.SetWall(X + x, Y + y * cellY + t, PlotStyle.WallId, PlotStyle.WallPaint);
                     }
                 }
             }
@@ -88,32 +142,15 @@ namespace PlotMarker
             {
                 for (var y = 0; y < Height; y++)
                 {
-                    for (var t = 0; t < style.LineWidth; t++)
+                    for (var t = 0; t < PlotStyle.LineWidth; t++)
                     {
-                        TileHelper.SetTile(X + x * cellX + t, Y + y, style.TileId, style.TilePaint);
-                        TileHelper.SetWall(X + x * cellX + t, Y + y, style.WallId, style.WallPaint);
+                        TileHelper.SetTile(X + x * cellX + t, Y + y, PlotStyle.TileId, PlotStyle.TilePaint);
+                        TileHelper.SetWall(X + x * cellX + t, Y + y, PlotStyle.WallId, PlotStyle.WallPaint);
                     }
                 }
             }
-
-            TileHelper.ResetSection(X, Y, Width, Height);
-
-            var cellsPos = new List<CellPosition>();
-            for (var x = 0; x < numX; x++)
-            {
-                for (var y = 0; y < numY; y++)
-                {
-                    cellsPos.Add(new()
-                    {
-                        X = X + x * cellX + style.LineWidth,
-                        Y = Y + y * cellY + style.LineWidth,
-                        Width = Width,
-                        Height = Height
-                    });
-                }
-            }
-            CellsPosition = cellsPos.ToArray();
-            PlotManager.UpdateCellsPos(this);
+            if (sendSection)
+                TileHelper.ResetSection(X, Y, Width, Height);
         }
 
         public void Generate(bool clear = true)
@@ -138,7 +175,7 @@ namespace PlotMarker
             {
                 throw new ArgumentOutOfRangeException(nameof(tileX), "物块坐标必须在本属地内部!");
             }
-            return PlotManager.CurrentPlot.Cells.FirstOrDefault(c => c.Contains(tileX, tileY));
+            return PlotManager.CurrentPlot.Cells.FirstOrDefault(c => c.IsVisiable && c.Contains(tileX, tileY));
         }
 
         public bool IsWall(int tileX, int tileY)
@@ -152,82 +189,22 @@ namespace PlotMarker
     }
     internal record CellPosition
     {
-        /// <summary>
-        /// 相对坐标
-        /// </summary>
-        public int X { get; set; }
-        /// <summary>
-        /// 相对坐标
-        /// </summary>
-        public int Y { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-    }
-    internal sealed class Cell : UserConfigBase<Cell>
-    {
-        /// <summary>
-        /// 所属区域
-        /// </summary>
-        public long PlotId { get; set; }
-        /// <summary> Cell所属的 <see cref="Plot"/> 引用 </summary>
-        public Plot Parent => PlotManager.Plots.FirstOrDefault(p => p.Id == PlotId);
-        public bool IsVisiable => LastPositionIndex != -1;
-
-        public int X => LastPositionIndex == -1 ? -1 : Parent.CellsPosition[LastPositionIndex]?.X ?? -1;
-        public int Y => LastPositionIndex == -1 ? -1 : Parent.CellsPosition[LastPositionIndex]?.Y ?? -1;
-
-        public int LastPositionIndex { get; set; } = 0;
-
-        public Point Center => new(X + (Parent.CellWidth / 2), Y + (Parent.Height / 2));
-
+        public int Index { get; set; }
+        public int IndexX { get; set; }
+        public int IndexY { get; set; }
+        public int TileX { get; set; }
+        public int TileY { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
 
-        /// <summary> 属地的主人 </summary>
-        public string Owner { get; set; }
-
         /// <summary>
-        /// 玩家 <see cref="Owner"/> 领取属地的时间
-        /// 用于判定过期 
+        /// 是否被某个子区域占用
         /// </summary>
-        public DateTime GetTime { get; set; }
-
-        public DateTime LastAccess { get; set; }
-
-        /// <summary> 有权限动属地者 </summary>
-        [JsonMap]
-        public List<int> AllowedIDs { get; set; } = new();
-
-        /// <summary>
-        /// Removes a user's access to the region
-        /// </summary>
-        /// <param name="id">User ID to remove</param>
-        /// <returns>true if the user was found and removed from the region's allowed users</returns>
-
-        public void ClearTiles()
-        {
-            for (var i = X; i < X + Parent.CellWidth; i++)
-            {
-                for (var j = Y; j < Y + Parent.CellHeight; j++)
-                {
-                    Main.tile[i, j] = new Tile();
-                }
-            }
-            TileHelper.ResetSection(X, Y, Parent.CellWidth, Parent.CellHeight);
-        }
-        public bool Contains(int x, int y)
-        {
-            return X <= x && x < X + Parent.CellWidth && Y <= y && y < Y + Parent.CellHeight;
-        }
-        public void GetInfo(TSPlayer receiver)
-        {
-            receiver.SendInfoMessage($"属地 {Id} - " +
-                $"领主: {(string.IsNullOrWhiteSpace(Owner) ? "无" : Owner)}" +
-                $" | 创建: {GetTime:g}" +
-                $" | 修改: {LastAccess:g}" +
-                $" | 最后一次生成坐标: {X} - {Y}");
-        }
+        /// <returns></returns>
+        public bool IsUsed()
+            => PlotManager.CurrentPlot.Cells.Exists(c => c.UsingCellPosition.Contains(Index));
     }
+    
 
     internal sealed class Style
     {

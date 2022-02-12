@@ -24,7 +24,7 @@ namespace BossFramework.BNet
         {
             Assembly.GetExecutingAssembly()
                         .GetTypes()
-                        .ForEach(t =>
+                        .BForEach(t =>
                         {
                             if (t.BaseType?.Name == "PacketHandlerBase`1")
                                 Handlers.Add(
@@ -94,8 +94,8 @@ namespace BossFramework.BNet
         }
         public static void DeregistePacketHandler(Action<PacketEventArgs> action)
         {
-            SendPacketHandlers.ForEach(s => s.Value.Remove(action));
-            GetPacketHandlers.ForEach(s => s.Value.Remove(action));
+            SendPacketHandlers.BForEach(s => s.Value.Remove(action));
+            GetPacketHandlers.BForEach(s => s.Value.Remove(action));
         }
         public static void RegisteGetPacketHandler(PacketTypes type, Action<PacketEventArgs> action)
         {

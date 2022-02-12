@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TrProtocol.Packets;
-using static MonoMod.InlineRT.MonoModRule;
 
 namespace BossFramework.BCore
 {
@@ -21,7 +20,7 @@ namespace BossFramework.BCore
 
             Signs = DB.DBTools.GetAll<BSign>().Where(r => r.WorldId == Terraria.Main.worldID).ToList();
 
-            Terraria.Main.sign.Where(s => s != null).ForEach(s =>
+            Terraria.Main.sign.Where(s => s != null).BForEach(s =>
             {
                 if (!Signs.Exists(sign => sign.X == s.x && sign.Y == s.y))
                 {
@@ -38,7 +37,7 @@ namespace BossFramework.BCore
         {
             Task.Run(() =>
             {
-                BInfo.OnlinePlayers.ForEach(plr =>
+                BInfo.OnlinePlayers.BForEach(plr =>
                 {
                     if (plr.WatchingSign != null
                     && !new Rectangle(plr.WatchingSign.X, plr.WatchingSign.Y, 2, 2).Intersects(new Rectangle(plr.TileX - 5, plr.TileY - 5, 14, 12)))
@@ -48,7 +47,7 @@ namespace BossFramework.BCore
                     lock (Signs)
                     {
                         Signs.Where(s => BUtils.IsPointInCircle(s.X, s.Y, plr.TileX, plr.TileY, BConfig.Instance.SignRefreshRadius) && plr.WatchingSign != s)
-                        .ForEach(s => s.SendTo(plr));
+                        .BForEach(s => s.SendTo(plr));
                     }
                 });
             });
@@ -85,11 +84,12 @@ namespace BossFramework.BCore
                 Y = tileY,
                 Text = text,
                 Owner = plr?.Index ?? -1,
-                LastUpdateUser = plr?.Index ?? -1
+                LastUpdateUser = plr?.Index ?? -1,
+                WorldId = Terraria.Main.worldID
             };
             DB.DBTools.Insert(sign);
             Signs.Add(sign);
-            BLog.Info($"创建标牌数据于 {sign.X} - {sign.Y}");
+            BLog.Info($"创建标牌数据于 {sign.X} - {sign.Y}{(plr is null ? "" : $"来自 {plr}")}");
             return sign;
         }
 
@@ -100,7 +100,7 @@ namespace BossFramework.BCore
             if (target.LastWatchingSignIndex > 998)
                 target.LastWatchingSignIndex = -1;
             target.LastWatchingSignIndex++;
-            if(watch)
+            if (watch)
                 target.WatchingSign = sign;
 
             target.SendPacket(new ReadSign()

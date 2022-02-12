@@ -454,11 +454,46 @@ namespace PlotMarker
                                     player.SendErrorMessage("你不是该属地的主人.");
                                     return;
                                 }
-                                cell.GetInfo(player);
+                                player.SendInfoMessage(cell.GetInfo());
                                 return;
                             }
                             player.SendErrorMessage("选择点不在属地内.");
                         }
+                    }
+                    break;
+                case "goto":
+                case "前往":
+                    Cell[] cells = args.Player.HasPermission("pm.player.gotoeverywhere")
+                        ? PlotManager.CurrentPlot.Cells.ToArray()
+                        : PlotManager.GetCellsOfPlayer(args.Player.Name);
+                    if (cells.Any())
+                    {
+                        if (args.Parameters.Count > 1)
+                        {
+                            if (int.TryParse(args.Parameters[1], out var cellIndex))
+                            {
+                                if (cells.FirstOrDefault(c => c.Id == cellIndex) is { } cell)
+                                {
+                                    GotoCell(args.Player, cell);
+                                }
+                                else
+                                    args.Player.SendErrorMessage($"未找到Id为 {cellIndex} 的属地, 或者它不属于你");
+                            }
+                            else
+                                args.Player.SendErrorMessage($"无效的属地编号: {args.Parameters[1]}");
+                        }
+                        else
+                            GotoCell(args.Player, cells.First());
+                    }
+                    else
+                        args.Player.SendInfoMessage($"未找到任何, 请输入 {"/mp get".Color("7FDFDE")} 来获取属地");
+                    void GotoCell(TSPlayer plr, Cell cell)
+                    {
+                        plr.SendInfoMessage($"正在前往属地 [{cell.Id}]");
+                        if (!cell.IsVisiable && !cell.ShowCell(plr))
+                            return;
+                        plr.Teleport(cell.AbsloteSpawnX, cell.AbsloteSpawnY);
+                        plr.SendSuccessMessage($"已传送至属地 [{cell.Id}]");
                     }
                     break;
                 case "帮助":
@@ -470,11 +505,12 @@ namespace PlotMarker
                         }
                         var list = new List<string>
                         {
-                            "获取 - 获取选中点区域 (get/获取)",
-                            "自动获取 - 自动获取区域 (autoget/自动获取)",
-                            "允许 <玩家名> - 给自己的属地增加协助者 (allow/允许/添加)",
-                            "禁止 <玩家名> - 移除协助者 (disallow/禁止/删除)",
-                            "信息 - 查看当前点坐标所在属地的信息 (info/信息/查询)",
+                            "获取(get) - 获取一块属地",
+                            "允许(allow/添加) <玩家名> - 给自己的属地增加协助者 ",
+                            "禁止(disallow/删除) <玩家名> - 移除协助者 ",
+                            "信息(info/查询) - 查看当前点坐标所在属地的信息 ",
+                            "列表(list) - 查看自己所拥有的属地",
+                            "前往(goto) <属地ID>- 前往指定id的属地, 不指定则会默认前往自己的第一块属地",
                             "帮助 [页码] - 获取帮助 (help/帮助)"
                         };
                         PaginationTools.SendPage(args.Player, pageNumber, list,
@@ -588,7 +624,7 @@ namespace PlotMarker
                             var cell = PlotManager.GetCellByPosition(tileX, tileY);
                             if (cell != null)
                             {
-                                cell.GetInfo(player);
+                                player.SendInfoMessage(cell.GetInfo());
                                 return;
                             }
                             player.SendErrorMessage("选择点未生成属地.");
@@ -691,7 +727,7 @@ namespace PlotMarker
 
         public static bool BlockModify(TSPlayer player, int tileX, int tileY)
         {
-            if (!BlockModify_Inner(player, tileX, tileY))
+            if (!BlockModify_ShouldStop(player, tileX, tileY))
             {
                 return false;
             }
@@ -705,7 +741,7 @@ namespace PlotMarker
             return true;
         }
 
-        private static bool BlockModify_Inner(TSPlayer player, int tileX, int tileY)
+        private static bool BlockModify_ShouldStop(TSPlayer player, int tileX, int tileY)
         {
             if (!player.IsLoggedIn)
             {
@@ -717,10 +753,7 @@ namespace PlotMarker
             {
                 return false;
             }
-            if (plot.IsWall(tileX, tileY))
-            {
-                return !player.HasPermission("pm.build.wall");
-            }
+            
             if (plot.FindCell(tileX, tileY) is { } cell)
             {
                 if (string.Equals(cell.Owner, player.Name, StringComparison.Ordinal)
@@ -731,7 +764,10 @@ namespace PlotMarker
                     return false;
                 }
             }
-
+            else if (plot.IsWall(tileX, tileY))
+            {
+                return !player.HasPermission("pm.build.wall");
+            }
             return true;
         }
     }

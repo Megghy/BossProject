@@ -25,7 +25,7 @@ namespace BossFramework.BModules
             {
                 if (time != 0)
                     _timers.Where(timer => time % timer.Value.Time == 0)
-                    .ForEach(timer =>
+                    .BForEach(timer =>
                     {
                         Task.Run(() => timer.Key.Invoke(null, null));
                     });
@@ -33,15 +33,15 @@ namespace BossFramework.BModules
             };
             Assembly.GetExecutingAssembly()
                 .GetTypes()
-                .ForEach(t => t.GetMethods()
+                .BForEach(t => t.GetMethods()
                     .Where(m => m.GetCustomAttributes(true).FirstOrDefault(a => a is SimpleTimerAttribute) != null)
-                        .ForEach(m =>
+                        .BForEach(m =>
                         {
                             var attr = m.GetCustomAttributes(true).FirstOrDefault(a => a is SimpleTimerAttribute) as SimpleTimerAttribute;
                             _timers.Add(m, attr);
                         }));
             temp.Start();
-            _timers.Where(timer => timer.Value.CallOnRegister).ForEach(timer => Task.Run(() => timer.Key.Invoke(null, null)));
+            _timers.Where(timer => timer.Value.CallOnRegister).BForEach(timer => Task.Run(() => timer.Key.Invoke(null, null)));
         }
     }
 }

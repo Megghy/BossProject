@@ -19,7 +19,7 @@ namespace BossFramework.BInterfaces
             var t = GetType();
             var list = new List<SubCommandAttribute>();
             t.GetMethods()
-            .ForEach(method =>
+            .BForEach(method =>
             {
                 if (method.GetCustomAttribute<SubCommandAttribute>() is { } attr)
                 {

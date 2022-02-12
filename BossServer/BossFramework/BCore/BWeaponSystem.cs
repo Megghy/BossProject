@@ -2,11 +2,13 @@
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Terraria.ID;
 using TerrariaApi.Server;
+using TrProtocol;
 using TrProtocol.Packets;
 using TShockAPI;
 
@@ -39,7 +41,7 @@ namespace BossFramework.BCore
             BWeapons = ScriptManager.LoadScripts<BaseBWeapon>(WeaponScriptPath);
             BLog.Success($"成功加载 {BWeapons.Length} 个自定义武器");
 
-            BInfo.OnlinePlayers.Where(p => p.IsCustomWeaponMode).ForEach(p =>
+            BInfo.OnlinePlayers.Where(p => p.IsCustomWeaponMode).BForEach(p =>
             {
                 p.Weapons = (from w in BWeapons select (BaseBWeapon)Activator.CreateInstance(w.GetType(), null)).ToArray(); //给玩家生成武器对象
                 p.ChangeItemsToBWeapon();
@@ -52,7 +54,7 @@ namespace BossFramework.BCore
         public static void OnGameUpdate(EventArgs args)
         {
             BInfo.OnlinePlayers.Where(p => p.IsCustomWeaponMode)
-                .ForEach(p =>
+                .BForEach(p =>
                 {
                     if (p.TrPlayer.controlUseItem)
                         p.Weapons.FirstOrDefault(w => p.ItemInHand.NetId == 0 ? w.Equals(p.TsPlayer.SelectedItem) : w.Equals(p.ItemInHand))
@@ -63,10 +65,10 @@ namespace BossFramework.BCore
         public static void OnSecendUpdate()
         {
             BInfo.OnlinePlayers.Where(p => p?.IsCustomWeaponMode ?? false)
-                .ForEach(p =>
+                .BForEach(p =>
                 {
                     if (p.RelesedProjs.Where(p => DateTimeOffset.Now.ToUnixTimeSeconds() - p.CreateTime > BInfo.ProjMaxLiveTick).ToArray() is { Length: > 0 } inactiveProjs)
-                        inactiveProjs.ForEach(projInfo =>
+                        inactiveProjs.BForEach(projInfo =>
                         {
                             projInfo.KillProj();
                             p.RelesedProjs.Remove(projInfo); //存活太久则删除
@@ -127,7 +129,7 @@ namespace BossFramework.BCore
             if (args.Player.Weapons.Where(w => w.Equals(args.Player.TsPlayer.SelectedItem)).FirstOrDefault() is { } weapon)
             {
                 var selectItem = args.Player.TsPlayer.SelectedItem;
-                if (weapon.OnShootProj(args.Player, args.Proj, args.Proj.Velocity.ToXNA(), (weapon.ShootProj ?? selectItem.shoot) == args.Proj.ProjType)) //如果返回true则关闭客户端对应弹幕
+                if (weapon.OnShootProj(args.Player, args.Proj, args.Proj.Velocity, (weapon.ShootProj ?? selectItem.shoot) == args.Proj.ProjType)) //如果返回true则关闭客户端对应弹幕
                 {
                     args.Handled = true;
                     args.Proj.ProjType = 0;
@@ -155,6 +157,7 @@ namespace BossFramework.BCore
                 Prefix = 80,
                 Stack = 1,
             };
+            List<Packet> packetData = new();
             plr.TrPlayer.inventory.ForEach((item, i) =>
             {
                 if (i < 50 && (item is null || item?.type == 0))
@@ -163,17 +166,27 @@ namespace BossFramework.BCore
                     plr.TsPlayer.TPlayer.inventory[i].SetDefaults(FillItem);
                     plr.TsPlayer.TPlayer.inventory[i].prefix = 80;
                     slotPacket.ItemSlot = (short)i;
-                    plr.SendPacket(slotPacket);
+                    packetData.Add(slotPacket);
                 }
             });
+            plr.SendPackets(packetData);
         }
         private static void RemoveFillItems(this BPlayer plr)
         {
+            var slotPacket = new SyncEquipment()
+            {
+                ItemType = 0,
+                PlayerSlot = plr.Index,
+                Prefix = 0,
+                Stack = 0,
+            };
+            List<Packet> packetData = new();
             plr.TsPlayer?.TPlayer.inventory.ForEach((item, i) =>
             {
-                if (item is { type: FillItem, prefix: 80 })
-                    plr.RemoveItem(i);
+                slotPacket.ItemSlot = (short)i;
+                packetData.Add(slotPacket);
             });
+            plr.SendPackets(packetData);
         }
         private static void SpawnBWeapon(this BPlayer plr, BaseBWeapon weapon, int slot)
         {
@@ -189,7 +202,7 @@ namespace BossFramework.BCore
                 Owner = 0,
                 Prefix = (byte)weapon.Prefix,
                 ItemType = (short)weapon.ItemID,
-                Position = plr.TrPlayer.position.ToTrProtocol(),
+                Position = plr.TrPlayer.position,
                 Stack = (short)weapon.Stack,
                 Velocity = default
             }); //生成普通物品

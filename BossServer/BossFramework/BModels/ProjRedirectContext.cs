@@ -47,7 +47,7 @@ namespace BossFramework.BModels
                     var rawData = proj.SerializePacket();
                     var all = BindingRegion.GetAllPlayerInRegion();
                     (sendToSelf ? all : all.Where(p => p != from))
-                        .ForEach(p => p.TsPlayer?.SendRawData(rawData));
+                        .BForEach(p => p.TsPlayer?.SendRawData(rawData));
                 }
             }
             catch (Exception ex)
@@ -70,9 +70,9 @@ namespace BossFramework.BModels
             var plrs = BindingRegion.GetAllPlayerInRegion();
             if (ignoreSelf)
                 plrs.Where(p => p.Index != killProj.PlayerSlot)
-                .ForEach(p => p.TsPlayer?.SendRawData(rawData));
+                .BForEach(p => p.TsPlayer?.SendRawData(rawData));
             else
-                plrs.ForEach(p => p.TsPlayer?.SendRawData(rawData));
+                plrs.BForEach(p => p.TsPlayer?.SendRawData(rawData));
         }
     }
 }

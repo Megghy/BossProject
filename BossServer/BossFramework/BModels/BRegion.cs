@@ -49,6 +49,7 @@ namespace BossFramework.BModels
             {
                 if (_childRegion is null)
                 {
+                    _childRegion = new();
                     ChildsId.ForEach(r =>
                         {
                             if (BRegionSystem.AllBRegion.FirstOrDefault(r => r.Id == r.Id) is { } child)

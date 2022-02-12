@@ -12,6 +12,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
+		<PackageReference Include="BssomSerializer" Version="1.1.3" />
 		<PackageReference Include="FreeSql.Extensions.BaseEntity" Version="3.0.100" />
 		<PackageReference Include="FreeSql.Extensions.JsonMap" Version="3.0.100" />
 		<PackageReference Include="FreeSql.Extensions.Linq" Version="3.0.100" />
@@ -24,11 +25,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\TrProtocol\TrProtocol.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Reference Include="HttpServer">
 			<HintPath>..\Lib\HttpServer.dll</HintPath>
-		</Reference>
-		<Reference Include="TrProtocol">
-			<HintPath>..\Lib\TrProtocol.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 

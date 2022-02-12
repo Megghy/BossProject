@@ -13,13 +13,13 @@ namespace BossFramework.BHooks.HookHandlers
             var auto = new Dictionary<MethodInfo, AutoPostInitAttribute>();
             Assembly.GetExecutingAssembly()
                         .GetTypes()
-                        .ForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-                        .ForEach(m =>
+                        .BForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+                        .BForEach(m =>
                         {
                             if (m.GetCustomAttribute<AutoPostInitAttribute>() is { } attr)
                                 auto.Add(m, attr);
                         }));
-            auto.OrderBy(a => a.Value.Order).ForEach(kv =>
+            auto.OrderBy(a => a.Value.Order).BForEach(kv =>
             {
                 try
                 {

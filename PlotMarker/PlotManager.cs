@@ -40,8 +40,9 @@ namespace PlotMarker
                 WorldId = worldid,
                 X = x,
                 Y = y,
-                Width = style.CellWidth,
-                Height = style.CellHeight
+                Width = width,
+                Height = height,
+                PlotStyle = style
             };
             if (!DBTools.Exist<Plot>(p => p.Name == name && p.WorldId == worldid))
             {
@@ -65,14 +66,53 @@ namespace PlotMarker
             => Task.Run(() => plot.UpdateSingle(p => p.CellsPosition));
 
         #region 子属地可见性操作
-        public static int FindUseableArea(int count)
+        /// <summary>
+        /// 寻找可以放得下属地的区域
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns>左上角的子区域位置</returns>
+        public static CellPosition[] FindUseableArea(this Cell cell, bool isFirstRun = true)
         {
-            return 1;
+            List<CellPosition> cellPosList = new();
+            for (var x = 0; x < CurrentPlot.CellsPosition2D.GetLength(0); x++)
+            {
+                for (var y = 0; y < CurrentPlot.CellsPosition2D.GetLength(1); y++)
+                {
+                    for (int tempX = 0; tempX < cell.Level; tempX++)
+                    {
+                        for (int tempY = 0; tempY < cell.Level; tempY++)
+                        {
+                            var cellPos = CurrentPlot.CellsPosition2D[x + tempY, y + tempY];
+                            if (cellPos.IsUsed())
+                                goto loop;
+                            else
+                                cellPosList.Add(cellPos);
+                        }
+                    }
+                    return cellPosList.ToArray();
+                loop:
+                    cellPosList.Clear();
+                }
+            }
+            //跑完一圈依然没有能用的
+            CurrentPlot.Cells.Where(c =>
+                {
+                    var plr = TShock.Players.FirstOrDefault(p => p.Name == c.Owner);
+                    if (plr is null || c.Contains(plr.TileX, plr.TileY))
+                        return true;
+                    return false;
+                })
+                .ForEach(c =>
+                {
+                    c.ClearTiles(false);
+                });
+            TileHelper.ResetSection(CurrentPlot.X, CurrentPlot.Y, CurrentPlot.Width, CurrentPlot.Height);
+            if (isFirstRun)
+                return cell.FindUseableArea(false);
+            else
+                return null;
         }
-        public static void ShowCell(Cell cell)
-        {
-
-        }
+        
         #endregion
 
         public static void CreateNewCell(TSPlayer player)
@@ -81,8 +121,6 @@ namespace PlotMarker
             {
                 var cell = new Cell()
                 {
-                    Width = CurrentPlot.CellWidth,
-                    Height = CurrentPlot.CellHeight,
                     CreateTime = DateTime.Now,
                     PlotId = CurrentPlot.Id,
                     AllowedIDs = new(),
@@ -99,21 +137,6 @@ namespace PlotMarker
         }
 
         #region 子属地操作
-        public static void ApplyForCell(TSPlayer player, int tileX, int tileY)
-        {
-            var cell = GetCellByPosition(tileX, tileY);
-            if (cell == null)
-            {
-                player.SendErrorMessage("在选中点位置没有属地.");
-                return;
-            }
-            if (!string.IsNullOrWhiteSpace(cell.Owner) && !player.HasPermission("plotmarker.admin.editall"))
-            {
-                player.SendErrorMessage("该属地已被占用.");
-                return;
-            }
-            Apply(player, cell);
-        }
 
         private static void Apply(TSPlayer player, Cell cell)
         {
@@ -170,10 +193,16 @@ namespace PlotMarker
         }
         public static void FuckCell(Cell cell)
         {
+            if (cell.IsVisiable)
+                cell.Invisiable();
             cell.Owner = string.Empty;
             cell.GetTime = default;
             cell.LastAccess = default;
             cell.AllowedIDs.Clear();
+            cell.UsingCellPosition.Clear();
+            cell.LastPositionIndex = -1;
+            Array.Clear(cell.TileData);
+            cell.SerializedTileData = null;
             cell.ClearTiles();
 
             DBTools.SQL.Update<Cell>(cell)
@@ -181,6 +210,7 @@ namespace PlotMarker
                 .Set(c => c.GetTime)
                 .Set(c => c.LastAccess)
                 .Set(c => c.AllowedIDs)
+                .Set(c => c.SerializedTileData)
                 .ExecuteAffrows();
         }
         #endregion
@@ -189,8 +219,6 @@ namespace PlotMarker
         {
             return Plots.FirstOrDefault(p => p.Name.Equals(plotname, StringComparison.Ordinal));
         }
-
-        
 
         public static int GetTotalCells(string playerName)
             => (int)DBTools.SQL.Select<Cell>()
@@ -201,7 +229,6 @@ namespace PlotMarker
         {
             return GetCellsOfPlayer(name).SingleOrDefault();
         }
-
         public static Cell[] GetCellsOfPlayer(string name)
         {
             return (from plot in Plots

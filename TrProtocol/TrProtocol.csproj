@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Serializers\TileEntitiesSerializer\**" />
+    <EmbeddedResource Remove="Serializers\TileEntitiesSerializer\**" />
+    <None Remove="Serializers\TileEntitiesSerializer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Models\Vector2.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OTAPI.Upcoming" Version="3.0.30-alpha" />
+  </ItemGroup>
+
+</Project>

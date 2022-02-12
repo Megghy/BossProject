@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
+using TrProtocol.Models;
 using TrProtocol.Packets;
 
 namespace BossFramework
@@ -35,13 +36,13 @@ namespace BossFramework
             var auto = new Dictionary<MethodInfo, AutoInitAttribute>();
             Assembly.GetExecutingAssembly()
                         .GetTypes()
-                        .ForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-                        .ForEach(m =>
+                        .BForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+                        .BForEach(m =>
                         {
                             if (m.GetCustomAttribute<AutoInitAttribute>() is { } attr)
                                 auto.Add(m, attr);
                         }));
-            auto.OrderBy(a => a.Value.Order).ForEach(kv =>
+            auto.OrderBy(a => a.Value.Order).BForEach(kv =>
             {
                 try
                 {

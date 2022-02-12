@@ -10,8 +10,8 @@ namespace BossFramework.BHooks.HookHandlers
         {
             Assembly.GetExecutingAssembly()
                         .GetTypes()
-                        .ForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-                        .ForEach(m =>
+                        .BForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+                        .BForEach(m =>
                         {
                             if (m.GetCustomAttribute<ReloadableAttribute>() is { })
                                 m.Invoke(BPlugin.Instance, null);

@@ -10,7 +10,7 @@ using Terraria.GameContent.Events;
 using TrProtocol;
 using TrProtocol.Packets;
 using TShockAPI;
-using BitsByte = TrProtocol.Models.BitsByte;
+using ProtocolBitsByte = TrProtocol.Models.ProtocolBitsByte;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace BossFramework
@@ -36,7 +36,8 @@ namespace BossFramework
                 count++;
             }
         }
-        public static void ForEach<T>(this IEnumerable<T> source, Action<T> action) => source.ForEach((obj, _) => action(obj));
+        //为了和ts的foreach区分名字
+        public static void BForEach<T>(this IEnumerable<T> source, Action<T> action) => source.ForEach((obj, _) => action(obj));
         public static void ForEach(this int count, Action<int> action)
         {
             if (count < 1)
@@ -58,8 +59,6 @@ namespace BossFramework
             othor = othor.ToLower();
             return text == othor || text.StartsWith(othor);
         }
-        public static Vector2 ToXNA(this TrProtocol.Models.Vector2 vector) => new(vector.X, vector.Y);
-        public static TrProtocol.Models.Vector2 ToTrProtocol(this Vector2 vector) => new(vector.X, vector.Y);
         public static bool IsPointInCircle(int x, int y, int cx, int cy, double r)
         {
             //到圆心的距离 是否大于半径。半径是R  
@@ -117,13 +116,37 @@ namespace BossFramework
                 return default;
             }
         }
+        public static T DeserializeBytes<T>(this byte[] data)
+        {
+            try
+            {
+                return Bssom.Serializer.BssomSerializer.Deserialize<T>(data);
+            }
+            catch (Exception ex)
+            {
+                BLog.Error(ex);
+                return default;
+            }
+        }
+        public static byte[] SerializeToBytes(this object data)
+        {
+            try
+            {
+                return Bssom.Serializer.BssomSerializer.Serialize(data);
+            }
+            catch (Exception ex)
+            {
+                BLog.Error(ex);
+                return default;
+            }
+        }
         public static WorldData GetCurrentWorldData(bool? ssc = null)
         {
             var worldInfo = new WorldData
             {
                 Time = (int)Main.time
             };
-            BitsByte bb3 = 0;
+            ProtocolBitsByte bb3 = 0;
             bb3[0] = Main.dayTime;
             bb3[1] = Main.bloodMoon;
             bb3[2] = Main.eclipse;
@@ -171,7 +194,7 @@ namespace BossFramework
             {
                 worldInfo.Rain = 0;
             }
-            BitsByte bb4 = 0;
+            ProtocolBitsByte bb4 = 0;
             bb4[0] = WorldGen.shadowOrbSmashed;
             bb4[1] = NPC.downedBoss1;
             bb4[2] = NPC.downedBoss2;
@@ -181,7 +204,7 @@ namespace BossFramework
             bb4[6] = ssc ?? Main.ServerSideCharacter;
             bb4[7] = NPC.downedPlantBoss;
             worldInfo.EventInfo1 = bb4;
-            BitsByte bb5 = 0;
+            ProtocolBitsByte bb5 = 0;
             bb5[0] = NPC.downedMechBoss1;
             bb5[1] = NPC.downedMechBoss2;
             bb5[2] = NPC.downedMechBoss3;
@@ -191,7 +214,7 @@ namespace BossFramework
             bb5[6] = Main.pumpkinMoon;
             bb5[7] = Main.snowMoon;
             worldInfo.EventInfo2 = bb5;
-            BitsByte bb6 = 0;
+            ProtocolBitsByte bb6 = 0;
             bb6[0] = Main.expertMode;
             bb6[1] = Main.fastForwardTime;
             bb6[2] = Main.slimeRain;
@@ -201,7 +224,7 @@ namespace BossFramework
             bb6[6] = NPC.downedMartians;
             bb6[7] = NPC.downedAncientCultist;
             worldInfo.EventInfo3 = bb6;
-            BitsByte bb7 = 0;
+            ProtocolBitsByte bb7 = 0;
             bb7[0] = NPC.downedMoonlord;
             bb7[1] = NPC.downedHalloweenKing;
             bb7[2] = NPC.downedHalloweenTree;
@@ -211,7 +234,7 @@ namespace BossFramework
             bb7[6] = NPC.downedGolemBoss;
             bb7[7] = BirthdayParty.PartyIsUp;
             worldInfo.EventInfo4 = bb7;
-            BitsByte bb8 = 0;
+            ProtocolBitsByte bb8 = 0;
             bb8[0] = NPC.downedPirates;
             bb8[1] = NPC.downedFrost;
             bb8[2] = NPC.downedGoblins;
@@ -248,7 +271,7 @@ namespace BossFramework
 
         public static void SendPacketToAll(this BPlayer _, Packet packet)
         {
-            BInfo.OnlinePlayers.ForEach(p => p.SendPacket(packet));
+            BInfo.OnlinePlayers.BForEach(p => p.SendPacket(packet));
         }
         public static void SendMsg(this TSPlayer plr, object msg, Color color = default)
         {

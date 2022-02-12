@@ -58,7 +58,7 @@ namespace BossFramework.DB
         public int UpdateMany<TV>(params Expression<Func<T, TV>>[] extracts)
         {
             var u = DBTools.SQL.Update<T>(this);
-            extracts.ForEach(e => u.Set(e));
+            extracts.BForEach(e => u.Set(e));
             return u.ExecuteAffrows();
         }
     }

@@ -1,4 +1,5 @@
 ﻿using BossFramework.BModels;
+using Microsoft.Xna.Framework;
 using TrProtocol.Models;
 using TrProtocol.Packets;
 using TShockAPI;
@@ -14,7 +15,7 @@ namespace BossFramework.BInterfaces
             {
                 if (_tweakePacket is null)
                 {
-                    var b1 = new BitsByte();
+                    var b1 = new ProtocolBitsByte();
                     b1[0] = Color.HasValue;
                     b1[1] = Damage.HasValue;
                     b1[2] = KnockBack.HasValue;
@@ -23,7 +24,7 @@ namespace BossFramework.BInterfaces
                     b1[5] = ShootProj.HasValue;
                     b1[6] = ShootSpeed.HasValue;
                     b1[7] = true;
-                    var b2 = new BitsByte();
+                    var b2 = new ProtocolBitsByte();
                     b2[0] = Width.HasValue;
                     b2[1] = Height.HasValue;
                     b2[2] = Size.HasValue;
@@ -131,14 +132,11 @@ namespace BossFramework.BInterfaces
         }
 
         protected Terraria.Projectile _proj = new();
-        protected void CreateProj(BPlayer plr, int projID, Microsoft.Xna.Framework.Vector2 position, Vector2 velocity, int damage = -1, float knockBack = -1, float ai0 = -1, float ai1 = -1)
-            => CreateProj(plr, projID, position.ToTrProtocol(), velocity, damage, knockBack, ai0, ai1);
-        protected void CreateProj(BPlayer plr, int projID, Microsoft.Xna.Framework.Vector2 position, Microsoft.Xna.Framework.Vector2 velocity, int damage = -1, float knockBack = -1, float ai0 = -1, float ai1 = -1)
-            => CreateProj(plr, projID, position.ToTrProtocol(), velocity.ToTrProtocol(), damage, knockBack, ai0, ai1);
+
         protected void CreateProj(BPlayer plr, int projID, Vector2 position, Vector2 velocity, int damage = -1, float knockBack = -1, float ai0 = -1, float ai1 = -1)
         {
             _proj.SetDefaults(projID);
-            var bb = new BitsByte();
+            var bb = new ProtocolBitsByte();
             bb[0] = ai0 != -1;
             bb[1] = ai1 != -1;
             bb[3] = true; //bannerid
