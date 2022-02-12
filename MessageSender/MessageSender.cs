@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Reflection;
 using Terraria;
+using Terraria.Utilities;
 using TerrariaApi.Server;
 using TShockAPI;
 
@@ -201,7 +202,7 @@ namespace MessageSender
                 if (!byte.TryParse(rgbs[0], out var r) || !byte.TryParse(rgbs[1], out var g) || !byte.TryParse(rgbs[2], out var b))
                 {
                     color = Color.Yellow;
-                    text = string.Join(" ", args.Parameters.Skip(1));
+                    text = args.Parameters[1];
                 }
                 else
                 {
@@ -212,9 +213,8 @@ namespace MessageSender
             else
             {
                 color = Color.Yellow;
-                text = string.Join(" ", args.Parameters.Skip(1));
+                text = args.Parameters[1];
             }
-
             SendCombatText(player, text, color, broadcast);
         }
 
@@ -225,7 +225,6 @@ namespace MessageSender
                 args.Player.SendErrorMessage("Invalid syntax! Proper syntax: /sendctpos [-b/--broadcast] <tileX> <tileY> <Messages> [r] [g] [b]");
                 return;
             }
-
             var broadcast = false;
             if (string.Equals(args.Parameters[0], "-b", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(args.Parameters[0], "--broadcast", StringComparison.OrdinalIgnoreCase))
@@ -233,7 +232,6 @@ namespace MessageSender
                 broadcast = true;
                 args.Parameters.RemoveAt(0);
             }
-
             if (!int.TryParse(args.Parameters[0], out var x) || !int.TryParse(args.Parameters[1], out var y))
             {
                 args.Player.SendErrorMessage("Invalid position!");
@@ -244,27 +242,25 @@ namespace MessageSender
 
             Color color;
             string text;
-
             if (args.Parameters.Count >= 4)
             {
                 var rgbs = args.Parameters.Skip(args.Parameters.Count - 3).ToArray();
                 if (!byte.TryParse(rgbs[0], out var r) || !byte.TryParse(rgbs[1], out var g) || !byte.TryParse(rgbs[2], out var b))
                 {
                     color = Color.Yellow;
-                    text = string.Join(" ", args.Parameters);
+                    text = args.Parameters[0];
                 }
                 else
                 {
                     color = new Color(r, g, b);
-                    text = string.Join(" ", args.Parameters.GetRange(0, args.Parameters.Count - 4));
+                    text = args.Parameters[0]; ;
                 }
             }
             else
             {
                 color = Color.Yellow;
-                text = string.Join(" ", args.Parameters);
+                text = args.Parameters[0]; ;
             }
-
             SendCombatText(args.Player, text, color, new Vector2(x * 16, y * 16), broadcast);
         }
 
@@ -281,7 +277,6 @@ namespace MessageSender
         public static void SendCombatText(TSPlayer player, string text, Color color, Rectangle location, bool broadcast = false)
         {
             var position = GetPosition(location);
-
             if (broadcast)
                 TSPlayer.All.SendData(PacketTypes.CreateCombatTextExtended, text, (int)color.PackedValue, position.X, position.Y);
             else
@@ -291,16 +286,17 @@ namespace MessageSender
         private static Vector2 GetPosition(Rectangle location)
         {
             var vector = Vector2.Zero;
-
             var position = new Vector2(
                 location.X + location.Width * 0.5f - vector.X * 0.5f,
                 location.Y + location.Height * 0.25f - vector.Y * 0.5f
             );
-
+            
+            if (Main.rand == null)
+                Main.rand = new UnifiedRandom();
             position.X += Main.rand.Next(-(int)(location.Width * 0.5), (int)(location.Width * 0.5) + 1);
             position.Y += Main.rand.Next(-(int)(location.Height * 0.5), (int)(location.Height * 0.5) + 1);
-
             return position;
         }
+        
     }
 }

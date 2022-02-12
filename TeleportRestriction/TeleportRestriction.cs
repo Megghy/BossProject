@@ -93,7 +93,7 @@ namespace TeleportRestriction
             Commands.ChatCommands.Insert(index, new Command(Permissions.tp, Teleport, "tp", "传")
             {
                 AllowServer = false,
-                HelpText = "传送到另外的玩家位置."
+                HelpText = "传送到其他玩家位置."
             });
             Commands.ChatCommands.Add(new Command("teleportres.manage", TrManage, "tpres"));
         }
