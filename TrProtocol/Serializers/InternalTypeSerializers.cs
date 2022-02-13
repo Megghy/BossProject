@@ -27,6 +27,7 @@ namespace TrProtocol
             RegisterSerializer(new ByteArraySerializer());
 
             RegisterSerializer(new ColorSerailizer());
+            RegisterSerializer(new PlayerDeathReasonSerializer());
             RegisterSerializer(new NetworkSerializer());
             RegisterSerializer(new Vector2Serailizer());
             RegisterSerializer(new PositionSerializer());

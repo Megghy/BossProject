@@ -2,7 +2,7 @@
 
 namespace TrProtocol
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Interface, AllowMultiple = true)]
     public sealed class SerializerAttribute : Attribute
     {
         public string version;

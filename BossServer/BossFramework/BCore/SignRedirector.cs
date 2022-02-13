@@ -4,13 +4,14 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TrProtocol;
 using TrProtocol.Packets;
 
 namespace BossFramework.BCore
 {
     public static class SignRedirector
     {
-        public static List<BSign> Signs { get; private set; }
+        private static List<BSign> Signs { get; set; }
         private static List<BSign> OverrideSign { get; set; } = new();
 
         [AutoPostInit]
@@ -31,6 +32,8 @@ namespace BossFramework.BCore
                     }); //不存在则新建
                 }
             });
+
+            BLog.Success($"共加载 {Signs.Count} 个标牌");
         }
         [SimpleTimer(Time = 5)]
         private static void UpdateClientSign()
@@ -39,16 +42,22 @@ namespace BossFramework.BCore
             {
                 BInfo.OnlinePlayers.BForEach(plr =>
                 {
-                    if (plr.WatchingSign != null
-                    && !new Rectangle(plr.WatchingSign.X, plr.WatchingSign.Y, 2, 2).Intersects(new Rectangle(plr.TileX - 5, plr.TileY - 5, 14, 12)))
+                    if (plr.WatchingSign?.sign is { } sign
+                    && !new Rectangle(sign.X, sign.Y, 2, 2).Intersects(new Rectangle(plr.TileX - 5, plr.TileY - 5, 14, 12)))
                         plr.WatchingSign = null; //超出范围则未在编辑标牌.
 
-                    plr.LastWatchingSignIndex = plr.WatchingSign == null ? -1 : 0; //从第一个开始, 第零个一般是当前正在看的
-                    lock (Signs)
+                    plr.LastWatchingSignIndex = (short)(plr.WatchingSign == null ? -1 : 0); //从第一个开始, 第零个一般是当前正在看的
+                    var packets = new List<Packet>();
+                    Signs.Where(s => BUtils.IsPointInCircle(s.X, s.Y, plr.TileX, plr.TileY, BConfig.Instance.SignRefreshRadius))
+                    .BForEach(s => packets.Add(new ReadSign()
                     {
-                        Signs.Where(s => BUtils.IsPointInCircle(s.X, s.Y, plr.TileX, plr.TileY, BConfig.Instance.SignRefreshRadius) && plr.WatchingSign != s)
-                        .BForEach(s => s.SendTo(plr));
-                    }
+                        PlayerSlot = plr.Index,
+                        Position = new((short)s.X, (short)s.Y),
+                        Text = s.Text,
+                        SignSlot = plr.GetNextSignSlot(),
+                        Bit1 = new Terraria.BitsByte(true)
+                    }));
+                    plr.SendPackets(packets);
                 });
             });
         }
@@ -56,8 +65,20 @@ namespace BossFramework.BCore
         {
             if (FindBSignFromPos(sign.Position.X, sign.Position.Y) is { } s)
             {
-                s.UpdateSingle(s => s.Text, sign.Text);
-                plr?.SendSuccessMsg($"已更新标牌");
+                if (sign.Text != s.Text)
+                {
+                    s.UpdateSingle(s => s.LastUpdateUser, plr.Index);
+                    s.UpdateSingle(s => s.Text, sign.Text);
+
+                    BInfo.OnlinePlayers.Where(p => p.WatchingSign?.sign == s)
+                        .BForEach(p =>
+                        {
+                            sign.SignSlot = plr.WatchingSign.Value.slot;
+                            p.SendPacket(sign); //同步给其他正在看这个牌子的玩家
+                        });
+
+                    plr?.SendSuccessMsg($"已更新标牌");
+                }
             }
             else
             {
@@ -89,27 +110,34 @@ namespace BossFramework.BCore
             };
             DB.DBTools.Insert(sign);
             Signs.Add(sign);
-            BLog.Info($"创建标牌数据于 {sign.X} - {sign.Y}{(plr is null ? "" : $"来自 {plr}")}");
+            BLog.DEBUG($"创建标牌数据于 {sign.X} - {sign.Y} {(plr is null ? "" : $"来自 {plr}")}");
             return sign;
         }
-
+        public static short GetNextSignSlot(this BPlayer plr)
+        {
+            if (plr.LastWatchingSignIndex > 998)
+                plr.LastWatchingSignIndex = -1;
+            plr.LastWatchingSignIndex++;
+            if (plr.LastWatchingSignIndex == plr.WatchingChest?.slot)
+                plr.LastWatchingSignIndex++;
+            return plr.LastWatchingSignIndex;
+        }
         public static BSign FindBSignFromPos(int tileX, int tileY)
             => OverrideSign.LastOrDefault(s => s.Contains(tileX, tileY)) ?? Signs.LastOrDefault(s => s.Contains(tileX, tileY));
         public static void SendTo(this BSign sign, BPlayer target, bool watch = false)
         {
-            if (target.LastWatchingSignIndex > 998)
-                target.LastWatchingSignIndex = -1;
-            target.LastWatchingSignIndex++;
             if (watch)
-                target.WatchingSign = sign;
+                target.WatchingSign = new(target.LastWatchingSignIndex, sign);
+
+            var slot = target.GetNextSignSlot();
 
             target.SendPacket(new ReadSign()
             {
                 PlayerSlot = target.Index,
                 Position = new((short)sign.X, (short)sign.Y),
                 Text = sign.Text,
-                SignSlot = (short)target.LastWatchingSignIndex,
-                Bit1 = new Terraria.BitsByte(watch)
+                SignSlot = slot,
+                Bit1 = new Terraria.BitsByte(!watch)
             });
         }
 

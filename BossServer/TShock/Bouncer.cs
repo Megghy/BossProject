@@ -93,7 +93,7 @@ namespace TShockAPI
             GetDataHandlers.NewProjectile += OnNewProjectile;
             GetDataHandlers.NPCStrike += OnNPCStrike;
             GetDataHandlers.ProjectileKill += OnProjectileKill;
-            GetDataHandlers.ChestItemChange += OnChestItemChange;
+            // GetDataHandlers.ChestItemChange += OnChestItemChange; 会和重定向冲突
             GetDataHandlers.ChestOpen += OnChestOpen;
             GetDataHandlers.PlaceChest += OnPlaceChest;
             GetDataHandlers.PlayerZone += OnPlayerZone;

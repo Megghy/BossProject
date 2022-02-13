@@ -8,7 +8,7 @@ using TrProtocol.Models;
 
 namespace TrProtocol.Serializers
 {
-    public class TileEntityShareSerializer : FieldSerializer<IProtocolTileEntity>
+    public class TileEntitySerializer : FieldSerializer<IProtocolTileEntity>
     {
         protected override IProtocolTileEntity _Read(BinaryReader br)
         {

@@ -221,7 +221,7 @@ namespace TerrariaUI
 
             if ((touch.State == TouchState.Moving || touch.State == TouchState.End)
                     && (previous == null || previous.State == TouchState.End))
-                throw new InvalidOperationException($"Moving, Previous State: {previous.State}");
+                throw new InvalidOperationException($"Moving, Previous State: {previous?.State}");
 
             if (touch.State == TouchState.Moving && touch.AbsoluteX == previous.AbsoluteX && touch.AbsoluteY == previous.AbsoluteY)
                 return session.Used;

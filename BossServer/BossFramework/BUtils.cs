@@ -48,7 +48,7 @@ namespace BossFramework
             {
                 throw new ArgumentNullException(nameof(action));
             }
-            for (int i = count; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 action(i);
             }
@@ -269,9 +269,16 @@ namespace BossFramework
         public static void SendTo(this Packet packet, BPlayer plr)
             => plr.SendPacket(packet);
 
-        public static void SendPacketToAll(this BPlayer _, Packet packet)
+        public static void SendPacketToAll(Packet packet, BPlayer ignore = null)
         {
-            BInfo.OnlinePlayers.BForEach(p => p.SendPacket(packet));
+            BInfo.OnlinePlayers.Where(p => p != ignore).BForEach(p => p.SendPacket(packet));
+        }
+        public static void SendPacketsToAll(this IEnumerable<Packet> packets, BPlayer ignore = null)
+        {
+            List<byte> packetData = new();
+            packets.ForEach(packet => packetData.AddRange(packet.SerializePacket()));
+            var packetBytes = packetData.ToArray();
+            BInfo.OnlinePlayers.Where(p => p != ignore).BForEach(p => p.SendRawData(packetBytes));
         }
         public static void SendMsg(this TSPlayer plr, object msg, Color color = default)
         {

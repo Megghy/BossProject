@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Terraria.DataStructures;
 using TrProtocol.Models.TileEntities;
+using TrProtocol.Serializers;
 
 namespace TrProtocol.Models
 {
+    [Serializer(typeof(TileEntitySerializer))]
     public interface IProtocolTileEntity
     {
         public static readonly IReadOnlyDictionary<TileEntityType, Type> tileEntityDict = new Dictionary<TileEntityType, Type>()

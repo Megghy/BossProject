@@ -53,8 +53,13 @@ namespace BossFramework.BModels
 
         public List<BWeaponRelesedProj> RelesedProjs { get; } = new();
 
-        public BSign WatchingSign { get; internal set; }
-        public int LastWatchingSignIndex { get; set; } = -1;
+
+        
+        public (short slot, BSign sign)? WatchingSign { get; internal set; }
+        public short LastWatchingSignIndex { get; internal set; } = -1;
+
+        public (short slot, BChest chest)? WatchingChest { get; internal set; }
+        public short LastSyncChestIndex { get; internal set; } = -1; 
 
         #region 小游戏部分
         public long Point { get; set; }
@@ -127,9 +132,15 @@ namespace BossFramework.BModels
             Prefix = 0,
             Stack = 0
         };
-        public void RemoveItem(int slot, bool turnToAir = true)
+        public SyncEquipment RemoveItemPacket(int slot, bool clearServerSideItem = true)
         {
-            if(turnToAir)
+            _emptyItemPacket.ItemSlot = (short)slot;
+            _emptyItemPacket.PlayerSlot = Index;
+            return _emptyItemPacket;
+        }
+        public void RemoveItem(int slot, bool clearServerSideItem = true)
+        {
+            if(clearServerSideItem)
                 TrPlayer.inventory[slot]?.SetDefaults();
             _emptyItemPacket.ItemSlot = (short)slot;
             _emptyItemPacket.PlayerSlot = Index;
@@ -154,7 +165,7 @@ namespace BossFramework.BModels
                 StatMana = (short)TsPlayer.TPlayer.statMana,
                 StatManaMax = (short)TsPlayer.TPlayer.statLifeMax2
             });
-            this.SendPacketToAll(new ManaEffect()
+            BUtils.SendPacketToAll(new ManaEffect()
             {
                 PlayerSlot = Index,
                 Amount = (short)(value < 0 ? -value : value)

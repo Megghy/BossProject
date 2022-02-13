@@ -47,7 +47,8 @@ namespace TrProtocol
         private readonly Dictionary<Type, Type> enumSerializers = new()
         {
             [typeof(short)] = typeof(ShortEnumSerializer<>),
-            [typeof(byte)] = typeof(ByteEnumSerializer<>)
+            [typeof(byte)] = typeof(ByteEnumSerializer<>),
+            [typeof(int)] = typeof(NormalEnumSerializer<>)
         };
 
         private readonly ArraySerializer arraySerializer = new();
@@ -121,6 +122,7 @@ namespace TrProtocol
 
                 if (t.BaseType == typeof(Enum))
                 {
+                    var aa = t.GetFields()[0].FieldType;
                     var genrericType = enumSerializers[t.GetFields()[0].FieldType];
                     var seriliazer = genrericType.MakeGenericType(t);
                     ser = (IFieldSerializer)Activator.CreateInstance(seriliazer);

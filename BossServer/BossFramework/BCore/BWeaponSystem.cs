@@ -195,8 +195,9 @@ namespace BossFramework.BCore
             plr.TrPlayer.inventory[slot].prefix = (byte)weapon.Prefix;
             plr.TrPlayer.inventory[slot].stack = weapon.Stack; //将玩家背标目标位置更改为指定物品
 
+            var packets = new List<Packet>();
             var itemID = 400 - slot;
-            plr.SendPacket(new InstancedItem()
+            packets.Add(new InstancedItem()
             {
                 ItemSlot = (short)itemID,
                 Owner = 0,
@@ -209,9 +210,11 @@ namespace BossFramework.BCore
 
             var packet = weapon.TweakePacket;
             packet.ItemSlot = (short)itemID;
-            plr.SendPacket(packet); //转换为自定义物品
+            packets.Add(packet); //转换为自定义物品
 
-            plr.RemoveItem(slot, false); //移除旧的物品
+            packets.Add(plr.RemoveItemPacket(slot)); //移除旧的物品
+
+            plr.SendPackets(packets);
         }
         private static void ChangeSingleItemToBWeapon(this BPlayer plr, BaseBWeapon weapon, int slot)
         {

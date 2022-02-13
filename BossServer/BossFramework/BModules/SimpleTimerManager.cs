@@ -1,5 +1,4 @@
 ﻿using BossFramework.BAttributes;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -33,7 +32,7 @@ namespace BossFramework.BModules
             };
             Assembly.GetExecutingAssembly()
                 .GetTypes()
-                .BForEach(t => t.GetMethods()
+                .BForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
                     .Where(m => m.GetCustomAttributes(true).FirstOrDefault(a => a is SimpleTimerAttribute) != null)
                         .BForEach(m =>
                         {
