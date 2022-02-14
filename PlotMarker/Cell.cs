@@ -274,6 +274,9 @@ namespace PlotMarker
             {
                 if (TileEntity.ByID.TryGetValue(entity.ID, out var placedEntity))
                 {
+                    TileEntity.ByID.Remove(placedEntity.ID);
+                    TileEntity.ByPosition.Remove(placedEntity.Position);
+
                     packetData.Add(new TileEntitySharing()
                     {
                         ID = placedEntity.ID,
