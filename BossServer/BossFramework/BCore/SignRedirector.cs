@@ -1,5 +1,6 @@
 ﻿using BossFramework.BAttributes;
 using BossFramework.BModels;
+using BossFramework.DB;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,15 +12,15 @@ namespace BossFramework.BCore
 {
     public static class SignRedirector
     {
-        private static List<BSign> Signs { get; set; }
-        private static List<BSign> OverrideSign { get; set; } = new();
+        public static List<BSign> Signs { get; set; }
+        private static List<BSign> _overrideSign { get; set; } = new();
 
         [AutoPostInit]
         private static void InitSign()
         {
             BLog.DEBUG("初始化标牌重定向");
 
-            Signs = DB.DBTools.GetAll<BSign>().Where(r => r.WorldId == Terraria.Main.worldID).ToList();
+            Signs = DBTools.GetAll<BSign>().Where(r => r.WorldId == Terraria.Main.worldID).ToList();
 
             Terraria.Main.sign.Where(s => s != null).BForEach(s =>
             {
@@ -34,6 +35,17 @@ namespace BossFramework.BCore
             });
 
             BLog.Success($"共加载 {Signs.Count} 个标牌");
+
+            var invalidCount = 0;
+            Signs.Where(s => !Terraria.Main.tileSign[Terraria.Main.tile[s.X, s.Y].type])
+                .ToArray()
+                .BForEach(s =>
+                {
+                    RemoveSign(s);
+                    invalidCount++;
+                });
+            if(invalidCount > 0)
+                BLog.Success($"移除 {invalidCount} 个无效标牌");
         }
         [SimpleTimer(Time = 5)]
         private static void UpdateClientSign()
@@ -48,42 +60,64 @@ namespace BossFramework.BCore
 
                     plr.LastWatchingSignIndex = (short)(plr.WatchingSign == null ? -1 : 0); //从第一个开始, 第零个一般是当前正在看的
                     var packets = new List<Packet>();
-                    Signs.Where(s => BUtils.IsPointInCircle(s.X, s.Y, plr.TileX, plr.TileY, BConfig.Instance.SignRefreshRadius))
-                    .BForEach(s => packets.Add(new ReadSign()
-                    {
-                        PlayerSlot = plr.Index,
-                        Position = new((short)s.X, (short)s.Y),
-                        Text = s.Text,
-                        SignSlot = plr.GetNextSignSlot(),
-                        Bit1 = new Terraria.BitsByte(true)
-                    }));
+                    
+                    AllSign().Where(s => BUtils.IsPointInCircle(s.X, s.Y, plr.TileX, plr.TileY, BConfig.Instance.SignRefreshRadius))
+                        .BForEach(s => packets.Add(new ReadSign()
+                        {
+                            PlayerSlot = plr.Index,
+                            Position = new((short)s.X, (short)s.Y),
+                            Text = s.Text,
+                            SignSlot = plr.GetNextSignSlot(),
+                            Bit1 = new Terraria.BitsByte(true)
+                        }));
+
                     plr.SendPackets(packets);
                 });
             });
         }
+
+        #region 事件
+
+        public delegate void OnSignCreate(BEventArgs.SignCreateEventArgs args);
+        public static event OnSignCreate SignCreate;
+        public delegate void OnSignUpdate(BEventArgs.SignUpdateEventArgs args);
+        public static event OnSignUpdate SignUpdate;
+        public delegate void OnSignRemove(BEventArgs.SignRmoveEventArgs args);
+        public static event OnSignRemove SignRemove;
         public static void OnSyncSign(BPlayer plr, ReadSign sign)
         {
             if (FindBSignFromPos(sign.Position.X, sign.Position.Y) is { } s)
             {
                 if (sign.Text != s.Text)
                 {
-                    s.UpdateSingle(s => s.LastUpdateUser, plr.Index);
-                    s.UpdateSingle(s => s.Text, sign.Text);
+                    var args = new BEventArgs.SignUpdateEventArgs(plr, s, sign.Text);
+                    SignUpdate?.Invoke(args);
+                    if (!args.Handled)
+                    {
+                        s.Text = sign.Text;
+                        s.UpdateSingle(s => s.LastUpdateUser, plr.Index);
+                        s.UpdateSingle(s => s.Text, sign.Text);
 
-                    BInfo.OnlinePlayers.Where(p => p.WatchingSign?.sign == s)
-                        .BForEach(p =>
-                        {
-                            sign.SignSlot = plr.WatchingSign.Value.slot;
-                            p.SendPacket(sign); //同步给其他正在看这个牌子的玩家
-                        });
+                        BInfo.OnlinePlayers.Where(p => p.WatchingSign?.sign == s)
+                            .BForEach(p =>
+                            {
+                                sign.SignSlot = plr.WatchingSign.Value.slot;
+                                p.SendPacket(sign); //同步给其他正在看这个牌子的玩家
+                            });
 
-                    plr?.SendSuccessMsg($"已更新标牌");
+                        plr?.SendSuccessMsg($"已更新标牌");
+                    }
                 }
             }
             else
             {
-                CreateSign(sign.Position.X, sign.Position.Y, sign.Text, plr);
-                plr?.SendSuccessMsg($"已创建标牌");
+                var args = new BEventArgs.SignCreateEventArgs(plr, sign.Position);
+                SignCreate?.Invoke(args);
+                if (!args.Handled)
+                {
+                    CreateSign(sign.Position.X, sign.Position.Y, sign.Text, plr);
+                    plr?.SendSuccessMsg($"已创建标牌");
+                }
             }
         }
         public static void OnOpenSign(BPlayer plr, RequestReadSign readSign)
@@ -96,6 +130,9 @@ namespace BossFramework.BCore
                     .SendTo(plr, true);
             }
         }
+        #endregion
+
+        #region 标牌操作
         public static BSign CreateSign(int tileX, int tileY, string text, BPlayer plr = null)
         {
 
@@ -108,7 +145,7 @@ namespace BossFramework.BCore
                 LastUpdateUser = plr?.Index ?? -1,
                 WorldId = Terraria.Main.worldID
             };
-            DB.DBTools.Insert(sign);
+            DBTools.Insert(sign);
             Signs.Add(sign);
             BLog.DEBUG($"创建标牌数据于 {sign.X} - {sign.Y} {(plr is null ? "" : $"来自 {plr}")}");
             return sign;
@@ -123,7 +160,7 @@ namespace BossFramework.BCore
             return plr.LastWatchingSignIndex;
         }
         public static BSign FindBSignFromPos(int tileX, int tileY)
-            => OverrideSign.LastOrDefault(s => s.Contains(tileX, tileY)) ?? Signs.LastOrDefault(s => s.Contains(tileX, tileY));
+            => _overrideSign.LastOrDefault(s => s.Contains(tileX, tileY)) ?? Signs.LastOrDefault(s => s.Contains(tileX, tileY));
         public static void SendTo(this BSign sign, BPlayer target, bool watch = false)
         {
             if (watch)
@@ -140,9 +177,27 @@ namespace BossFramework.BCore
                 Bit1 = new Terraria.BitsByte(!watch)
             });
         }
+        public static bool RemoveSign(int x, int y)
+        {
+            if(FindBSignFromPos(x, y) is { } sign)
+            {
+                RemoveSign(sign);
+                return true;
+            }
+            return false;
+        }
+        public static void RemoveSign(BSign sign)
+        {
+            BInfo.OnlinePlayers.Where(p => p.WatchingSign?.sign == sign)
+                    .BForEach(p => p.WatchingSign = null);
+            if (!DeregisterOverrideSign(sign))
+                if (Signs.Remove(sign))
+                    DBTools.Delete(sign);
+        }
+        #endregion
 
         public static void RegisterOverrideSign(int tileX, int tileY, string text)
-            => OverrideSign.Add(new()
+            => _overrideSign.Add(new()
             {
                 X = tileX,
                 Y = tileY,
@@ -150,7 +205,22 @@ namespace BossFramework.BCore
                 Owner = -1,
                 LastUpdateUser = -1
             });
-        public static void DeregisterOverrideSign(int tileX, int tileY, string text)
-            => OverrideSign.RemoveAll(s => s.Contains(tileX, tileY));
+        public static bool DeregisterOverrideSign(int tileX, int tileY)
+            => _overrideSign.RemoveAll(s => s.Contains(tileX, tileY)) != 0;
+        public static bool DeregisterOverrideSign(BSign sign)
+            => _overrideSign.Remove(sign);
+        /// <summary>
+        /// 包含注册的牌子在内的所有牌子
+        /// </summary>
+        /// <returns></returns>
+        public static BSign[] AllSign()
+        {
+            var result = new List<BSign>();
+            result.AddRange(Signs);
+            result.AddRange(_overrideSign);
+            return result.ToArray();
+        }
+        public static BSign[] RegistedSigns
+            => _overrideSign.ToArray();
     }
 }

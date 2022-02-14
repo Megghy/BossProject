@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 
 namespace TerrariaApi.Server
 {
@@ -19,6 +20,8 @@ namespace TerrariaApi.Server
             get;
             set;
         }
+
+        public Assembly PluginAssembly { get; set; }
 
         public PluginContainer(TerrariaPlugin plugin) : this(plugin, true)
         {

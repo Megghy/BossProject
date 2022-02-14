@@ -6,8 +6,8 @@ namespace TrProtocol.Models.TileEntities
     {
         public ProtocolTELogicSensor(TELogicSensor entity) : base(entity)
         {
-            LogicCheck = (LogicCheckType)entity.logicCheck;
-            On = entity.On;
+            LogicCheck = (LogicCheckType)(entity?.logicCheck ?? TELogicSensor.LogicCheckType.None);
+            On = entity?.On ?? false;
         }
 
         public override TileEntityType EntityType => TileEntityType.TELogicSensor;

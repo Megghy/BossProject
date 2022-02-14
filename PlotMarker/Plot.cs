@@ -48,13 +48,13 @@ namespace PlotMarker
         /// 小块区域的引用. 其中数组索引就是 <see cref="Cell.Id"/> ,
         /// 而顺序(数组索引)是按照 <see cref="GenerateCells"/> 中添加列表的顺序来
         /// </summary>
-        public List<Cell> Cells { get; internal set; }
+        public List<Cell> Cells { get; internal set; } = new List<Cell>();
 
         /// <summary>
         /// 区域的坐标信息
         /// </summary>
         [JsonMap]
-        public CellPosition[] CellsPosition { get; set; }
+        public List<CellPosition> CellsPosition { get; set; }
         private CellPosition[,] _cellsPosition2D;
         public CellPosition[,] CellsPosition2D
         {
@@ -115,7 +115,7 @@ namespace PlotMarker
                     index++;
                 }
             }
-            CellsPosition = cellsPos.ToArray();
+            CellsPosition = cellsPos.ToList();
             PlotManager.UpdateCellsPos(this);
         }
         public void ReDrawLines(bool sendSection = true)
@@ -202,7 +202,7 @@ namespace PlotMarker
         /// </summary>
         /// <returns></returns>
         public bool IsUsed()
-            => PlotManager.CurrentPlot.Cells.Exists(c => c.UsingCellPosition.Contains(Index));
+            => PlotManager.CurrentPlot.Cells.Exists(c => c.UsingCellPositionIndex.Contains(Index));
     }
     
 

@@ -7,8 +7,8 @@ namespace TrProtocol.Models.TileEntities
     {
         public ProtocolTEHatRack(TEHatRack entity) : base(entity)
         {
-            Dyes = entity._dyes.Select(i => ItemData.Get(i)).ToArray();
-            Items = entity._items.Select(i => ItemData.Get(i)).ToArray();
+            Dyes = entity?._dyes.Select(i => ItemData.Get(i)).ToArray() ?? new ItemData[2];
+            Items = entity?._items.Select(i => ItemData.Get(i)).ToArray() ?? new ItemData[2];
         }
 
         public override TileEntityType EntityType => TileEntityType.TEHatRack;

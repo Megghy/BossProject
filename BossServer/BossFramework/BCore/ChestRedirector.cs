@@ -12,7 +12,7 @@ namespace BossFramework.BCore
 {
     public static class ChestRedirector
     {
-        private static List<BChest> _chests { get; set; }
+        public static List<BChest> Chests { get; set; }
         private static List<BChest> _overrideChest { get; set; } = new();
 
         [AutoPostInit]
@@ -20,17 +20,17 @@ namespace BossFramework.BCore
         {
             BLog.DEBUG("初始化箱子重定向");
 
-            _chests = DBTools.GetAll<BChest>().Where(r => r.WorldId == Terraria.Main.worldID).ToList();
+            Chests = DBTools.GetAll<BChest>().Where(r => r.WorldId == Terraria.Main.worldID).ToList();
 
             Terraria.Main.chest.Where(s => s != null).BForEach(chest =>
             {
-                if (!_chests.Exists(c => c.X == chest.x && c.Y == chest.y))
+                if (!Chests.Exists(c => c.X == chest.x && c.Y == chest.y))
                 {
                     CreateChest(chest.x, chest.y, chest.name, chest.item.Select(i => ItemData.Get(i)).ToArray(), null); //不存在则新建
                 }
             });
 
-            BLog.Success($"共加载 {_chests.Count} 个箱子");
+            BLog.Success($"共加载 {Chests.Count} 个箱子");
         }
 
         #region 事件
@@ -46,11 +46,19 @@ namespace BossFramework.BCore
         public static void OnChestOpen(BPlayer plr, RequestChestOpen packet)
         {
             if (FindChestFromPos(packet.Position.X, packet.Position.Y) is { } c)
-                c.PlayerOpenChest(plr); //为保证本地箱子id一致 每次发送都得给所有人发
+                c.PlayerOpenChest(plr);
             else //不确定要不要生成, 要是有人一直代码发包就能一直创建了
-            {
                 CreateChest(packet.Position.X, packet.Position.Y, "", new ItemData[40], plr)
-                    .PlayerOpenChest(plr);
+                        .PlayerOpenChest(plr);
+            if (Terraria.WorldGen.IsChestRigged(packet.Position.X, packet.Position.Y))
+            {
+                Terraria.Wiring.SetCurrentUser(plr.Index);
+                Terraria.Wiring.HitSwitch(packet.Position.X, packet.Position.Y);
+                Terraria.Wiring.SetCurrentUser();
+                BUtils.SendPacketToAll(new HitSwitch()
+                {
+                    Position = packet.Position
+                }, plr);
             }
         }
         public static void OnUpdateChestItem(BPlayer plr, SyncChestItem packet)
@@ -101,18 +109,14 @@ namespace BossFramework.BCore
         {
             if (packet.Operation is 1 or 3 or 5 && FindChestFromPos(packet.Position.X, packet.Position.Y) is { } chest) //破坏箱子
             {
-                BInfo.OnlinePlayers.Where(p => p.WatchingChest?.chest == chest)
-                    .BForEach(p => p.WatchingChest = null);
-                if (!_overrideChest.Remove(chest))
-                    _chests.Remove(chest);
-                DBTools.Delete(chest);
+                RemoveChest(chest);
                 BLog.DEBUG($"箱子数据移除, 位于 [{packet.Position.X} - {packet.Position.Y}], 来自 {plr}");
             }
         }
         #endregion
 
         public static BChest FindChestFromPos(int tileX, int tileY)
-            => _overrideChest.LastOrDefault(c => c.Contains(tileX, tileY)) ?? _chests.LastOrDefault(s => s.Contains(tileX, tileY));
+            => _overrideChest.LastOrDefault(c => c.Contains(tileX, tileY)) ?? Chests.LastOrDefault(s => s.Contains(tileX, tileY));
         public static BChest CreateChest(int tileX, int tileY, string name, ItemData[] items = null, BPlayer plr = null)
         {
             var i = new ItemData[40];
@@ -128,12 +132,12 @@ namespace BossFramework.BCore
                 Name = name
             };
             DBTools.Insert(chest);
-            _chests.Add(chest);
+            Chests.Add(chest);
             BLog.DEBUG($"创建箱子数据于 {chest.X} - {chest.Y} {(plr is null ? "" : $"来自 {plr}")}");
             return chest;
         }
 
-        #region 箱子发送
+        #region 箱子操作
         public static void PlayerOpenChest(this BChest chest, BPlayer target)
         {
             short slot = 7999;
@@ -193,13 +197,57 @@ namespace BossFramework.BCore
             });
             return list;
         }
+        public static bool RemoveChest(int tileX, int tileY)
+        {
+            if (FindChestFromPos(tileX, tileY) is { } chest)
+            {
+                RemoveChest(chest);
+                return true;
+            }
+            return false;
+        }
+        public static void RemoveChest(BChest chest)
+        {
+            BInfo.OnlinePlayers.Where(p => p.WatchingChest?.chest == chest)
+                    .BForEach(p => p.WatchingChest = null);
+            if (!DeregisterOverrideChest(chest))
+                if (Chests.Remove(chest))
+                    DBTools.Delete(chest);
+        }
         #endregion
 
+        public static void RegisterOverrideChest(short x, short y, ItemData[] items)
+        {
+            var newItems = new ItemData[40];
+            if (items is { Length: > 0 })
+                40.ForEach(i =>
+                {
+                    if (items.Length > i)
+                        newItems[i] = items[i] ?? new();
+                });
+            RegisterOverrideChest(new()
+            {
+                Items = newItems,
+                X = x,
+                Y = y
+            });
+        }
         public static void RegisterOverrideChest(BChest chest)
             => _overrideChest.Add(chest);
-        public static void DeregisterOverrideSign(int tileX, int tileY)
-            => _overrideChest.RemoveAll(s => s.Contains(tileX, tileY));
-        public static void DeregisterOverrideSign(BChest chest)
+        public static bool DeregisterOverrideChest(int tileX, int tileY)
+            => _overrideChest.RemoveAll(s => s.Contains(tileX, tileY)) != 0;
+        public static bool DeregisterOverrideChest(BChest chest)
             => _overrideChest.Remove(chest);
+        /// <summary>
+        /// 包含注册的箱子在内的所有箱子
+        /// </summary>
+        /// <returns></returns>
+        public static BChest[] AllChest()
+        {
+            var result = new List<BChest>();
+            result.AddRange(Chests);
+            result.AddRange(_overrideChest);
+            return result.ToArray();
+        }
     }
 }

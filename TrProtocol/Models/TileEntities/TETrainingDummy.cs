@@ -6,7 +6,7 @@ namespace TrProtocol.Models.TileEntities
     {
         public ProtocolTETrainingDummy(TETrainingDummy entity) : base(entity)
         {
-            NPC = entity.npc;
+            NPC = entity?.npc ?? -1;
         }
 
         public override TileEntityType EntityType => TileEntityType.TETrainingDummy;

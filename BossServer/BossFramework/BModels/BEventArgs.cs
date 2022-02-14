@@ -1,4 +1,5 @@
-﻿using TrProtocol;
+﻿using Microsoft.Xna.Framework;
+using TrProtocol;
 using TrProtocol.Packets;
 
 namespace BossFramework.BModels
@@ -6,6 +7,7 @@ namespace BossFramework.BModels
     public interface IEventArgs
     {
         public bool Handled { get; set; }
+        public BPlayer Player { get; }
     }
     public static class BEventArgs
     {
@@ -61,6 +63,41 @@ namespace BossFramework.BModels
             public PlayerHurtV2 Hurt { get; set; }
             public BPlayer Player { get; set; }
             public bool Handled { get; set; } = false;
+        }
+        public class SignCreateEventArgs : IEventArgs
+        {
+            public SignCreateEventArgs(BPlayer plr, Point position)
+            {
+                Player = plr;
+                Position = position;
+            }
+            public bool Handled { get; set; } = false;
+            public BPlayer Player { get;private set; }
+            public Point Position { get;private set; }
+        }
+        public class SignUpdateEventArgs : IEventArgs
+        {
+            public SignUpdateEventArgs(BPlayer plr, BSign sign, string newText)
+            {
+                Player = plr;
+                Sign = sign;
+                NewText = newText;
+            }
+            public bool Handled { get; set; } = false;
+            public BPlayer Player { get; private set; }
+            public BSign Sign { get; private set; }
+            public string NewText { get; private set; }
+        }
+        public class SignRmoveEventArgs
+        {
+            public SignRmoveEventArgs(BPlayer plr, BSign sign)
+            {
+                Player = plr;
+                Sign = sign;
+            }
+            public bool Handled { get; set; } = false;
+            public BPlayer Player { get; private set; }
+            public BSign Sign { get; private set; }
         }
     }
 }

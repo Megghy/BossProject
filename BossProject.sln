@@ -44,6 +44,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewBadgeSystem", "NewBadgeS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrProtocol", "TrProtocol\TrProtocol.csproj", "{4FDC2260-9A2A-4722-B25A-E8971832EF89}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldEdit", "WorldEdit\WorldEdit.csproj", "{54E4E7AD-ED4D-41AD-854B-C2F81E4DEBAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -196,6 +198,14 @@ Global
 		{4FDC2260-9A2A-4722-B25A-E8971832EF89}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4FDC2260-9A2A-4722-B25A-E8971832EF89}.Release|x86.ActiveCfg = Release|Any CPU
 		{4FDC2260-9A2A-4722-B25A-E8971832EF89}.Release|x86.Build.0 = Release|Any CPU
+		{54E4E7AD-ED4D-41AD-854B-C2F81E4DEBAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54E4E7AD-ED4D-41AD-854B-C2F81E4DEBAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54E4E7AD-ED4D-41AD-854B-C2F81E4DEBAD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{54E4E7AD-ED4D-41AD-854B-C2F81E4DEBAD}.Debug|x86.Build.0 = Debug|Any CPU
+		{54E4E7AD-ED4D-41AD-854B-C2F81E4DEBAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54E4E7AD-ED4D-41AD-854B-C2F81E4DEBAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54E4E7AD-ED4D-41AD-854B-C2F81E4DEBAD}.Release|x86.ActiveCfg = Release|Any CPU
+		{54E4E7AD-ED4D-41AD-854B-C2F81E4DEBAD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,7 +6,7 @@ namespace TrProtocol.Models.TileEntities
     {
         public ProtocolTEWeaponsRack(TEWeaponsRack entity) : base(entity)
         {
-            Item = entity.item;
+            Item = entity?.item ?? new();
         }
 
         public override TileEntityType EntityType => TileEntityType.TEWeaponsRack;

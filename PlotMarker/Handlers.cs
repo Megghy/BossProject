@@ -9,6 +9,9 @@ using TShockAPI;
 using TShockAPI.Net;
 using Microsoft.Xna.Framework;
 using Terraria.DataStructures;
+using BossFramework.BModels;
+using TerrariaApi.Server;
+using System.Reflection.PortableExecutable;
 
 namespace PlotMarker
 {
@@ -26,7 +29,6 @@ namespace PlotMarker
 				{ PacketTypes.PlaceTileEntity, HandlePlaceTileEntity},
 				{ PacketTypes.TileSendSquare, HandleSendTileSquare}
 			};
-
 		public static bool HandleGetData(PacketTypes type, TSPlayer player, MemoryStream data)
 		{
 			if (GetDataHandlerDelegates.TryGetValue(type, out var handler))
@@ -46,28 +48,29 @@ namespace PlotMarker
 		}
 
 		private static bool HandleSendTileSquare(GetDataHandlerArgs args)
-		{
+{
 			var player = args.Player;
-			var size = args.Data.ReadInt16();
-			var tileX = args.Data.ReadInt16();
-			var tileY = args.Data.ReadInt16();
+			int tileX = args.Data.ReadInt16();
+			int tileY = args.Data.ReadInt16();
+			var width = args.Data.ReadByte();
+			var height = args.Data.ReadByte();
 
-			var tiles = new NetTile[size, size];
-			for (int x = 0; x < size; x++)
+			var tiles = new NetTile[width, height];
+			for (int x = 0; x < width; x++)
 			{
-				for (int y = 0; y < size; y++)
+				for (int y = 0; y < height; y++)
 				{
 					tiles[x, y] = new NetTile(args.Data);
 				}
 			}
 
-			for (int x = 0; x < size; x++)
+			for (int x = 0; x < width; x++)
 			{
 				int realx = tileX + x;
 				if (realx < 0 || realx >= Main.maxTilesX)
 					continue;
 
-				for (int y = 0; y < size; y++)
+				for (int y = 0; y < height; y++)
 				{
 					int realy = tileY + y;
 					if (realy < 0 || realy >= Main.maxTilesY)

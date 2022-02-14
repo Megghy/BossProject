@@ -8,6 +8,7 @@ namespace FakeProvider
     [StructLayout(LayoutKind.Sequential, Size = 14, Pack = 1)]
     public struct StructTile : ITile
     {
+        public static readonly StructTile Empty = new();
         public const int Type_Solid = 0;
         public const int Type_Halfbrick = 1;
         public const int Type_SlopeDownRight = 2;

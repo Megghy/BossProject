@@ -10,6 +10,10 @@ namespace TrProtocol.Models
             => new(p.X, p.Y);
         public static implicit operator ShortPosition(Point16 p)
             => new(p.X, p.Y);
+        public static implicit operator Point(ShortPosition p)
+            => new(p.X, p.Y);
+        public static implicit operator ShortPosition(Point p)
+            => new(p.X, p.Y);
         private class ShortPositionSerializer : FieldSerializer<ShortPosition>
         {
             protected override ShortPosition _Read(BinaryReader br)
