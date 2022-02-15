@@ -237,7 +237,12 @@ namespace PlotMarker
                     where cell.Owner.Equals(name, StringComparison.Ordinal)
                     select cell).ToArray();
         }
-
+        public static Cell GetCurrentCell(this TSPlayer plr)
+        {
+            if(CurrentPlot.Cells.FirstOrDefault(c => c.IsVisiable && c.Contains(plr.TileX, plr.TileY)) is { } cell)
+                return cell;
+            return null;
+        }
         public static void ChangeOwner(Cell cell, UserAccount user)
         {
             cell.Owner = user.Name;

@@ -142,6 +142,10 @@ namespace FakeProvider
             ServerApi.Hooks.ServerLeave.Register(this, OnServerLeave);
 
             SignRedirector.SignRead += OnRequestSign;
+            SignRedirector.SignUpdate += OnUpdateSign;
+            ChestRedirector.ChestOpen += OnRequestChest;
+            ChestRedirector.ChestSyncActive += OnCloseChest;
+            ChestRedirector.ChestUpdateItem += OnUpdateChest;
 
             Commands.ChatCommands.AddRange(CommandList);
         }
