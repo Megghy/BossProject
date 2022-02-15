@@ -170,7 +170,7 @@ namespace FakeProvider
         #region 箱子牌子
         private static T GetTopEntity<T>(int x, int y, int targetPlrIndex = -1) where T : IFake
         {
-            if (FakeProviderAPI.Tile.Providers.Where(p => p.Enabled && (!(p.Observers?.Any() == true) || (p.Observers?.Contains(targetPlrIndex) ?? true))).ToArray() is { Length: > 0 } entities
+            if (FakeProviderAPI.Tile.Providers.Where(p => p != null && p.Enabled && (!(p.Observers?.Any() == true) || (p.Observers?.Contains(targetPlrIndex) ?? true))).ToArray() is { Length: > 0 } entities
                 && entities.MaxBy(s => s.Order)
                     .Entities
                     .FirstOrDefault(e => e is T result && result.X == x && result.Y == y) is { } result)
