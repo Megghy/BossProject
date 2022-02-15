@@ -1,12 +1,14 @@
 ﻿using BossFramework.BAttributes;
 using BossFramework.BModels;
 using BossFramework.DB;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TrProtocol;
 using TrProtocol.Models;
 using TrProtocol.Packets;
+using static BossFramework.BCore.SignRedirector;
 
 namespace BossFramework.BCore
 {
@@ -34,6 +36,16 @@ namespace BossFramework.BCore
         }
 
         #region 事件
+        public delegate void OnChestOpen(BEventArgs.ChestOpenEventArgs args);
+        public static event OnChestOpen ChestOpen;
+        public delegate void OnChestCreate(BEventArgs.ChestCreateEventArgs args);
+        public static event OnChestCreate ChestCreate;
+        public delegate void OnChestUpdateItem(BEventArgs.ChestUpdateItemEventArgs args);
+        public static event OnChestUpdateItem ChestUpdateItem;
+        public delegate void OnChestRemove(BEventArgs.ChestRemoveEventArgs args);
+        public static event OnChestRemove ChestRemove;
+        public delegate void OnChestSyncActive(BEventArgs.ChestSyncActiveEventArgs args);
+        public static event OnChestSyncActive ChestSyncActive;
         public static void OnGetName(BPlayer plr, ChestName packet)
         {
             if (FindChestFromPos(packet.Position.X, packet.Position.Y) is { } c)
@@ -43,74 +55,93 @@ namespace BossFramework.BCore
                 plr.SendPacket(packet);
             }
         }
-        public static void OnChestOpen(BPlayer plr, RequestChestOpen packet)
+        public static void OnRequestChestOpen(BPlayer plr, RequestChestOpen packet)
         {
-            if (FindChestFromPos(packet.Position.X, packet.Position.Y) is { } c)
-                c.PlayerOpenChest(plr);
-            else //不确定要不要生成, 要是有人一直代码发包就能一直创建了
-                CreateChest(packet.Position.X, packet.Position.Y, "", new ItemData[40], plr)
-                        .PlayerOpenChest(plr);
-            if (Terraria.WorldGen.IsChestRigged(packet.Position.X, packet.Position.Y))
+            var args = new BEventArgs.ChestOpenEventArgs(plr, packet.Position);
+            ChestOpen?.Invoke(args);
+            if (!args.Handled)
             {
-                Terraria.Wiring.SetCurrentUser(plr.Index);
-                Terraria.Wiring.HitSwitch(packet.Position.X, packet.Position.Y);
-                Terraria.Wiring.SetCurrentUser();
-                BUtils.SendPacketToAll(new HitSwitch()
+                if (FindChestFromPos(packet.Position.X, packet.Position.Y) is { } c)
+                    c.OpenChest(plr);
+                else //不确定要不要生成, 要是有人一直代码发包就能一直创建了
+                    CreateChest(packet.Position.X, packet.Position.Y, "", new ItemData[40], plr)
+                            .OpenChest(plr);
+                if (Terraria.WorldGen.IsChestRigged(packet.Position.X, packet.Position.Y))
                 {
-                    Position = packet.Position
-                }, plr);
+                    Terraria.Wiring.SetCurrentUser(plr.Index);
+                    Terraria.Wiring.HitSwitch(packet.Position.X, packet.Position.Y);
+                    Terraria.Wiring.SetCurrentUser();
+                    BUtils.SendPacketToAll(new HitSwitch()
+                    {
+                        Position = packet.Position
+                    }, plr);
+                }
             }
         }
         public static void OnUpdateChestItem(BPlayer plr, SyncChestItem packet)
         {
-            if (packet.ChestSlot is > -1 and < 8000 && plr.WatchingChest.HasValue)
+            var args = new BEventArgs.ChestUpdateItemEventArgs(plr, packet);
+            ChestUpdateItem?.Invoke(args);
+            if (!args.Handled)
             {
-                var chest = plr.WatchingChest.Value.chest;
+                if (packet.ChestSlot is > -1 and < 8000 && plr.WatchingChest.HasValue)
+                {
+                    var chest = plr.WatchingChest.Value.chest;
 
-                chest.Items[packet.ChestItemSlot] ??= new();
-                chest.Items[packet.ChestItemSlot].ItemID = packet.ItemType;
-                chest.Items[packet.ChestItemSlot].Prefix = packet.Prefix;
-                chest.Items[packet.ChestItemSlot].Stack = packet.Stack;
-                plr.WatchingChest.Value.chest.Items = chest.Items;
-                plr.WatchingChest.Value.chest.LastUpdateUser = (int)plr.Id;
+                    chest.Items[packet.ChestItemSlot] ??= new();
+                    chest.Items[packet.ChestItemSlot].ItemID = packet.ItemType;
+                    chest.Items[packet.ChestItemSlot].Prefix = packet.Prefix;
+                    chest.Items[packet.ChestItemSlot].Stack = packet.Stack;
+                    plr.WatchingChest.Value.chest.Items = chest.Items;
+                    plr.WatchingChest.Value.chest.LastUpdateUser = (int)plr.Id;
 
-                //同步给同样在看这个箱子的玩家
-                BInfo.OnlinePlayers.Where(p => p.WatchingChest?.chest == chest && p != plr)
-                    .BForEach(p =>
-                    {
-                        packet.ChestSlot = p.WatchingChest.Value.slot;
-                        p.SendPacket(packet);
-                    });
+                    //同步给同样在看这个箱子的玩家
+                    BInfo.OnlinePlayers.Where(p => p.WatchingChest?.chest == chest && p != plr)
+                        .BForEach(p =>
+                        {
+                            packet.ChestSlot = p.WatchingChest.Value.slot;
+                            p.SendPacket(packet);
+                        });
+                }
             }
         }
         public static void OnSyncActiveChest(BPlayer plr, SyncPlayerChest packet)
         {
-            Console.WriteLine($"{packet.ChestSlot}, {plr.WatchingChest?.slot} {plr.WatchingChest?.chest}");
-            if (packet.ChestSlot == -1 && plr.WatchingChest.HasValue) //-1时为退出箱子
+            var args = new BEventArgs.ChestSyncActiveEventArgs(plr, packet);
+            ChestSyncActive?.Invoke(args);
+            if (!args.Handled)
             {
-                var chest = plr.WatchingChest?.chest;
-                plr.WatchingChest = null;
-                if (chest.Name != packet.ChestName && !string.IsNullOrEmpty(packet.ChestName))
+                if (packet.ChestSlot == -1 && plr.WatchingChest.HasValue) //-1时为退出箱子
                 {
-                    chest.Name = packet.ChestName;
-                    plr.SendSuccessMsg($"已修改箱子名称为 {chest.Name}");
-                }
-                DBTools.SQL.Update<BChest>(chest)
-                    .Set(c => c.LastUpdateUser, chest.LastUpdateUser)
-                    .Set(c => c.Items, chest.Items)
-                    .Set(c => c.Name, chest.Name)
-                    .Set(c => c.UpdateTime, DateTime.Now)
-                    .ExecuteAffrows();
+                    var chest = plr.WatchingChest?.chest;
+                    plr.WatchingChest = null;
+                    if (chest.Name != packet.ChestName && !string.IsNullOrEmpty(packet.ChestName))
+                    {
+                        chest.Name = packet.ChestName;
+                        plr.SendSuccessMsg($"已修改箱子名称为 {chest.Name}");
+                    }
+                    DBTools.SQL.Update<BChest>(chest)
+                        .Set(c => c.LastUpdateUser, chest.LastUpdateUser)
+                        .Set(c => c.Items, chest.Items)
+                        .Set(c => c.Name, chest.Name)
+                        .Set(c => c.UpdateTime, DateTime.Now)
+                        .ExecuteAffrows();
 
-                BLog.DEBUG($"{plr} 关闭箱子 {chest}");
+                    BLog.DEBUG($"{plr} 关闭箱子 {chest}");
+                }
             }
         }
         public static void OnPlaceOrDestroyChest(BPlayer plr, ChestUpdates packet)
         {
             if (packet.Operation is 1 or 3 or 5 && FindChestFromPos(packet.Position.X, packet.Position.Y) is { } chest) //破坏箱子
             {
-                RemoveChest(chest);
-                BLog.DEBUG($"箱子数据移除, 位于 [{packet.Position.X} - {packet.Position.Y}], 来自 {plr}");
+                var args = new BEventArgs.ChestRemoveEventArgs(plr, packet.Position);
+                ChestRemove?.Invoke(args);
+                if (!args.Handled)
+                {
+                    RemoveChest(chest);
+                    BLog.DEBUG($"箱子数据移除, 位于 [{packet.Position.X} - {packet.Position.Y}], 来自 {plr}");
+                }
             }
         }
         #endregion
@@ -119,26 +150,33 @@ namespace BossFramework.BCore
             => _overrideChest.LastOrDefault(c => c.Contains(tileX, tileY)) ?? Chests.LastOrDefault(s => s.Contains(tileX, tileY));
         public static BChest CreateChest(int tileX, int tileY, string name, ItemData[] items = null, BPlayer plr = null)
         {
-            var i = new ItemData[40];
-            items?.CopyTo(i, 0);
-            var chest = new BChest()
+            var args = new BEventArgs.ChestCreateEventArgs(plr, new(tileX, tileY));
+            ChestCreate?.Invoke(args);
+            if (!args.Handled)
             {
-                X = (short)tileX,
-                Y = (short)tileY,
-                Items = i,
-                Owner = (int)(plr?.Id ?? -1),
-                LastUpdateUser = (int)(plr?.Id ?? -1),
-                WorldId = Terraria.Main.worldID,
-                Name = name
-            };
-            DBTools.Insert(chest);
-            Chests.Add(chest);
-            BLog.DEBUG($"创建箱子数据于 {chest.X} - {chest.Y} {(plr is null ? "" : $"来自 {plr}")}");
-            return chest;
+                var i = new ItemData[40];
+                items?.CopyTo(i, 0);
+                var chest = new BChest()
+                {
+                    X = (short)tileX,
+                    Y = (short)tileY,
+                    Items = i,
+                    Owner = (int)(plr?.Id ?? -1),
+                    LastUpdateUser = (int)(plr?.Id ?? -1),
+                    WorldId = Terraria.Main.worldID,
+                    Name = name
+                };
+                DBTools.Insert(chest);
+                Chests.Add(chest);
+                BLog.DEBUG($"创建箱子数据于 {chest.X} - {chest.Y} {(plr is null ? "" : $"来自 {plr}")}");
+                return chest;
+            }
+            else
+                return null;
         }
 
         #region 箱子操作
-        public static void PlayerOpenChest(this BChest chest, BPlayer target)
+        public static void OpenChest(this BChest chest, BPlayer target)
         {
             short slot = 7999;
             target.WatchingChest = new(slot, chest);
@@ -146,14 +184,6 @@ namespace BossFramework.BCore
             target.SendPackets(GetChestItemPakcets(chest, slot)); //同步物品
 
             target.SendPacket(GetSyncChestInfoPacket(chest, target, slot)); //同步箱子信息
-
-            target.SendPacket(new ChestName()
-            {
-                ChestSlot = slot,
-                Name = chest.Name,
-                NameLength = (byte)(chest.Name?.Length ?? 0),
-                Position = new(chest.X, chest.Y)
-            });
 
             BLog.DEBUG($"{target} 打开箱子 {chest}");
         }
@@ -247,6 +277,17 @@ namespace BossFramework.BCore
             var result = new List<BChest>();
             result.AddRange(Chests);
             result.AddRange(_overrideChest);
+            return result.ToArray();
+        }
+        public static BChest[] GetChestsInArea(int startX, int startY, int width, int height)
+        {
+            var result = new List<BChest>();
+            var rec = new Rectangle(startX, startY, width, height);
+            AllChest().ForEach((c, i) =>
+            {
+                if (!result.Exists(r => r.Contains(c.X, c.Y)) && rec.Contains(c.X, c.Y))
+                    result.Add(c);
+            });
             return result.ToArray();
         }
     }

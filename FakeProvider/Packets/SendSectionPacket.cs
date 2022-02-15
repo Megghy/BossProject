@@ -1,4 +1,5 @@
 ﻿#region Using
+using Microsoft.Xna.Framework;
 using System.IO.Compression;
 using Terraria;
 using Terraria.DataStructures;
@@ -453,6 +454,8 @@ namespace FakeProvider
             array4[num6] = b;
             writer.Write(array4, num6, num5 - num6);
             writer.Write(num);
+            var rec = new Rectangle(xStart, yStart, width, height);
+            
             for (int k = 0; k < (int)num; k++)
             {
                 Chest chest = Main.chest[(int)array[k]];

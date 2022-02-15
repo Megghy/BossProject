@@ -1,4 +1,7 @@
 ﻿#region Using
+using BossFramework;
+using BossFramework.BCore;
+using BossFramework.BModels;
 using Microsoft.Xna.Framework;
 using System.ComponentModel;
 using System.Reflection;
@@ -16,6 +19,8 @@ using Terraria.Net.Sockets;
 using Terraria.Social;
 using Terraria.Utilities;
 using TerrariaApi.Server;
+using TrProtocol;
+using TrProtocol.Packets;
 using TShockAPI;
 using static Terraria.GameContent.Creative.CreativePowers;
 #endregion
@@ -136,6 +141,8 @@ namespace FakeProvider
             ServerApi.Hooks.NetSendData.Register(this, OnSendData, Int32.MaxValue);
             ServerApi.Hooks.ServerLeave.Register(this, OnServerLeave);
 
+            SignRedirector.SignRead += OnRequestSign;
+
             Commands.ChatCommands.AddRange(CommandList);
         }
 
@@ -156,6 +163,85 @@ namespace FakeProvider
 
         #endregion
 
+        #region 箱子牌子
+        private static T GetTopEntity<T>(int x, int y, int targetPlrIndex = -1) where T : IFake
+        {
+            if (FakeProviderAPI.Tile.Providers.Where(p => p.Enabled && (!(p.Observers?.Any() == true) || (p.Observers?.Contains(targetPlrIndex) ?? true))).ToArray() is { Length: > 0 } entities
+                && entities.MaxBy(s => s.Order)
+                    .Entities
+                    .FirstOrDefault(e => e is T result && result.X == x && result.Y == y) is { } result)
+                return (T)result;
+            return default;
+        }
+        private static void OnUpdateSign(BEventArgs.SignUpdateEventArgs args)
+        {
+            if (GetTopEntity<FakeSign>(args.Position.X, args.Position.Y, args.Player.Index) is { })
+                args.Handled = true;
+        }
+        private static void OnRequestSign(BEventArgs.SignReadEventArgs args)
+        {
+            if(GetTopEntity<FakeSign>(args.Position.X, args.Position.Y, args.Player.Index) is { } sign)
+            {
+                args.Handled = true;
+                SignRedirector.SendSign(args.Player, (short)sign.x, (short)sign.y, sign.text);
+            }
+        }
+        private static void OnRequestChest(BEventArgs.ChestOpenEventArgs args)
+        {
+            if (GetTopEntity<FakeChest>(args.Position.X, args.Position.Y, args.Player.Index) is { } chest)
+            {
+                args.Handled = true;
+
+                List<Packet> list = new();
+                40.ForEach(i =>
+                {
+                    if (i < chest.item.Length)
+                    {
+                        chest.item[i] ??= new();
+                        var c = chest.item[i];
+                        list.Add(new SyncChestItem()
+                        {
+                            ChestSlot = 7998,
+                            ChestItemSlot = (byte)i,
+                            ItemType = (short)c.type,
+                            Prefix = c.prefix,
+                            Stack = (short)c.stack,
+                        });
+                    }
+                    else
+                        list.Add(new SyncChestItem()
+                        {
+                            ChestSlot = 7998,
+                            ChestItemSlot = (byte)i,
+                            ItemType = 0,
+                            Prefix = 0,
+                            Stack = 0,
+                        });
+                });
+
+                args.Player.SendPacket(new SyncPlayerChest()
+                {
+                    ChestSlot = 7998,
+                    ChestName = chest.name,
+                    ChestNameLength = (byte)(chest.name?.Length ?? 0),
+                    Position = new(chest.X, chest.Y)
+                });  //同步箱子信息
+
+                args.Player.SendPackets(list); //同步物品
+
+                args.Player.WatchingChest = null;
+            }
+        }
+        private static void OnCloseChest(BEventArgs.ChestSyncActiveEventArgs args)
+        {
+            if (GetTopEntity<FakeChest>(args.Position.X, args.Position.Y, args.Player.Index) is { } chest)
+                args.Handled = true;
+        }
+        private static void OnUpdateChest(BEventArgs.ChestUpdateItemEventArgs args)
+        {
+            args.Handled = args.Player.WatchingChest is null;
+        }
+        #endregion
         #region OnPreLoadWorld
 
         private static void OnPreLoadWorld(HandledEventArgs args)

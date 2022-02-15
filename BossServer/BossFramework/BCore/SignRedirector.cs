@@ -44,7 +44,7 @@ namespace BossFramework.BCore
                     RemoveSign(s);
                     invalidCount++;
                 });
-            if(invalidCount > 0)
+            if (invalidCount > 0)
                 BLog.Success($"移除 {invalidCount} 个无效标牌");
         }
         [SimpleTimer(Time = 5)]
@@ -60,7 +60,7 @@ namespace BossFramework.BCore
 
                     plr.LastWatchingSignIndex = (short)(plr.WatchingSign == null ? -1 : 0); //从第一个开始, 第零个一般是当前正在看的
                     var packets = new List<Packet>();
-                    
+
                     AllSign().Where(s => BUtils.IsPointInCircle(s.X, s.Y, plr.TileX, plr.TileY, BConfig.Instance.SignRefreshRadius))
                         .BForEach(s => packets.Add(new ReadSign()
                         {
@@ -77,20 +77,21 @@ namespace BossFramework.BCore
         }
 
         #region 事件
-
+        public delegate void OnSignRead(BEventArgs.SignReadEventArgs args);
+        public static event OnSignRead SignRead;
         public delegate void OnSignCreate(BEventArgs.SignCreateEventArgs args);
         public static event OnSignCreate SignCreate;
         public delegate void OnSignUpdate(BEventArgs.SignUpdateEventArgs args);
         public static event OnSignUpdate SignUpdate;
         public delegate void OnSignRemove(BEventArgs.SignRmoveEventArgs args);
         public static event OnSignRemove SignRemove;
-        public static void OnSyncSign(BPlayer plr, ReadSign sign)
+        internal static void OnSyncSign(BPlayer plr, ReadSign sign)
         {
             if (FindBSignFromPos(sign.Position.X, sign.Position.Y) is { } s)
             {
                 if (sign.Text != s.Text)
                 {
-                    var args = new BEventArgs.SignUpdateEventArgs(plr, s, sign.Text);
+                    var args = new BEventArgs.SignUpdateEventArgs(plr, sign);
                     SignUpdate?.Invoke(args);
                     if (!args.Handled)
                     {
@@ -120,14 +121,19 @@ namespace BossFramework.BCore
                 }
             }
         }
-        public static void OnOpenSign(BPlayer plr, RequestReadSign readSign)
+        internal static void OnOpenSign(BPlayer plr, RequestReadSign readSign)
         {
-            if (FindBSignFromPos(readSign.Position.X, readSign.Position.Y) is { } s)
-                s.SendTo(plr, true);
-            else //不确定要不要生成, 要是有人一直代码发包就能一直创建了
+            var args = new BEventArgs.SignReadEventArgs(plr, readSign.Position);
+            SignRead?.Invoke(args);
+            if (!args.Handled)
             {
-                CreateSign(readSign.Position.X, readSign.Position.Y, "", plr)
-                    .SendTo(plr, true);
+                if (FindBSignFromPos(readSign.Position.X, readSign.Position.Y) is { } s)
+                    s.SendSign(plr, true);
+                else //不确定要不要生成, 要是有人一直代码发包就能一直创建了
+                {
+                    CreateSign(readSign.Position.X, readSign.Position.Y, "", plr)
+                        .SendSign(plr, true);
+                }
             }
         }
         #endregion
@@ -161,25 +167,26 @@ namespace BossFramework.BCore
         }
         public static BSign FindBSignFromPos(int tileX, int tileY)
             => _overrideSign.LastOrDefault(s => s.Contains(tileX, tileY)) ?? Signs.LastOrDefault(s => s.Contains(tileX, tileY));
-        public static void SendTo(this BSign sign, BPlayer target, bool watch = false)
+        public static void SendSign(this BSign sign, BPlayer target, bool watch = false)
         {
             if (watch)
                 target.WatchingSign = new(target.LastWatchingSignIndex, sign);
-
-            var slot = target.GetNextSignSlot();
-
-            target.SendPacket(new ReadSign()
+            SendSign(target, (short)sign.X, (short)sign.Y, sign.Text, watch);
+        }
+        public static void SendSign(BPlayer plr, short x, short y, string text, bool watch = false)
+        {
+            plr.SendPacket(new ReadSign()
             {
-                PlayerSlot = target.Index,
-                Position = new((short)sign.X, (short)sign.Y),
-                Text = sign.Text,
-                SignSlot = slot,
+                PlayerSlot = plr.Index,
+                Position = new(x, y),
+                Text = text,
+                SignSlot = plr.GetNextSignSlot(),
                 Bit1 = new Terraria.BitsByte(!watch)
             });
         }
         public static bool RemoveSign(int x, int y)
         {
-            if(FindBSignFromPos(x, y) is { } sign)
+            if (FindBSignFromPos(x, y) is { } sign)
             {
                 RemoveSign(sign);
                 return true;
@@ -193,6 +200,17 @@ namespace BossFramework.BCore
             if (!DeregisterOverrideSign(sign))
                 if (Signs.Remove(sign))
                     DBTools.Delete(sign);
+        }
+        public static BSign[] GetSignsInArea(int startX, int startY, int width, int height)
+        {
+            var result = new List<BSign>();
+            var rec = new Rectangle(startX, startY, width, height);
+            AllSign().ForEach((s, i) =>
+            {
+                if (!result.Exists(r => r.Contains(s.X, s.Y)) && rec.Contains(s.X, s.Y))
+                    result.Add(s);
+            });
+            return result.ToArray();
         }
         #endregion
 

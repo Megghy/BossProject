@@ -58,7 +58,7 @@ namespace BossFramework.BModels
         public (short slot, BSign sign)? WatchingSign { get; internal set; }
         public short LastWatchingSignIndex { get; internal set; } = -1;
 
-        public (short slot, BChest chest)? WatchingChest { get; internal set; }
+        public (short slot, BChest chest)? WatchingChest { get; set; }
         public short LastSyncChestIndex { get; internal set; } = -1; 
 
         #region 小游戏部分
