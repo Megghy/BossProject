@@ -86,11 +86,9 @@ namespace PlotMarker
             //设置未隐藏的属地的信息
             PlotManager.CurrentPlot.Cells.Where(c => c.IsVisiable).ForEach(c =>
             {
+                c.RestoreCellTileData();
                 c.RegisteChestAndSign();
                 c.RestoreEntities();
-#if DEBUG
-                c.RestoreCellTileData();
-#endif
             });
         }
 
@@ -227,6 +225,7 @@ namespace PlotMarker
                             }
                         }
                         plot.Generate(clear);
+                        plot.Cells.Where(c =>c.IsVisiable).ForEach(c => c.RestoreCellTileData());
                     }
                     break;
                 case "信息":

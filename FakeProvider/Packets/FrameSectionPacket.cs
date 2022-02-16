@@ -41,16 +41,16 @@ namespace FakeProvider
         {
 
             byte[] data;
-            using (MemoryStream ms = new MemoryStream())
-            using (BinaryWriter bw = new BinaryWriter(ms))
+            using (MemoryStream ms = new())
+            using (BinaryWriter bw = new(ms))
             {
                 bw.BaseStream.Position = 2L;
                 bw.Write((byte)PacketTypes.TileFrameSection);
 
-                bw.Write((short)SX);
-                bw.Write((short)SY);
-                bw.Write((short)EX);
-                bw.Write((short)EY);
+                bw.Write(SX);
+                bw.Write(SY);
+                bw.Write(EX);
+                bw.Write(EY);
 
                 long position = bw.BaseStream.Position;
                 bw.BaseStream.Position = 0L;

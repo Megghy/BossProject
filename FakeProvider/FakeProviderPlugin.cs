@@ -170,11 +170,12 @@ namespace FakeProvider
         #region 箱子牌子
         private static T GetTopEntity<T>(int x, int y, int targetPlrIndex = -1) where T : IFake
         {
-            if (FakeProviderAPI.Tile.Providers.Where(p => p != null && p.Enabled && (!(p.Observers?.Any() == true) || (p.Observers?.Contains(targetPlrIndex) ?? true))).ToArray() is { Length: > 0 } entities
-                && entities.MaxBy(s => s.Order)
-                    .Entities
-                    .FirstOrDefault(e => e is T result && result.X == x && result.Y == y) is { } result)
-                return (T)result;
+            var providers = FakeProviderAPI.Tile.Providers.Where(p => p != null && p.Enabled && (!(p.Observers?.Any() == true) || (p.Observers?.Contains(targetPlrIndex) ?? true))).OrderBy(p => p.Order);
+            foreach (var p in providers)
+            {
+                if (p.Entities.FirstOrDefault(e => e is T result && result.X == x && result.Y == y) is { } result)
+                    return (T)result;
+            }
             return default;
         }
         private static void OnUpdateSign(BEventArgs.SignUpdateEventArgs args)
@@ -184,7 +185,7 @@ namespace FakeProvider
         }
         private static void OnRequestSign(BEventArgs.SignReadEventArgs args)
         {
-            if(GetTopEntity<FakeSign>(args.Position.X, args.Position.Y, args.Player.Index) is { } sign)
+            if (GetTopEntity<FakeSign>(args.Position.X, args.Position.Y, args.Player.Index) is { } sign)
             {
                 args.Handled = true;
                 SignRedirector.SendSign(args.Player, (short)sign.x, (short)sign.y, sign.text);
@@ -1319,7 +1320,7 @@ Custom valid : {ValidateWorldData(array, num)}";
             FakeProviderAPI.Tile.Initialize(VisibleWidth, VisibleHeight, 0, 0);
 
             FakeProviderAPI.World = FakeProviderAPI.CreateTileProvider(FakeProviderAPI.WorldProviderName, 0, 0,
-                maxTilesX, maxTilesY, Int32.MinValue + 1);
+                maxTilesX, maxTilesY, int.MinValue + 1);
 
             using (IDisposable previous = Main.tile as IDisposable)
                 Main.tile = FakeProviderAPI.World;

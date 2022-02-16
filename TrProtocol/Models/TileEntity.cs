@@ -51,6 +51,13 @@ namespace TrProtocol.Models
         public abstract void WriteExtraData(BinaryWriter writer);
         public abstract IProtocolTileEntity ReadExtraData(BinaryReader reader);
         protected abstract T ToTrTileEntityInternal();
-        public TileEntity ToTrTileEntity() => ToTrTileEntity();
+        public TileEntity ToTrTileEntity()
+        {
+            var result = ToTrTileEntityInternal();
+            result.type = (byte)EntityType;
+            result.Position = Position;
+            result.ID = ID;
+            return result;
+        }
     }
 }
