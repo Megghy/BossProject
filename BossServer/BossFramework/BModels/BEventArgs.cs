@@ -1,4 +1,5 @@
-﻿using TrProtocol;
+﻿using Microsoft.Xna.Framework;
+using TrProtocol;
 using TrProtocol.Packets;
 
 namespace BossFramework.BModels
@@ -6,6 +7,7 @@ namespace BossFramework.BModels
     public interface IEventArgs
     {
         public bool Handled { get; set; }
+        public BPlayer Player { get; }
     }
     public static class BEventArgs
     {
@@ -61,6 +63,109 @@ namespace BossFramework.BModels
             public PlayerHurtV2 Hurt { get; set; }
             public BPlayer Player { get; set; }
             public bool Handled { get; set; } = false;
+        }
+        public class SignReadEventArgs : IEventArgs
+        {
+            public SignReadEventArgs(BPlayer plr, Point position)
+            {
+                Player = plr;
+                Position = position;
+            }
+            public bool Handled { get; set; } = false;
+            public BPlayer Player { get; private set; }
+            public Point Position { get; private set; }
+        }
+        public class SignCreateEventArgs : IEventArgs
+        {
+            public SignCreateEventArgs(BPlayer plr, Point position)
+            {
+                Player = plr;
+                Position = position;
+            }
+            public bool Handled { get; set; } = false;
+            public BPlayer Player { get;private set; }
+            public Point Position { get;private set; }
+        }
+        public class SignUpdateEventArgs : IEventArgs
+        {
+            public SignUpdateEventArgs(BPlayer plr, ReadSign data)
+            {
+                Player = plr;
+                Data = data;
+            }
+            public bool Handled { get; set; } = false;
+            public BPlayer Player { get; private set; }
+            public ReadSign Data { get; private set; }
+            public Point Position => Data.Position;
+        }
+        public class SignRmoveEventArgs
+        {
+            public SignRmoveEventArgs(BPlayer plr, BSign sign)
+            {
+                Player = plr;
+                Sign = sign;
+            }
+            public bool Handled { get; set; } = false;
+            public BPlayer Player { get; private set; }
+            public BSign Sign { get; private set; }
+        }
+        public class ChestOpenEventArgs : IEventArgs
+        {
+            public ChestOpenEventArgs(BPlayer plr, Point position)
+            {
+                Player = plr;
+                Position = position;
+            }
+            public bool Handled { get; set; } = false;
+            public BPlayer Player { get; private set; }
+            public Point Position { get; private set; }
+        }
+        public class ChestCreateEventArgs : IEventArgs
+        {
+            public ChestCreateEventArgs(BPlayer plr, Point position)
+            {
+                Player = plr;
+                Position = position;
+            }
+            public bool Handled { get; set; } = false;
+            public BPlayer Player { get; private set; }
+            public Point Position { get; private set; }
+        }
+        public class ChestUpdateItemEventArgs : IEventArgs
+        {
+            public ChestUpdateItemEventArgs(BPlayer plr, SyncChestItem data)
+            {
+                Player = plr;
+                Data = data;
+            }
+            public bool Handled { get; set; } = false;
+            public BPlayer Player { get; private set; }
+            public SyncChestItem Data { get; private set; }
+        }
+        public class ChestRemoveEventArgs
+        {
+            public ChestRemoveEventArgs(BPlayer plr, Point position, BChest chest = null)
+            {
+                Player = plr;
+                Position = position;
+                Chest = chest;
+            }
+            public bool Handled { get; set; } = false;
+            public BPlayer Player { get; private set; }
+            public Point Position { get; private set; }
+            public BChest Chest { get; private set; }
+        }
+        public class ChestSyncActiveEventArgs
+        {
+            public ChestSyncActiveEventArgs(BPlayer plr, SyncPlayerChest data)
+            {
+                Player = plr;
+                Data = data;
+            }
+            public bool Handled { get; set; } = false;
+            public BPlayer Player { get; private set; }
+            public SyncPlayerChest Data { get; private set; }
+            public Point Position => Data.Position;
         }
     }
 }

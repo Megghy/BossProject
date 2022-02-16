@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using TerrariaApi.Server;
 using TShockAPI;
 
 namespace BossFramework.BCore
@@ -26,16 +27,26 @@ namespace BossFramework.BCore
                 Directory.CreateDirectory(ScriptCmdPath);
             try
             {
-                Assembly.GetExecutingAssembly()
-                    .GetTypes()
-                    .Where(t => t.BaseType == typeof(BaseCommand))
-                    .BForEach(t =>
+                var loaded = new List<Assembly>();
+                ServerApi.Plugins.Select(p => p.PluginAssembly)
+                .Where(a => a != null)
+                .BForEach(a =>
+                {
+                    if (!loaded.Contains(a))
                     {
-                        var tempCMD = (BaseCommand)Activator.CreateInstance(t)!;
-                        tempCMD.RegisterAllSubCommands();
-                        Cmds.Add(tempCMD);
-                        RegisteToTS(tempCMD);
-                    });
+                        a.GetTypes()
+                            .Where(t => t.BaseType == typeof(BaseCommand))
+                            .BForEach(t =>
+                            {
+                                var tempCMD = (BaseCommand)Activator.CreateInstance(t)!;
+                                tempCMD.RegisterAllSubCommands();
+                                Cmds.Add(tempCMD);
+                                RegisteToTS(tempCMD);
+                            });
+
+                        loaded.Add(a);
+                    }
+                });
 
                 //加载脚本命令文件
                 ScriptManager.LoadScripts<BaseCommand>(ScriptCmdPath)?

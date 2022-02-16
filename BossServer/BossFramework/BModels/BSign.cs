@@ -33,5 +33,8 @@ namespace BossFramework.BModels
 
         public bool Contains(int tileX, int tileY)
             => (X == tileX || X + 1 == tileX) && (Y == tileY || Y + 1 == tileY);
+
+        public override string ToString()
+            => $"{X} - {Y}: {Text}";
     }
 }

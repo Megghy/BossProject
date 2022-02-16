@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
+using TerrariaApi.Server;
 
 namespace BossFramework.BModules
 {
@@ -30,15 +31,25 @@ namespace BossFramework.BModules
                     });
                 time++;
             };
-            Assembly.GetExecutingAssembly()
-                .GetTypes()
-                .BForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-                    .Where(m => m.GetCustomAttributes(true).FirstOrDefault(a => a is SimpleTimerAttribute) != null)
-                        .BForEach(m =>
-                        {
-                            var attr = m.GetCustomAttributes(true).FirstOrDefault(a => a is SimpleTimerAttribute) as SimpleTimerAttribute;
-                            _timers.Add(m, attr);
-                        }));
+            var loaded = new List<Assembly>();
+            ServerApi.Plugins.Select(p => p.PluginAssembly)
+                .Where(a => a != null)
+                .BForEach(a =>
+                {
+                    if (!loaded.Contains(a))
+                    {
+                        a.GetTypes()
+                            .BForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+                            .Where(m => m.GetCustomAttributes(true).FirstOrDefault(a => a is SimpleTimerAttribute) != null)
+                            .BForEach(m =>
+                            {
+                                var attr = m.GetCustomAttributes(true).FirstOrDefault(a => a is SimpleTimerAttribute) as SimpleTimerAttribute;
+                                _timers.Add(m, attr);
+                            }));
+
+                        loaded.Add(a);
+                    }
+                });
             temp.Start();
             _timers.Where(timer => timer.Value.CallOnRegister).BForEach(timer => Task.Run(() => timer.Key.Invoke(null, null)));
         }

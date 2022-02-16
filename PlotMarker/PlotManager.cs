@@ -1,11 +1,22 @@
-﻿using BossFramework.DB;
+﻿using BossFramework;
+using BossFramework.DB;
+using Bssom.Serializer;
+using FakeProvider;
 using System.Data;
+using System.Linq;
 using Terraria;
+using TrProtocol.Models;
+using TrProtocol.Models.TileEntities;
 using TShockAPI;
 using TShockAPI.DB;
 
 namespace PlotMarker
 {
+    public record TempSavedEntityData
+    {
+        public TileEntityType Type { get; set; }
+        public byte[] EntityData { get; set; }
+    }
     internal static class PlotManager
     {
         public static List<Plot> Plots = new();
@@ -42,7 +53,8 @@ namespace PlotMarker
                 Y = y,
                 Width = width,
                 Height = height,
-                PlotStyle = style
+                PlotStyle = style,
+                Cells = new()
             };
             if (!DBTools.Exist<Plot>(p => p.Name == name && p.WorldId == worldid))
             {
@@ -97,14 +109,14 @@ namespace PlotMarker
             //跑完一圈依然没有能用的
             CurrentPlot.Cells.Where(c =>
                 {
-                    var plr = TShock.Players.FirstOrDefault(p => p.Name == c.Owner);
-                    if (plr is null || c.Contains(plr.TileX, plr.TileY))
+                    var plr = TShock.Players.FirstOrDefault(p => p?.Name == c.Owner);
+                    if (c.IsVisiable && (plr is null || c.Contains(plr.TileX, plr.TileY)))
                         return true;
                     return false;
                 })
                 .ForEach(c =>
                 {
-                    c.ClearTiles(false);
+                    c.Invisiable(false);
                 });
             TileHelper.ResetSection(CurrentPlot.X, CurrentPlot.Y, CurrentPlot.Width, CurrentPlot.Height);
             if (isFirstRun)
@@ -112,11 +124,13 @@ namespace PlotMarker
             else
                 return null;
         }
-        
+
         #endregion
 
-        public static void CreateNewCell(TSPlayer player)
+        public static Cell CreateNewCell(TSPlayer player)
         {
+            if (CurrentPlot is null)
+                return null;
             try
             {
                 var cell = new Cell()
@@ -124,32 +138,34 @@ namespace PlotMarker
                     CreateTime = DateTime.Now,
                     PlotId = CurrentPlot.Id,
                     AllowedIDs = new(),
-                    LastPositionIndex = -1
+                    LastPositionIndex = -1,
+                    Owner = player.Name,
+                    GetTime = DateTime.Now
                 };
-                Apply(player, cell);
-                player.Teleport(cell.Center.X * 16, cell.Center.Y * 16);
+
+                cell.TileData = new StructTile[CurrentPlot.CellWidth, CurrentPlot.CellHeight];
+                cell.Entities = new List<IProtocolTileEntity>();
+
+                cell.SerializedEntitiesData = cell.GetSerializedEntitiesData();
+                cell.SerializedTileData = cell.GetSerializedTileData();
+
+                CurrentPlot.Cells.Add(cell);
+
+                DBTools.Insert(cell);
+
+                player.SendSuccessMessage("系统已经分配给你一块地.");
+
+                return cell;
             }
             catch (Exception ex)
             {
                 TShock.Log.Error(ex.ToString());
                 player.SendErrorMessage("系统错误, 获取属地失败. 请联系管理.");
             }
+            return null;
         }
 
         #region 子属地操作
-
-        private static void Apply(TSPlayer player, Cell cell)
-        {
-            cell.Owner = player.Name;
-            cell.GetTime = DateTime.Now;
-
-            DBTools.SQL.Update<Cell>(cell)
-                .Set(c => c.Owner)
-                .Set(c => c.GetTime)
-                .ExecuteAffrows();
-
-            player.SendSuccessMessage("系统已经分配给你一块地.");
-        }
 
         public static bool AddCellUser(Cell cell, UserAccount user)
         {
@@ -195,23 +211,8 @@ namespace PlotMarker
         {
             if (cell.IsVisiable)
                 cell.Invisiable();
-            cell.Owner = string.Empty;
-            cell.GetTime = default;
-            cell.LastAccess = default;
-            cell.AllowedIDs.Clear();
-            cell.UsingCellPosition.Clear();
-            cell.LastPositionIndex = -1;
-            Array.Clear(cell.TileData);
-            cell.SerializedTileData = null;
-            cell.ClearTiles();
-
-            DBTools.SQL.Update<Cell>(cell)
-                .Set(c => c.Owner)
-                .Set(c => c.GetTime)
-                .Set(c => c.LastAccess)
-                .Set(c => c.AllowedIDs)
-                .Set(c => c.SerializedTileData)
-                .ExecuteAffrows();
+            CurrentPlot.Cells.Remove(cell);
+            DBTools.Delete(cell);
         }
         #endregion
 
@@ -236,7 +237,12 @@ namespace PlotMarker
                     where cell.Owner.Equals(name, StringComparison.Ordinal)
                     select cell).ToArray();
         }
-
+        public static Cell GetCurrentCell(this TSPlayer plr)
+        {
+            if(CurrentPlot.Cells.FirstOrDefault(c => c.IsVisiable && c.Contains(plr.TileX, plr.TileY)) is { } cell)
+                return cell;
+            return null;
+        }
         public static void ChangeOwner(Cell cell, UserAccount user)
         {
             cell.Owner = user.Name;

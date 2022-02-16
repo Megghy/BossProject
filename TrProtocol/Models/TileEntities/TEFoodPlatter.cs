@@ -6,7 +6,7 @@ namespace TrProtocol.Models.TileEntities
     {
         public ProtocolTEFoodPlatter(TEFoodPlatter entity) : base(entity)
         {
-            Item = entity.item;
+            Item = entity?.item ?? new();
         }
 
         public override void WriteExtraData(BinaryWriter writer)

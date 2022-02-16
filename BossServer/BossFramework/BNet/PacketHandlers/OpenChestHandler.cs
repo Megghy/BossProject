@@ -24,7 +24,7 @@ namespace BossFramework.BNet.PacketHandlers
             };
             GetDataHandlers.ChestOpen.Invoke(BPlugin.Instance, args);
             if (!args.Handled)
-                BCore.ChestRedirector.OnChestOpen(plr, packet);
+                BCore.ChestRedirector.OnRequestChestOpen(plr, packet);
             return true;
         }
 

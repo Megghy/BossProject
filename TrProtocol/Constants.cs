@@ -1,7 +1,23 @@
-﻿namespace TrProtocol
+﻿using System.Collections.Generic;
+using TrProtocol.Models.TileEntities;
+using TrProtocol.Models;
+using System;
+
+namespace TrProtocol
 {
     public static class Constants
     {
+        public static readonly IReadOnlyDictionary<TileEntityType, Type> tileEntityDict = new Dictionary<TileEntityType, Type>()
+        {
+            { TileEntityType.TETrainingDummy, typeof(ProtocolTETrainingDummy) },
+            { TileEntityType.TEItemFrame, typeof(ProtocolTEItemFrame) },
+            { TileEntityType.TELogicSensor, typeof(ProtocolTELogicSensor) },
+            { TileEntityType.TEDisplayDoll, typeof(ProtocolTEDisplayDoll) },
+            { TileEntityType.TEWeaponsRack, typeof(ProtocolTEWeaponsRack) },
+            { TileEntityType.TEHatRack, typeof(ProtocolTEHatRack) },
+            { TileEntityType.TEFoodPlatter, typeof(ProtocolTEFoodPlatter) },
+            { TileEntityType.TETeleportationPylon, typeof(ProtocolTETeleportationPylon) }
+        };
         [Bound("TerrariaXD230", 5044)]
         [Bound("Terraria230", 5044)]
         [Bound("Terraria233", 5087)]

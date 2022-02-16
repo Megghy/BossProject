@@ -10,7 +10,7 @@ namespace PlotMarker
     public sealed class PlotMarker : TerrariaPlugin
     {
         public override string Name => GetType().Name;
-        public override string Author => "MR.H";
+        public override string Author => "MR.H, Megghy修改";
         public override string Description => "Marks plots for players and manages them.";
         public override Version Version => Assembly.GetExecutingAssembly().GetName().Version;
 
@@ -25,6 +25,7 @@ namespace PlotMarker
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreet);
             ServerApi.Hooks.ServerLeave.Register(this, OnLeave);
             ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInitialize);
+            ServerApi.Hooks.WorldSave.Register(this, (args) => { Task.Run(() => PlotManager.CurrentPlot?.Cells.Where(c => c.IsVisiable).ForEach(c => c.SaveCellData())); });
         }
 
         protected override void Dispose(bool disposing)
@@ -49,7 +50,8 @@ namespace PlotMarker
             var cells = PlotManager.GetCellsOfPlayer(name);
             foreach (var c in cells)
             {
-                PlotManager.UpdateLastAccess(c);
+                if (c.IsVisiable)
+                    c.SaveCellData();
             }
         }
 
@@ -75,17 +77,21 @@ namespace PlotMarker
                 AllowServer = false,
                 HelpText = "管理玩家属地区域, 只限管理."
             });
-
-            Commands.ChatCommands.Add(new Command("pm.player.return", ReturnCell, "mycell", "返回属地")
-            {
-                AllowServer = false,
-                HelpText = "返回到玩家属地."
-            });
         }
 
         private static void OnPostInitialize(EventArgs args)
         {
             PlotManager.Reload();
+
+            //设置未隐藏的属地的信息
+            PlotManager.CurrentPlot.Cells.Where(c => c.IsVisiable).ForEach(c =>
+            {
+                c.RegisteChestAndSign();
+                c.RestoreEntities();
+#if DEBUG
+                c.RestoreCellTileData();
+#endif
+            });
         }
 
         private static void OnGreet(GreetPlayerEventArgs args)
@@ -246,7 +252,7 @@ namespace PlotMarker
                         var list = new List<string>
                         {
                             $" * 区域信息: {{{plot.X}, {plot.Y}, {plot.Width}, {plot.Height}}}",
-                            $" * 格子信息: w={plot.CellWidth}, h={plot.CellHeight}, cur={plot.CellsPosition.Length}, used={plot.Cells.Count()}",
+                            $" * 格子信息: w={plot.CellWidth}, h={plot.CellHeight}, cur={plot.CellsPosition.Count}, used={plot.Cells.Count()}",
                             $" * 创建者名: {plot.Owner}"
                         };
                         PaginationTools.SendPage(args.Player, pageNumber, list,
@@ -340,7 +346,7 @@ namespace PlotMarker
                     {
                         if (args.Parameters.Count != 1)
                         {
-                            args.Player.SendErrorMessage("语法无效. 正确语法: {0}", TShock.Utils.ColorTag("/属地 自动获取", Color.Cyan));
+                            args.Player.SendErrorMessage("语法无效. 正确语法: {0}", TShock.Utils.ColorTag("/属地 获取", Color.Cyan));
                             return;
                         }
 
@@ -352,7 +358,11 @@ namespace PlotMarker
                             return;
                         }
 
-                        PlotManager.CreateNewCell(args.Player);
+                        if (PlotManager.CreateNewCell(args.Player) is { } newCell)
+                        {
+                            newCell.ShowCell(args.Player);
+                            args.Player.Teleport(newCell.Center.X * 16, newCell.Center.Y * 16);
+                        }
                     }
                     break;
                 case "允许":
@@ -461,39 +471,53 @@ namespace PlotMarker
                         }
                     }
                     break;
+                case "save":
+                    if (args.Player.HasPermission("pm.player.save") && PlotManager.CurrentPlot.Cells.FirstOrDefault(c => c.Owner == args.Player.Name) is { } saveCell)
+                        saveCell.SaveCellData();
+                    break;
                 case "goto":
                 case "前往":
-                    Cell[] cells = args.Player.HasPermission("pm.player.gotoeverywhere")
+                    {
+                        Cell[] cells = args.Player.HasPermission("pm.admin.gotoeverywhere")
                         ? PlotManager.CurrentPlot.Cells.ToArray()
                         : PlotManager.GetCellsOfPlayer(args.Player.Name);
-                    if (cells.Any())
-                    {
-                        if (args.Parameters.Count > 1)
+                        if (cells.Any())
                         {
-                            if (int.TryParse(args.Parameters[1], out var cellIndex))
+                            if (args.Parameters.Count > 1)
                             {
-                                if (cells.FirstOrDefault(c => c.Id == cellIndex) is { } cell)
+                                if (int.TryParse(args.Parameters[1], out var cellIndex))
                                 {
-                                    GotoCell(args.Player, cell);
+                                    if (cells.FirstOrDefault(c => c.Id == cellIndex) is { } cell)
+                                    {
+                                        GotoCell(args.Player, cell);
+                                    }
+                                    else
+                                        args.Player.SendErrorMessage($"未找到Id为 {cellIndex} 的属地, 或者它不属于你");
                                 }
                                 else
-                                    args.Player.SendErrorMessage($"未找到Id为 {cellIndex} 的属地, 或者它不属于你");
+                                    args.Player.SendErrorMessage($"无效的属地编号: {args.Parameters[1]}");
                             }
                             else
-                                args.Player.SendErrorMessage($"无效的属地编号: {args.Parameters[1]}");
+                                GotoCell(args.Player, cells.First());
                         }
                         else
-                            GotoCell(args.Player, cells.First());
+                            args.Player.SendInfoMessage($"未找到任何, 请输入 {"/mp get".Color("7FDFDE")} 来获取属地");
+                        void GotoCell(TSPlayer plr, Cell cell)
+                        {
+                            plr.SendInfoMessage($"正在前往属地 [{cell.Id}]");
+                            if (!cell.IsVisiable && !cell.ShowCell(plr))
+                                return;
+                            plr.Teleport(cell.AbsloteSpawnX * 16, (cell.AbsloteSpawnY - 3) * 16);
+                            plr.SendSuccessMessage($"已传送至属地 [{cell.Id}]");
+                        }
                     }
-                    else
-                        args.Player.SendInfoMessage($"未找到任何, 请输入 {"/mp get".Color("7FDFDE")} 来获取属地");
-                    void GotoCell(TSPlayer plr, Cell cell)
+                    break;
+                case "list":
+                case "列表":
                     {
-                        plr.SendInfoMessage($"正在前往属地 [{cell.Id}]");
-                        if (!cell.IsVisiable && !cell.ShowCell(plr))
-                            return;
-                        plr.Teleport(cell.AbsloteSpawnX, cell.AbsloteSpawnY);
-                        plr.SendSuccessMessage($"已传送至属地 [{cell.Id}]");
+                        args.Player.SendInfoMessage(PlotManager.GetCellsOfPlayer(args.Player.Name) is { Length: > 0 } listCell
+                            ? string.Join("\r\n", listCell.Select(c => c.GetInfo()))
+                            : "你尚未获取属地");
                     }
                     break;
                 case "帮助":
@@ -578,6 +602,24 @@ namespace PlotMarker
 
             switch (cmd)
             {
+                case "list":
+                    {
+                        if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out var pageNumber))
+                        {
+                            return;
+                        }
+
+                        var cells = PlotManager.CurrentPlot.Cells.Select(p => p.GetInfo());
+
+                        PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(cells),
+                            new PaginationTools.Settings
+                            {
+                                HeaderFormat = "子属地列表 ({0}/{1}):",
+                                FooterFormat = "键入 {0}pm list {{0}} 以获取下一页列表.".SFormat(Commands.Specifier),
+                                NothingToDisplayString = "当前没有子属地."
+                            });
+                    }
+                    break;
                 case "fuck":
                 case "艹":
                     {
@@ -586,48 +628,146 @@ namespace PlotMarker
                             args.Player.SendErrorMessage("无权限执行.");
                             return;
                         }
-                        if (args.Parameters.Count != 1)
+                        if (args.Parameters.Count > 1)
                         {
-                            args.Player.SendErrorMessage("语法无效. 正确语法: /mp fuck");
-                            return;
+                            if (int.TryParse(args.Parameters[1], out var cellIndex))
+                            {
+                                if (PlotManager.CurrentPlot.Cells.FirstOrDefault(c => c.Id == cellIndex) is { } tempCellInfo)
+                                {
+                                    InternalFuckCell(args.Player, tempCellInfo);
+                                }
+                                else
+                                    args.Player.SendErrorMessage($"未找到id为 {cellIndex} 的子区域");
+                            }
+                            else
+                                args.Player.SendErrorMessage("语法无效. 正确语法: /gm fuck <指定区域ID>");
                         }
-                        info.Status = PlayerInfo.PointStatus.Delegate;
-                        info.OnGetPoint = InternalFuckCell;
-                        args.Player.SendErrorMessage("在属地内敲击或放置任意物块, 来艹无聊的东西.");
-
-                        void InternalFuckCell(int tileX, int tileY, TSPlayer player)
+                        else
                         {
-                            var cell = PlotManager.GetCellByPosition(tileX, tileY);
-                            if (cell != null)
+                            if (args.Player.GetCurrentCell() is { } tempCellInfo2)
+                                InternalFuckCell(args.Player, tempCellInfo2);
+                            else
+                                args.Player.SendErrorMessage("你未处于某个子属地内");
+                        }
+
+                        void InternalFuckCell(TSPlayer player, Cell cell)
+                        {
+                            if (args.Parameters.Exists(p => p.ToLower() == "true"))
                             {
                                 PlotManager.FuckCell(cell);
                                 player.SendSuccessMessage("愉悦, 艹完了.");
-                                return;
                             }
-                            player.SendErrorMessage("选择点不在属地内.");
+                            else
+                            {
+                                player.SendInfoMessage($"你确定要清空 {cell.Owner} 的属地 [{cell.Id}] 吗? 确定要清空请输入/cm hide {cell.Id} true");
+                            }
                         }
+                    }
+                    break;
+                case "del":
+                    {
+                        if (!args.Player.HasPermission("pm.admin.fuckcell"))
+                        {
+                            args.Player.SendErrorMessage("无权限执行.");
+                            return;
+                        }
+                        if (args.Parameters.Count > 1)
+                        {
+                            if (int.TryParse(args.Parameters[1], out var cellIndex))
+                            {
+                                if (PlotManager.CurrentPlot.Cells.FirstOrDefault(c => c.Id == cellIndex) is { } tempCellInfo)
+                                {
+                                    InternalDelCell(args.Player, tempCellInfo);
+                                }
+                                else
+                                    args.Player.SendErrorMessage($"未找到id为 {cellIndex} 的子区域");
+                            }
+                            else
+                                args.Player.SendErrorMessage("语法无效. 正确语法: /gm del <指定区域ID>");
+                        }
+                        else
+                        {
+                            if (args.Player.GetCurrentCell() is { } tempCellInfo2)
+                                InternalDelCell(args.Player, tempCellInfo2);
+                            else
+                                args.Player.SendErrorMessage("你未处于某个子属地内");
+                        }
+
+                        void InternalDelCell(TSPlayer player, Cell cell)
+                        {
+                            if (args.Parameters.Exists(p => p.ToLower() == "true"))
+                            {
+                                PlotManager.FuckCell(cell);
+                                player.SendSuccessMessage("指定属地已被删除");
+                            }
+                            else
+                            {
+                                player.SendInfoMessage($"你确定要删除 {cell.Owner} 的属地 [{cell.Id}] 吗? 确定要删除请输入/cm del {cell.Id} true");
+                            }
+                        }
+                    }
+                    break;
+                case "hide":
+                case "隐藏":
+                    {
+                        Cell[] cells = args.Player.HasPermission("pm.admin.hide")
+                        ? PlotManager.CurrentPlot.Cells.ToArray()
+                        : PlotManager.GetCellsOfPlayer(args.Player.Name);
+                        if (cells.Any())
+                        {
+                            if (args.Parameters.Count > 1)
+                            {
+                                if (int.TryParse(args.Parameters[1], out var cellIndex))
+                                {
+                                    if (cells.FirstOrDefault(c => c.Id == cellIndex) is { } cell)
+                                    {
+                                        HideCell(args.Player, cell);
+                                    }
+                                    else
+                                        args.Player.SendErrorMessage($"未找到Id为 {cellIndex} 的属地, 或者它不属于你");
+                                }
+                                else
+                                    args.Player.SendErrorMessage($"无效的属地编号: {args.Parameters[1]}");
+                            }
+                            else
+                                HideCell(args.Player, cells.First());
+                        }
+                        else
+                            args.Player.SendInfoMessage($"未找到任何, 请输入 {"/mp get".Color("7FDFDE")} 来获取属地");
+                    }
+                    void HideCell(TSPlayer plr, Cell cell)
+                    {
+                        if (cell.IsVisiable)
+                        {
+                            cell.Invisiable();
+                            args.Player.SendSuccessMessage($"已隐藏属地 [{cell.Id}]");
+                        }
+                        else
+                            args.Player.SendInfoMessage($"属地 [{cell.Id}] 未处于显示状态");
                     }
                     break;
                 case "info":
                     {
-                        if (args.Parameters.Count != 1)
+                        if(args.Parameters.Count > 1)
                         {
-                            args.Player.SendErrorMessage("语法无效. 正确语法: /gm get");
-                            return;
-                        }
-                        info.Status = PlayerInfo.PointStatus.Delegate;
-                        info.OnGetPoint = InternalCellInfo;
-                        args.Player.SendInfoMessage("在属地内敲击或放置任意物块, 来查看属地信息.");
-
-                        void InternalCellInfo(int tileX, int tileY, TSPlayer player)
-                        {
-                            var cell = PlotManager.GetCellByPosition(tileX, tileY);
-                            if (cell != null)
+                            if(int.TryParse(args.Parameters[1], out var cellIndex))
                             {
-                                player.SendInfoMessage(cell.GetInfo());
-                                return;
-                            }
-                            player.SendErrorMessage("选择点未生成属地.");
+                                if(PlotManager.CurrentPlot.Cells.FirstOrDefault(c => c.Id == cellIndex) is { } tempCellInfo)
+                                {
+                                    args.Player.SendInfoMessage(tempCellInfo.GetInfo());
+                                }
+                                else
+                                    args.Player.SendErrorMessage($"未找到id为 {cellIndex} 的子区域");
+                            }    
+                            else
+                                args.Player.SendErrorMessage("语法无效. 正确语法: /gm info <指定区域ID>");
+                        }
+                        else
+                        {
+                            if (args.Player.GetCurrentCell() is { } tempCellInfo2)
+                                args.Player.SendInfoMessage(tempCellInfo2.GetInfo());
+                            else
+                                args.Player.SendErrorMessage("你未处于某个子属地内");
                         }
                     }
                     break;
@@ -682,9 +822,11 @@ namespace PlotMarker
                         }
                         var list = new List<string>
                         {
-                            "info - 获取选中点区域信息",
-                            "fuck - 重置选中点区域",
-                            "chown - 更改选中点区域所有者(未完成)",
+                            "info <id> - 获取指定区域信息, 未填写id则默认为玩家所处属地",
+                            "fuck <id> - 重置指定区域, 未填写id则默认为玩家所处属地",
+                            "chown <id> - 更改指定区域所有者(未完成)",
+                            "del <id> - 删除指定区域, 未填写id则默认为玩家所处属地",
+                            "del <id> - 隐藏指定区域, 未填写id则默认为玩家所处属地",
                             "help [页码] - 获取帮助"
                         };
                         PaginationTools.SendPage(args.Player, pageNumber, list,
@@ -702,26 +844,6 @@ namespace PlotMarker
                             TShock.Utils.ColorTag("/cm help", Color.Cyan));
                     }
                     break;
-            }
-        }
-
-        private static void ReturnCell(CommandArgs args)
-        {
-            var count = PlotManager.GetTotalCells(args.Player.Account.Name);
-            if (count == 1)
-            {
-                var cell = PlotManager.GetOnlyCellOfPlayer(args.Player.Name);
-                if (args.Player.Teleport(cell.Center.X * 16, cell.Center.Y * 16))
-                    args.Player.SendSuccessMessage("已经传送到你的属地.");
-
-            }
-            else if (count > 1)
-            {
-                args.Player.SendErrorMessage("你当前有多个属地.");
-            }
-            else if (count <= 0)
-            {
-                args.Player.SendErrorMessage("你目前没有属地.");
             }
         }
 
@@ -753,7 +875,7 @@ namespace PlotMarker
             {
                 return false;
             }
-            
+
             if (plot.FindCell(tileX, tileY) is { } cell)
             {
                 if (string.Equals(cell.Owner, player.Name, StringComparison.Ordinal)

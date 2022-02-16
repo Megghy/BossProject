@@ -7,8 +7,8 @@ namespace TrProtocol.Models.TileEntities
     {
         public ProtocolTEDisplayDoll(TEDisplayDoll entity) : base(entity)
         {
-            Dyes = entity._dyes.Select(i => ItemData.Get(i)).ToArray();
-            Items = entity._items.Select(i => ItemData.Get(i)).ToArray();
+            Dyes = entity?._dyes.Select(i => ItemData.Get(i)).ToArray() ?? new ItemData[8];
+            Items = entity?._items.Select(i => ItemData.Get(i)).ToArray() ?? new ItemData[8];
         }
         protected override TEDisplayDoll ToTrTileEntityInternal()
         {

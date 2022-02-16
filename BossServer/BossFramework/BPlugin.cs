@@ -1,13 +1,11 @@
 ﻿using BossFramework.BAttributes;
-using BossFramework.BModels;
+using Bssom.Serializer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
-using TrProtocol.Models;
-using TrProtocol.Packets;
 
 namespace BossFramework
 {
@@ -29,19 +27,31 @@ namespace BossFramework
         #region 初始化
         public override void Initialize()
         {
+            BssomSerializer.Serialize(this);
             AutoInit();
         }
         private void AutoInit()
         {
             var auto = new Dictionary<MethodInfo, AutoInitAttribute>();
-            Assembly.GetExecutingAssembly()
-                        .GetTypes()
-                        .BForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-                        .BForEach(m =>
-                        {
-                            if (m.GetCustomAttribute<AutoInitAttribute>() is { } attr)
-                                auto.Add(m, attr);
-                        }));
+            var loaded = new List<Assembly>();
+            ServerApi.Plugins.Select(p => p.PluginAssembly)
+                .Where(a => a != null)
+                .BForEach(a =>
+                {
+                    if (!loaded.Contains(a))
+                    {
+                        a.GetTypes()
+                            .BForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+                            .BForEach(m =>
+                            {
+                                if (m.GetCustomAttribute<AutoInitAttribute>() is { } attr)
+                                    auto.Add(m, attr);
+                            }));
+
+                        loaded.Add(a);
+                    }
+                });
+
             auto.OrderBy(a => a.Value.Order).BForEach(kv =>
             {
                 try

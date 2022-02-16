@@ -22,7 +22,7 @@ namespace FakeProvider
         public int Layer { get; private set; }
         public bool Enabled { get; private set; } = false;
         public HashSet<int> Observers { get; private set; }
-        private List<IFake> _Entities = new List<IFake>();
+        private List<IFake> _Entities = new();
         public ReadOnlyCollection<IFake> Entities => new ReadOnlyCollection<IFake>(_Entities.ToList());
         private object Locker = new object();
 
@@ -689,7 +689,8 @@ namespace FakeProvider
 
         private bool ApplyEntity(IFake Entity)
         {
-            if (Entity is FakeSign)
+            //牌子箱子获取已重定向
+            /*if (Entity is FakeSign sign)
             {
                 Entity.X = ProviderCollection.OffsetX + this.X + Entity.RelativeX;
                 Entity.Y = ProviderCollection.OffsetY + this.Y + Entity.RelativeY;
@@ -704,13 +705,13 @@ namespace FakeProvider
                     if (!applied && Main.sign[i] == null)
                     {
                         applied = true;
-                        Main.sign[i] = (FakeSign)Entity;
+                        Main.sign[i] = sign;
                         Entity.Index = i;
                     }
                 }
                 return applied;
             }
-            else if (Entity is FakeChest)
+            else if (Entity is FakeChest chest)
             {
                 Entity.X = ProviderCollection.OffsetX + this.X + Entity.RelativeX;
                 Entity.Y = ProviderCollection.OffsetY + this.Y + Entity.RelativeY;
@@ -725,24 +726,24 @@ namespace FakeProvider
                     if (!applied && Main.chest[i] == null)
                     {
                         applied = true;
-                        Main.chest[i] = (FakeChest)Entity;
+                        Main.chest[i] = chest;
                         Entity.Index = i;
                     }
                 }
                 return applied;
             }
-            else if (Entity is TileEntity)
+            else */if (Entity is TileEntity tileEntity)
             {
-                Point16 position = new Point16(Entity.X, Entity.Y);
+                Point16 position = new(Entity.X, Entity.Y);
                 if (TileEntity.ByPosition.TryGetValue(position, out TileEntity entity)
                         && entity == Entity)
                     TileEntity.ByPosition.Remove(position);
                 Entity.X = ProviderCollection.OffsetX + this.X + Entity.RelativeX;
                 Entity.Y = ProviderCollection.OffsetY + this.Y + Entity.RelativeY;
-                TileEntity.ByPosition[new Point16(Entity.X, Entity.Y)] = (TileEntity)Entity;
+                TileEntity.ByPosition[new Point16(Entity.X, Entity.Y)] = tileEntity;
                 if (Entity.Index < 0)
                     Entity.Index = TileEntity.AssignNewID();
-                TileEntity.ByID[Entity.Index] = (TileEntity)Entity;
+                TileEntity.ByID[Entity.Index] = tileEntity;
                 return true;
             }
             else
@@ -754,7 +755,7 @@ namespace FakeProvider
 
         private void HideEntity(IFake Entity)
         {
-            if (Entity is Sign)
+            /*if (Entity is Sign)
             {
                 if (Entity.Index >= 0 && Main.sign[Entity.Index] == Entity)
                     Main.sign[Entity.Index] = null;
@@ -764,7 +765,7 @@ namespace FakeProvider
                 if (Entity.Index >= 0 && Main.chest[Entity.Index] == Entity)
                     Main.chest[Entity.Index] = null;
             }
-            else if (Entity is TileEntity entity)
+            else */if (Entity is TileEntity entity)
             {
                 TileEntity.ByID.Remove(Entity.Index);
                 if (Entity.Index >= 0

@@ -9,21 +9,10 @@ namespace TrProtocol.Models
     [Serializer(typeof(TileEntitySerializer))]
     public interface IProtocolTileEntity
     {
-        public static readonly IReadOnlyDictionary<TileEntityType, Type> tileEntityDict = new Dictionary<TileEntityType, Type>()
-        {
-            { TileEntityType.TETrainingDummy, typeof(ProtocolTETrainingDummy) },
-            { TileEntityType.TEItemFrame, typeof(ProtocolTEItemFrame) },
-            { TileEntityType.TELogicSensor, typeof(ProtocolTELogicSensor) },
-            { TileEntityType.TEDisplayDoll, typeof(ProtocolTEDisplayDoll) },
-            { TileEntityType.TEWeaponsRack, typeof(ProtocolTEWeaponsRack) },
-            { TileEntityType.TEHatRack, typeof(ProtocolTEHatRack) },
-            { TileEntityType.TEFoodPlatter, typeof(ProtocolTEFoodPlatter) },
-            { TileEntityType.TETeleportationPylon, typeof(ProtocolTETeleportationPylon) }
-        };
         public static IProtocolTileEntity Read(BinaryReader br)
         {
             var type = (TileEntityType)br.ReadByte();
-            if (tileEntityDict.TryGetValue(type, out var t))
+            if (Constants.tileEntityDict.TryGetValue(type, out var t))
             {
                 var entity = Activator.CreateInstance(t) as IProtocolTileEntity;
                 entity.ID = br.ReadInt32();
@@ -53,8 +42,8 @@ namespace TrProtocol.Models
     {
         public ProtocolTileEntity(T entity)
         {
-            Position = entity.Position;
-            ID = entity.ID;
+            Position = entity?.Position ?? new();
+            ID = entity?.ID ?? -1;
         }
         public abstract TileEntityType EntityType { get; }
         public ShortPosition Position { get; set; }

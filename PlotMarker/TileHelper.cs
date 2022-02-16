@@ -91,5 +91,24 @@ namespace PlotMarker
 				}
 			}
 		}
+
+		public static T[] To1D<T>(this T[,] data)
+			=> data.OfType<T>().ToArray();
+		public static T[,] To2D<T>(this T[] data, int width, int height)
+        {
+			if (data.Length != width * height)
+				throw new ArgumentException("wrong size");
+			var result = new T[width, height];
+			var index = 0;
+			for (var i = 0; i < width; i++)
+            {
+				for(var j = 0; j < height; j++)
+                {
+					result[i, j] = data[index];
+					index++;
+				}
+            }
+			return result;
+        }
 	}
 }

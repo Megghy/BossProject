@@ -12,6 +12,8 @@ using TrProtocol.Packets;
 using TShockAPI;
 using ProtocolBitsByte = TrProtocol.Models.ProtocolBitsByte;
 using Color = Microsoft.Xna.Framework.Color;
+using System.IO.Compression;
+using System.IO;
 
 namespace BossFramework
 {
@@ -140,6 +142,49 @@ namespace BossFramework
                 return default;
             }
         }
+        public static byte[] CompressBytes(this byte[] data)
+        {
+            try
+            {
+                using (MemoryStream memoryStream = new())
+                {
+                    using (DeflateStream deflateStream = new(memoryStream, CompressionMode.Compress))
+                    {
+                        deflateStream.Write(data, 0, data.Length);
+                    }
+                    return memoryStream.ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                BLog.Error(ex);
+                return null;
+            }
+        }
+
+        public static byte[] DecompressBytes(this byte[] data)
+        {
+            try
+            {
+                using (MemoryStream decompressedStream = new())
+                {
+                    using (MemoryStream compressStream = new(data))
+                    {
+                        using (DeflateStream deflateStream = new(compressStream, CompressionMode.Decompress))
+                        {
+                            deflateStream.CopyTo(decompressedStream);
+                        }
+                    }
+                    return decompressedStream.ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                BLog.Error(ex);
+                return null;
+            }
+        }
+
         public static WorldData GetCurrentWorldData(bool? ssc = null)
         {
             var worldInfo = new WorldData

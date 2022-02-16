@@ -273,8 +273,11 @@ namespace TerrariaApi.Server
             var ts = new PluginContainer((TerrariaPlugin)Activator.CreateInstance(typeof(TShockAPI.TShock), game));
             plugins.Add(ts); //默认加载ts
             pluginInitWatches.Add(ts.Plugin, new());
-            var boss = new PluginContainer((TerrariaPlugin)Activator.CreateInstance(typeof(BossFramework.BPlugin), game));
-            plugins.Add(boss); //默认加载ts
+            var boss = new PluginContainer((TerrariaPlugin)Activator.CreateInstance(typeof(BossFramework.BPlugin), game))
+            {
+                PluginAssembly = Assembly.GetExecutingAssembly()
+            };
+            plugins.Add(boss); //默认加载boss
             pluginInitWatches.Add(boss.Plugin, new());
 
             foreach (FileInfo fileInfo in fileInfos)
@@ -290,10 +293,9 @@ namespace TerrariaApi.Server
 
                 try
                 {
-                    Assembly assembly;
                     // The plugin assembly might have been resolved by another plugin assembly already, so no use to
                     // load it again, but we do still have to verify it and create plugin instances.
-                    if (!loadedAssemblies.TryGetValue(fileNameWithoutExtension, out assembly))
+                    if (!loadedAssemblies.TryGetValue(fileNameWithoutExtension, out Assembly assembly))
                     {
                         try
                         {
@@ -345,7 +347,10 @@ namespace TerrariaApi.Server
                             throw new InvalidOperationException(
                                 string.Format("Could not create an instance of plugin class \"{0}\".", type.FullName), ex);
                         }
-                        plugins.Add(new PluginContainer(pluginInstance));
+                        plugins.Add(new PluginContainer(pluginInstance)
+                        {
+                            PluginAssembly = assembly
+                        });
                     }
                 }
                 catch (Exception ex)

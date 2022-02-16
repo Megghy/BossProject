@@ -9,6 +9,7 @@ namespace BossFramework.BHooks
         [AutoInit("挂载所有Hook")]
         private static void HandleHooks()
         {
+            OTAPI.Hooks.Netplay.CreateTcpListener += HookHandlers.SocketCreateHandler.OnSocketCreate;
             GeneralHooks.ReloadEvent += HookHandlers.ReloadHandler.OnReload;
             AccountHooks.AccountCreate += HookHandlers.CreateAccountHandler.OnCreateAccount;
 
