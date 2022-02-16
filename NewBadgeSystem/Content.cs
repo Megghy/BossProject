@@ -28,7 +28,7 @@ namespace BadgeSystem
 			if (!TryParse(colorHex, out var color)&& colorHex!="")
 			{
 				ColorHex = color.Hex3();
-				TShock.Log.ConsoleError("Invalid color string");
+				TShock.Log.ConsoleError("无效数字代码");
 			}
 			Color = color;
 		}
