@@ -84,7 +84,7 @@ namespace PlotMarker
             PlotManager.Reload();
 
             //设置未隐藏的属地的信息
-            PlotManager.CurrentPlot.Cells.Where(c => c.IsVisiable).ForEach(c =>
+            PlotManager.CurrentPlot?.Cells?.Where(c => c.IsVisiable).ForEach(c =>
             {
                 c.RestoreCellTileData();
                 c.RegisteChestAndSign();
