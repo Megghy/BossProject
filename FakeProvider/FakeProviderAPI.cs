@@ -9,7 +9,7 @@ namespace FakeProvider
         public const string WorldProviderName = "__world__";
         public static TileProviderCollection Tile { get; internal set; }
         public static TileProvider World { get; internal set; }
-        private static ObserversEqualityComparer OEC = new ObserversEqualityComparer();
+        private static ObserversEqualityComparer OEC = new();
 
         #endregion
 
@@ -17,7 +17,7 @@ namespace FakeProvider
 
         public static TileProvider CreateTileProvider(string Name, int X, int Y, int Width, int Height, int Layer = 0)
         {
-            TileProvider result = new TileProvider();
+            TileProvider result = new();
             result.Initialize(Name, X, Y, Width, Height, Layer);
             Tile.Add(result);
             return result;
@@ -25,7 +25,7 @@ namespace FakeProvider
 
         public static TileProvider CreateTileProvider(string Name, int X, int Y, int Width, int Height, int Layer, ModFramework.ICollection<ITile> CopyFrom)
         {
-            TileProvider result = new TileProvider();
+            TileProvider result = new();
             result.Initialize(Name, X, Y, Width, Height, Layer, CopyFrom);
             Tile.Add(result);
             return result;

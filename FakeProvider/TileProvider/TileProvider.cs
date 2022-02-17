@@ -1,4 +1,5 @@
 ﻿#region Using
+using BossFramework;
 using System.Collections.ObjectModel;
 using Terraria;
 using Terraria.DataStructures;
@@ -341,7 +342,7 @@ namespace FakeProvider
 
         public FakeSign AddSign(int X, int Y, string Text)
         {
-            FakeSign sign = new FakeSign(this, -1, X, Y, Text);
+            FakeSign sign = new(this, -1, X, Y, Text);
             lock (Locker)
                 _Entities.Add(sign);
             UpdateEntity(sign);
@@ -744,10 +745,8 @@ namespace FakeProvider
                 if (Entity.Index < 0)
                     Entity.Index = TileEntity.AssignNewID();
                 TileEntity.ByID[Entity.Index] = tileEntity;
-                return true;
             }
-            else
-                throw new ArgumentException($"Unknown entity type {Entity.GetType().Name}", nameof(Entity));
+            return true;
         }
 
         #endregion
@@ -782,8 +781,6 @@ namespace FakeProvider
                     trainingDummy.npc = -1;
                 }
             }
-            else
-                throw new ArgumentException($"Unknown entity type {Entity.GetType().Name}", nameof(Entity));
         }
 
         #endregion
@@ -819,7 +816,7 @@ namespace FakeProvider
                         RemoveEntity(entity);
 
             (int x, int y, int width, int height) = XYWH(ProviderCollection.OffsetX, ProviderCollection.OffsetY);
-            for (int i = 0; i < Main.sign.Length; i++)
+            /*for (int i = 0; i < Main.sign.Length; i++)
             {
                 Sign sign = Main.sign[i];
                 if (sign == null)
@@ -851,24 +848,18 @@ namespace FakeProvider
                     else
                         Main.chest[i] = null;
                 }
-            }
+            }*/
 
             foreach (TileEntity entity in TileEntity.ByID.Values.ToArray())
             {
                 int entityX = entity.Position.X;
                 int entityY = entity.Position.Y;
 
-                if ((entity.GetType().Name == nameof(TETrainingDummy)            // <=> not FakeTrainingDummy or some other inherited type
-                        || entity.GetType().Name == nameof(TEItemFrame)          // <=> not FakeItemFrame or some other inherited type
-                        || entity.GetType().Name == nameof(TELogicSensor)        // <=> not FakeLogicSensor or some other inherited type
-                        || entity.GetType().Name == nameof(TEDisplayDoll)        // <=> not FakeDisplayDoll or some other inherited type
-                        || entity.GetType().Name == nameof(TEFoodPlatter)        // <=> not FakeFoodPlatter or some other inherited type
-                        || entity.GetType().Name == nameof(TEHatRack)            // <=> not FakeHatRack or some other inherited type
-                        || entity.GetType().Name == nameof(TETeleportationPylon) // <=> not FakeTeleportationPylon or some other inherited type
-                        || entity.GetType().Name == nameof(TEWeaponsRack))       // <=> not FakeWeaponsRack or some other inherited type
+                if (entity.GetType().IsSubclassOf(typeof(TileEntity))
                     && Helper.Inside(entityX, entityY, x, y, width, height)
                     && TileOnTop(entityX - this.X, entityY - this.Y))
                 {
+                    Entities.Where(e => e.X == entityX && e.Y == entityY).BForEach(e => RemoveEntity(e));
                     if (IsEntityTile(entityX - this.X, entityY - this.Y, GetEntityTileTypes(entity)))
                         AddEntity(entity, true);
                     else

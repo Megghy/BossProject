@@ -4,8 +4,10 @@ using BossFramework.DB;
 using FakeProvider;
 using FreeSql.DataAnnotations;
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameContent.Tile_Entities;
 using TrProtocol;
 using TrProtocol.Models;
 using TrProtocol.Models.TileEntities;
@@ -184,7 +186,7 @@ namespace PlotMarker
                 .ForEach(entity =>
                 {
                     var e = Activator.CreateInstance(Constants.tileEntityDict[(TileEntityType)entity.Value.type], new object[] { entity.Value }) as IProtocolTileEntity;
-                    e.Position = new(e.Position.X - startX, e.Position.Y - startY); //转换为相对坐标
+                    e.Position = new(entity.Key.X - startX, entity.Key.Y - startY); //转换为相对坐标
                     Entities.Add(e);
                 });
             SerializedEntitiesData = GetSerializedEntitiesData();
@@ -277,6 +279,16 @@ namespace PlotMarker
                     TileEntity.ByID.Remove(placedEntity.ID);
                     TileEntity.ByPosition.Remove(placedEntity.Position);
 
+                    if(placedEntity is TETrainingDummy dummy)
+                    {
+                        NPC npc = Main.npc[dummy.npc];
+                        npc.type = 0;
+                        npc.active = false;
+                        NetMessage.SendData((int)PacketTypes.NpcUpdate, -1, -1, null, dummy.npc);
+                        dummy.npc = -1;
+                        (entity as ProtocolTETrainingDummy).NPC = -1;
+                    }
+
                     packetData.Add(new TileEntitySharing()
                     {
                         ID = placedEntity.ID,
@@ -364,26 +376,45 @@ namespace PlotMarker
 
         public void RestoreEntities()
         {
-            List<Packet> packetData = new(); //合并数据包 减少发包次数
+            List<byte> packetData = new(); //合并数据包 减少发包次数
             Entities.ForEach(entity =>
             {
                 var entityX = X + entity.Position.X;
                 var entityY = Y + entity.Position.Y;
-                TileEntity.PlaceEntityNet((int)entity.EntityType, entityX, entityY);
+                TileEntity.ByPosition.Where(t => t.Key.X == entityX && t.Key.Y == entityY)
+                .ToArray()
+                .ForEach(e =>
+                {
+                    TileEntity.ByPosition.Remove(e.Key);
+                    TileEntity.ByID.Remove(e.Value.ID);
+                    packetData.AddRange(new TileEntitySharing()
+                    {
+                        ID = e.Value.ID,
+                        IsNew = false
+                    }.SerializePacket());
+                });
+                TileEntity.manager._types[(int)entity.EntityType].NetPlaceEntityAttempt(entityX, entityY);
                 if (TileEntity.ByPosition.TryGetValue(new(entityX, entityY), out var placedEntity))
                 {
-                    //更新原有信息
-                    entity.Position = new(placedEntity.Position.X - X, placedEntity.Position.Y - Y);
+                    var trEntity = entity.ToTrTileEntity();
+                    trEntity.ID = placedEntity.ID;
+                    trEntity.Position = placedEntity.Position;
+                    TileEntity.ByID[placedEntity.ID] = trEntity;
+                    TileEntity.ByPosition[placedEntity.Position] = trEntity;
+
                     entity.ID = placedEntity.ID;
-                    packetData.Add(new TileEntitySharing()
+                    entity.Position = new(entityX, entityY); //位置信息为绝对坐标
+                    packetData.AddRange(new TileEntitySharing()
                     {
                         ID = placedEntity.ID,
                         IsNew = true,
                         Entity = entity
-                    });
+                    }.SerializePacket());
+                    entity.Position = new(entityX - X, entityY - Y); //更换位置信息为相对坐标
                 }
             });
-            BInfo.OnlinePlayers.ForEach(p => p.SendPackets(packetData));
+            FakeProviderAPI.World.ScanEntities(); //fakeprovider重新获取entity
+            BInfo.OnlinePlayers.ForEach(p => p.SendRawData(packetData.ToArray()));
         }
         #endregion
 
