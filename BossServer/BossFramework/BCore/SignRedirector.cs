@@ -26,11 +26,7 @@ namespace BossFramework.BCore
             {
                 if (!Signs.Exists(sign => sign.X == s.x && sign.Y == s.y))
                 {
-                    OnSyncSign(null, new()
-                    {
-                        Text = s.text,
-                        Position = new((short)s.x, (short)s.y)
-                    }); //不存在则新建
+                    CreateSign(s.x, s.y, s.text); //不存在则新建
                 }
             });
 
