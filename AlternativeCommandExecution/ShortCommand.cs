@@ -68,9 +68,8 @@ namespace AlternativeCommandExecution
             {
                 return;
             }
-
-            ShortCommandUtil.HandleCommand(tsplr, text);
-            args.Handled = true;
+ 
+            args.Handled = ShortCommandUtil.HandleCommand(tsplr, text);
         }
 
         private static void LoadShortCommands()

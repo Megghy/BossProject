@@ -22,7 +22,7 @@ namespace BossFramework.BNet.PacketHandlers
                 X = packet.Position.X,
                 Y = packet.Position.Y
             };
-            GetDataHandlers.ChestOpen.Invoke(BPlugin.Instance, args);
+            GetDataHandlers.ChestOpen.Invoke(BossPlugin.Instance, args);
             if (!args.Handled)
                 BCore.ChestRedirector.OnRequestChestOpen(plr, packet);
             return true;

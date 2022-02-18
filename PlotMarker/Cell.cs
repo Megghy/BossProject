@@ -265,7 +265,8 @@ namespace PlotMarker
             DeregisteChestAndSign();
 
             //重新画线
-            Parent.ReDrawLines(sendSection);
+            //Parent.ReDrawLines(sendSection);
+            //不升级的话就不用重画线
 
             BLog.Info($"属地 [{Id}]<{Owner}> 现在处于隐藏状态");
         }

@@ -25,6 +25,9 @@ namespace BossFramework.BCore
         {
             if (!Directory.Exists(ScriptCmdPath))
                 Directory.CreateDirectory(ScriptCmdPath);
+
+            TShockAPI.Hooks.PlayerHooks.PlayerCommand += OnUseAnyCmd;
+
             try
             {
                 var loaded = new List<Assembly>();
@@ -65,7 +68,7 @@ namespace BossFramework.BCore
         /// <param name="cmd"></param>
         private static void RegisteToTS(BaseCommand cmd)
         {
-            var tscmd = new Command(OnCmd, cmd.Names);
+            var tscmd = new Command(OnBCmd, cmd.Names);
             Commands.ChatCommands.Add(tscmd);
             _tsCmds.Add(tscmd);
         }
@@ -78,18 +81,33 @@ namespace BossFramework.BCore
             RegisteAllCommands();
             BLog.Success("指令已重载");
         }
+        private static void OnUseAnyCmd(TShockAPI.Hooks.PlayerCommandEventArgs args)
+        {
+            CommandPlaceholder.Placeholders.Where(p => p.Match(args.CommandText))
+                .ForEach(p =>
+                {
+                    args.CommandText = p.Replace(args, args.CommandText);
+                    if (args.Parameters.Any())
+                        for (int i = 0; i < args.Parameters.Count; i++)
+                        {
+                            if (p.Match(args.Parameters[i]))
+                                args.Parameters[i] = p.Replace(args, args.Parameters[i]);
+                        }
+                });
+        }
         /// <summary>
         /// 当ts玩家调用命令
         /// </summary>
         /// <param name="args"></param>
-        private static void OnCmd(CommandArgs args)
+        private static void OnBCmd(CommandArgs args)
         {
             if (args.Player.Account is null)
             {
                 args.Player.SendInfoMessage($"尚未登陆, 无法使用此命令");
                 return;
             }
-            var cmdName = args.Message.Contains(" ") ? args.Message.Split(' ')[0] : args.Message;
+            var cmdName = args.Message.Contains(' ') ? args.Message.Split(' ')[0] : args.Message;
+
             if (Cmds.FirstOrDefault(c => c.Names.Any(c => c.ToLower() == cmdName.ToLower())) is { } cmd)
             {
                 if (args.Parameters.Any())

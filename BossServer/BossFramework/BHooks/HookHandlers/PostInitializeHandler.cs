@@ -26,7 +26,7 @@ namespace BossFramework.BHooks.HookHandlers
                     var attr = kv.Value;
                     if (attr.PreInitMessage is { } pre)
                         BLog.Info(pre);
-                    kv.Key.Invoke(BPlugin.Instance, null);
+                    kv.Key.Invoke(BossPlugin.Instance, null);
                     if (attr.PostInitMessage is { } post)
                         BLog.Info(post);
                 }

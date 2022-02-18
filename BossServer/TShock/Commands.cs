@@ -655,10 +655,10 @@ namespace TShockAPI
 
             IEnumerable<Command> cmds = ChatCommands.FindAll(c => c.HasAlias(cmdName));
 
-            if (Hooks.PlayerHooks.OnPlayerCommand(player, cmdName, cmdText, args, ref cmds, cmdPrefix))
+            if (PlayerHooks.OnPlayerCommand(player, cmdName, ref cmdText, args, ref cmds, cmdPrefix))
                 return true;
 
-            if (cmds.Count() == 0)
+            if (cmds.Any())
             {
                 if (player.AwaitingResponse.ContainsKey(cmdName))
                 {
@@ -667,6 +667,9 @@ namespace TShockAPI
                     call(new CommandArgs(cmdText, player, args));
                     return true;
                 }
+            }
+            else
+            {
                 player.SendErrorMessage("输入的命令无效，输入{0}help以获取有效命令列表", Specifier);
                 return true;
             }

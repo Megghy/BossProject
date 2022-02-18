@@ -14,7 +14,7 @@ namespace BossFramework.BHooks.HookHandlers
                         .BForEach(m =>
                         {
                             if (m.GetCustomAttribute<ReloadableAttribute>() is { })
-                                m.Invoke(BPlugin.Instance, null);
+                                m.Invoke(BossPlugin.Instance, null);
                         }));
         }
     }

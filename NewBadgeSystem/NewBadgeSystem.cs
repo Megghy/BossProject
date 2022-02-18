@@ -6,6 +6,7 @@ using Terraria.Localization;
 using Terraria.Net;
 using Terraria.UI.Chat;
 using TerrariaApi.Server;
+using TrProtocol.Packets;
 using TShockAPI;
 using TShockAPI.Hooks;
 
@@ -31,7 +32,7 @@ namespace BadgeSystem
 
 		public override void Initialize()
 		{
-			ServerApi.Hooks.ServerChat.Register(this, OnChat, 999);
+			PlayerHooks.PlayerChat += OnChat;
 			ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreet);
 			ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
 		}
@@ -40,7 +41,7 @@ namespace BadgeSystem
 		{
 			if (disposing)
 			{
-				ServerApi.Hooks.ServerChat.Deregister(this, OnChat);
+				PlayerHooks.PlayerChat -= OnChat;
 				ServerApi.Hooks.NetGreetPlayer.Deregister(this, OnGreet);
 				ServerApi.Hooks.GameInitialize.Deregister(this, OnInitialize);
 			}
@@ -180,83 +181,19 @@ namespace BadgeSystem
 		{
 			PlayerData.GetPlayerData(TShock.Players[args.Who]);
 		}
-		private static void OnChat(ServerChatEventArgs args)
+		private static void OnChat(PlayerChatEventArgs args)
 		{
 			if (args.Handled)
 			{
 				return;
 			}
-			TSPlayer tSPlayer = TShock.Players[args.Who];
-			if (tSPlayer == null)
-			{
-				args.Handled = true;
-				return;
-			}
-			PlayerData playerData = PlayerData.GetPlayerData(tSPlayer);
-			
-			//if (!playerData.Any)
-			//{
-			//	return;
-			//}
 			args.Handled = true;
-			string tshockText = args.Text;
-			foreach (KeyValuePair<LocalizedText, ChatCommandId> localizedCommand in ChatManager.Commands._localizedCommands)
-			{
-				if (localizedCommand.Value._name == args.CommandId._name)
-				{
-					tshockText = (string.IsNullOrEmpty(tshockText) ? localizedCommand.Key.Value : (localizedCommand.Key.Value + " " + tshockText));
-					break;
-				}
-			}
-			if ((tshockText.StartsWith(TShock.Config.Settings.CommandSpecifier) || tshockText.StartsWith(TShock.Config.Settings.CommandSilentSpecifier)) && !string.IsNullOrWhiteSpace(tshockText.Substring(1)))
-			{
-				args.Handled = true;
-				if (!Commands.HandleCommand(tSPlayer, tshockText))
-				{
-					tSPlayer.SendErrorMessage("无法分析命令，请与管理员联系");
-				}
-				return;
-			}
-			if (!tSPlayer.HasPermission(Permissions.canchat))
-			{
-				args.Handled = true;
-				return;
-			}
-			if (tSPlayer.mute)
-			{
-				tSPlayer.SendErrorMessage("你已被禁言，无法发送消息");
-				args.Handled = true;
-				return;
-			}
-			if (!TShock.Config.Settings.EnableChatAboveHeads)
-			{
-				tshockText = string.Format(TShock.Config.Settings.ChatFormat, tSPlayer.Group.Name, playerData.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix, args.Text);
-				bool flag = PlayerHooks.OnPlayerChat(tSPlayer, args.Text, ref tshockText);
-				args.Handled = true;
-				if (!flag)
-				{
-					TShock.Utils.Broadcast(tshockText, tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B);
-				}
-				return;
-			}
-			Player player = Main.player[args.Who];
-			string name = player.name;
-			player.name = string.Format(TShock.Config.Settings.ChatAboveHeadsFormat, tSPlayer.Group.Name, tSPlayer.Group.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix);
-			NetMessage.SendData(4, -1, -1, NetworkText.FromLiteral(player.name), args.Who);
-			player.name = name;
-			if (PlayerHooks.OnPlayerChat(tSPlayer, args.Text, ref tshockText))
-			{
-				args.Handled = true;
-				return;
-			}
-			NetPacket packet = NetTextModule.SerializeServerMessage(NetworkText.FromLiteral(tshockText), new Color(tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B), (byte)args.Who);
-			NetManager.Instance.Broadcast(packet, args.Who);
-			NetMessage.SendData(4, -1, -1, NetworkText.FromLiteral(name), args.Who);
-			string text = $"<{string.Format(TShock.Config.Settings.ChatAboveHeadsFormat, tSPlayer.Group.Name, tSPlayer.Group.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix)}> {tshockText}";
-			tSPlayer.SendMessage(text, tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B);
-			TSPlayer.Server.SendMessage(text, tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B);
-			TShock.Log.Info("广播: {0}", text);
-			args.Handled = true;
+			TSPlayer tSPlayer = args.Player;
+			var playerData = PlayerData.GetPlayerData(tSPlayer);
+			TSPlayer.All.SendMessage(string.Format(TShock.Config.Settings.ChatFormat, tSPlayer.Group.Name, playerData.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix, args.RawText), Color.White);
+			var msg = $"{args.Player.Name}: {args.RawText}";
+			Console.WriteLine(msg);
+			TShock.Log.Write(msg, System.Diagnostics.TraceLevel.Info);
 		}
 
 		private static void BadgeInfo(CommandArgs args)

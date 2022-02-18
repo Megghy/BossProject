@@ -32,6 +32,7 @@ namespace PlotMarker
                             plot.Cells = LoadCells(plot);
                             Plots.Add(plot);
                         });
+            TShock.Log.ConsoleInfo($"[PlotMarker] 共加载 {Plots.Count} 个属地, {CurrentPlot?.Cells.Count} 个子属地.");
         }
 
         public static List<Cell> LoadCells(Plot parent)

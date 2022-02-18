@@ -147,6 +147,10 @@ namespace BossFramework.BModels
             SendPacket(_emptyItemPacket);
         }
 
+        public bool GivePoint(int num, string from = "未知")
+            => BCore.BPointSystem.ChangePoint(Index, num, from);
+        public bool TakePoint(int num, string from = "未知")
+            => BCore.BPointSystem.ChangePoint(Index, -num, from);
         #region 玩家状态
         /// <summary>
         /// 增加或减少玩家魔法值, 如果不足的话返回 false

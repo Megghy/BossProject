@@ -22,7 +22,7 @@ namespace BossFramework.BNet.PacketHandlers
                 X = packet.Position.X,
                 Y = packet.Position.Y,
             };
-            GetDataHandlers.Sign.Invoke(BPlugin.Instance, args);
+            GetDataHandlers.Sign.Invoke(BossPlugin.Instance, args);
             if (!args.Handled)
                 BCore.SignRedirector.OnSyncSign(plr, packet);
             return true; //不让其被otapi handle

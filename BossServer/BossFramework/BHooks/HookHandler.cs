@@ -13,11 +13,11 @@ namespace BossFramework.BHooks
             GeneralHooks.ReloadEvent += HookHandlers.ReloadHandler.OnReload;
             AccountHooks.AccountCreate += HookHandlers.CreateAccountHandler.OnCreateAccount;
 
-            ServerApi.Hooks.NetGreetPlayer.Register(BPlugin.Instance, HookHandlers.PlayerGreetHandler.OnGreetPlayer);
-            ServerApi.Hooks.ServerLeave.Register(BPlugin.Instance, HookHandlers.PlayerLeaveHandler.OnPlayerLeave);
-            ServerApi.Hooks.GamePostInitialize.Register(BPlugin.Instance, HookHandlers.PostInitializeHandler.OnGamePostInitialize, int.MinValue);
-            ServerApi.Hooks.GameUpdate.Register(BPlugin.Instance, HookHandlers.GameUpdateHandler.OnGameUpdate);
-            ServerApi.Hooks.NetGetData.Register(BPlugin.Instance, BNet.PacketHandler.OnGetData);
+            ServerApi.Hooks.NetGreetPlayer.Register(BossPlugin.Instance, HookHandlers.PlayerGreetHandler.OnGreetPlayer);
+            ServerApi.Hooks.ServerLeave.Register(BossPlugin.Instance, HookHandlers.PlayerLeaveHandler.OnPlayerLeave);
+            ServerApi.Hooks.GamePostInitialize.Register(BossPlugin.Instance, HookHandlers.PostInitializeHandler.OnGamePostInitialize, int.MinValue);
+            ServerApi.Hooks.GameUpdate.Register(BossPlugin.Instance, HookHandlers.GameUpdateHandler.OnGameUpdate);
+            ServerApi.Hooks.NetGetData.Register(BossPlugin.Instance, BNet.PacketHandler.OnGetData);
         }
     }
 }

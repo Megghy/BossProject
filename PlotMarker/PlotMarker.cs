@@ -225,7 +225,7 @@ namespace PlotMarker
                             }
                         }
                         plot.Generate(clear);
-                        plot.Cells.Where(c =>c.IsVisiable).ForEach(c => c.RestoreCellTileData());
+                        plot.Cells.Where(c => c.IsVisiable).ForEach(c => c.RestoreCellTileData());
                     }
                     break;
                 case "信息":
@@ -665,7 +665,7 @@ namespace PlotMarker
                     break;
                 case "del":
                     {
-                        if (!args.Player.HasPermission("pm.admin.fuckcell"))
+                        if (!args.Player.HasPermission("pm.admin.delcell"))
                         {
                             args.Player.SendErrorMessage("无权限执行.");
                             return;
@@ -747,17 +747,17 @@ namespace PlotMarker
                     break;
                 case "info":
                     {
-                        if(args.Parameters.Count > 1)
+                        if (args.Parameters.Count > 1)
                         {
-                            if(int.TryParse(args.Parameters[1], out var cellIndex))
+                            if (int.TryParse(args.Parameters[1], out var cellIndex))
                             {
-                                if(PlotManager.CurrentPlot.Cells.FirstOrDefault(c => c.Id == cellIndex) is { } tempCellInfo)
+                                if (PlotManager.CurrentPlot.Cells.FirstOrDefault(c => c.Id == cellIndex) is { } tempCellInfo)
                                 {
                                     args.Player.SendInfoMessage(tempCellInfo.GetInfo());
                                 }
                                 else
                                     args.Player.SendErrorMessage($"未找到id为 {cellIndex} 的子区域");
-                            }    
+                            }
                             else
                                 args.Player.SendErrorMessage("语法无效. 正确语法: /gm info <指定区域ID>");
                         }
@@ -813,6 +813,21 @@ namespace PlotMarker
                         }
                     }
                     break;
+                case "redraw":
+                    if(!args.Player.HasPermission("pm.admin.redraw"))
+                    {
+                        args.Player.SendErrorMessage("你没有使用此命令的权限");
+                        return;
+                    }
+                    if (PlotManager.CurrentPlot is null)
+                        args.Player.SendErrorMessage($"尚未生成属地");
+                    else
+                    {
+                        PlotManager.CurrentPlot.Cells.ForEach(c => c.RestoreCellTileData(false));
+                        TileHelper.ResetSection(PlotManager.CurrentPlot.X, PlotManager.CurrentPlot.Y, PlotManager.CurrentPlot.Width, PlotManager.CurrentPlot.Height);
+                        args.Player.SendSuccessMessage("完成");
+                    }
+                    break;
                 case "help":
                     {
                         if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out var pageNumber))
@@ -855,7 +870,10 @@ namespace PlotMarker
             var info = PlayerInfo.GetInfo(player);
             if (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - info.BPm > 2000)
             {
-                player.SendErrorMessage("该属地被保护, 无法更改物块.");
+                if (player.HasPermission("pm.build.everywhere"))
+                    player.SendErrorMessage("该区域尚未生成属地");
+                else
+                    player.SendErrorMessage("该属地被保护, 无法更改物块.");
                 info.BPm = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             }
 
@@ -869,13 +887,7 @@ namespace PlotMarker
                 return true;
             }
 
-            var plot = PlotManager.Plots.FirstOrDefault(p => p.Contains(tileX, tileY));
-            if (plot == null)
-            {
-                return false;
-            }
-
-            if (plot.FindCell(tileX, tileY) is { } cell)
+            if (PlotManager.CurrentPlot?.FindCell(tileX, tileY) is { } cell)
             {
                 if (string.Equals(cell.Owner, player.Name, StringComparison.Ordinal)
                     || cell.AllowedIDs?.Contains(player.Account.ID) == true
@@ -885,7 +897,7 @@ namespace PlotMarker
                     return false;
                 }
             }
-            else if (plot.IsWall(tileX, tileY))
+            else if (PlotManager.CurrentPlot?.IsWall(tileX, tileY) == true)
             {
                 return !player.HasPermission("pm.build.wall");
             }

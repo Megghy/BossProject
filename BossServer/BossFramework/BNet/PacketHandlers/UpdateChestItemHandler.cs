@@ -19,7 +19,7 @@ namespace BossFramework.BNet.PacketHandlers
                 Stacks = packet.Stack,
                 Type = packet.ItemType
             };
-            GetDataHandlers.ChestItemChange.Invoke(BPlugin.Instance, args);
+            GetDataHandlers.ChestItemChange.Invoke(BossPlugin.Instance, args);
             if (!args.Handled)
                 BCore.ChestRedirector.OnUpdateChestItem(plr, packet);
             return true;

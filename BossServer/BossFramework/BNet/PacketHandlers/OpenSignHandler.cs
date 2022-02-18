@@ -22,7 +22,7 @@ namespace BossFramework.BNet.PacketHandlers
                 X = packet.Position.X,
                 Y = packet.Position.Y
             };
-            GetDataHandlers.SignRead.Invoke(BPlugin.Instance, args);
+            GetDataHandlers.SignRead.Invoke(BossPlugin.Instance, args);
             if (!args.Handled)
                 BCore.SignRedirector.OnOpenSign(plr, packet);
             return true;

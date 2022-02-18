@@ -19,6 +19,7 @@ namespace BossFramework.BAttributes
         }
         public string[] Names { get; set; }
         public string Permission { get; set; }
+        public string Description { get; set; }
         public MethodInfo Method { get; set; }
     }
 }

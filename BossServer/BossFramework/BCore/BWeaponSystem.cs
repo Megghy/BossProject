@@ -28,7 +28,7 @@ namespace BossFramework.BCore
 
             LoadWeapon();
 
-            ServerApi.Hooks.GameUpdate.Register(BPlugin.Instance, OnGameUpdate);
+            ServerApi.Hooks.GameUpdate.Register(BossPlugin.Instance, OnGameUpdate);
 
             ProjRedirector.ProjCreate += OnProjCreate;
             ProjRedirector.ProjDestroy += OnProjDestroy;

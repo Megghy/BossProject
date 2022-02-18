@@ -10,11 +10,11 @@ using TerrariaApi.Server;
 namespace BossFramework
 {
     [ApiVersion(2, 1)]
-    public class BPlugin : TerrariaPlugin
+    public class BossPlugin : TerrariaPlugin
     {
-        public static BPlugin Instance { get; private set; }
+        public static BossPlugin Instance { get; private set; }
 
-        public BPlugin(Main game) : base(game)
+        public BossPlugin(Main game) : base(game)
         {
             Instance = this;
             Order = int.MaxValue; //最后加载

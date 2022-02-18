@@ -394,7 +394,7 @@ namespace TShockAPI.Hooks
         /// <param name="commands">The list of commands.</param>
         /// <param name="cmdPrefix">The command specifier used.</param>
         /// <returns>True if the event has been handled.</returns>
-        public static bool OnPlayerCommand(TSPlayer player, string cmdName, string cmdText, List<string> args, ref IEnumerable<Command> commands, string cmdPrefix)
+        public static bool OnPlayerCommand(TSPlayer player, string cmdName, ref string cmdText, List<string> args, ref IEnumerable<Command> commands, string cmdPrefix)
         {
             if (PlayerCommand == null)
             {
@@ -410,6 +410,7 @@ namespace TShockAPI.Hooks
                 CommandPrefix = cmdPrefix,
             };
             PlayerCommand(playerCommandEventArgs);
+            cmdText = playerCommandEventArgs.CommandText;
             return playerCommandEventArgs.Handled;
         }
 

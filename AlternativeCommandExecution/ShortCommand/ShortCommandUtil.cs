@@ -7,12 +7,12 @@ namespace AlternativeCommandExecution.ShortCommand
     {
         private static readonly Type CommandsType = typeof(Commands);
 
-        public static void HandleCommand(TSPlayer player, string text)
+        public static bool HandleCommand(TSPlayer player, string text)
         {
             if (!Internal_ParseCmd(text, out var cmdText, out var cmdName, out var args, out var silent))
             {
                 player.SendErrorMessage("指令无效；键入 {0}help 以获取可用指令。", Commands.Specifier);
-                return;
+                return true;
             }
 
             var sc = Plugin.ShortCommands.Where(x => x.HasName(cmdName)).ToList();
@@ -35,38 +35,11 @@ namespace AlternativeCommandExecution.ShortCommand
                         player.SendErrorMessage(ex.Message);
                     }
                 }
+                return true;
             }
             else
             {
-                var cmds = Commands.ChatCommands.FindAll(x => x.HasAlias(cmdName));
-
-                if (cmds.Count == 0)
-                {
-                    if (player.AwaitingResponse.ContainsKey(cmdName))
-                    {
-                        Action<CommandArgs> call = player.AwaitingResponse[cmdName];
-                        player.AwaitingResponse.Remove(cmdName);
-                        call(new CommandArgs(cmdText, player, args));
-                        return;
-                    }
-                    player.SendErrorMessage("键入的指令无效；使用 {0}help 查看有效指令。", Commands.Specifier);
-                    return;
-                }
-                foreach (var cmd in cmds)
-                {
-                    if (!cmd.CanRun(player))
-                    {
-                        player.SendErrorMessage("你没有权限执行该指令。", Commands.Specifier);
-                    }
-                    else if (!cmd.AllowServer && !player.RealPlayer)
-                    {
-                        player.SendErrorMessage("你必须在游戏内执行该指令。");
-                    }
-                    else
-                    {
-                        cmd.Run(cmdText, silent, player, args);
-                    }
-                }
+                return Commands.HandleCommand(player, text);
             }
         }
 

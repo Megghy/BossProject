@@ -1,6 +1,8 @@
 ﻿using BossFramework.BCore;
+using BossFramework.BInterfaces;
 using BossFramework.DB;
 using FreeSql.DataAnnotations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TShockAPI.DB;
@@ -11,7 +13,7 @@ namespace BossFramework.BModels
     {
         public const string DefaultRegionName = "DefaultBRegion";
         public static BRegion Default { get; } = new(null);
-        public BRegion() { Name = DefaultRegionName; WorldId = Terraria.Main.worldID; }
+        public BRegion() { Name = DefaultRegionName; WorldId = Terraria.Main.worldID; Init(); }
         public BRegion(Region region)
         {
             OriginRegion = region;
@@ -24,10 +26,16 @@ namespace BossFramework.BModels
             if (Name != DefaultRegionName)
                 OriginRegion ??= TShockAPI.TShock.Regions.Regions.FirstOrDefault(r => r.Name == Name && r.WorldID == WorldId.ToString());
             ProjContext = new(this);
+
+            Tags = BRegionSystem.GetTags(this);
         }
 
         #region 自身变量
         public string Name { get; private set; }
+        [JsonMap]
+        public List<string> TagsName { get; private set; } = new();
+        public List<BaseRegionTag> Tags { get; internal set; } = new();
+
         public long WorldId { get; private set; }
         public Region OriginRegion { get; private set; }
         public int ParentId { get; private set; }
@@ -94,6 +102,37 @@ namespace BossFramework.BModels
                 _parent = region;
                 UpdateSingle(r => r.ParentId, _parent.Id);
             }
+        }
+        public bool AddTag(BaseRegionTag tag)
+        {
+            if (TagsName.Contains(tag.Name))
+                return false;
+            TagsName.Add(tag.Name);
+            if (UpdateSingle(r => r.TagsName) > 0)
+            {
+                Tags.Add((BaseRegionTag)Activator.CreateInstance(tag.GetType(), null));
+                return true;
+            }
+            else
+            {
+                TagsName.Remove(tag.Name);
+                return false;
+            }
+        }
+        public void AddTag(string tagName)
+        {
+            if (!TagsName.Contains(tagName))
+                return;
+            if (TagsName.Remove(tagName) && UpdateSingle(r => r.TagsName) > 0)
+            {
+                if(Tags.FirstOrDefault(t => t.Name == tagName) is { } tag)
+                {
+                    Tags.Remove(tag);
+                    tag.Dispose();
+                }    
+            }
+            else
+                TagsName.Add(tagName);
         }
         #endregion
 
