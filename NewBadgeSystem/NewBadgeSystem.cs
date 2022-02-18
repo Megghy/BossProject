@@ -255,7 +255,7 @@ namespace BadgeSystem
 			string text = $"<{string.Format(TShock.Config.Settings.ChatAboveHeadsFormat, tSPlayer.Group.Name, tSPlayer.Group.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix)}> {tshockText}";
 			tSPlayer.SendMessage(text, tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B);
 			TSPlayer.Server.SendMessage(text, tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B);
-			TShock.Log.Info("Broadcast: {0}", text);
+			TShock.Log.Info("广播: {0}", text);
 			args.Handled = true;
 		}
 

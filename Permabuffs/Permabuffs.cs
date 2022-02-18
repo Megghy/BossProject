@@ -196,7 +196,7 @@ namespace Permabuffs
 					var info = PlayerInfo.GetPlayerInfo(TShock.Players[i]);
 					if (info.BypassChange)
 					{
-						return;
+						continue;
 					}
 					if (rb != null)
 					{

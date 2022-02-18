@@ -422,8 +422,8 @@ namespace TShockAPI
                 if (Config.Settings.RestApiEnabled)
                     RestApi.Start();
 
-                Log.ConsoleInfo("自动保存 " + (Config.Settings.AutoSave ? "启用" : "禁用"));
-                Log.ConsoleInfo("备份 " + (Backups.Interval > 0 ? "启用" : "禁用"));
+                Log.ConsoleInfo("自动保存：" + (Config.Settings.AutoSave ? "启用" : "禁用"));
+                Log.ConsoleInfo("备份：" + (Backups.Interval > 0 ? "启用" : "禁用"));
 
                 Initialized?.Invoke();
 
@@ -798,7 +798,7 @@ namespace TShockAPI
                     if (IPAddress.TryParse(ip, out addr))
                     {
                         Netplay.ServerIP = addr;
-                        ServerApi.LogWriter.PluginWriteLine(this, string.Format("Listening on IP {0}.", addr), TraceLevel.Verbose);
+                        ServerApi.LogWriter.PluginWriteLine(this, string.Format("监听IP {0}.", addr), TraceLevel.Verbose);
                     }
                     else
                     {
@@ -843,7 +843,7 @@ namespace TShockAPI
                         Netplay.ListenPort = port;
                         Config.Settings.ServerPort = port;
                         OverridePort = true;
-                        Log.ConsoleInfo("Port overridden by startup argument. Set to " + port);
+                        Log.ConsoleInfo("端口被启动参数覆盖. 被设置为：" + port);
                     }
                 })
                 .AddFlags(restTokenSet, (token) =>
@@ -928,12 +928,12 @@ namespace TShockAPI
 
             if (!Config.Settings.DisableLoginBeforeJoin)
             {
-                Log.ConsoleInfo("已开启在加入之前登录.在连接时，玩家可能输入玩家密码，而非服务器密码");
+                Log.ConsoleInfo("\n已开启在加入之前登录。在连接时，玩家可能输入玩家密码，而非服务器密码");
             }
 
             if (!Config.Settings.DisableUUIDLogin)
             {
-                Log.ConsoleInfo("使用UUID登录已开启. 用户通过UUID自动登录.");
+                Log.ConsoleInfo("使用UUID登录已开启. 用户将通过UUID自动登录.");
                 Log.ConsoleInfo("恶意服务器很容易窃取用户的UUID。如果运行公共服务器，可以考虑关闭此选项。");
             }
 

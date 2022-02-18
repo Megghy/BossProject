@@ -49,7 +49,7 @@ namespace BadgeSystem
 				using QueryResult queryResult = _database.QueryReader("SELECT * FROM NewBadge WHERE Id=@0", userId);
 				if (queryResult?.Read() ?? false)
 				{
-					TShock.Log.ConsoleInfo("1");
+					//TShock.Log.ConsoleInfo("1");
 					string value = queryResult.Get<string>("TotalBrackets");
 					string[] item = JsonConvert.DeserializeObject<string[]>(value);
 					value = queryResult.Get<string>("CurrentBrackets");
@@ -68,7 +68,7 @@ namespace BadgeSystem
 						new Tuple<IEnumerable<string>, IEnumerable<string>>(item3, item4),
 						new Tuple<IEnumerable<string>, IEnumerable<string>>(item5, item6) };
 
-					TShock.Log.ConsoleInfo("2 :" + tuples.Count().ToString());
+					//TShock.Log.ConsoleInfo("2 :" + tuples.Count().ToString());
 					return tuples;
 				}
 			}
