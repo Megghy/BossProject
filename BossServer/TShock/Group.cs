@@ -114,7 +114,7 @@ namespace TShockAPI
                 permissions.Clear();
                 negatedpermissions.Clear();
                 if (null != value)
-                    value.Split(',').ForEach(p => AddPermission(p.Trim()));
+                    value.Split(',').TForEach(p => AddPermission(p.Trim()));
             }
         }
 

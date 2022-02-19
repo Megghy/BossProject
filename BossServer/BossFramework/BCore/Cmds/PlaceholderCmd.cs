@@ -19,7 +19,7 @@ namespace BossFramework.BCore.Cmds
                 var name = args[0].ToLower();
                 if (CommandPlaceholder.Placeholders.Exists(p => p.Name == name))
                 {
-                    args.BPlayer.SendErrorMsg($"{name} 已存在.");
+                    args.Player.SendErrorMsg($"{name} 已存在.");
                     return;
                 }
                 var code = args.FullCommand.Remove(0, args.SubCommandName.Length + args.CommandName.Length + args[0].Length + 3);
@@ -33,15 +33,15 @@ namespace BossFramework.BCore.Cmds
                     };
                     DBTools.Insert(info);
                     CommandPlaceholder.Placeholders.Add(info);
-                    args.BPlayer.SendSuccessMsg($"已添加占位符 {name}");
+                    args.Player.SendSuccessMsg($"已添加占位符 {name}");
                 }
                 catch (Exception ex)
                 {
-                    args.BPlayer.SendErrorMsg($"未能添加占位符.\r\n{ex.Message}");
+                    args.Player.SendErrorMsg($"未能添加占位符.\r\n{ex.Message}");
                 }
             }
             else
-                args.BPlayer.SendInfoMsg($"格式错误. /ph add <占位符名称> <返回代码>");
+                args.Player.SendInfoMsg($"格式错误. /ph add <占位符名称> <返回代码>");
         }
         [NeedPermission("boss.admin.placeholder.add")]
         public static void Del(SubCommandArgs args)
@@ -53,18 +53,18 @@ namespace BossFramework.BCore.Cmds
                 {
                     DBTools.Delete(info);
                     CommandPlaceholder.Placeholders.Remove(info);
-                    args.BPlayer.SendErrorMsg($"已移除占位符 {name}");
+                    args.Player.SendErrorMsg($"已移除占位符 {name}");
                 }
                 else
-                    args.BPlayer.SendErrorMsg($"未找到名为 {name} 的占位符");
+                    args.Player.SendErrorMsg($"未找到名为 {name} 的占位符");
             }
             else
-                args.BPlayer.SendInfoMsg($"格式错误. /ph del <占位符名称>");
+                args.Player.SendInfoMsg($"格式错误. /ph del <占位符名称>");
         }
         [NeedPermission("boss.admin.placeholder.list")]
         public static void List(SubCommandArgs args)
         {
-            args.BPlayer.SendInfoMsg(string.Join("\r\n", CommandPlaceholder.Placeholders.Select(p => $"{{{p.Name}}} => {p.EvalString}")));
+            args.Player.SendInfoMsg(string.Join("\r\n", CommandPlaceholder.Placeholders.Select(p => $"{{{p.Name}}} => {p.EvalString}")));
         }
     }
 }

@@ -33,13 +33,13 @@ namespace BossFramework.BCore
                 var loaded = new List<Assembly>();
                 ServerApi.Plugins.Select(p => p.PluginAssembly)
                 .Where(a => a != null)
-                .BForEach(a =>
+                .ForEach(a =>
                 {
                     if (!loaded.Contains(a))
                     {
                         a.GetTypes()
                             .Where(t => t.BaseType == typeof(BaseCommand))
-                            .BForEach(t =>
+                            .ForEach(t =>
                             {
                                 var tempCMD = (BaseCommand)Activator.CreateInstance(t)!;
                                 tempCMD.RegisterAllSubCommands();
@@ -53,7 +53,7 @@ namespace BossFramework.BCore
 
                 //加载脚本命令文件
                 ScriptManager.LoadScripts<BaseCommand>(ScriptCmdPath)?
-                    .BForEach(s =>
+                    .ForEach(s =>
                     {
                         s.RegisterAllSubCommands();
                         Cmds.Add(s);
@@ -84,7 +84,7 @@ namespace BossFramework.BCore
         private static void OnUseAnyCmd(TShockAPI.Hooks.PlayerCommandEventArgs args)
         {
             CommandPlaceholder.Placeholders.Where(p => p.Match(args.CommandText))
-                .ForEach(p =>
+                .TForEach(p =>
                 {
                     args.CommandText = p.Replace(args, args.CommandText);
                     if (args.Parameters.Any())
@@ -114,7 +114,7 @@ namespace BossFramework.BCore
                 {
                     var subCmds = cmd.SubCommands.Where(s => s.Names?.Any(n => n.ToLower() == args.Parameters[0].ToLower()) ?? false).ToArray();
                     if (subCmds.Any())
-                        subCmds.BForEach(s =>
+                        subCmds.ForEach(s =>
                         {
                             ExcuteSubCmd(cmd, s, args, cmdName);
                         });
@@ -138,7 +138,7 @@ namespace BossFramework.BCore
                 {
                     var subArg = new SubCommandArgs(args, cmdName);
                     var isAwaitable = subCmd.Method?.ReturnType.GetMethod(nameof(Task.GetAwaiter)) != null;
-                    var invokeArg = subCmd.Method?.GetParameters().Any() == true ? new object[] { subArg } : new object[] { };
+                    var invokeArg = subCmd.Method?.GetParameters().Any() == true ? new object[] { subArg } : Array.Empty<object>();
                     if (isAwaitable)
                     {
                         if (subCmd.Method?.ReturnType.IsGenericType == true)

@@ -86,7 +86,7 @@ namespace RegionTrigger
             set
             {
                 _permissions.Clear();
-                value?.Split(',').ForEach(AddPermission);
+                value?.Split(',').TForEach(AddPermission);
             }
         }
 

@@ -859,7 +859,7 @@ namespace FakeProvider
                     && Helper.Inside(entityX, entityY, x, y, width, height)
                     && TileOnTop(entityX - this.X, entityY - this.Y))
                 {
-                    Entities.Where(e => e.X == entityX && e.Y == entityY).BForEach(e => RemoveEntity(e));
+                    Entities.Where(e => e.X == entityX && e.Y == entityY).ForEach(e => RemoveEntity(e));
                     if (IsEntityTile(entityX - this.X, entityY - this.Y, GetEntityTileTypes(entity)))
                         AddEntity(entity, true);
                     else

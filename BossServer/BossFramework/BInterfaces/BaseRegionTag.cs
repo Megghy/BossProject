@@ -12,7 +12,14 @@ namespace BossFramework.BInterfaces
         public BaseRegionTag(BRegion region) { Region = region; }
         public abstract string Name { get; }
         public abstract string Description { get; }
+        public bool IncludeChild { get; protected set; } = true;
         public BRegion Region { get; protected set; }
+        public BPlayer[] Players 
+            => Region.GetPlayers(IncludeChild);
+        public BaseRegionTag CreateInstance(BRegion region)
+        {
+            return Activator.CreateInstance(GetType(), new object[] { region }) as BaseRegionTag;
+        }
 
         public virtual void Dispose()
         {

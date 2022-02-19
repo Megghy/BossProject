@@ -22,7 +22,7 @@ namespace BossFramework.BCore
 
             Signs = DBTools.GetAll<BSign>().Where(r => r.WorldId == Terraria.Main.worldID).ToList();
 
-            Terraria.Main.sign.Where(s => s != null).BForEach(s =>
+            Terraria.Main.sign.Where(s => s != null).ForEach(s =>
             {
                 if (!Signs.Exists(sign => sign.X == s.x && sign.Y == s.y))
                 {
@@ -35,7 +35,7 @@ namespace BossFramework.BCore
             var invalidCount = 0;
             Signs.Where(s => !Terraria.Main.tileSign[Terraria.Main.tile[s.X, s.Y].type])
                 .ToArray()
-                .BForEach(s =>
+                .ForEach(s =>
                 {
                     RemoveSign(s);
                     invalidCount++;
@@ -48,7 +48,7 @@ namespace BossFramework.BCore
         {
             Task.Run(() =>
             {
-                BInfo.OnlinePlayers.BForEach(plr =>
+                BInfo.OnlinePlayers.ForEach(plr =>
                 {
                     if (plr.WatchingSign?.sign is { } sign
                     && !new Rectangle(sign.X, sign.Y, 2, 2).Intersects(new Rectangle(plr.TileX - 5, plr.TileY - 5, 14, 12)))
@@ -58,7 +58,7 @@ namespace BossFramework.BCore
                     var packets = new List<Packet>();
 
                     AllSign().Where(s => BUtils.IsPointInCircle(s.X, s.Y, plr.TileX, plr.TileY, BConfig.Instance.SignRefreshRadius))
-                        .BForEach(s => packets.Add(new ReadSign()
+                        .ForEach(s => packets.Add(new ReadSign()
                         {
                             PlayerSlot = plr.Index,
                             Position = new((short)s.X, (short)s.Y),
@@ -96,7 +96,7 @@ namespace BossFramework.BCore
                         s.UpdateSingle(s => s.Text, sign.Text);
 
                         BInfo.OnlinePlayers.Where(p => p.WatchingSign?.sign == s)
-                            .BForEach(p =>
+                            .ForEach(p =>
                             {
                                 sign.SignSlot = plr.WatchingSign.Value.slot;
                                 p.SendPacket(sign); //同步给其他正在看这个牌子的玩家
@@ -192,7 +192,7 @@ namespace BossFramework.BCore
         public static void RemoveSign(BSign sign)
         {
             BInfo.OnlinePlayers.Where(p => p.WatchingSign?.sign == sign)
-                    .BForEach(p => p.WatchingSign = null);
+                    .ForEach(p => p.WatchingSign = null);
             if (!DeregisterOverrideSign(sign))
                 if (Signs.Remove(sign))
                     DBTools.Delete(sign);

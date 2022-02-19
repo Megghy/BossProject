@@ -36,13 +36,13 @@ namespace BossFramework
             var loaded = new List<Assembly>();
             ServerApi.Plugins.Select(p => p.PluginAssembly)
                 .Where(a => a != null)
-                .BForEach(a =>
+                .ForEach(a =>
                 {
                     if (!loaded.Contains(a))
                     {
                         a.GetTypes()
-                            .BForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-                            .BForEach(m =>
+                            .ForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+                            .ForEach(m =>
                             {
                                 if (m.GetCustomAttribute<AutoInitAttribute>() is { } attr)
                                     auto.Add(m, attr);
@@ -52,7 +52,7 @@ namespace BossFramework
                     }
                 });
 
-            auto.OrderBy(a => a.Value.Order).BForEach(kv =>
+            auto.OrderBy(a => a.Value.Order).ForEach(kv =>
             {
                 try
                 {

@@ -38,7 +38,7 @@ namespace BossFramework
             Console.WriteLine(debugText);
             Console.ResetColor();
             BInfo.OnlinePlayers.Where(p => p.TsPlayer?.HasPermission("boss.admin.debug") == true)
-                .BForEach(p => BUtils.SendMsg(p.TsPlayer, debugText, new(130, 200, 200)));
+                .ForEach(p => BUtils.SendMsg(p.TsPlayer, debugText, new(130, 200, 200)));
         }
         private static void LogDirect(object message, string prefix = "Log", ConsoleColor color = ConsoleColor.Gray, bool save = true)
         {

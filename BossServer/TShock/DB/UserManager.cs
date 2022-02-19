@@ -94,7 +94,7 @@ namespace TShockAPI.DB
             try
             {
                 // Logout any player logged in as the account to be removed
-                TShock.Players.Where(p => p?.IsLoggedIn == true && p.Account.Name == account.Name).ForEach(p => p.Logout());
+                TShock.Players.Where(p => p?.IsLoggedIn == true && p.Account.Name == account.Name).TForEach(p => p.Logout());
 
                 UserAccount tempuser = GetUserAccount(account);
                 int affected = _database.Query("DELETE FROM Users WHERE Username=@0", account.Name);

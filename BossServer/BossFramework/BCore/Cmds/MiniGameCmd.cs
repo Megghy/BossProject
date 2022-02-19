@@ -24,9 +24,9 @@ namespace BossFramework.BCore.Cmds
         [SubCommand("create", "c", Permission = "boss.minigame.player.create")]
         public void CreateGame(SubCommandArgs args)
         {
-            if (args.BPlayer.IsInGame())
+            if (args.Player.IsInGame())
             {
-                args.BPlayer.SendErrorMsg(AlreadyInGame_Exception);
+                args.Player.SendErrorMsg(AlreadyInGame_Exception);
                 return;
             }
             if (args.Any())
@@ -36,22 +36,22 @@ namespace BossFramework.BCore.Cmds
                     if (games.Any())
                     {
                         if (games.Length > 1)
-                            args.BPlayer.SendMultipleMatchError(games.Select(g => g.Names.FirstOrDefault()));
-                        else if (MiniGameManager.CreateGame(games.First(), args.BPlayer) is { } game)
+                            args.Player.SendMultipleMatchError(games.Select(g => g.Names.FirstOrDefault()));
+                        else if (MiniGameManager.CreateGame(games.First(), args.Player) is { } game)
                         {
-                            game.Join(args.BPlayer);
-                            args.BPlayer.SendSuccessMsg($"成功创建小游戏 [{game.Name}]");
-                            BLog.Success($"[{args.BPlayer}] 申请创建小游戏 => [{game}]");
+                            game.Join(args.Player);
+                            args.Player.SendSuccessMsg($"成功创建小游戏 [{game.Name}]");
+                            BLog.Success($"[{args.Player}] 申请创建小游戏 => [{game}]");
                         }
                         else
-                            args.BPlayer.SendErrorMsg($"当前无法创建小游戏 [{games.First().Names.First()}]");
+                            args.Player.SendErrorMsg($"当前无法创建小游戏 [{games.First().Names.First()}]");
                     }
                 }
                 else
-                    args.BPlayer.SendErrorMsg($"未找到名称中包含 [{args.First()}] 的小游戏");
+                    args.Player.SendErrorMsg($"未找到名称中包含 [{args.First()}] 的小游戏");
             }
             else
-                args.BPlayer.SendErrorMsg($"{BCommand.InvalidInput} /{args.CommandName} {args.SubCommandName} <要创建的小游戏名称>");
+                args.Player.SendErrorMsg($"{BCommand.InvalidInput} /{args.CommandName} {args.SubCommandName} <要创建的小游戏名称>");
         }
         #endregion
 

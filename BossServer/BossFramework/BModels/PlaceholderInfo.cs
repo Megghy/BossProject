@@ -34,7 +34,7 @@ namespace BossFramework.BModels
             {
                 var match = _regex.Match(text);
                 var newText = text;
-                match.Groups.Keys.ForEach(k => newText = newText.Replace(match.Groups[k].Value, result));
+                match.Groups.Keys.TForEach(k => newText = newText.Replace(match.Groups[k].Value, result));
                 return newText;
             }
         }

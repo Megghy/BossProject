@@ -24,7 +24,7 @@ namespace TShockAPI
 {
     public static class LinqExt
     {
-        public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
+        public static void TForEach<T>(this IEnumerable<T> source, Action<T> action)
         {
             if (source == null) throw new ArgumentNullException("source");
             if (action == null) throw new ArgumentNullException("action");

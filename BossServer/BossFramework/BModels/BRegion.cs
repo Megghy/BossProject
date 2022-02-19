@@ -27,7 +27,13 @@ namespace BossFramework.BModels
                 OriginRegion ??= TShockAPI.TShock.Regions.Regions.FirstOrDefault(r => r.Name == Name && r.WorldID == WorldId.ToString());
             ProjContext = new(this);
 
-            Tags = BRegionSystem.GetTags(this);
+            Tags = BRegionSystem.CreateTags(this);
+            Tags.ForEach(t =>
+            {
+                if (TagsName.Contains(t.Name))
+                    TagsName.Remove(t.Name);
+            });
+            UpdateSingle(r => r.TagsName);
         }
 
         #region 自身变量
@@ -67,6 +73,10 @@ namespace BossFramework.BModels
                 return _childRegion;
             }
         }
+
+        public BPlayer[] GetPlayers(bool includeChild = true)
+            => BInfo.OnlinePlayers.Where(p => p?.CurrentRegion?.IsPlayerInThis(p, includeChild) == true)
+            .ToArray();
         #endregion
 
         #region 弹幕重定向
@@ -103,14 +113,35 @@ namespace BossFramework.BModels
                 UpdateSingle(r => r.ParentId, _parent.Id);
             }
         }
-        public bool AddTag(BaseRegionTag tag)
+
+        public bool IsPlayerInThis(BPlayer plr, bool includeChild = true)
+        {
+            return plr.CurrentRegion == this || (includeChild && IsInChildRegion(plr, this));
+            bool IsInChildRegion(BPlayer plr, BRegion parent){
+                if (parent.ChildRegion.Any())
+                {
+                    foreach (var child in parent.ChildRegion)
+                    {
+                        if (IsInChildRegion(plr, child))
+                            return true;
+                    }
+                    return false;
+                }
+                else
+                    return false;
+            }
+        }
+
+        public bool AddTag(BaseRegionTag tag, bool createInstance = true)
         {
             if (TagsName.Contains(tag.Name))
                 return false;
             TagsName.Add(tag.Name);
             if (UpdateSingle(r => r.TagsName) > 0)
             {
-                Tags.Add((BaseRegionTag)Activator.CreateInstance(tag.GetType(), null));
+                Tags.Add(createInstance
+                    ? (BaseRegionTag)Activator.CreateInstance(tag.GetType(), new object[] { tag.Region })
+                    : tag);
                 return true;
             }
             else
@@ -119,7 +150,7 @@ namespace BossFramework.BModels
                 return false;
             }
         }
-        public void AddTag(string tagName)
+        public void DelTag(string tagName)
         {
             if (!TagsName.Contains(tagName))
                 return;

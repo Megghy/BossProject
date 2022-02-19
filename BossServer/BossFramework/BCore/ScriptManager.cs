@@ -46,7 +46,7 @@ namespace BossFramework.BCore
             if (!Directory.Exists(path))
                 throw new DirectoryNotFoundException($"路径 {path} 不存在");
             var scripts = new List<T>();
-            Directory.GetFiles(path, "*.cs").BForEach(f =>
+            Directory.GetFiles(path, "*.cs").ForEach(f =>
             {
                 try
                 {

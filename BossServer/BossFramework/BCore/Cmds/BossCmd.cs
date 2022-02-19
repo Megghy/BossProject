@@ -27,10 +27,10 @@ namespace BossFramework.BCore.Cmds
                     plr.ChangeCustomWeaponMode(enable);
                 }
                 else
-                    args.BPlayer.SendErrorMsg($"未找到名为 {args[0]} 的玩家");
+                    args.Player.SendErrorMsg($"未找到名为 {args[0]} 的玩家");
             }
             else
-                args.BPlayer.SendErrorMsg($"格式错误. /boss ncw <玩家名> (on/off)");
+                args.Player.SendErrorMsg($"格式错误. /boss ncw <玩家名> (on/off)");
         }
     }
 }

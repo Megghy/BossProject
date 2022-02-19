@@ -6,7 +6,7 @@ namespace BossFramework.BAttributes
     /// <summary>
     /// 表示这是一个子命令
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class SubCommandAttribute : Attribute
     {
         /// <summary>

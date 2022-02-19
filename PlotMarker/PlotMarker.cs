@@ -28,7 +28,7 @@ namespace PlotMarker
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreet);
             ServerApi.Hooks.ServerLeave.Register(this, OnLeave);
             ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInitialize);
-            ServerApi.Hooks.WorldSave.Register(this, (args) => { Task.Run(() => PlotManager.CurrentPlot?.Cells.Where(c => c.IsVisiable).ForEach(c => c.SaveCellData())); });
+            ServerApi.Hooks.WorldSave.Register(this, (args) => { Task.Run(() => PlotManager.CurrentPlot?.Cells.Where(c => c.IsVisiable).TForEach(c => c.SaveCellData())); });
         }
 
         protected override void Dispose(bool disposing)
@@ -87,7 +87,7 @@ namespace PlotMarker
             PlotManager.Reload();
 
             //设置未隐藏的属地的信息
-            PlotManager.CurrentPlot?.Cells?.Where(c => c.IsVisiable).ForEach(c =>
+            PlotManager.CurrentPlot?.Cells?.Where(c => c.IsVisiable).TForEach(c =>
             {
                 c.RestoreCellTileData();
                 c.RegisteChestAndSign();
@@ -226,7 +226,7 @@ namespace PlotMarker
                                 if (reader.Get<string>("WorldId") == Main.worldID.ToString())
                                 {
                                     var cells = LoadCells(plot);
-                                    cells.ForEach(c =>
+                                    cells.TForEach(c =>
                                     {
                                         var posIndex = PlotManager.CurrentPlot.CellsPosition.FirstOrDefault(pos =>
                                         {
@@ -400,7 +400,7 @@ namespace PlotMarker
                             }
                         }
                         plot.Generate(clear);
-                        plot.Cells.Where(c => c.IsVisiable).ForEach(c => c.RestoreCellTileData());
+                        plot.Cells.Where(c => c.IsVisiable).TForEach(c => c.RestoreCellTileData());
                     }
                     break;
                 case "信息":

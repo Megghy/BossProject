@@ -39,7 +39,7 @@ namespace BossFramework
             }
         }
         //为了和ts的foreach区分名字
-        public static void BForEach<T>(this IEnumerable<T> source, Action<T> action) => source.ForEach((obj, _) => action(obj));
+        public static void ForEach<T>(this IEnumerable<T> source, Action<T> action) => source.ForEach((obj, _) => action(obj));
         public static void ForEach(this int count, Action<int> action)
         {
             if (count < 1)
@@ -316,14 +316,14 @@ namespace BossFramework
 
         public static void SendPacketToAll(Packet packet, BPlayer ignore = null)
         {
-            BInfo.OnlinePlayers.Where(p => p != ignore).BForEach(p => p.SendPacket(packet));
+            BInfo.OnlinePlayers.Where(p => p != ignore).ForEach(p => p.SendPacket(packet));
         }
         public static void SendPacketsToAll(this IEnumerable<Packet> packets, BPlayer ignore = null)
         {
             List<byte> packetData = new();
-            packets.ForEach(packet => packetData.AddRange(packet.SerializePacket()));
+            packets.TForEach(packet => packetData.AddRange(packet.SerializePacket()));
             var packetBytes = packetData.ToArray();
-            BInfo.OnlinePlayers.Where(p => p != ignore).BForEach(p => p.SendRawData(packetBytes));
+            BInfo.OnlinePlayers.Where(p => p != ignore).ForEach(p => p.SendRawData(packetBytes));
         }
         public static void SendMsg(this TSPlayer plr, object msg, Color color = default)
         {

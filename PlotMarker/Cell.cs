@@ -130,7 +130,7 @@ namespace PlotMarker
             if (SerializedEntitiesData is null)
                 return list;
             SerializedEntitiesData.DecompressBytes().DeserializeBytes<TempSavedEntityData[]>()
-                .ForEach(entityInfo => list.Add(entityInfo.Type switch
+                .TForEach(entityInfo => list.Add(entityInfo.Type switch
                 {
                     TileEntityType.TEHatRack => entityInfo.EntityData.DeserializeBytes<ProtocolTEHatRack>(),
                     TileEntityType.TEWeaponsRack => entityInfo.EntityData.DeserializeBytes<ProtocolTEWeaponsRack>(),
@@ -183,7 +183,7 @@ namespace PlotMarker
             Entities.Clear();
             var rec = new Rectangle(startX, startY, Width, Height);
             TileEntity.ByPosition.Where(t => rec.Contains(t.Key.X, t.Key.Y))
-                .ForEach(entity =>
+                .TForEach(entity =>
                 {
                     var e = Activator.CreateInstance(Constants.tileEntityDict[(TileEntityType)entity.Value.type], new object[] { entity.Value }) as IProtocolTileEntity;
                     e.Position = new(entity.Key.X - startX, entity.Key.Y - startY); //转换为相对坐标
@@ -203,7 +203,7 @@ namespace PlotMarker
 
             //保存箱子数据
             ChestRedirector.AllChest().Where(c => rec.Contains(c.X, c.Y))
-                .ForEach(c =>
+                .TForEach(c =>
                 {
                     if (CellChests.FirstOrDefault(s => s.TileX == c.X - startX && s.TileY == c.Y - startY) is { } oldChest)
                         oldChest.Items = c.Items;
@@ -218,7 +218,7 @@ namespace PlotMarker
 
             //保存牌子数据
             SignRedirector.AllSign().Where(s => rec.Contains(s.X, s.Y))
-                .ForEach(s =>
+                .TForEach(s =>
                 {
                     if (CellSigns.FirstOrDefault(temp => temp.TileX == s.X - startX && temp.TileY == s.Y - startY) is { } oldSign)
                         oldSign.Text = s.Text;
@@ -282,7 +282,7 @@ namespace PlotMarker
                     TileEntity.ByID.Remove(placedEntity.ID);
                     TileEntity.ByPosition.Remove(placedEntity.Position);
 
-                    if(placedEntity is TETrainingDummy dummy)
+                    if(placedEntity is TETrainingDummy dummy && dummy.npc != -1)
                     {
                         NPC npc = Main.npc[dummy.npc];
                         npc.type = 0;
@@ -386,7 +386,7 @@ namespace PlotMarker
                 var entityY = Y + entity.Position.Y;
                 TileEntity.ByPosition.Where(t => t.Key.X == entityX && t.Key.Y == entityY)
                 .ToArray()
-                .ForEach(e =>
+                .TForEach(e =>
                 {
                     TileEntity.ByPosition.Remove(e.Key);
                     TileEntity.ByID.Remove(e.Value.ID);
@@ -417,7 +417,7 @@ namespace PlotMarker
                 }
             });
             FakeProviderAPI.World.ScanEntities(); //fakeprovider重新获取entity
-            BInfo.OnlinePlayers.ForEach(p => p.SendRawData(packetData.ToArray()));
+            BInfo.OnlinePlayers.TForEach(p => p.SendRawData(packetData.ToArray()));
         }
         #endregion
 

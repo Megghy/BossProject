@@ -24,7 +24,7 @@ namespace BossFramework.BCore
 
             Chests = DBTools.GetAll<BChest>().Where(r => r.WorldId == Terraria.Main.worldID).ToList();
 
-            Terraria.Main.chest.Where(s => s != null).BForEach(chest =>
+            Terraria.Main.chest.Where(s => s != null).ForEach(chest =>
             {
                 if (!Chests.Exists(c => c.X == chest.x && c.Y == chest.y))
                 {
@@ -97,7 +97,7 @@ namespace BossFramework.BCore
 
                     //同步给同样在看这个箱子的玩家
                     BInfo.OnlinePlayers.Where(p => p.WatchingChest?.chest == chest && p != plr)
-                        .BForEach(p =>
+                        .ForEach(p =>
                         {
                             packet.ChestSlot = p.WatchingChest.Value.slot;
                             p.SendPacket(packet);
@@ -239,7 +239,7 @@ namespace BossFramework.BCore
         public static void RemoveChest(BChest chest)
         {
             BInfo.OnlinePlayers.Where(p => p.WatchingChest?.chest == chest)
-                    .BForEach(p => p.WatchingChest = null);
+                    .ForEach(p => p.WatchingChest = null);
             if (!DeregisterOverrideChest(chest))
                 if (Chests.Remove(chest))
                     DBTools.Delete(chest);

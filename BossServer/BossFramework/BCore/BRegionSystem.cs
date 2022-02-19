@@ -53,7 +53,7 @@ namespace BossFramework.BCore
             {
                 lock (r)
                 {
-                    r.Tags = r.GetTags();
+                    r.Tags = r.CreateTags();
                 }
             });
         }
@@ -144,7 +144,7 @@ namespace BossFramework.BCore
                 }
             }
         }
-        public static List<BaseRegionTag> GetTags(this BRegion region)
+        public static List<BaseRegionTag> CreateTags(this BRegion region)
             => region.TagsName is null
             ? new()
             :RegionTags?.Where(t => region?.TagsName?.Contains(t.Name) == true)

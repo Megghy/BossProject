@@ -12,7 +12,7 @@ using TShockAPI;
 
 namespace BossFramework.BModels
 {
-    public partial class BPlayer : UserConfigBase<BPlayer>
+    public partial class BPlayer : UserConfigBase<BPlayer>, ISendMsg
     {
         public BPlayer() { }
         public BPlayer(TSPlayer plr)
@@ -84,7 +84,7 @@ namespace BossFramework.BModels
         public void SendPackets(IEnumerable<Packet> p)
         {
             List<byte> packetData = new();
-            p.ForEach(packet => packetData.AddRange(packet.SerializePacket()));
+            p.TForEach(packet => packetData.AddRange(packet.SerializePacket()));
             TsPlayer?.SendRawData(packetData.ToArray());
         }
         public void SendRawData(byte[] data) => TsPlayer?.SendRawData(data);

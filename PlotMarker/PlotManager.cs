@@ -27,7 +27,7 @@ namespace PlotMarker
             Plots.Clear();
 
             DBTools.GetAll<Plot>(p => p.WorldId == Main.worldID)
-                        .ForEach(plot =>
+                        .TForEach(plot =>
                         {
                             plot.Cells = LoadCells(plot);
                             Plots.Add(plot);
