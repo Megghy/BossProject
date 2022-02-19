@@ -30,6 +30,8 @@ namespace BossFramework
 
         public static void DEBUG(object text)
         {
+            if (!BConfig.Instance.DebugInfo)
+                return;
             var caller = new StackFrame(1).GetMethod();
             var debugText = $"[{caller!.DeclaringType!.Name}.{caller.Name}] <DEBUG> {text}";
             Console.ForegroundColor = ConsoleColor.DarkCyan;
