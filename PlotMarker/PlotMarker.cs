@@ -198,6 +198,98 @@ namespace PlotMarker
 
             switch (cmd)
             {
+                case "upload":
+                    try
+                    {
+                        if (PlotManager.CurrentPlot is null)
+                        {
+                            args.Player.SendErrorMessage($"还没属地");
+                            return;
+                        }
+                        using (var reader = TShock.DB.QueryReader("SELECT * FROM Plots WHERE WorldId = @0", Main.worldID.ToString()))
+                        {
+                            while (reader.Read())
+                            {
+                                var plot = new tempPlot
+                                {
+                                    Id = reader.Get<int>("Id"),
+                                    Name = reader.Get<string>("Name"),
+                                    X = reader.Get<int>("X"),
+                                    Y = reader.Get<int>("Y"),
+                                    Width = reader.Get<int>("Width"),
+                                    Height = reader.Get<int>("Height"),
+                                    CellWidth = reader.Get<int>("CellWidth"),
+                                    CellHeight = reader.Get<int>("CellHeight"),
+                                    Owner = reader.Get<string>("Owner"),
+                                };
+                                if (reader.Get<string>("WorldId") == Main.worldID.ToString())
+                                {
+                                    var cells = LoadCells(plot);
+                                    cells.ForEach(c =>
+                                    {
+                                        var posIndex = PlotManager.CurrentPlot.CellsPosition.FirstOrDefault(pos =>
+                                        {
+                                            var rec = new Rectangle(pos.TileX, pos.TileY, pos.Width, pos.Height);
+                                            return rec.Contains(c.X + 1, c.Y + 1);
+                                        });
+                                        var newCell = new Cell()
+                                        {
+                                            AllowedIDs = c.AllowedIDs,
+                                            TileData = new FakeProvider.StructTile[plot.CellWidth, plot.CellHeight],
+                                            GetTime = c.GetTime,
+                                            LastAccess = c.LastAccess,
+                                            Level = 1,
+                                            Owner = c.Owner,
+                                            PlotId = PlotManager.CurrentPlot.Id,
+                                            LastPositionIndex = posIndex.Index,
+                                            UsingCellPositionIndex = new List<int>() { posIndex.Index }
+                                        };
+                                        DBTools.Insert(newCell);
+                                        newCell.SaveCellData();
+                                        PlotManager.CurrentPlot.Cells.Add(newCell);
+                                        Console.WriteLine($"已添加 {newCell.Id}, 属于 {newCell.Owner}");
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                    tempCell[] LoadCells(tempPlot parent)
+                    {
+                        var list = new List<tempCell>();
+                        using (var reader = TShock.DB.QueryReader("SELECT * FROM `cells` WHERE `cells`.`PlotId` = @0 ORDER BY `cells`.`CellId` ASC",
+                            parent.Id))
+                        {
+                            while (reader.Read())
+                            {
+                                var cell = new tempCell
+                                {
+                                    Id = reader.Get<int>("CellId"),
+                                    X = reader.Get<int>("X"),
+                                    Y = reader.Get<int>("Y"),
+                                    Owner = reader.Get<string>("Owner"),
+                                    GetTime = DateTime.TryParse(reader.Get<string>("GetTime"), out DateTime dt) ? dt : default(DateTime),
+                                    LastAccess = DateTime.TryParse(reader.Get<string>("LastAccess"), out dt) ? dt : default(DateTime),
+                                    AllowedIDs = new List<int>()
+                                };
+                                var mergedids = reader.Get<string>("UserIds") ?? "";
+                                var splitids = mergedids.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                foreach (var t in splitids)
+                                {
+                                    if (int.TryParse(t, out int userid))
+                                        cell.AllowedIDs.Add(userid);
+                                    else
+                                        TShock.Log.Warn("UserIDs 有一列不可用数据: " + t);
+                                }
+                                list.Add(cell);
+                            }
+                        }
+                        return list.ToArray();
+                    }
+                    break;
                 case "点":
                 case "point":
                     {
