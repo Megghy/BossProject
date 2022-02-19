@@ -76,7 +76,37 @@ namespace PlotMarker
         }
 
         public static void UpdateCellsPos(Plot plot)
-            => Task.Run(() => plot.UpdateSingle(p => p.CellsPosition));
+        {
+            Task.Run(() =>
+            {
+                var style = PlotMarker.Config.PlotStyle;
+                var cellX = plot.CellWidth + style.LineWidth;
+                var cellY = plot.CellHeight + style.LineWidth;
+                var numX = (plot.Width - style.LineWidth) / cellX;
+                var numY = (plot.Height - style.LineWidth) / cellY;
+                var cellsPos = new List<CellPosition>();
+                var index = 0;
+                for (var x = 0; x < numX; x++)
+                {
+                    for (var y = 0; y < numY; y++)
+                    {
+                        cellsPos.Add(new()
+                        {
+                            TileX = plot.X + x * cellX + style.LineWidth,
+                            TileY = plot.Y + y * cellY + style.LineWidth,
+                            Width = style.CellWidth,
+                            Height = style.CellHeight,
+                            IndexX = x,
+                            IndexY = y,
+                            Index = index
+                        });
+                        index++;
+                    }
+                }
+                plot.CellsPosition = cellsPos.ToList();
+                plot.UpdateSingle(p => p.CellsPosition);
+            });
+        }
 
         #region 子属地可见性操作
         /// <summary>

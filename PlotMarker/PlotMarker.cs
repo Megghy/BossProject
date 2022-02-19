@@ -1,8 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BossFramework.DB;
+using Microsoft.Xna.Framework;
 using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
+using TShockAPI.DB;
 
 namespace PlotMarker
 {
@@ -118,7 +120,77 @@ namespace PlotMarker
                 args.Handled = Handlers.HandleGetData(type, player, data);
             }
         }
+        internal sealed class tempPlot
+        {
+            /// <summary> 属地在数据库中的Id </summary>
+            public int Id { get; set; }
 
+            /// <summary> 属地的名字 </summary>
+            public string Name { get; set; }
+
+            /// <summary> 属地的起始X坐标 </summary>
+            public int X { get; set; }
+
+            /// <summary> 属地的起始Y坐标 </summary>
+            public int Y { get; set; }
+
+            /// <summary> 属地的宽 </summary>
+            public int Width { get; set; }
+
+            /// <summary> 属地的高 </summary>
+            public int Height { get; set; }
+
+            /// <summary> 小块区域的宽 </summary>
+            public int CellWidth { get; set; }
+
+            /// <summary> 小块区域的高 </summary>
+            public int CellHeight { get; set; }
+
+            /// <summary> 整片属地的拥有者 </summary>
+            public string Owner { get; set; }
+
+            /// <summary>
+            /// 小块区域的引用. 其中数组索引就是 <see cref="Cell.Id"/> ,
+            /// 而顺序(数组索引)是按照 <see cref="Plot.GenerateCells"/> 中添加列表的顺序来
+            /// </summary>
+            public Cell[] Cells { get; internal set; }
+        }
+
+        internal sealed class tempCell
+        {
+            /// <summary> Cell在 <see cref="Plot.Cells"/> 的索引 </summary>
+            public int Id { get; set; }
+
+            /// <summary> Cell所属的 <see cref="Plot"/> 引用 </summary>
+            public Plot Parent { get; set; }
+
+            /// <summary> Cell的起始X坐标 </summary>
+            public int X { get; set; }
+
+            /// <summary> Cell的起始X坐标 </summary>
+            public int Y { get; set; }
+
+            public Point Center => new Point(X + Parent.CellWidth / 2, Y + Parent.CellHeight / 2);
+
+            /// <summary> 属地的主人 </summary>
+            public string Owner { get; set; }
+
+            /// <summary>
+            /// 玩家 <see cref="Owner"/> 领取属地的时间
+            /// 用于判定过期 
+            /// </summary>
+            public DateTime GetTime { get; set; }
+
+            public DateTime LastAccess { get; set; }
+
+            /// <summary> 有权限动属地者 </summary>
+            public List<int> AllowedIDs { get; set; }
+
+            public bool Contains(int x, int y)
+            {
+                return X <= x && x < X + Parent.CellWidth && Y <= y && y < Y + Parent.CellHeight;
+            }
+        }
         private static void AreaManage(CommandArgs args)
         {
             var cmd = args.Parameters.Count > 0 ? args.Parameters[0].ToLower() : "help";
@@ -170,6 +242,14 @@ namespace PlotMarker
                         }
 
                     }
+                    break;
+                case "updatepos":
+                    if (PlotManager.CurrentPlot is null)
+                    {
+                        args.Player.SendErrorMessage($"还没属地");
+                        return;
+                    }
+                    PlotManager.UpdateCellsPos(PlotManager.CurrentPlot);
                     break;
                 case "删除":
                 case "del":
@@ -709,16 +789,16 @@ namespace PlotMarker
                 case "hide":
                 case "隐藏":
                     {
-                        Cell[] cells = args.Player.HasPermission("pm.admin.hide")
+                        Cell[] hideCells = args.Player.HasPermission("pm.admin.hide")
                         ? PlotManager.CurrentPlot.Cells.ToArray()
                         : PlotManager.GetCellsOfPlayer(args.Player.Name);
-                        if (cells.Any())
+                        if (hideCells.Any())
                         {
                             if (args.Parameters.Count > 1)
                             {
                                 if (int.TryParse(args.Parameters[1], out var cellIndex))
                                 {
-                                    if (cells.FirstOrDefault(c => c.Id == cellIndex) is { } cell)
+                                    if (hideCells.FirstOrDefault(c => c.Id == cellIndex) is { } cell)
                                     {
                                         HideCell(args.Player, cell);
                                     }
@@ -729,7 +809,7 @@ namespace PlotMarker
                                     args.Player.SendErrorMessage($"无效的属地编号: {args.Parameters[1]}");
                             }
                             else
-                                HideCell(args.Player, cells.First());
+                                args.Player.SendErrorMessage($"未指定属地编号");
                         }
                         else
                             args.Player.SendInfoMessage($"未找到任何, 请输入 {"/mp get".Color("7FDFDE")} 来获取属地");
@@ -744,6 +824,33 @@ namespace PlotMarker
                         else
                             args.Player.SendInfoMessage($"属地 [{cell.Id}] 未处于显示状态");
                     }
+                    break;
+                case "show":
+                    Cell[] showCells = args.Player.HasPermission("pm.admin.show")
+                        ? PlotManager.CurrentPlot.Cells.ToArray()
+                        : PlotManager.GetCellsOfPlayer(args.Player.Name);
+                    if (showCells.Any())
+                    {
+                        if (args.Parameters.Count > 1)
+                        {
+                            if (int.TryParse(args.Parameters[1], out var cellIndex))
+                            {
+                                if (showCells.FirstOrDefault(c => c.Id == cellIndex) is { } cell)
+                                {
+                                    cell.ShowCell(args.Player);
+                                    args.Player.SendSuccessMessage($"已显示 {cell.Id}");
+                                }
+                                else
+                                    args.Player.SendErrorMessage($"未找到Id为 {cellIndex} 的属地, 或者它不属于你");
+                            }
+                            else
+                                args.Player.SendErrorMessage($"无效的属地编号: {args.Parameters[1]}");
+                        }
+                        else
+                            args.Player.SendErrorMessage($"未指定属地编号");
+                    }
+                    else
+                        args.Player.SendInfoMessage($"未找到任何, 请输入 {"/mp get".Color("7FDFDE")} 来获取属地");
                     break;
                 case "info":
                     {
@@ -814,7 +921,7 @@ namespace PlotMarker
                     }
                     break;
                 case "redraw":
-                    if(!args.Player.HasPermission("pm.admin.redraw"))
+                    if (!args.Player.HasPermission("pm.admin.redraw"))
                     {
                         args.Player.SendErrorMessage("你没有使用此命令的权限");
                         return;
@@ -886,8 +993,9 @@ namespace PlotMarker
             {
                 return true;
             }
-
-            if (PlotManager.CurrentPlot?.FindCell(tileX, tileY) is { } cell)
+            if (PlotManager.CurrentPlot is null || !PlotManager.CurrentPlot.Contains(tileX, tileY))
+                return false;
+            else if (PlotManager.CurrentPlot.FindCell(tileX, tileY) is { } cell)
             {
                 if (string.Equals(cell.Owner, player.Name, StringComparison.Ordinal)
                     || cell.AllowedIDs?.Contains(player.Account.ID) == true
@@ -897,7 +1005,7 @@ namespace PlotMarker
                     return false;
                 }
             }
-            else if (PlotManager.CurrentPlot?.IsWall(tileX, tileY) == true)
+            else if (PlotManager.CurrentPlot.IsWall(tileX, tileY) == true)
             {
                 return !player.HasPermission("pm.build.wall");
             }

@@ -77,7 +77,7 @@ namespace PlotMarker
         /// <summary>
         /// 注意 其中的坐标为相对坐标
         /// </summary>
-        public List<IProtocolTileEntity> Entities { get; set; }
+        public List<IProtocolTileEntity> Entities { get; set; } = new();
         [Column(DbType = "MEDIUMBLOB")]
         public byte[] SerializedEntitiesData { get; set; }
         [JsonMap]
@@ -97,21 +97,21 @@ namespace PlotMarker
             => (short)(LastPositionIndex == -1
             ? -1
             : Parent.CellsPosition[LastPositionIndex]?.TileY ?? -1);
-        public Point Center => new(X + (Parent.CellWidth / 2), Y + (Parent.Height / 2));
-        public int Width => Parent.CellWidth * Level + (Parent.LineWidth * Level - 1);
-        public int Height => Parent.Height * Level + (Parent.LineWidth * Level - 1);
+        public Point Center => new(X + (Width / 2), Y + (Height / 2));
+        public int Width => Parent.CellWidth * Level + (Parent.LineWidth * (Level - 1));
+        public int Height => Parent.CellHeight * Level + (Parent.LineWidth * (Level - 1));
         public int AbsloteSpawnX
             => LastPositionIndex == -1
             ? -1
             : SpawnX == -1
             ? Center.X
-            : (Parent.CellsPosition[LastPositionIndex]?.TileX ?? -1) + SpawnX;
+            : X + SpawnX;
         public int AbsloteSpawnY
             => LastPositionIndex == -1
             ? -1
             : SpawnY == -1
             ? Center.Y
-            : (Parent.CellsPosition[LastPositionIndex]?.TileY ?? -1) + SpawnY;
+            : Y + SpawnY;
 
         internal byte[] GetSerializedTileData()
             => TileData.SerializeToBytes().CompressBytes();
@@ -163,7 +163,7 @@ namespace PlotMarker
             return X <= x && x < X + Parent.CellWidth && Y <= y && y < Y + Parent.CellHeight;
         }
         public string GetInfo()
-            => $"ID: [{Id}] - " +
+            => $"ID: [{Id}] <{(IsVisiable ? "可见" : "不可见")}> - " +
                 $"领主: {(string.IsNullOrWhiteSpace(Owner) ? "未知" : Owner)}" +
                 $" | 创建: {GetTime:g}" +
                 $" | 修改: {LastAccess:g}" +
@@ -267,6 +267,8 @@ namespace PlotMarker
             //重新画线
             //Parent.ReDrawLines(sendSection);
             //不升级的话就不用重画线
+            if (sendSection)
+                TileHelper.ResetSection(X, Y, Width, Height);
 
             BLog.Info($"属地 [{Id}]<{Owner}> 现在处于隐藏状态");
         }

@@ -96,26 +96,6 @@ namespace PlotMarker
 
             TileHelper.ResetSection(X, Y, Width, Height);
 
-            var cellsPos = new List<CellPosition>();
-            var index = 0;
-            for (var x = 0; x < numX; x++)
-            {
-                for (var y = 0; y < numY; y++)
-                {
-                    cellsPos.Add(new()
-                    {
-                        TileX = X + x * cellX + style.LineWidth,
-                        TileY = Y + y * cellY + style.LineWidth,
-                        Width = Width,
-                        Height = Height,
-                        IndexX = x,
-                        IndexY = y,
-                        Index = index
-                    });
-                    index++;
-                }
-            }
-            CellsPosition = cellsPos.ToList();
             PlotManager.UpdateCellsPos(this);
         }
         public void ReDrawLines(bool sendSection = true)
