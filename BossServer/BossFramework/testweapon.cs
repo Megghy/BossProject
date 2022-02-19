@@ -22,7 +22,7 @@ public class testweapon : BaseBWeapon
     {
         if (isDefaultProj)
         {
-            CreateProj(plr, 950, new Vector2, velocity, 0);
+            CreateProj(plr, 950, plr.TrPlayer.position, velocity, 0);
             return true;
         }
         return false;

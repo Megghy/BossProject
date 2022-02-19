@@ -1,4 +1,5 @@
-﻿using BossFramework.DB;
+﻿using BossFramework.BCore;
+using BossFramework.DB;
 using Microsoft.Xna.Framework;
 using System.Reflection;
 using Terraria;
@@ -246,6 +247,8 @@ namespace PlotMarker
                                         };
                                         DBTools.Insert(newCell);
                                         newCell.SaveCellData();
+                                        newCell.CellChests.ForEach(c => ChestRedirector.RemoveChest(c.TileX, c.TileY));
+                                        newCell.CellSigns.ForEach(c => SignRedirector.RemoveSign(c.TileX, c.TileY));
                                         PlotManager.CurrentPlot.Cells.Add(newCell);
                                         Console.WriteLine($"已添加 {newCell.Id}, 属于 {newCell.Owner}");
                                     });

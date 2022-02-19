@@ -138,18 +138,7 @@ namespace PlotMarker
                 }
             }
             //跑完一圈依然没有能用的
-            CurrentPlot.Cells.Where(c =>
-                {
-                    var plr = TShock.Players.FirstOrDefault(p => p?.Name == c.Owner);
-                    if (c.IsVisiable && (plr is null || c.Contains(plr.TileX, plr.TileY)))
-                        return true;
-                    return false;
-                })
-                .ForEach(c =>
-                {
-                    c.Invisiable(false);
-                });
-            TileHelper.ResetSection(CurrentPlot.X, CurrentPlot.Y, CurrentPlot.Width, CurrentPlot.Height);
+            CurrentPlot.Cells.OrderBy(c => c.LastAccess).FirstOrDefault()?.Invisiable();
             if (isFirstRun)
                 return cell.FindUseableArea(false);
             else
