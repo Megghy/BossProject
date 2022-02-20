@@ -733,7 +733,8 @@ namespace FakeProvider
                 }
                 return applied;
             }
-            else */if (Entity is TileEntity tileEntity)
+            else */
+            if (Entity is TileEntity tileEntity)
             {
                 Point16 position = new(Entity.X, Entity.Y);
                 if (TileEntity.ByPosition.TryGetValue(position, out TileEntity entity)
@@ -764,7 +765,8 @@ namespace FakeProvider
                 if (Entity.Index >= 0 && Main.chest[Entity.Index] == Entity)
                     Main.chest[Entity.Index] = null;
             }
-            else */if (Entity is TileEntity entity)
+            else */
+            if (Entity is TileEntity entity)
             {
                 TileEntity.ByID.Remove(Entity.Index);
                 if (Entity.Index >= 0

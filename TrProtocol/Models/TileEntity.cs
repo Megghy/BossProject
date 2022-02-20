@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using TrProtocol.Models.TileEntities;
 using TrProtocol.Serializers;
 
 namespace TrProtocol.Models
@@ -9,7 +7,7 @@ namespace TrProtocol.Models
     [Serializer(typeof(TileEntitySerializer))]
     public interface IProtocolTileEntity
     {
-        public static IProtocolTileEntity Read(BinaryReader br)
+        public static IProtocolTileEntity Read(BinaryBufferReader br)
         {
             var type = (TileEntityType)br.ReadByte();
             if (Constants.tileEntityDict.TryGetValue(type, out var t))
@@ -35,7 +33,7 @@ namespace TrProtocol.Models
         public ShortPosition Position { get; set; }
         public int ID { get; set; }
         public void WriteExtraData(BinaryWriter writer);
-        public IProtocolTileEntity ReadExtraData(BinaryReader reader);
+        public IProtocolTileEntity ReadExtraData(BinaryBufferReader reader);
         public TileEntity ToTrTileEntity();
     }
     public abstract partial class ProtocolTileEntity<T> : IProtocolTileEntity where T : TileEntity
@@ -49,7 +47,7 @@ namespace TrProtocol.Models
         public ShortPosition Position { get; set; }
         public int ID { get; set; }
         public abstract void WriteExtraData(BinaryWriter writer);
-        public abstract IProtocolTileEntity ReadExtraData(BinaryReader reader);
+        public abstract IProtocolTileEntity ReadExtraData(BinaryBufferReader reader);
         protected abstract T ToTrTileEntityInternal();
         public TileEntity ToTrTileEntity()
         {

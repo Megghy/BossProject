@@ -121,8 +121,10 @@ namespace BossFramework.BCore
                     else if (cmd.SubCommands.FirstOrDefault(s => !s.Names?.Any() ?? true) is { } defaultSubCmd)
                         ExcuteSubCmd(cmd, defaultSubCmd, args, cmdName);
                     else
-                        args.Player.SendInfoMessage($"无效的命令");
+                        cmd.Help(new(args, cmdName));
                 }
+                else
+                    cmd.Help(new(args, cmdName));
             }
         }
         private static async void ExcuteSubCmd(BaseCommand baseCmd, SubCommandAttribute subCmd, CommandArgs args, string cmdName)

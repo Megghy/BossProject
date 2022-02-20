@@ -23,7 +23,7 @@ namespace TrProtocol
                 this.type = type;
             }
 
-            public object Read(BinaryReader br)
+            public object Read(BinaryBufferReader br)
             {
                 var o = Activator.CreateInstance(type);
                 deserializer(o, br);
@@ -37,12 +37,12 @@ namespace TrProtocol
         }
 
         private delegate void Serializer(object o, BinaryWriter bw);
-        private delegate void Deserializer(object o, BinaryReader br);
+        private delegate void Deserializer(object o, BinaryBufferReader br);
 
         private readonly Dictionary<Type, Action<BinaryWriter, Packet>> serializers = new();
 
-        private readonly Dictionary<MessageID, Func<BinaryReader, Packet>> deserializers = new();
-        private readonly Dictionary<NetModuleType, Func<BinaryReader, NetModulesPacket>> moduledeserializers = new();
+        private readonly Dictionary<MessageID, Func<BinaryBufferReader, Packet>> deserializers = new();
+        private readonly Dictionary<NetModuleType, Func<BinaryBufferReader, NetModulesPacket>> moduledeserializers = new();
 
         private readonly Dictionary<Type, Type> enumSerializers = new()
         {
@@ -211,12 +211,9 @@ namespace TrProtocol
             this.version = version;
             LoadPackets(Assembly.GetExecutingAssembly());
         }
-
-        public Packet Deserialize(BinaryReader br0)
+        public Packet Deserialize(BinaryBufferReader br)
         {
-            var l = br0.ReadInt16();
-            using var ms = new MemoryStream(br0.ReadBytes(l - 2));
-            using var br = new BinaryReader(ms);
+            var l = br.ReadInt16();
             Packet result = null;
             var msgid = (MessageID)br.ReadByte();
             if (msgid == MessageID.NetModules)
@@ -232,9 +229,9 @@ namespace TrProtocol
             else
                 Console.WriteLine($"[Warning] message type = {msgid} not defined, ignoring");
 
-            if (br.BaseStream.Position != br.BaseStream.Length)
+            if (br.Position != l)
             {
-                Console.WriteLine($"[Warning] {br.BaseStream.Length - br.BaseStream.Position} not used when deserializing {(client ? "S2C::" : "C2S::")}{result}");
+                Console.WriteLine($"[Warning] {(l + 2) - br.Position} not used when deserializing {(client ? "S2C::" : "C2S::")}{result}");
             }
             return result;
         }

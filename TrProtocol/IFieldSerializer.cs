@@ -7,7 +7,7 @@ namespace TrProtocol
     public interface IFieldSerializer
     {
         protected static object[] empty = Array.Empty<object>();
-        object Read(BinaryReader br);
+        object Read(BinaryBufferReader br);
         void Write(BinaryWriter bw, object o);
     }
 

@@ -10,15 +10,17 @@ namespace TrProtocol.Models
     {
         private class SectionDataSerializer : FieldSerializer<SectionData>
         {
-            protected override SectionData _Read(BinaryReader reader)
+            protected override SectionData _Read(BinaryBufferReader reader)
             {
                 reader.BaseStream.Position = 1L;
                 var compressed = reader.ReadBoolean();
+                using var outstream = new MemoryStream();
                 if (compressed)
                 {
                     using (var ds = new DeflateStream(reader.BaseStream, CompressionMode.Decompress, true))
                     {
-                        using (var br = new BinaryReader(ds))
+                        ds.CopyTo(outstream);
+                        using (var br = new BinaryBufferReader(outstream.ToArray()))
                         {
                             return deserialize(br);
                         }
@@ -30,7 +32,7 @@ namespace TrProtocol.Models
                     return deserialize(reader);
                 }
 
-                SectionData deserialize(BinaryReader br)
+                SectionData deserialize(BinaryBufferReader br)
                 {
                     var data = new SectionData
                     {
@@ -90,7 +92,7 @@ namespace TrProtocol.Models
                     return data;
                 }
 
-                ComplexTileData deserializeTile(BinaryReader br)
+                ComplexTileData deserializeTile(BinaryBufferReader br)
                 {
                     var tile = new ComplexTileData
                     {

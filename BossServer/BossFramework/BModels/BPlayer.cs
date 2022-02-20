@@ -14,6 +14,10 @@ namespace BossFramework.BModels
 {
     public partial class BPlayer : UserConfigBase<BPlayer>, ISendMsg
     {
+        public static readonly BPlayer Default = new(new(255) { })
+        {
+            Id = -1
+        };
         public BPlayer() { }
         public BPlayer(TSPlayer plr)
         {
@@ -54,12 +58,12 @@ namespace BossFramework.BModels
         public List<BWeaponRelesedProj> RelesedProjs { get; } = new();
 
 
-        
+
         public (short slot, BSign sign)? WatchingSign { get; internal set; }
         public short LastWatchingSignIndex { get; internal set; } = -1;
 
         public (short slot, BChest chest)? WatchingChest { get; set; }
-        public short LastSyncChestIndex { get; internal set; } = -1; 
+        public short LastSyncChestIndex { get; internal set; } = -1;
 
         #region 小游戏部分
         public long Point { get; set; }
@@ -140,7 +144,7 @@ namespace BossFramework.BModels
         }
         public void RemoveItem(int slot, bool clearServerSideItem = true)
         {
-            if(clearServerSideItem)
+            if (clearServerSideItem)
                 TrPlayer.inventory[slot]?.SetDefaults();
             _emptyItemPacket.ItemSlot = (short)slot;
             _emptyItemPacket.PlayerSlot = Index;

@@ -1,5 +1,4 @@
-﻿using Terraria.DataStructures;
-using TrProtocol.Models;
+﻿using TrProtocol.Models;
 
 namespace TrProtocol.Packets
 {

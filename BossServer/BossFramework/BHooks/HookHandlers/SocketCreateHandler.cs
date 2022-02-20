@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static OTAPI.Hooks.Netplay;
+﻿using static OTAPI.Hooks.Netplay;
 
 namespace BossFramework.BHooks.HookHandlers
 {

@@ -4,16 +4,16 @@ using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using Terraria;
 using Terraria.GameContent.Events;
 using TrProtocol;
 using TrProtocol.Packets;
 using TShockAPI;
-using ProtocolBitsByte = TrProtocol.Models.ProtocolBitsByte;
 using Color = Microsoft.Xna.Framework.Color;
-using System.IO.Compression;
-using System.IO;
+using ProtocolBitsByte = TrProtocol.Models.ProtocolBitsByte;
 
 namespace BossFramework
 {
@@ -38,7 +38,6 @@ namespace BossFramework
                 count++;
             }
         }
-        //为了和ts的foreach区分名字
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action) => source.ForEach((obj, _) => action(obj));
         public static void ForEach(this int count, Action<int> action)
         {
@@ -292,7 +291,7 @@ namespace BossFramework
             worldInfo.InvasionType = (sbyte)Main.invasionType;
             return worldInfo;
         }
-        public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("Boss.BPlayer");
+        public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("Boss.BPlayer") ?? BPlayer.Default;
         public static byte[] SerializePacket(this Packet p) => PacketHandler.Serializer.Serialize(p);
         public static void Kill(this SyncProjectile proj)
         {
@@ -320,10 +319,14 @@ namespace BossFramework
         }
         public static void SendPacketsToAll(this IEnumerable<Packet> packets, BPlayer ignore = null)
         {
+            var data = packets.GetPacketsByteData();
+            BInfo.OnlinePlayers.Where(p => p != ignore).ForEach(p => p.SendRawData(data));
+        }
+        public static byte[] GetPacketsByteData(this IEnumerable<Packet> packets)
+        {
             List<byte> packetData = new();
             packets.TForEach(packet => packetData.AddRange(packet.SerializePacket()));
-            var packetBytes = packetData.ToArray();
-            BInfo.OnlinePlayers.Where(p => p != ignore).ForEach(p => p.SendRawData(packetBytes));
+            return packetData.ToArray();
         }
         public static void SendMsg(this TSPlayer plr, object msg, Color color = default)
         {

@@ -17,25 +17,19 @@ namespace BossFramework.BCore.Cmds
             {
                 if (BRegionSystem.FindBRegionByName(args[0]) is { } region)
                 {
-                    if(args.SubCommandName == "addtag")
+                    if (args.SubCommandName == "addtag")
                     {
-                        if (!region.TagsName.Contains(args[1]))
+                        if (!region.Tags.Contains(args[1]))
                         {
-                            if (BRegionSystem.RegionTags.FirstOrDefault(t => t.Name.IsSimilarWith(args[1])) is { } tag)
-                            {
-                                var newTag = tag.CreateInstance(region);
-                                region.AddTag(newTag, false);
-                                args.SendSuccessMsg($"成功添加标签 {tag.Name}");
-                            }
-                            else
-                                args.SendInfoMsg($"未找到名为 {args[1]} 的标签");
+                            region.AddTag(args[1].ToLower(), false);
+                            args.SendSuccessMsg($"成功添加标签 {args[1]}");
                         }
                         else
                             args.SendInfoMsg($"标签 {args[1]} 已存在于区域 {region.Name} 中");
                     }
                     else
                     {
-                        if (region.TagsName.Contains(args[1]))
+                        if (region.Tags.Contains(args[1]))
                         {
                             region.DelTag(args[1]);
                             args.SendSuccessMsg($"已移除标签 {args[1]}");
@@ -53,7 +47,15 @@ namespace BossFramework.BCore.Cmds
         [SubCommand("listtag", Permission = "boss.bregion.admin.listtag")]
         public static void List(SubCommandArgs args)
         {
-            args.SendInfoMsg(string.Join("\r\n", BRegionSystem.RegionTags.Select(r => $"{r.Name}: {r.Description}")));
+            if (args.Any())
+            {
+                if (BRegionSystem.FindBRegionByName(args[0]) is { } region)
+                    args.SendInfoMsg(string.Join(", ", region.Tags));
+                else
+                    args.SendErrorMsg($"未找到名为 {args[0]} 的区域");
+            }
+            else
+                args.SendErrorMsg($"格式错误. /bregion(br) listtag <区域名>");
         }
     }
 }

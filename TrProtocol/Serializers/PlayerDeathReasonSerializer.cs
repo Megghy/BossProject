@@ -1,11 +1,10 @@
 ﻿using System.IO;
-using Terraria.DataStructures;
 
 namespace TrProtocol.Models
 {
     public class PlayerDeathReasonSerializer : FieldSerializer<PlayerDeathReason>
     {
-        protected override PlayerDeathReason _Read(BinaryReader br)
+        protected override PlayerDeathReason _Read(BinaryBufferReader br)
         {
             return PlayerDeathReason.FromReader(br);
         }

@@ -1,12 +1,8 @@
-﻿using BossFramework;
-using BossFramework.DB;
-using Bssom.Serializer;
+﻿using BossFramework.DB;
 using FakeProvider;
 using System.Data;
-using System.Linq;
 using Terraria;
 using TrProtocol.Models;
-using TrProtocol.Models.TileEntities;
 using TShockAPI;
 using TShockAPI.DB;
 
@@ -259,7 +255,7 @@ namespace PlotMarker
         }
         public static Cell GetCurrentCell(this TSPlayer plr)
         {
-            if(CurrentPlot.Cells.FirstOrDefault(c => c.IsVisiable && c.Contains(plr.TileX, plr.TileY)) is { } cell)
+            if (CurrentPlot.Cells.FirstOrDefault(c => c.IsVisiable && c.Contains(plr.TileX, plr.TileY)) is { } cell)
                 return cell;
             return null;
         }

@@ -4,7 +4,7 @@ namespace TrProtocol.Models
 {
     public partial class ItemData
     {
-        public ItemData(BinaryReader br)
+        public ItemData(BinaryBufferReader br)
         {
             Read(br);
         }
@@ -20,7 +20,7 @@ namespace TrProtocol.Models
             bw.Write(Prefix);
             bw.Write(Stack);
         }
-        public ItemData Read(BinaryReader br)
+        public ItemData Read(BinaryBufferReader br)
         {
             ItemID = br.ReadInt16();
             Prefix = br.ReadByte();
@@ -33,6 +33,8 @@ namespace TrProtocol.Models
         public static implicit operator Item(ItemData item)
         {
             var i = new Item();
+            if (item is null)
+                return i;
             i.SetDefaults(item.ItemID);
             i.prefix = item.Prefix;
             i.stack = item.Stack;

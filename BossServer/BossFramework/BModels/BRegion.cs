@@ -1,8 +1,6 @@
 ﻿using BossFramework.BCore;
-using BossFramework.BInterfaces;
 using BossFramework.DB;
 using FreeSql.DataAnnotations;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using TShockAPI.DB;
@@ -26,21 +24,12 @@ namespace BossFramework.BModels
             if (Name != DefaultRegionName)
                 OriginRegion ??= TShockAPI.TShock.Regions.Regions.FirstOrDefault(r => r.Name == Name && r.WorldID == WorldId.ToString());
             ProjContext = new(this);
-
-            Tags = BRegionSystem.CreateTags(this);
-            Tags.ForEach(t =>
-            {
-                if (TagsName.Contains(t.Name))
-                    TagsName.Remove(t.Name);
-            });
-            UpdateSingle(r => r.TagsName);
         }
 
         #region 自身变量
         public string Name { get; private set; }
         [JsonMap]
-        public List<string> TagsName { get; private set; } = new();
-        public List<BaseRegionTag> Tags { get; internal set; } = new();
+        public List<string> Tags { get; private set; } = new();
 
         public long WorldId { get; private set; }
         public Region OriginRegion { get; private set; }
@@ -55,7 +44,7 @@ namespace BossFramework.BModels
             }
         }
         [JsonMap]
-        public List<long> ChildsId { get; private set; }
+        public List<long> ChildsId { get; private set; } = new();
         private List<BRegion> _childRegion;
         public List<BRegion> ChildRegion
         {
@@ -64,7 +53,7 @@ namespace BossFramework.BModels
                 if (_childRegion is null)
                 {
                     _childRegion = new();
-                    ChildsId.ForEach(r =>
+                    ChildsId?.ForEach(r =>
                         {
                             if (BRegionSystem.AllBRegion.FirstOrDefault(r => r.Id == r.Id) is { } child)
                                 _childRegion.Add(child);
@@ -75,7 +64,7 @@ namespace BossFramework.BModels
         }
 
         public BPlayer[] GetPlayers(bool includeChild = true)
-            => BInfo.OnlinePlayers.Where(p => p?.CurrentRegion?.IsPlayerInThis(p, includeChild) == true)
+            => BInfo.OnlinePlayers.Where(p => IsPlayerInThis(p, includeChild) == true)
             .ToArray();
         #endregion
 
@@ -117,7 +106,8 @@ namespace BossFramework.BModels
         public bool IsPlayerInThis(BPlayer plr, bool includeChild = true)
         {
             return plr.CurrentRegion == this || (includeChild && IsInChildRegion(plr, this));
-            bool IsInChildRegion(BPlayer plr, BRegion parent){
+            bool IsInChildRegion(BPlayer plr, BRegion parent)
+            {
                 if (parent.ChildRegion.Any())
                 {
                     foreach (var child in parent.ChildRegion)
@@ -132,38 +122,25 @@ namespace BossFramework.BModels
             }
         }
 
-        public bool AddTag(BaseRegionTag tag, bool createInstance = true)
+        public bool AddTag(string tagName, bool createInstance = true)
         {
-            if (TagsName.Contains(tag.Name))
+            if (Tags.Contains(tagName))
                 return false;
-            TagsName.Add(tag.Name);
-            if (UpdateSingle(r => r.TagsName) > 0)
-            {
-                Tags.Add(createInstance
-                    ? (BaseRegionTag)Activator.CreateInstance(tag.GetType(), new object[] { tag.Region })
-                    : tag);
+            Tags.Add(tagName);
+            if (UpdateSingle(r => r.Tags) > 0)
                 return true;
-            }
             else
             {
-                TagsName.Remove(tag.Name);
+                Tags.Remove(tagName);
                 return false;
             }
         }
         public void DelTag(string tagName)
         {
-            if (!TagsName.Contains(tagName))
+            if (!Tags.Contains(tagName))
                 return;
-            if (TagsName.Remove(tagName) && UpdateSingle(r => r.TagsName) > 0)
-            {
-                if(Tags.FirstOrDefault(t => t.Name == tagName) is { } tag)
-                {
-                    Tags.Remove(tag);
-                    tag.Dispose();
-                }    
-            }
-            else
-                TagsName.Add(tagName);
+            if (!Tags.Remove(tagName) || UpdateSingle(r => r.Tags) == 0)
+                Tags.Add(tagName);
         }
         #endregion
 

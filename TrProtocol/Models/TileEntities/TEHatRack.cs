@@ -32,7 +32,7 @@ namespace TrProtocol.Models.TileEntities
             }
         }
 
-        public override ProtocolTEHatRack ReadExtraData(BinaryReader reader)
+        public override ProtocolTEHatRack ReadExtraData(BinaryBufferReader reader)
         {
             ProtocolBitsByte bitsByte = reader.ReadByte();
             for (int i = 0; i < 2; i++)

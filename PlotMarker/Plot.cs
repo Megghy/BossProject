@@ -1,11 +1,6 @@
 ﻿using BossFramework.DB;
-using Bssom.Serializer;
-using FakeProvider;
 using FreeSql.DataAnnotations;
-using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
-using Terraria;
-using TShockAPI;
 
 namespace PlotMarker
 {
@@ -184,7 +179,7 @@ namespace PlotMarker
         public bool IsUsed()
             => PlotManager.CurrentPlot.Cells.Exists(c => c.UsingCellPositionIndex.Contains(Index));
     }
-    
+
 
     internal sealed class Style
     {

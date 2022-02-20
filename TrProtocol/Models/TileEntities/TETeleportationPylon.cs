@@ -10,7 +10,7 @@ namespace TrProtocol.Models.TileEntities
 
         public override TileEntityType EntityType => TileEntityType.TETeleportationPylon;
 
-        public override ProtocolTETeleportationPylon ReadExtraData(BinaryReader reader)
+        public override ProtocolTETeleportationPylon ReadExtraData(BinaryBufferReader reader)
         {
             return this;
         }

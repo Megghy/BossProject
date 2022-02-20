@@ -16,7 +16,7 @@ namespace TrProtocol.Models.TileEntities
             writer.Write((byte)LogicCheck);
             writer.Write(On);
         }
-        public override ProtocolTELogicSensor ReadExtraData(BinaryReader reader)
+        public override ProtocolTELogicSensor ReadExtraData(BinaryBufferReader reader)
         {
             LogicCheck = (LogicCheckType)reader.ReadByte();
             On = reader.ReadBoolean();

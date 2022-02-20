@@ -7,7 +7,7 @@ namespace TrProtocol.Models
     {
         private class BitsByteSerializer : FieldSerializer<ProtocolBitsByte>
         {
-            protected override ProtocolBitsByte _Read(BinaryReader br)
+            protected override ProtocolBitsByte _Read(BinaryBufferReader br)
             {
                 return br.ReadByte();
             }

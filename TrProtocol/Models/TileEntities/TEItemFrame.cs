@@ -12,10 +12,11 @@ namespace TrProtocol.Models.TileEntities
         public override TileEntityType EntityType => TileEntityType.TEItemFrame;
         public override void WriteExtraData(BinaryWriter writer)
         {
+            Item ??= new();
             Item.Write(writer);
         }
 
-        public override ProtocolTEItemFrame ReadExtraData(BinaryReader reader)
+        public override ProtocolTEItemFrame ReadExtraData(BinaryBufferReader reader)
         {
             Item = new(reader);
             return this;

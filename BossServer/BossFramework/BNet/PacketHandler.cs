@@ -1,9 +1,9 @@
 ﻿using BossFramework.BAttributes;
+using BossFramework.BCore;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using Terraria;
@@ -36,12 +36,11 @@ namespace BossFramework.BNet
         {
             var type = (PacketTypes)args.Buffer[2];
             var plr = TShock.Players[args.Socket.Id]?.GetBPlayer() ?? new(TShock.Players[args.Socket.Id]);
-            using var reader = new BinaryReader(new MemoryStream(args.Buffer));
+            var reader = new BinaryBufferReader(args.Buffer);
             if (Handlers.TryGetValue(type, out var handler))
             {
                 try
                 {
-                    reader.BaseStream.Position = 0L;
                     args.Handled = handler.GetPacket(plr, Serializer.Deserialize(reader));
                 }
                 catch (Exception ex)
@@ -63,12 +62,11 @@ namespace BossFramework.BNet
             }
             var type = args.MsgID;
             var plr = TShock.Players[args.Msg.whoAmI]?.GetBPlayer() ?? new(TShock.Players[args.Msg.whoAmI]);
-            var reader = args.Msg.reader;
+            var reader = new BinaryBufferReader(args.Msg.readBuffer, args.Index - 3, BitConverter.ToInt16(args.Msg.readBuffer, args.Index - 3));
             if (Handlers.TryGetValue(type, out var handler))
             {
                 try
                 {
-                    reader.BaseStream.Position = args.Index - 3;
                     args.Handled = handler.GetPacket(plr, Serializer.Deserialize(reader));
                 }
                 catch (Exception ex)
@@ -78,7 +76,6 @@ namespace BossFramework.BNet
             }
             else
             {
-                reader.BaseStream.Position = args.Index - 3;
                 args.Handled = OnGetPacket(plr, type, reader);
             }
         }
@@ -104,18 +101,17 @@ namespace BossFramework.BNet
             else
                 GetPacketHandlers[type].Add(action);
         }
-        internal static bool OnSendPacket(BPlayer plr, PacketTypes type, BinaryReader reader)
+        internal static bool OnSendPacket(BPlayer plr, PacketTypes type, BinaryBufferReader reader)
         {
             if (SendPacketHandlers.TryGetValue(type, out var list) && list.Any())
             {
                 try
                 {
-                    var args = new PacketEventArgs(plr, Serializer.Deserialize(reader));
-                    list.ForEach(h =>
-                    {
-                        if (!args.Handled)
-                            h.Invoke(args);
-                    });
+                    var args = new PacketEventArgs(plr, type, reader);
+
+                    list.ForEach(h => h.Invoke(args));
+                    BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnSendPacket(r, args)));
+
                     return args.Handled;
                 }
                 catch (Exception ex)
@@ -125,18 +121,17 @@ namespace BossFramework.BNet
             }
             return false;
         }
-        internal static bool OnGetPacket(BPlayer plr, PacketTypes type, BinaryReader reader)
+        internal static bool OnGetPacket(BPlayer plr, PacketTypes type, BinaryBufferReader reader)
         {
             if (GetPacketHandlers.TryGetValue(type, out var list) && list.Any())
             {
                 try
                 {
-                    var args = new PacketEventArgs(plr, Serializer.Deserialize(reader));
-                    list.ForEach(h =>
-                    {
-                        if (!args.Handled)
-                            h.Invoke(args);
-                    });
+                    var args = new PacketEventArgs(plr, type, reader);
+
+                    list.ForEach(h => h.Invoke(args));
+                    BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnGetPacket(r, args)));
+
                     return args.Handled;
                 }
                 catch (Exception ex)

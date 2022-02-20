@@ -4,7 +4,7 @@ namespace TrProtocol.Models
 {
     public class ColorSerailizer : FieldSerializer<Color>
     {
-        protected override Color _Read(BinaryReader bb)
+        protected override Color _Read(BinaryBufferReader bb)
         {
             return new Color(bb.ReadByte(), bb.ReadByte(), bb.ReadByte());
         }

@@ -7,7 +7,7 @@ namespace TrProtocol.Models
     {
         private class UShortPositionSerializer : FieldSerializer<UShortPosition>
         {
-            protected override UShortPosition _Read(BinaryReader br)
+            protected override UShortPosition _Read(BinaryBufferReader br)
             {
                 return new UShortPosition
                 {

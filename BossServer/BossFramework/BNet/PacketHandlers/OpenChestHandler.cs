@@ -1,10 +1,5 @@
 ﻿using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TrProtocol.Packets;
 using TShockAPI;
 

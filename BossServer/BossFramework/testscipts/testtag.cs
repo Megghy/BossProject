@@ -1,25 +1,39 @@
 ﻿using BossFramework;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using System.Linq;
+using System;
 
-public class testtag : BaseRegionTag
+public class testtag : BaseRegionTagProcessor
 {
-    public testtag(BRegion region) : base(region)
+
+    public override void Init()
     {
     }
-
-    public override string Name => "test";
-
-    public override string Description => "锁定白天";
-    public override void GameUpdate(long gameTime)
+    public override void Dispose()
     {
-        if(gameTime / 60 == 0 && Players.Any())
+    }
+    public override void GameUpdate(BRegion region, long gameTime)
+    {
+        if (gameTime % 60 == 0 && region.GetPlayers() is { } plrs && plrs.Length > 0 && region.Tags.Exists(t => t.StartsWith("world")))
         {
             var worldData = BUtils.GetCurrentWorldData();
-            worldData.Time = 7200;
+            Console.WriteLine($"{region.Name}");
+
+            region.Tags.ForEach(t =>
+            {
+                switch (t.ToLower())
+                {
+                    case "world.lockday":
+                        worldData.Time = 7200;
+                        break;
+                    case "world.lockrain":
+                        worldData.Rain = 10;
+                        break;
+                }
+            });
+
             var data = worldData.SerializePacket();
-            Players.ForEach(p => p.SendRawData(data));
+            plrs.ForEach(p => p.SendRawData(data));
         }
     }
 }

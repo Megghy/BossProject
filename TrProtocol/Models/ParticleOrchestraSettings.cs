@@ -14,7 +14,7 @@ namespace TrProtocol.Models
             writer.Write(IndexOfPlayerWhoInvokedThis);
         }
 
-        public static ParticleOrchestraSettings DeserializeFrom(BinaryReader reader)
+        public static ParticleOrchestraSettings DeserializeFrom(BinaryBufferReader reader)
         {
             return new ParticleOrchestraSettings
             {

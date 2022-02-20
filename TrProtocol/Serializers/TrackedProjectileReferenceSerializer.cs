@@ -4,11 +4,11 @@ namespace TrProtocol.Models
 {
     public class TrackedProjectileReferenceSerializer : FieldSerializer<TrackedProjectileReference>
     {
-        protected override TrackedProjectileReference _Read(BinaryReader br)
+        protected override TrackedProjectileReference _Read(BinaryBufferReader br)
         {
             var proj = new TrackedProjectileReference
             {
-                 ProjectileOwnerIndex = br.ReadInt16()
+                ProjectileOwnerIndex = br.ReadInt16()
             };
             if (proj.ProjectileOwnerIndex == -1)
                 return proj;

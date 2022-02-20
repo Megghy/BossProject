@@ -42,71 +42,71 @@ namespace TrProtocol
 
         private class GuidSerializer : FieldSerializer<Guid>
         {
-            protected override Guid _Read(BinaryReader br) => new(br.ReadBytes(16));
+            protected override Guid _Read(BinaryBufferReader br) => new(br.ReadBytes(16));
             protected override void _Write(BinaryWriter bw, Guid t) => bw.Write(t.ToByteArray());
         }
 
         private class BoolSerializer : FieldSerializer<bool>
         {
-            protected override bool _Read(BinaryReader br) => br.ReadBoolean();
+            protected override bool _Read(BinaryBufferReader br) => br.ReadBoolean();
             protected override void _Write(BinaryWriter bw, bool t) => bw.Write(t);
         }
         private class ByteSerializer : NumFieldSerializer<byte>
         {
-            protected override byte _Read(BinaryReader br) => br.ReadByte();
+            protected override byte _Read(BinaryBufferReader br) => br.ReadByte();
             protected override void _Write(BinaryWriter bw, byte t) => bw.Write(t);
         }
         private class SByteSerializer : NumFieldSerializer<sbyte>
         {
-            protected override sbyte _Read(BinaryReader br) => br.ReadSByte();
+            protected override sbyte _Read(BinaryBufferReader br) => br.ReadSByte();
             protected override void _Write(BinaryWriter bw, sbyte t) => bw.Write(t);
         }
         private class ShortSerializer : NumFieldSerializer<short>
         {
-            protected override short _Read(BinaryReader br) => br.ReadInt16();
+            protected override short _Read(BinaryBufferReader br) => br.ReadInt16();
             protected override void _Write(BinaryWriter bw, short t) => bw.Write(t);
         }
         private class UShortSerializer : NumFieldSerializer<ushort>
         {
-            protected override ushort _Read(BinaryReader br) => br.ReadUInt16();
+            protected override ushort _Read(BinaryBufferReader br) => br.ReadUInt16();
             protected override void _Write(BinaryWriter bw, ushort t) => bw.Write(t);
         }
         private class IntSerializer : NumFieldSerializer<int>
         {
-            protected override int _Read(BinaryReader br) => br.ReadInt32();
+            protected override int _Read(BinaryBufferReader br) => br.ReadInt32();
             protected override void _Write(BinaryWriter bw, int t) => bw.Write(t);
         }
         private class UIntSerializer : NumFieldSerializer<uint>
         {
-            protected override uint _Read(BinaryReader br) => br.ReadUInt32();
+            protected override uint _Read(BinaryBufferReader br) => br.ReadUInt32();
             protected override void _Write(BinaryWriter bw, uint t) => bw.Write(t);
         }
         private class LongSerializer : FieldSerializer<long>
         {
-            protected override long _Read(BinaryReader br) => br.ReadInt64();
+            protected override long _Read(BinaryBufferReader br) => br.ReadInt64();
             protected override void _Write(BinaryWriter bw, long t) => bw.Write(t);
         }
         private class ULongSerializer : FieldSerializer<ulong>
         {
-            protected override ulong _Read(BinaryReader br) => br.ReadUInt64();
+            protected override ulong _Read(BinaryBufferReader br) => br.ReadUInt64();
             protected override void _Write(BinaryWriter bw, ulong t) => bw.Write(t);
         }
 
         private class FloatSerializer : FieldSerializer<float>
         {
-            protected override float _Read(BinaryReader br) => br.ReadSingle();
+            protected override float _Read(BinaryBufferReader br) => br.ReadSingle();
             protected override void _Write(BinaryWriter bw, float t) => bw.Write(t);
         }
 
         private class StringSerializer : FieldSerializer<string>
         {
-            protected override string _Read(BinaryReader br) => br.ReadString();
+            protected override string _Read(BinaryBufferReader br) => br.ReadString();
             protected override void _Write(BinaryWriter bw, string t) => bw.Write(t);
         }
 
         private class ByteArraySerializer : FieldSerializer<byte[]>
         {
-            protected override byte[] _Read(BinaryReader br)
+            protected override byte[] _Read(BinaryBufferReader br)
             {
                 return br.ReadBytes((int)(br.BaseStream.Length - br.BaseStream.Position));
             }
@@ -137,7 +137,7 @@ namespace TrProtocol
                 this.type = type;
             }
 
-            protected override Array _Read(BinaryReader br)
+            protected override Array _Read(BinaryBufferReader br)
             {
                 var t = Array.CreateInstance(type, size);
                 var n = size.Length;

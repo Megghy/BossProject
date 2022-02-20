@@ -1,10 +1,6 @@
 ﻿using BossFramework.DB;
 using FreeSql.DataAnnotations;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TrProtocol.Models;
 
 namespace BossFramework.BModels

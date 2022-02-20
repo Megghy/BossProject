@@ -4,7 +4,7 @@ namespace TrProtocol.Models
 {
     public class Vector2Serailizer : FieldSerializer<Vector2>
     {
-        protected override Vector2 _Read(BinaryReader bb)
+        protected override Vector2 _Read(BinaryBufferReader bb)
         {
             return new Vector2(bb.ReadSingle(), bb.ReadSingle());
         }

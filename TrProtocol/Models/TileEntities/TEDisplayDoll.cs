@@ -59,7 +59,7 @@ namespace TrProtocol.Models.TileEntities
                 }
             }
         }
-        public override ProtocolTEDisplayDoll ReadExtraData(BinaryReader reader)
+        public override ProtocolTEDisplayDoll ReadExtraData(BinaryBufferReader reader)
         {
             ProtocolBitsByte bitsByte = reader.ReadByte();
             ProtocolBitsByte bitsByte2 = reader.ReadByte();

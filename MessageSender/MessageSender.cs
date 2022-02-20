@@ -290,13 +290,13 @@ namespace MessageSender
                 location.X + location.Width * 0.5f - vector.X * 0.5f,
                 location.Y + location.Height * 0.25f - vector.Y * 0.5f
             );
-            
+
             if (Main.rand == null)
                 Main.rand = new UnifiedRandom();
             position.X += Main.rand.Next(-(int)(location.Width * 0.5), (int)(location.Width * 0.5) + 1);
             position.Y += Main.rand.Next(-(int)(location.Height * 0.5), (int)(location.Height * 0.5) + 1);
             return position;
         }
-        
+
     }
 }

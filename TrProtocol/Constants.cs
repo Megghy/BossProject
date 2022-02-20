@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using TrProtocol.Models.TileEntities;
+﻿using System;
+using System.Collections.Generic;
 using TrProtocol.Models;
-using System;
+using TrProtocol.Models.TileEntities;
 
 namespace TrProtocol
 {

@@ -8,7 +8,6 @@ using System.Linq;
 using TrProtocol;
 using TrProtocol.Models;
 using TrProtocol.Packets;
-using static BossFramework.BCore.SignRedirector;
 
 namespace BossFramework.BCore
 {

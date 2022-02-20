@@ -15,7 +15,7 @@ namespace BossFramework.BCore
     public static class BRegionSystem
     {
         public static List<BRegion> AllBRegion { get; private set; }
-        public static BaseRegionTag[] RegionTags { get; private set; }
+        public static BaseRegionTagProcessor[] RegionTagProcessers { get; private set; }
         public static string RegionTagPath => Path.Combine(ScriptManager.ScriptRootPath, "RegionTags");
 
         [AutoPostInit]
@@ -43,19 +43,12 @@ namespace BossFramework.BCore
         [Reloadable]
         private static void LoadRegionTags()
         {
-            if(!Directory.Exists(RegionTagPath))
+            if (!Directory.Exists(RegionTagPath))
                 Directory.CreateDirectory(RegionTagPath);
-            RegionTags = ScriptManager.LoadScripts<BaseRegionTag>(RegionTagPath);
-            BLog.Success($"成功加载 {RegionTags.Length} 个区域标签");
-
-            AllBRegion.ForEach(r => r.Tags?.ForEach(t => t.Dispose()));
-            AllBRegion.ForEach(r =>
-            {
-                lock (r)
-                {
-                    r.Tags = r.CreateTags();
-                }
-            });
+            RegionTagProcessers?.ForEach(t => t.Dispose());
+            RegionTagProcessers = ScriptManager.LoadScripts<BaseRegionTagProcessor>(RegionTagPath);
+            BLog.Success($"成功加载 {RegionTagProcessers.Length} 个区域标签处理器");
+            RegionTagProcessers = new BaseRegionTagProcessor[] { new testtag() };
         }
 
         public delegate void OnEnterBRegion(BRegionEventArgs args);
@@ -98,21 +91,20 @@ namespace BossFramework.BCore
                     if (r.ChildRegion.Contains(r))
                         r.RemoveChild(r);
                 });
-                bregion.Tags?.ForEach(t => t.Dispose());
                 DB.DBTools.Delete(bregion);
                 BLog.DEBUG($"区域事件: [移除] - {bregion.Id}");
             }
         }
         public static void OnGameUpdate(EventArgs args)
         {
-            AllBRegion.ForEach(r => r.Tags?.ForEach(t => t.GameUpdate(BInfo.GameTick)));
+            AllBRegion.ForEach(r => RegionTagProcessers.ForEach(t => t.GameUpdate(r, BInfo.GameTick)));
         }
         public static void OnEnterRegion(RegionHooks.RegionEnteredEventArgs args)
         {
             if (FindBRegionForRegion(args.Region) is { } bregion)
             {
                 CallBRegionEvent(bregion, args.Player.GetBPlayer(), true);
-                bregion.Tags?.ForEach(t => t.EnterRegion(args.Player.GetBPlayer()));
+                RegionTagProcessers.ForEach(t => t.EnterRegion(bregion, args.Player.GetBPlayer()));
             }
         }
         public static void OnLeaveRegion(RegionHooks.RegionLeftEventArgs args)
@@ -120,7 +112,7 @@ namespace BossFramework.BCore
             if (FindBRegionForRegion(args.Region) is { } bregion)
             {
                 CallBRegionEvent(bregion, args.Player.GetBPlayer(), false);
-                bregion.Tags?.ForEach(t => t.LeaveRegion(args.Player.GetBPlayer()));
+                RegionTagProcessers.ForEach(t => t.LeaveRegion(bregion, args.Player.GetBPlayer()));
             }
         }
         private static void CallBRegionEvent(BRegion region, BPlayer plr, bool isEnter)
@@ -144,11 +136,5 @@ namespace BossFramework.BCore
                 }
             }
         }
-        public static List<BaseRegionTag> CreateTags(this BRegion region)
-            => region.TagsName is null
-            ? new()
-            :RegionTags?.Where(t => region?.TagsName?.Contains(t.Name) == true)
-                .Select(t => (BaseRegionTag)Activator.CreateInstance(t.GetType(), new object[] { region }))
-                .ToList() ?? new();
     }
 }

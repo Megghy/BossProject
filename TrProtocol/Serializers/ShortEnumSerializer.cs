@@ -5,7 +5,7 @@ namespace TrProtocol.Serializers
 {
     public class ShortEnumSerializer<T> : FieldSerializer<T> where T : Enum
     {
-        protected override T _Read(BinaryReader br)
+        protected override T _Read(BinaryBufferReader br)
         {
             return (T)(object)br.ReadInt16();
         }

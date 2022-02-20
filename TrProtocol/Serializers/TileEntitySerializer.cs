@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using TrProtocol.Models;
 
 namespace TrProtocol.Serializers
 {
     public class TileEntitySerializer : FieldSerializer<IProtocolTileEntity>
     {
-        protected override IProtocolTileEntity _Read(BinaryReader br)
+        protected override IProtocolTileEntity _Read(BinaryBufferReader br)
         {
             return IProtocolTileEntity.Read(br);
         }

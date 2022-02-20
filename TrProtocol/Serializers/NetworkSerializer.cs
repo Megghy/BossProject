@@ -1,11 +1,10 @@
 ﻿using System.IO;
-using Terraria.Localization;
 
 namespace TrProtocol.Models
 {
     class NetworkSerializer : FieldSerializer<NetworkText>
     {
-        protected override NetworkText _Read(BinaryReader br)
+        protected override NetworkText _Read(BinaryBufferReader br)
         {
             return NetworkText.Deserialize(br);
         }

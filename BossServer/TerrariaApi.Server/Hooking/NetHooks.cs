@@ -4,6 +4,7 @@ using System;
 using Terraria;
 using Terraria.Localization;
 using Terraria.Net;
+using TrProtocol;
 
 namespace TerrariaApi.Server.Hooking
 {

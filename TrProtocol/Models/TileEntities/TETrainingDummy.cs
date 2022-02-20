@@ -15,7 +15,7 @@ namespace TrProtocol.Models.TileEntities
             writer.Write((short)NPC);
         }
 
-        public override ProtocolTETrainingDummy ReadExtraData(BinaryReader reader)
+        public override ProtocolTETrainingDummy ReadExtraData(BinaryBufferReader reader)
         {
             NPC = reader.ReadInt16();
             return this;

@@ -11,7 +11,7 @@ namespace TrProtocol.Models
     {
         private class SquareDataSerializer : FieldSerializer<SquareData>
         {
-            protected override SquareData _Read(BinaryReader br)
+            protected override SquareData _Read(BinaryBufferReader br)
             {
                 var square = new SquareData()
                 {
@@ -111,7 +111,7 @@ namespace TrProtocol.Models
         }
         private class SquareDataSerializer1405 : FieldSerializer<SquareData>
         {
-            protected override SquareData _Read(BinaryReader br)
+            protected override SquareData _Read(BinaryBufferReader br)
             {
                 var size = br.ReadUInt16();
                 var squareData_ = new SquareData

@@ -36,7 +36,7 @@ namespace BossFramework.BInterfaces
                 if (attrs.Any())
                     attrs.ForEach(a => list.Add(new SubCommandAttribute()
                     {
-                        Names = new string[] { method.Name.ToLower() },
+                        Names = ((SubCommandAttribute)a).Names,
                         Method = method,
                         Permission = method.GetCustomAttribute<NeedPermissionAttribute>()?.Perms?.FirstOrDefault()
                     }));

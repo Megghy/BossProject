@@ -7,7 +7,7 @@ namespace TrProtocol.Models
     {
         private class ParticleOrchestraSettingsSerializer : FieldSerializer<ParticleOrchestraSettings>
         {
-            protected override ParticleOrchestraSettings _Read(BinaryReader br)
+            protected override ParticleOrchestraSettings _Read(BinaryBufferReader br)
             {
                 return DeserializeFrom(br);
             }

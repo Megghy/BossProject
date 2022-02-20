@@ -7,7 +7,7 @@ namespace TrProtocol.Models
     {
         private class LiquidDataSerializer : FieldSerializer<LiquidData>
         {
-            protected override LiquidData _Read(BinaryReader br)
+            protected override LiquidData _Read(BinaryBufferReader br)
             {
                 var liquid = new LiquidData()
                 {

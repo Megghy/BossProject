@@ -14,7 +14,7 @@ namespace TrProtocol.Models.TileEntities
             Item.Write(writer);
         }
 
-        public override ProtocolTEFoodPlatter ReadExtraData(BinaryReader reader)
+        public override ProtocolTEFoodPlatter ReadExtraData(BinaryBufferReader reader)
         {
             Item = new ItemData(reader);
             return this;

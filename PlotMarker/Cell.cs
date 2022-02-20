@@ -4,7 +4,6 @@ using BossFramework.DB;
 using FakeProvider;
 using FreeSql.DataAnnotations;
 using Microsoft.Xna.Framework;
-using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Tile_Entities;
@@ -282,7 +281,7 @@ namespace PlotMarker
                     TileEntity.ByID.Remove(placedEntity.ID);
                     TileEntity.ByPosition.Remove(placedEntity.Position);
 
-                    if(placedEntity is TETrainingDummy dummy && dummy.npc != -1)
+                    if (placedEntity is TETrainingDummy dummy && dummy.npc != -1)
                     {
                         NPC npc = Main.npc[dummy.npc];
                         npc.type = 0;
@@ -377,7 +376,7 @@ namespace PlotMarker
             CellSigns.ForEach(c => SignRedirector.RegisterOverrideSign((short)(c.TileX + X), (short)(c.TileY + Y), c.Text));
         }
 
-        public void RestoreEntities()
+        public void RestoreEntities(bool reScanEntity = true)
         {
             List<byte> packetData = new(); //合并数据包 减少发包次数
             Entities.ForEach(entity =>
@@ -416,7 +415,8 @@ namespace PlotMarker
                     entity.Position = new(entityX - X, entityY - Y); //更换位置信息为相对坐标
                 }
             });
-            FakeProviderAPI.World.ScanEntities(); //fakeprovider重新获取entity
+            if (reScanEntity)
+                FakeProviderAPI.World.ScanEntities(); //fakeprovider重新获取entity
             BInfo.OnlinePlayers.TForEach(p => p.SendRawData(packetData.ToArray()));
         }
         #endregion

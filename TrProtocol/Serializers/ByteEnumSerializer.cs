@@ -5,7 +5,7 @@ namespace TrProtocol.Serializers
 {
     public class ByteEnumSerializer<T> : FieldSerializer<T> where T : Enum
     {
-        protected override T _Read(BinaryReader br)
+        protected override T _Read(BinaryBufferReader br)
         {
             return (T)(object)br.ReadByte();
         }
@@ -17,7 +17,7 @@ namespace TrProtocol.Serializers
     }
     public class NormalEnumSerializer<T> : FieldSerializer<T> where T : Enum
     {
-        protected override T _Read(BinaryReader br)
+        protected override T _Read(BinaryBufferReader br)
         {
             return (T)(object)br.ReadByte();
         }

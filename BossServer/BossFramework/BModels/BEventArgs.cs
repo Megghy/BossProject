@@ -13,13 +13,27 @@ namespace BossFramework.BModels
     {
         public class PacketEventArgs : IEventArgs
         {
-            public PacketEventArgs(BPlayer plr, Packet packet)
+            public PacketEventArgs(BPlayer plr, PacketTypes type, BinaryBufferReader reader)
             {
                 Player = plr;
-                Packet = packet;
+                PacketType = type;
+                Reader = reader;
             }
-            public BPlayer Player { get; private set; }
-            public Packet Packet { get; set; }
+            public PacketTypes PacketType { get; init; }
+            public BPlayer Player { get; init; }
+            private BinaryBufferReader Reader { get; init; }
+            private Packet _packet;
+            /// <summary>
+            /// 未确定是否要读取前只使用 <see cref="PacketType"/> 查看类型
+            /// </summary>
+            public Packet Packet
+            {
+                get
+                {
+                    _packet ??= BNet.PacketHandler.Serializer.Deserialize(Reader);
+                    return _packet;
+                }
+            }
             public bool Handled { get; set; } = false;
         }
         public class ProjCreateEventArgs : IEventArgs
@@ -83,8 +97,8 @@ namespace BossFramework.BModels
                 Position = position;
             }
             public bool Handled { get; set; } = false;
-            public BPlayer Player { get;private set; }
-            public Point Position { get;private set; }
+            public BPlayer Player { get; private set; }
+            public Point Position { get; private set; }
         }
         public class SignUpdateEventArgs : IEventArgs
         {

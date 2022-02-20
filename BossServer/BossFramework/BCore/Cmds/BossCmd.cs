@@ -17,11 +17,11 @@ namespace BossFramework.BCore.Cmds
         [SubCommand("ncw", Permission = "boss.admin.changecustomweaponmode")]
         public static void ncw(SubCommandArgs args)
         {
-            if(args.Any())
+            if (args.Any())
             {
-                if(BInfo.OnlinePlayers.FirstOrDefault(p => p.Name.IsSimilarWith(args[0])) is { } plr)
+                if (BInfo.OnlinePlayers.FirstOrDefault(p => p.Name.IsSimilarWith(args[0])) is { } plr)
                 {
-                    bool enable = args.Count() > 1 
+                    bool enable = args.Count() > 1
                         ? args[1].ToLower() is "on" or "true" or "enable"
                         : !plr.IsCustomWeaponMode;
                     plr.ChangeCustomWeaponMode(enable);

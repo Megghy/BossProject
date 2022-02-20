@@ -1,11 +1,6 @@
 ﻿using BossFramework.DB;
 using CSScriptLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using TShockAPI;
 
 namespace BossFramework.BModels

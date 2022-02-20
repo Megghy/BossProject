@@ -83,7 +83,7 @@ namespace TUIPlugin
                 BossFramework.BCore.ProjRedirector.ProjCreate += OnNewProjectile;
 
                 PlayerHooks.PlayerLogout += OnPlayerLogout;
-                
+
                 if (FakesEnabled)
                     ServerApi.Hooks.PostWorldSave.Register(this, OnPostSaveWorld);
                 TUI.Hooks.LoadRoot.Event += OnLoadRoot;

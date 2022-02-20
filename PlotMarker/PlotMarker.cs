@@ -1,5 +1,6 @@
 ﻿using BossFramework.BCore;
 using BossFramework.DB;
+using FakeProvider;
 using Microsoft.Xna.Framework;
 using System.Reflection;
 using Terraria;
@@ -89,10 +90,11 @@ namespace PlotMarker
             //设置未隐藏的属地的信息
             PlotManager.CurrentPlot?.Cells?.Where(c => c.IsVisiable).TForEach(c =>
             {
-                c.RestoreCellTileData();
+                c.RestoreCellTileData(false);
                 c.RegisteChestAndSign();
-                c.RestoreEntities();
+                c.RestoreEntities(false);
             });
+            FakeProviderAPI.World.ScanEntities(); //fakeprovider重新获取entity
         }
 
         private static void OnGreet(GreetPlayerEventArgs args)

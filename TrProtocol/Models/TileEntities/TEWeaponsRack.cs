@@ -15,7 +15,7 @@ namespace TrProtocol.Models.TileEntities
             Item.Write(writer);
         }
 
-        public override ProtocolTEWeaponsRack ReadExtraData(BinaryReader reader)
+        public override ProtocolTEWeaponsRack ReadExtraData(BinaryBufferReader reader)
         {
             Item = new(reader);
             return this;

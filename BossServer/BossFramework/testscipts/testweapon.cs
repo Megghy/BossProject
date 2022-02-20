@@ -1,7 +1,5 @@
 ﻿using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using System;
-using Terraria.ID;
 using TrProtocol.Packets;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
@@ -38,6 +36,6 @@ public class testweapon : BaseBWeapon
     }
     public override void OnProjDestroy(BPlayer plr, KillProjectile killProj)
     {
-        
+
     }
 }

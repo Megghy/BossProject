@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Terraria;
 
 namespace TrProtocol.Models
 {
@@ -163,7 +162,7 @@ namespace TrProtocol.Models
         }
 
         // Token: 0x060000F2 RID: 242 RVA: 0x00005368 File Offset: 0x00003568
-        public static ProtocolBitsByte[] DecomposeBitsBytesChain(BinaryReader reader)
+        public static ProtocolBitsByte[] DecomposeBitsBytesChain(BinaryBufferReader reader)
         {
             List<ProtocolBitsByte> list = new List<ProtocolBitsByte>();
             ProtocolBitsByte item;

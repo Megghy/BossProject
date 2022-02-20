@@ -20,8 +20,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyRegion", "SkyRegion\SkyRegion.csproj", "{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegionTrigger", "RegionTrigger\RegionTrigger.csproj", "{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Colosseo", "Colosseo\Colosseo.csproj", "{9D8644C1-F0C0-4443-AE76-F70A2C96824F}"
@@ -100,14 +98,6 @@ Global
 		{77EFC43B-1E5E-4204-AC51-CB2621379BA8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{77EFC43B-1E5E-4204-AC51-CB2621379BA8}.Release|x86.ActiveCfg = Release|Any CPU
 		{77EFC43B-1E5E-4204-AC51-CB2621379BA8}.Release|x86.Build.0 = Release|Any CPU
-		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Debug|x86.Build.0 = Debug|Any CPU
-		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Release|x86.ActiveCfg = Release|Any CPU
-		{949A58C8-5E59-4EC7-A4FE-2430EC4EC35D}.Release|x86.Build.0 = Release|Any CPU
 		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA95F7A9-1937-46BD-B7BE-30005BDDC68A}.Debug|x86.ActiveCfg = Debug|Any CPU

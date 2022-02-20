@@ -4,7 +4,7 @@ namespace TrProtocol.Models
 {
     class PositionSerializer : FieldSerializer<Point>
     {
-        protected override Point _Read(BinaryReader br)
+        protected override Point _Read(BinaryBufferReader br)
         {
             return new Point
             {

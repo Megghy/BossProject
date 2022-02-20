@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Terraria.DataStructures;
 
 namespace TrProtocol.Models
 {
@@ -16,7 +15,7 @@ namespace TrProtocol.Models
             => new(p.X, p.Y);
         private class ShortPositionSerializer : FieldSerializer<ShortPosition>
         {
-            protected override ShortPosition _Read(BinaryReader br)
+            protected override ShortPosition _Read(BinaryBufferReader br)
             {
                 return new ShortPosition
                 {
