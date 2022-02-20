@@ -238,6 +238,8 @@ namespace BossFramework
             {
                 worldInfo.Rain = 0;
             }
+            else
+                worldInfo.Rain = Main.maxRaining;
             ProtocolBitsByte bb4 = 0;
             bb4[0] = WorldGen.shadowOrbSmashed;
             bb4[1] = NPC.downedBoss1;

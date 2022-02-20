@@ -460,11 +460,7 @@ namespace Philosophyz
             if (!SendDataHooks.InvokePreSendData(remoteClient, remoteClient))
                 return;
 
-            Main.ServerSideCharacter = ssc;
-
             TShock.Players[remoteClient]?.SendRawData(PackInfo(ssc));
-
-            Main.ServerSideCharacter = true;
 
             SendDataHooks.InvokePostSendData(remoteClient, remoteClient);
         }

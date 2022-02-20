@@ -18,6 +18,7 @@ namespace BossFramework.BHooks
             ServerApi.Hooks.GamePostInitialize.Register(BossPlugin.Instance, HookHandlers.PostInitializeHandler.OnGamePostInitialize, int.MinValue);
             ServerApi.Hooks.GameUpdate.Register(BossPlugin.Instance, HookHandlers.GameUpdateHandler.OnGameUpdate);
             ServerApi.Hooks.NetGetData.Register(BossPlugin.Instance, BNet.PacketHandler.OnGetData);
+            ServerApi.Hooks.NetSendBytes.Register(BossPlugin.Instance, BNet.PacketHandler.OnSendData);
         }
     }
 }
