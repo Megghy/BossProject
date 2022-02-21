@@ -24,6 +24,7 @@ namespace BossFramework.BCore
             BLog.DEBUG("初始化区域管理");
 
             AllBRegion = DB.DBTools.GetAll<BRegion>().Where(r => r.WorldId == Terraria.Main.worldID).ToList();
+            AllBRegion.Insert(0, BRegion.Default);
 
             TShockAPI.TShock.Regions.Regions.ForEach(r =>
             {
@@ -33,6 +34,7 @@ namespace BossFramework.BCore
                 }
             });
             LoadRegionTags();
+            BLog.Success($"共加载 {AllBRegion.Count} 个区域");
 
             RegionHooks.RegionEntered += OnEnterRegion;
             RegionHooks.RegionLeft += OnLeaveRegion;
