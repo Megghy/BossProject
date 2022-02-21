@@ -10,7 +10,7 @@ namespace BossFramework.BHooks.HookHandlers
         {
             Assembly.GetExecutingAssembly()
                         .GetTypes()
-                        .ForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+                        .ForEach(t => t.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy)
                         .ForEach(m =>
                         {
                             if (m.GetCustomAttribute<ReloadableAttribute>() is { } && m.DeclaringType.Name != "BaseConfig`1")

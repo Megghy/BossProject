@@ -119,7 +119,7 @@ namespace BossFramework.BCore
         }
         private static void CallBRegionEvent(BRegion region, BPlayer plr, bool isEnter)
         {
-            if (region.Parent is { } parent)
+            if (region.Parent is { } parent && parent != region)
                 CallBRegionEvent(parent, plr, isEnter);
             else
             {

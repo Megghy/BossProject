@@ -63,10 +63,10 @@ namespace BossFramework.BCore.Cmds
         {
             var plrData = new PlayerData(plr.TsPlayer);
             plrData.CopyCharacter(plr.TsPlayer);
-            var money = new MoneyInfo(plrData.inventory.Count(i => i.NetId == 74),
-                plrData.inventory.Count(i => i.NetId == 73),
-                plrData.inventory.Count(i => i.NetId == 72),
-                plrData.inventory.Count(i => i.NetId == 71));
+            var money = new MoneyInfo(plrData.inventory.Where(i => i.NetId == 74).Sum(i => i.Stack),
+                plrData.inventory.Where(i => i.NetId == 73).Sum(i => i.Stack),
+                plrData.inventory.Where(i => i.NetId == 72).Sum(i => i.Stack),
+                plrData.inventory.Where(i => i.NetId == 71).Sum(i => i.Stack));
             Dictionary<int, (NetItem item, bool beEmpty)> items = new();
             recipe.RequireItem.ForEach(item =>
             {
@@ -102,11 +102,6 @@ namespace BossFramework.BCore.Cmds
                 if (money.TotalCoin >= recipe.RequireCoin && plr.TrPlayer.BuyItem(recipe.RequireCoin))
                 {
                     var packets = new List<Packet>();
-                    items.ForEach(i =>
-                    {
-
-                    });
-                    packets.SendPacketsToAll();
                     plrData.CopyCharacter(plr.TsPlayer);
                     plrData.inventory.ForEach((i, slot) =>
                     {
@@ -125,7 +120,7 @@ namespace BossFramework.BCore.Cmds
                                 Stack = (short)plr.TrPlayer.inventory[slot].stack
                             });
                         }
-                         else
+                        else
                             packets.Add(new SyncEquipment()
                             {
                                 ItemSlot = (short)slot,
@@ -135,7 +130,10 @@ namespace BossFramework.BCore.Cmds
                                 Stack = (short)i.Stack
                             });
                     });
+                    plr.SendPacket(BUtils.GetCurrentWorldData(true));
                     packets.SendPacketsToAll();
+                    if (!Terraria.Main.ServerSideCharacter)
+                        plr.SendPacket(BUtils.GetCurrentWorldData(false));
 
                     recipe.GiveItem.ForEach(i => plr.TsPlayer.GiveItem(i.NetId, i.Stack, i.PrefixId));
                     recipe.ExcuteCommands.ForEach(c => Commands.HandleCommand(plr.TsPlayer, c));
