@@ -760,20 +760,20 @@ namespace TShockAPI
         {
             return String.Format("[c/{0}:{1}]", color.Hex3(), text);
         }
-
+        public string ItemTag(int id, int prefix, int stack)
+        {
+            string options = stack > 1 ? "/s" + stack : prefix != 0 ? "/p" + prefix : "";
+            return string.Format("[i{0}:{1}]", options, id);
+        }
+        public string ItemTag(NetItem item)
+            => ItemTag(item.NetId, item.PrefixId, item.Stack);
         /// <summary>
         /// Converts an item into its text representation using the item chat tag.
         /// </summary>
         /// <param name="item">The item to convert.</param>
         /// <returns>The <paramref name="item"/> NetID surrounded by the item tag with proper stack/prefix data.</returns>
         public string ItemTag(Item item)
-        {
-            int netID = item.netID;
-            int stack = item.stack;
-            int prefix = item.prefix;
-            string options = stack > 1 ? "/s" + stack : prefix != 0 ? "/p" + prefix : "";
-            return String.Format("[i{0}:{1}]", options, netID);
-        }
+            => ItemTag(item.type, item.prefix, item.stack);
 
         /// <summary>
         /// Gets a list of points selected by a mass-wiring tool.

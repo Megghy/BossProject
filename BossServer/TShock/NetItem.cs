@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using Newtonsoft.Json;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Terraria;
 
 namespace TShockAPI
@@ -180,6 +181,12 @@ namespace TShockAPI
             return item == null
                 ? new NetItem()
                 : new NetItem(item.netID, item.stack, item.prefix);
+        }
+        public override bool Equals([NotNullWhen(true)] object? obj)
+        {
+            if (obj is NetItem item)
+                return item.NetId == NetId && item.Stack == Stack && item.PrefixId == PrefixId;
+            return false;
         }
     }
 }
