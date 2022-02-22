@@ -42,6 +42,11 @@ namespace BossFramework
         }
         private static void LogDirect(object message, string prefix = "Log", ConsoleColor color = ConsoleColor.Gray, bool save = true)
         {
+            if (BHooks.HookHandlers.ReloadHandler.Caller is { RealPlayer: true })
+            {
+                var c = System.Drawing.Color.FromName(color.ToString());
+                BHooks.HookHandlers.ReloadHandler.Caller.SendMessage(message.ToString(), new(c.R, c.G, c.B));
+            }
             var caller = new StackFrame(2).GetMethod();
             var from = $"{caller!.DeclaringType!.Name}.{caller.Name}";
             var log = $"[{from}] <{prefix}> {message}";

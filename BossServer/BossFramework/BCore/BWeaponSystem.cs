@@ -124,17 +124,19 @@ namespace BossFramework.BCore
         }
         public static void OnProjCreate(BEventArgs.ProjCreateEventArgs args)
         {
-            if (!args.Player.IsCustomWeaponMode)
+            if (!args.Player.IsCustomWeaponMode || args.Proj.PlayerSlot != args.Player.Index)
                 return;
             if (args.Player.Weapons.Where(w => w.Equals(args.Player.TsPlayer.SelectedItem)).FirstOrDefault() is { } weapon)
             {
+                args.Handled = true;
                 var selectItem = args.Player.TsPlayer.SelectedItem;
                 if (weapon.OnShootProj(args.Player, args.Proj, args.Proj.Velocity, (weapon.ShootProj ?? selectItem.shoot) == args.Proj.ProjType)) //如果返回true则关闭客户端对应弹幕
                 {
-                    args.Handled = true;
                     args.Proj.ProjType = 0;
                     args.Player.SendPacket(args.Proj);
                 }
+                else 
+                    weapon.CreateProj(args.Player, args.Proj);
             }
         }
         public static void OnProjDestroy(BEventArgs.ProjDestroyEventArgs args)

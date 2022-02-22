@@ -324,6 +324,8 @@ namespace BossFramework
             var data = packets.GetPacketsByteData();
             BInfo.OnlinePlayers.Where(p => p != ignore).ForEach(p => p.SendRawData(data));
         }
+        public static void SendPacketsTo(this IEnumerable<Packet> packets, BPlayer plr)
+            => plr.SendPackets(packets);
         public static byte[] GetPacketsByteData(this IEnumerable<Packet> packets)
         {
             List<byte> packetData = new();

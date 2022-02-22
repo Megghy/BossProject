@@ -132,8 +132,11 @@ namespace BossFramework.BInterfaces
         }
 
         protected Terraria.Projectile _proj = new();
-
-        protected void CreateProj(BPlayer plr, int projID, Vector2 position, Vector2 velocity, int damage = -1, float knockBack = -1, float ai0 = -1, float ai1 = -1)
+        public void CreateProj(BPlayer plr, SyncProjectile proj)
+        {
+            plr.RelesedProjs.Add(new(plr, plr.ProjContext.CreateOrSyncProj(plr, proj, true), this, plr.CurrentRegion));
+        }
+        public void CreateProj(BPlayer plr, int projID, Vector2 position, Vector2 velocity, int damage = -1, float knockBack = -1, float ai0 = -1, float ai1 = -1)
         {
             _proj.SetDefaults(projID);
             var bb = new ProtocolBitsByte();

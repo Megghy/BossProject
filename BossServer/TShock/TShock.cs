@@ -117,8 +117,6 @@ namespace TShockAPI
         public static RestManager RestManager;
         /// <summary>Utils - Static reference to the utilities class, which contains a variety of utility functions.</summary>
         public static Utils Utils = Utils.Instance;
-        /// <summary>UpdateManager - Static reference to the update checker, which checks for updates and notifies server admins of updates.</summary>
-        public static UpdateManager UpdateManager;
         /// <summary>Log - Static reference to the log system, which outputs to either SQL or a text file, depending on user config.</summary>
         public static ILog Log;
         /// <summary>instance - Static reference to the TerrariaPlugin instance.</summary>
@@ -986,7 +984,6 @@ namespace TShockAPI
                 Main.worldName = Config.Settings.ServerName;
             }
 
-            UpdateManager = new UpdateManager();
         }
 
         /// <summary>LastCheck - Used to keep track of the last check for basically all time based checks.</summary>

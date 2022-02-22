@@ -4,6 +4,7 @@ using FreeSql.DataAnnotations;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Terraria;
 using TrProtocol;
@@ -33,6 +34,8 @@ namespace BossFramework.BModels
         }
 
         #region 变量
+        public Stopwatch PingChecker { get; } = new();
+        public int LastPing { get; internal set; } = -1;
         public TSPlayer TsPlayer { get; internal set; }
         public Player TrPlayer => TsPlayer?.TPlayer;
         public string Name => TsPlayer?.Name ?? "unknown";

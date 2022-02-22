@@ -344,10 +344,6 @@ namespace TShockAPI
             });
             #endregion
             #region Configuration Commands
-            add(new Command(Permissions.maintenance, CheckUpdates, "checkupdates(检查更新)", "checkupdates")
-            {
-                HelpText = "检查TShock更新"
-            });
             add(new Command(Permissions.maintenance, Off, "off(关服)", "off", "exit", "stop")
             {
                 HelpText = "关闭服务器且保存数据"
@@ -1971,20 +1967,6 @@ namespace TShockAPI
         {
             string reason = ((args.Parameters.Count > 0) ? "服务器正在关闭: " + String.Join(" ", args.Parameters) : "服务器正在关闭!");
             TShock.Utils.StopServer(false, reason);
-        }
-
-        private static void CheckUpdates(CommandArgs args)
-        {
-            args.Player.SendInfoMessage("更新列队已被加入日程。");
-            try
-            {
-                TShock.UpdateManager.UpdateCheckAsync(null).Wait();
-            }
-            catch (Exception)
-            {
-                //swallow the exception
-                return;
-            }
         }
 
         private static void ManageRest(CommandArgs args)

@@ -46,9 +46,11 @@ namespace BossFramework.BCore
                         ProjCreate?.Invoke(args);
                         if (!args.Handled)
                         {
-                            plr.CurrentRegion.ProjContext.CreateOrSyncProj(plr, proj);
+                            plr.CurrentRegion.ProjContext.CreateOrSyncProj(plr, proj, proj.PlayerSlot == 255);
                         }
                     }
+                    else
+                        Task.Delay(1).Wait();
                 }
                 catch (Exception ex)
                 {
@@ -66,7 +68,7 @@ namespace BossFramework.BCore
         {
             Task.Run(() => args.Region.ProjContext.Projs
                 .Where(p => p != null)
-                .ForEach(p => args.Player.SendPacket(p))); //同步当前区域弹幕
+                .SendPacketsTo(args.Player)); //同步当前区域弹幕
         }
         public static void OnLeaveRegion(BEventArgs.BRegionEventArgs args)
         {

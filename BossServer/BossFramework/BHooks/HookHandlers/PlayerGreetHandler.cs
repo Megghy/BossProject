@@ -1,5 +1,6 @@
 ﻿using BossFramework.BModels;
 using TerrariaApi.Server;
+using TrProtocol.Packets;
 using TShockAPI;
 
 namespace BossFramework.BHooks.HookHandlers
@@ -15,6 +16,8 @@ namespace BossFramework.BHooks.HookHandlers
                 {
                     bPlr.TsPlayer = tsPlr;
                     tsPlr.SetData("Boss.BPlayer", bPlr);
+                    bPlr.SendPacket(new ResetItemOwner() { ItemSlot = BCore.StatusSender.PING_ITEM_SLOT });
+                    bPlr.PingChecker.Start();
                 }
                 else
                     tsPlr.Disconnect($"服务器内部错误, 请尝试重新进入");

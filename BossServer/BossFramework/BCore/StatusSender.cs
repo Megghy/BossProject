@@ -4,12 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using TrProtocol.Packets;
 
 namespace BossFramework.BCore
 {
     public static class StatusSender
     {
+        public const int PING_ITEM_SLOT = 400;
         internal static readonly Dictionary<Func<BPlayer, string>, int> _statusCallback = new() { { DefaultStatus, 99 } };
         [SimpleTimer(Time = 1)]
         public static void UpdateStatus()
@@ -18,7 +20,7 @@ namespace BossFramework.BCore
             {
                 var text = _statusCallback.OrderByDescending(s => s.Value)
                 .First().Key(p);
-                text = "                                                                                                           \r\n"
+                text = "                                                                                                 \r\n"
                  + text + RepeatLineBreaks(59);
                 p.SendPacket(new StatusText()
                 {
@@ -30,7 +32,20 @@ namespace BossFramework.BCore
         }
         private static string DefaultStatus(BPlayer plr)
         {
-            return $"test: {plr.Name}";
+            var sb = new StringBuilder();
+            sb.AppendLine($"Ping: {(plr.LastPing < 50 ? "[i:3738]" : "[i:3736]")} {plr.LastPing} ms");
+            sb.AppendLine($"在线: {BInfo.OnlinePlayers.Length} 人");
+            return sb.ToString();
+        }
+        internal static void GetPingBackPacket(BPlayer plr)
+        {
+            Task.Run(() =>
+            {
+                plr.LastPing = (int)plr.PingChecker.ElapsedMilliseconds;
+                Task.Delay(500).Wait();
+                plr.SendPacket(new ResetItemOwner() { ItemSlot = PING_ITEM_SLOT });
+                plr.PingChecker.Restart();
+            });
         }
         /// <summary>
         /// 注册状态信息
