@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.IO.Streams;
 using Terraria.GameContent;
+using TrProtocol;
 using static Terraria.GameContent.NetModules.NetTeleportPylonModule;
 
 namespace TShockAPI.Handlers.NetModules
@@ -31,7 +32,7 @@ namespace TShockAPI.Handlers.NetModules
         /// Reads the pylon data from the net module
         /// </summary>
         /// <param name="data"></param>
-        public void Deserialize(MemoryStream data)
+        public void Deserialize(BinaryBufferReader data)
         {
             PylonEventType = (SubPacketType)data.ReadInt8();
             TileX = data.ReadInt16();

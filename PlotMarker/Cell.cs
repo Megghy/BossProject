@@ -76,9 +76,9 @@ namespace PlotMarker
         /// <summary>
         /// 注意 其中的坐标为相对坐标
         /// </summary>
-        public List<IProtocolTileEntity> Entities { get; set; } = new();
         [Column(DbType = "MEDIUMBLOB")]
         public byte[] SerializedEntitiesData { get; set; }
+        public List<IProtocolTileEntity> Entities { get; set; } = new();
         [JsonMap]
         public List<SimpleSignData> CellSigns { get; set; } = new();
         [JsonMap]
@@ -162,7 +162,9 @@ namespace PlotMarker
             return X <= x && x < X + Parent.CellWidth && Y <= y && y < Y + Parent.CellHeight;
         }
         public string GetInfo()
-            => $"ID: [{Id}] <{(IsVisiable ? "可见" : "不可见")}> - " +
+        {
+            SaveCellData();
+            return $"ID: [{Id}] <{(IsVisiable ? "可见" : "不可见")}> - " +
                 $"领主: {(string.IsNullOrWhiteSpace(Owner) ? "未知" : Owner)}" +
                 $" | 创建: {GetTime:g}" +
                 $" | 修改: {LastAccess:g}" +
@@ -170,6 +172,7 @@ namespace PlotMarker
                 $" | 箱子数量: {CellChests.Count}" +
                 $" | 牌子数量: {CellSigns.Count}" +
                 $" | 物块数量: {TileData.To1D().Count(t => !t.isTheSameAs(StructTile.Empty))}";
+        }
         public bool SaveCellData()
         {
             if (!IsVisiable)
@@ -266,6 +269,11 @@ namespace PlotMarker
             //重新画线
             //Parent.ReDrawLines(sendSection);
             //不升级的话就不用重画线
+
+            //清理内存占用
+            Entities = null;
+            TileData = null;
+
             if (sendSection)
                 TileHelper.ResetSection(X, Y, Width, Height);
 
@@ -300,7 +308,6 @@ namespace PlotMarker
             });
             BUtils.SendPacketsToAll(packetData);
         }
-
         public void DeregisteChestAndSign()
         {
             //删除游戏地图上的箱子
@@ -326,8 +333,12 @@ namespace PlotMarker
                 return false;
             if (this.FindUseableArea() is { } pos)
             {
-                LastPositionIndex = pos.First().Index;
-                UsingCellPositionIndex.AddRange(pos.Select(p => p.Index));
+                TileData ??= GetDeserializedTildData();
+                Entities ??= GetDeserializedEntitiesData();
+
+                LastPositionIndex = pos.Index;
+                UsingCellPositionIndex.Clear();
+                UsingCellPositionIndex.Add(pos.Index);
 
                 UpdateSingle(c => c.LastPositionIndex);
                 UpdateSingle(c => c.UsingCellPositionIndex);

@@ -39,6 +39,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.Utilities;
 using TerrariaApi.Server;
+using TrProtocol;
 using TShockAPI.CLI;
 using TShockAPI.Configuration;
 using TShockAPI.DB;
@@ -1579,7 +1580,7 @@ namespace TShockAPI
             {
                 length = 0;
             }
-            using (var data = new MemoryStream(e.Msg.readBuffer, e.Index, e.Length - 1))
+            using (var data = new BinaryBufferReader(e.Msg.readBuffer, e.Index, length))
             {
                 // Exceptions are already handled
                 e.Handled = GetDataHandlers.HandlerGetData(type, player, data);

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using TrProtocol;
 
 namespace TShockAPI.Handlers.NetModules
 {
@@ -11,7 +12,7 @@ namespace TShockAPI.Handlers.NetModules
         /// No deserialization needed. This should never be received by the server
         /// </summary>
         /// <param name="data"></param>
-        public void Deserialize(MemoryStream data)
+        public void Deserialize(BinaryBufferReader data)
         {
         }
 

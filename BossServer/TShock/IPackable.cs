@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using System.IO;
+using TrProtocol;
 
 namespace TShockAPI
 {
@@ -35,6 +36,6 @@ namespace TShockAPI
         /// Reads object information from the stream
         /// </summary>
         /// <param name="stream">Stream to read from</param>
-        void Unpack(Stream stream);
+        void Unpack(BinaryBufferReader stream);
     }
 }

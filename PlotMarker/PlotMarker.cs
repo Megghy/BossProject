@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
+using TrProtocol;
 using TShockAPI;
 using TShockAPI.DB;
 
@@ -88,11 +89,19 @@ namespace PlotMarker
             PlotManager.Reload();
 
             //设置未隐藏的属地的信息
-            PlotManager.CurrentPlot?.Cells?.Where(c => c.IsVisiable).TForEach(c =>
+            PlotManager.CurrentPlot?.Cells?.ForEach(c =>
             {
-                c.RestoreCellTileData(false);
-                c.RegisteChestAndSign();
-                c.RestoreEntities(false);
+                if (c.IsVisiable)
+                {
+                    c.RestoreCellTileData(false);
+                    c.RegisteChestAndSign();
+                    c.RestoreEntities(false);
+                }
+                else
+                {
+                    c.TileData = null;
+                    c.Entities = null;
+                }
             });
             FakeProviderAPI.World.ScanEntities(); //fakeprovider重新获取entity
         }
@@ -118,7 +127,7 @@ namespace PlotMarker
                 return;
             }
 
-            using (var data = new MemoryStream(args.Msg.readBuffer, args.Index, args.Length - 1))
+            using (var data = new BinaryBufferReader(args.Msg.readBuffer, args.Index, args.Length - 1))
             {
                 args.Handled = Handlers.HandleGetData(type, player, data);
             }
@@ -238,7 +247,6 @@ namespace PlotMarker
                                         var newCell = new Cell()
                                         {
                                             AllowedIDs = c.AllowedIDs,
-                                            TileData = new FakeProvider.StructTile[plot.CellWidth, plot.CellHeight],
                                             GetTime = c.GetTime,
                                             LastAccess = c.LastAccess,
                                             Level = 1,

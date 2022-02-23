@@ -110,37 +110,20 @@ namespace PlotMarker
         /// </summary>
         /// <param name="count"></param>
         /// <returns>左上角的子区域位置</returns>
-        public static CellPosition[] FindUseableArea(this Cell cell, bool isFirstRun = true)
+        public static CellPosition FindUseableArea(this Cell cell, bool isFirstRun = true)
         {
-            List<CellPosition> cellPosList = new();
-            for (var x = 0; x < CurrentPlot.CellsPosition2D.GetLength(0); x++)
+            if (CurrentPlot?.CellsPosition.FirstOrDefault(p => !p.IsUsed) is { } pos)
+                return pos;
+            else if (CurrentPlot?.Cells.Where(c => c.IsVisiable)
+                    .OrderBy(c => c.LastAccess)
+                    .FirstOrDefault() is { } oldest)
             {
-                for (var y = 0; y < CurrentPlot.CellsPosition2D.GetLength(1); y++)
-                {
-                    for (int tempX = 0; tempX < cell.Level; tempX++)
-                    {
-                        for (int tempY = 0; tempY < cell.Level; tempY++)
-                        {
-                            var cellPos = CurrentPlot.CellsPosition2D[x + tempY, y + tempY];
-                            if (cellPos.IsUsed())
-                                goto loop;
-                            else
-                                cellPosList.Add(cellPos);
-                        }
-                    }
-                    return cellPosList.ToArray();
-                loop:
-                    cellPosList.Clear();
-                }
+                var index = oldest.LastPositionIndex;
+                oldest.Invisiable();
+                return CurrentPlot?.CellsPosition[index];
             }
-            //跑完一圈依然没有能用的
-            CurrentPlot.Cells.OrderBy(c => c.LastAccess).FirstOrDefault()?.Invisiable();
-            if (isFirstRun)
-                return cell.FindUseableArea(false);
-            else
-                return null;
+            return null;
         }
-
         #endregion
 
         public static Cell CreateNewCell(TSPlayer player)

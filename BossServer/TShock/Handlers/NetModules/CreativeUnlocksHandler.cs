@@ -3,6 +3,7 @@ using System.IO.Streams;
 using Terraria;
 using Terraria.GameContent.NetModules;
 using Terraria.Net;
+using TrProtocol;
 
 namespace TShockAPI.Handlers.NetModules
 {
@@ -28,7 +29,7 @@ namespace TShockAPI.Handlers.NetModules
         /// Reads the unlock data from the stream
         /// </summary>
         /// <param name="data"></param>
-        public void Deserialize(MemoryStream data)
+        public void Deserialize(BinaryBufferReader data)
         {
             // For whatever reason Terraria writes '0' to the stream at the beginning of this packet.
             // If this value is not 0 then its been crafted by a non-vanilla client.

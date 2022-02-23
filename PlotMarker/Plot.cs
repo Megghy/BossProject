@@ -176,7 +176,7 @@ namespace PlotMarker
         /// 是否被某个子区域占用
         /// </summary>
         /// <returns></returns>
-        public bool IsUsed()
+        public bool IsUsed
             => PlotManager.CurrentPlot.Cells.Exists(c => c.UsingCellPositionIndex.Contains(Index));
     }
 

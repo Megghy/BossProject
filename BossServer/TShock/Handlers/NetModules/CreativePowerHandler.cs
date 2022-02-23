@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Streams;
+using TrProtocol;
 using static TShockAPI.GetDataHandlers;
 
 namespace TShockAPI.Handlers.NetModules
@@ -19,7 +20,7 @@ namespace TShockAPI.Handlers.NetModules
         /// Reads the power type from the stream
         /// </summary>
         /// <param name="data"></param>
-        public void Deserialize(MemoryStream data)
+        public void Deserialize(BinaryBufferReader data)
         {
             PowerType = (CreativePowerTypes)data.ReadInt16();
         }

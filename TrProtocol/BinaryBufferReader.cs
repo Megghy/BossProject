@@ -55,7 +55,8 @@ namespace TrProtocol
                 _position = newPos;
             }
         }
-
+        public byte ReadInt8()
+            => InternalReadSpan(1)[0];
         public override short ReadInt16() => BinaryPrimitives.ReadInt16LittleEndian(InternalReadSpan(2));
 
         public override ushort ReadUInt16() => BinaryPrimitives.ReadUInt16LittleEndian(InternalReadSpan(2));
