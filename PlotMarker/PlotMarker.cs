@@ -247,7 +247,6 @@ namespace PlotMarker
                                         var newCell = new Cell()
                                         {
                                             AllowedIDs = c.AllowedIDs,
-                                            GetTime = c.GetTime,
                                             LastAccess = c.LastAccess,
                                             Level = 1,
                                             Owner = c.Owner,

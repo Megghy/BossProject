@@ -1,7 +1,7 @@
 ﻿namespace TrProtocol.Models
 {
     [LegacySerializer]
-    public class SimpleTileData
+    public struct SimpleTileData
     {
         public ProtocolBitsByte Flags1 { get; set; }
         public ProtocolBitsByte Flags2 { get; set; }
@@ -13,7 +13,7 @@
         [Condition("Flags1", 0)]
         public ushort TileType { get; set; }
 
-        private bool TileFrameImportant => Flags1[0] && Constants.tileFrameImportant[TileType];
+        private bool TileFrameImportant => Flags1[0] && Terraria.Main.tileFrameImportant[TileType];
         [Condition("TileFrameImportant")]
         public short FrameX { get; set; }
         [Condition("TileFrameImportant")]

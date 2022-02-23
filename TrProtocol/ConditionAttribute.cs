@@ -96,7 +96,7 @@ namespace TrProtocol
     public sealed class IgnoreAttribute : Attribute
     {
     }
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public sealed class LegacySerializerAttribute : Attribute
     {
     }

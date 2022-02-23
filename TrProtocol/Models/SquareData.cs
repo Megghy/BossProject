@@ -3,7 +3,7 @@
 namespace TrProtocol.Models
 {
     [LegacySerializer]
-    public partial class SquareData
+    public partial struct SquareData
     {
         [ProtocolVersion("TerrariaXD230")]
         [ProtocolVersion("Terraria230")]

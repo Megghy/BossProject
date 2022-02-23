@@ -60,10 +60,6 @@ namespace PlotMarker
         public int LastPositionIndex { get; set; } = -1;
         /// <summary> 属地的主人 </summary>
         public string Owner { get; set; }
-        /// <summary>
-        /// 玩家 <see cref="Owner"/> 领取属地的时间
-        /// </summary>
-        public DateTime GetTime { get; set; }
         public DateTime LastAccess { get; set; }
         /// <summary> 有权限动属地者 </summary>
         [JsonMap]
@@ -162,17 +158,14 @@ namespace PlotMarker
             return X <= x && x < X + Parent.CellWidth && Y <= y && y < Y + Parent.CellHeight;
         }
         public string GetInfo()
-        {
-            SaveCellData();
-            return $"ID: [{Id}] <{(IsVisiable ? "可见" : "不可见")}> - " +
+            => $"ID: [{Id}] <{(IsVisiable ? "可见" : "不可见")}> - " +
                 $"领主: {(string.IsNullOrWhiteSpace(Owner) ? "未知" : Owner)}" +
-                $" | 创建: {GetTime:g}" +
+                $" | 创建: {CreateTime:g}" +
                 $" | 修改: {LastAccess:g}" +
                 $" | 最后一次生成坐标: {X} - {Y}" +
                 $" | 箱子数量: {CellChests.Count}" +
                 $" | 牌子数量: {CellSigns.Count}" +
-                $" | 物块数量: {TileData.To1D().Count(t => !t.isTheSameAs(StructTile.Empty))}";
-        }
+                $" | 物块数量: {(TileData ?? GetDeserializedTildData()).To1D().Count(t => !t.isTheSameAs(StructTile.Empty))}";
         public bool SaveCellData()
         {
             if (!IsVisiable)
@@ -236,6 +229,7 @@ namespace PlotMarker
             return DBTools.SQL.Update<Cell>(this)
                 .Set(c => c.Level, Level)
                 .Set(c => c.Owner, Owner)
+                .Set(c => c.AllowedIDs, AllowedIDs)
                 .Set(c => c.UsingCellPositionIndex, UsingCellPositionIndex)
                 .Set(c => c.LastPositionIndex, LastPositionIndex)
                 .Set(c => c.LastAccess, LastAccess)
@@ -253,10 +247,9 @@ namespace PlotMarker
         {
             if (!IsVisiable)
                 return;
+            UsingCellPositionIndex.Clear(); //移除占用的位置
 
             SaveCellData(); //先保存数据
-
-            UsingCellPositionIndex.Clear(); //移除占用的位置
 
             ClearTiles(false); //清除物块, 这里不需要同步section
 

@@ -20,8 +20,8 @@ namespace BossFramework.BCore
             {
                 var text = _statusCallback.OrderByDescending(s => s.Value)
                 .First().Key(p);
-                text = "                                                                                                 \r\n"
-                 + text + RepeatLineBreaks(59);
+                text = "                                                                           \r\n"
+                 + text + RepeatLineBreaks(50);
                 p.SendPacket(new StatusText()
                 {
                     Text = Terraria.Localization.NetworkText.FromLiteral(text),
@@ -43,8 +43,8 @@ namespace BossFramework.BCore
             {
                 plr.LastPing = (int)plr.PingChecker.ElapsedMilliseconds;
                 Task.Delay(500).Wait();
-                plr.SendPacket(new ResetItemOwner() { ItemSlot = PING_ITEM_SLOT });
                 plr.PingChecker.Restart();
+                plr.SendPacket(new ResetItemOwner() { ItemSlot = PING_ITEM_SLOT });
             });
         }
         /// <summary>

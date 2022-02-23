@@ -78,10 +78,8 @@ namespace FakeProvider
 
                     bb2[0] = tile.wire2();
                     bb2[1] = tile.wire3();
-                    if (tile.active())// && tile.color() > 0) // Allow clearing paint
-                        bb2[2] = true;
-                    if (tile.wall > 0)// && tile.wallColor() > 0) // Allow clearing paint
-                        bb2[3] = true;
+                    bb2[2] = tile.active();
+                    bb2[3] = tile.wall > 0;
                     bb2 += (byte)(tile.slope() << 4);
                     bb2[7] = tile.wire4();
                     data.Data.Tiles[x - X, y - Y] = (new()
@@ -94,8 +92,8 @@ namespace FakeProvider
                         LiquidType = tile.liquid,
                         TileColor = tile.color(),
                         TileType = tile.type,
-                        WallColor = tile.color(),
-                        WallType = tile.type,
+                        WallColor = tile.wallColor(),
+                        WallType = tile.wall,
                     });
                 }
             }

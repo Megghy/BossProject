@@ -7,7 +7,7 @@ namespace TrProtocol.Models
     [Serializer(typeof(SquareDataSerializer1405), "Terraria233")]
     [Serializer(typeof(SquareDataSerializer1405), "Terraria234")]
     [Serializer(typeof(SquareDataSerializer))]
-    public partial class SquareData
+    public partial struct SquareData
     {
         private class SquareDataSerializer : FieldSerializer<SquareData>
         {
@@ -90,7 +90,7 @@ namespace TrProtocol.Models
                         if (flags1[0])
                         {
                             bw.Write(tile.TileType);
-                            if (Constants.tileFrameImportant[tile.TileType])
+                            if (Terraria.Main.tileFrameImportant[tile.TileType])
                             {
                                 bw.Write(tile.FrameX);
                                 bw.Write(tile.FrameY);
