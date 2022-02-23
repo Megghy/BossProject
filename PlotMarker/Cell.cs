@@ -15,14 +15,14 @@ using TShockAPI;
 
 namespace PlotMarker
 {
-    record SimpleChestData
+    struct SimpleChestData
     {
         public string Name { get; set; }
         public short TileX { get; set; }
         public short TileY { get; set; }
-        public ItemData[] Items { get; set; } = new ItemData[40];
+        public ItemData[] Items { get; set; }
     }
-    record SimpleSignData
+    struct SimpleSignData
     {
         public short TileX { get; set; }
         public short TileY { get; set; }
@@ -60,6 +60,10 @@ namespace PlotMarker
         public int LastPositionIndex { get; set; } = -1;
         /// <summary> 属地的主人 </summary>
         public string Owner { get; set; }
+        /// <summary>
+        /// 玩家 <see cref="Owner"/> 领取属地的时间
+        /// </summary>
+        public DateTime GetTime { get; set; }
         public DateTime LastAccess { get; set; }
         /// <summary> 有权限动属地者 </summary>
         [JsonMap]
@@ -160,7 +164,7 @@ namespace PlotMarker
         public string GetInfo()
             => $"ID: [{Id}] <{(IsVisiable ? "可见" : "不可见")}> - " +
                 $"领主: {(string.IsNullOrWhiteSpace(Owner) ? "未知" : Owner)}" +
-                $" | 创建: {CreateTime:g}" +
+                $" | 创建: {GetTime:g}" +
                 $" | 修改: {LastAccess:g}" +
                 $" | 最后一次生成坐标: {X} - {Y}" +
                 $" | 箱子数量: {CellChests.Count}" +
