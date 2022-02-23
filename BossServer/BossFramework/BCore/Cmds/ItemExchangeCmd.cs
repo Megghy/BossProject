@@ -41,6 +41,10 @@ namespace BossFramework.BCore.Cmds
             else
                 args.SendErrorMsg($"格式错误. /ie exchangeother <玩家名> <配方名>");
         }
+        public static void List(SubCommandArgs args)
+        {
+            args.SendInfoMsg($"可用配方:\r\n{string.Join("\r\n", ItemExchangeConfig.Instance.Recipes.Select(r => $"{r.Name} [{MoneyInfo.GetFromCopper(r.RequireCoin)}] 所需物品: {string.Join(' ', r.RequireItem.Select(i => TShock.Utils.ItemTag(i)))}"))}");
+        }
         record MoneyInfo(long Platinum, long Gold, long Silver, long Copper)
         {
             public long TotalCoin

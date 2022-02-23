@@ -147,7 +147,6 @@ namespace TShockAPI
         internal void OnPlayerUpdate(object sender, PlayerUpdateEventArgs args)
         {
             DisableFlags disableFlags = TShock.Config.Settings.DisableSecondUpdateLogs ? DisableFlags.WriteToConsole : DisableFlags.WriteToLogAndConsole;
-            bool useItem = args.Control.IsUsingItem;
             TSPlayer player = args.Player;
             string itemName = player.TPlayer.inventory[args.SelectedItem].Name;
 
@@ -166,7 +165,6 @@ namespace TShockAPI
             }
 
             args.Handled = false;
-            return;
         }
 
         internal void OnChestItemChange(object sender, ChestItemEventArgs args)
@@ -183,7 +181,6 @@ namespace TShockAPI
             }
 
             args.Handled = false;
-            return;
         }
 
         internal void OnTileEdit(object sender, TileEditEventArgs args)

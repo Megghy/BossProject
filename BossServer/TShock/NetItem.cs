@@ -188,5 +188,18 @@ namespace TShockAPI
                 return item.NetId == NetId && item.Stack == Stack && item.PrefixId == PrefixId;
             return false;
         }
+
+        public static bool operator ==(NetItem left, NetItem right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(NetItem left, NetItem right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+            => base.GetHashCode();
     }
 }

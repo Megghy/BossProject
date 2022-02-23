@@ -18,7 +18,7 @@ namespace BossFramework.BInterfaces
         public virtual void Help(SubCommandArgs args)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"命令: {string.Join(',', Names)}");
+            sb.AppendLine($"无效输入. 可用命令: {string.Join(',', Names)}");
             SubCommands.ForEach(s => sb.AppendLine($"{string.Join(',', s.Names)} : {s.Description} {(args.TsPlayer.HasPermission("boss.admin") ? $"<{s.Permission}>" : "")}"));
             args.SendInfoMsg(sb.ToString());
         }

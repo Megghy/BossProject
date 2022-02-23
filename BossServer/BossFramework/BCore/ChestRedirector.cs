@@ -81,27 +81,24 @@ namespace BossFramework.BCore
         {
             var args = new BEventArgs.ChestUpdateItemEventArgs(plr, packet);
             ChestUpdateItem?.Invoke(args);
-            if (!args.Handled)
+            if (!args.Handled && packet.ChestSlot is > -1 and < 8000 && plr.WatchingChest.HasValue)
             {
-                if (packet.ChestSlot is > -1 and < 8000 && plr.WatchingChest.HasValue)
-                {
-                    var chest = plr.WatchingChest.Value.chest;
+                var chest = plr.WatchingChest.Value.chest;
 
-                    chest.Items[packet.ChestItemSlot] ??= new();
-                    chest.Items[packet.ChestItemSlot].ItemID = packet.ItemType;
-                    chest.Items[packet.ChestItemSlot].Prefix = packet.Prefix;
-                    chest.Items[packet.ChestItemSlot].Stack = packet.Stack;
-                    plr.WatchingChest.Value.chest.Items = chest.Items;
-                    plr.WatchingChest.Value.chest.LastUpdateUser = (int)plr.Id;
+                chest.Items[packet.ChestItemSlot] ??= new();
+                chest.Items[packet.ChestItemSlot].ItemID = packet.ItemType;
+                chest.Items[packet.ChestItemSlot].Prefix = packet.Prefix;
+                chest.Items[packet.ChestItemSlot].Stack = packet.Stack;
+                plr.WatchingChest.Value.chest.Items = chest.Items;
+                plr.WatchingChest.Value.chest.LastUpdateUser = (int)plr.Id;
 
-                    //同步给同样在看这个箱子的玩家
-                    BInfo.OnlinePlayers.Where(p => p.WatchingChest?.chest == chest && p != plr)
-                        .ForEach(p =>
-                        {
-                            packet.ChestSlot = p.WatchingChest.Value.slot;
-                            p.SendPacket(packet);
-                        });
-                }
+                //同步给同样在看这个箱子的玩家
+                BInfo.OnlinePlayers.Where(p => p.WatchingChest?.chest == chest && p != plr)
+                    .ForEach(p =>
+                    {
+                        packet.ChestSlot = p.WatchingChest.Value.slot;
+                        p.SendPacket(packet);
+                    });
             }
         }
         public static void OnSyncActiveChest(BPlayer plr, SyncPlayerChest packet)

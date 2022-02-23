@@ -1,11 +1,12 @@
 ﻿#region Using
 using Microsoft.Xna.Framework;
+using System.Diagnostics.CodeAnalysis;
 using Terraria;
 using Terraria.DataStructures;
 #endregion
 namespace FakeProvider
 {
-    public sealed class TileReference : ITile
+    public struct TileReference : ITile
     {
         #region Constants
 
@@ -23,9 +24,9 @@ namespace FakeProvider
 
         #region Data
 
-        private StructTile[,] Data;
-        public int X { get; }
-        public int Y { get; }
+        private readonly StructTile[,] Data;
+        public readonly int X;
+        public readonly int Y;
 
         #endregion
         #region Constructor
@@ -605,5 +606,11 @@ namespace FakeProvider
             $"Wall:{wall} Slope:{slope()} fX:{frameX} fY:{frameY}";
 
         #endregion
+        public override bool Equals([NotNullWhen(true)] object obj)
+        {
+            if (obj is ITile t)
+                return t.isTheSameAs(this);
+            return false;
+        }
     }
 }

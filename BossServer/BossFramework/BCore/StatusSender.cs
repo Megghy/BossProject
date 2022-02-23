@@ -33,7 +33,7 @@ namespace BossFramework.BCore
         private static string DefaultStatus(BPlayer plr)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"Ping: {(plr.LastPing < 50 ? "[i:3738]" : "[i:3736]")} {plr.LastPing} ms");
+            sb.AppendLine($"Ping: {(plr.LastPing < 70 ? "[i:3738]" : "[i:3736]")} {plr.LastPing} ms");
             sb.AppendLine($"在线: {BInfo.OnlinePlayers.Length} 人");
             return sb.ToString();
         }

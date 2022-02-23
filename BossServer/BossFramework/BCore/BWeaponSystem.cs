@@ -81,7 +81,7 @@ namespace BossFramework.BCore
                 return true;
             if (item.ItemSlot > 50 || item.ItemType == 0) //空格子或者拿手上则忽略
                 return false;
-            if (plr.Weapons?.Where(w => w.Equals(item)).FirstOrDefault() is { } bweapon)
+            if (plr.Weapons?.FirstOrDefault(w => w.Equals(item)) is { } bweapon)
             {
                 var targetItem = plr.TsPlayer.TPlayer.inventory[item.ItemSlot];
                 if ((targetItem is null || targetItem?.type == 0)
@@ -105,11 +105,11 @@ namespace BossFramework.BCore
                 var hurt = args.Hurt;
                 var targetPlayer = TShock.Players[hurt.OtherPlayerSlot]?.GetBPlayer();
                 var deathReason = hurt.Reason;
-                if (plr.RelesedProjs.Where(p => p.Proj.ProjSlot == deathReason._sourceProjectileIndex).FirstOrDefault() is { } projInfo)
+                if (plr.RelesedProjs.FirstOrDefault(p => p.Proj.ProjSlot == deathReason._sourceProjectileIndex) is { } projInfo)
                 {
                     args.Handled = projInfo.FromWeapon.OnProjHit(plr, targetPlayer, projInfo.Proj, hurt.Damage, hurt.HitDirection, (byte)hurt.CoolDown);
                 }
-                else if (plr.Weapons.Where(w => w.ItemID == deathReason._sourceItemType && w.Prefix == deathReason._sourceItemPrefix).FirstOrDefault() is { } weapon)
+                else if (plr.Weapons.FirstOrDefault(w => w.ItemID == deathReason._sourceItemType && w.Prefix == deathReason._sourceItemPrefix) is { } weapon)
                 {
                     args.Handled = weapon.OnHit(plr, targetPlayer, hurt.Damage, hurt.HitDirection, (byte)hurt.CoolDown);
                 }
@@ -126,7 +126,7 @@ namespace BossFramework.BCore
         {
             if (!args.Player.IsCustomWeaponMode || args.Proj.PlayerSlot != args.Player.Index)
                 return;
-            if (args.Player.Weapons.Where(w => w.Equals(args.Player.TsPlayer.SelectedItem)).FirstOrDefault() is { } weapon)
+            if (args.Player.Weapons.FirstOrDefault(w => w.Equals(args.Player.TsPlayer.SelectedItem)) is { } weapon)
             {
                 args.Handled = true;
                 var selectItem = args.Player.TsPlayer.SelectedItem;
@@ -135,13 +135,13 @@ namespace BossFramework.BCore
                     args.Proj.ProjType = 0;
                     args.Player.SendPacket(args.Proj);
                 }
-                else 
+                else
                     weapon.CreateProj(args.Player, args.Proj);
             }
         }
         public static void OnProjDestroy(BEventArgs.ProjDestroyEventArgs args)
         {
-            if (args.Player.RelesedProjs.Where(p => p.Proj.ProjSlot == args.KillProj.ProjSlot).FirstOrDefault() is { } projInfo)
+            if (args.Player.RelesedProjs.FirstOrDefault(p => p.Proj.ProjSlot == args.KillProj.ProjSlot) is { } projInfo)
             {
                 projInfo.FromWeapon.OnProjDestroy(args.Player, args.KillProj);
                 args.Player.RelesedProjs.Remove(projInfo);
@@ -241,7 +241,7 @@ namespace BossFramework.BCore
             for (int i = 49; i >= 0; i--)
             {
                 var item = plr.TsPlayer?.TPlayer?.inventory[i];
-                if (BWeapons.Where(w => w.Equals(item)).FirstOrDefault() is { } bweapon)
+                if (BWeapons.FirstOrDefault(w => w.Equals(item)) is { } bweapon)
                     plr.SpawnBWeapon(bweapon, i);
                 Task.Delay(10).Wait();
             }
@@ -254,7 +254,7 @@ namespace BossFramework.BCore
         {
             plr.TrPlayer.inventory.ForEach((item, i) =>
             {
-                if (BWeapons.Where(w => w.Equals(item)).Any())
+                if (BWeapons.Any(w => w.Equals(item)))
                     plr.SendPacket(new SyncEquipment()
                     {
                         ItemSlot = (short)i,

@@ -12,13 +12,13 @@ using TShockAPI;
 
 namespace BossFramework.BCore
 {
-    public class BCommand
+    public static class BCommand
     {
         #region 命令提示
         public const string InvalidInput = "无效的命令格式";
         #endregion
         public static string ScriptCmdPath => Path.Combine(ScriptManager.ScriptRootPath, "Cmds");
-        public static readonly List<BaseCommand> Cmds = new();
+        internal static readonly List<BaseCommand> Cmds = new();
         private static readonly List<Command> _tsCmds = new();
         [AutoInit("注册Boss服命令")]
         public static void RegisteAllCommands()
@@ -127,7 +127,9 @@ namespace BossFramework.BCore
                     cmd.Help(new(args, cmdName));
             }
         }
+#pragma warning disable S3168 // "async" methods should not return "void"
         private static async void ExcuteSubCmd(BaseCommand baseCmd, SubCommandAttribute subCmd, CommandArgs args, string cmdName)
+#pragma warning restore S3168 // "async" methods should not return "void"
         {
             try
             {

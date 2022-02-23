@@ -28,7 +28,7 @@ namespace BossFramework.BNet.PacketHandlers
             {
                 projName = Terraria.Lang.GetProjectileName(packet.Reason._sourceProjectileType).ToString();
             }
-            var text = $"{(item is null ? "" : TShock.Utils.ItemTag(item)) + " "}" +
+            var text = $">{(item is null ? "" : TShock.Utils.ItemTag(item)) + " "}" +
                 $"{plr.Name.Color("C8E1C7")} " +
                 $"被 {targetName} " +
                 $"{(projName is null ? "" : $"的 {projName}")}" +

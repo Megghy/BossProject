@@ -19,13 +19,13 @@ namespace FakeProvider
         public const int Liquid_Lava = 1;
         public const int Liquid_Honey = 2;
 
-        public ushort type;
-        public ushort wall;
         public byte liquid;
-        public short sTileHeader;
         public byte bTileHeader;
         public byte bTileHeader2;
         public byte bTileHeader3;
+        public ushort type;
+        public ushort wall;        
+        public short sTileHeader;
         public short frameX;
         public short frameY;
 

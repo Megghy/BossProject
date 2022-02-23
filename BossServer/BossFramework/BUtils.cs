@@ -29,7 +29,7 @@ namespace BossFramework
             {
                 throw new ArgumentNullException(nameof(action));
             }
-            if (source.Count() < 1)
+            if (!source.Any())
                 return;
             int count = 0;
             foreach (T obj in source)
@@ -65,7 +65,7 @@ namespace BossFramework
             //到圆心的距离 是否大于半径。半径是R  
             //如O(x,y)点圆心，任意一点P（x1,y1） （x-x1）*(x-x1)+(y-y1)*(y-y1)>R*R 那么在圆外 反之在圆内
 
-            if (!((cx - x) * (cx - x) + (cy - y) * (cy - y) > r * r))
+            if ((cx - x) * (cx - x) + (cy - y) * (cy - y) <= r * r)
             {
                 return true;        //当前点在圆内
             }
@@ -74,13 +74,12 @@ namespace BossFramework
                 return false;       //当前点在圆外
             }
         }
-        public class Circle//圆类
+        public struct Circle//圆类
         {
             public Circle(Point point, double r)//构造函数
             {
-                Center.X = point.X;
-                Center.X = point.Y;
-                this.R = r;
+                Center = point;
+                R = r;
             }
             public int Is(Point point)//判断函数
             {
@@ -89,8 +88,8 @@ namespace BossFramework
                 else if (a == R) return 0;
                 else return 1;
             }
-            public Point Center;//圆心坐标
-            public double R;//圆半径
+            public Point Center { get; init; }//圆心坐标
+            public double R { get; init; }//圆半径
         }
 
         public static T DeserializeJson<T>(this string text)
@@ -157,7 +156,9 @@ namespace BossFramework
             catch (Exception ex)
             {
                 BLog.Error(ex);
+#pragma warning disable S1168 // Empty arrays and collections should be returned instead of null
                 return null;
+#pragma warning restore S1168 // Empty arrays and collections should be returned instead of null
             }
         }
 
@@ -180,7 +181,9 @@ namespace BossFramework
             catch (Exception ex)
             {
                 BLog.Error(ex);
+#pragma warning disable S1168 // Empty arrays and collections should be returned instead of null
                 return null;
+#pragma warning restore S1168 // Empty arrays and collections should be returned instead of null
             }
         }
 
@@ -298,7 +301,7 @@ namespace BossFramework
         public static void Kill(this SyncProjectile proj)
         {
             var plr = TShock.Players[proj.PlayerSlot]?.GetBPlayer();
-            plr.SendPacket(new KillProjectile()
+            plr?.SendPacket(new KillProjectile()
             {
                 ProjSlot = proj.ProjSlot,
                 PlayerSlot = proj.PlayerSlot
@@ -309,7 +312,7 @@ namespace BossFramework
             var plr = TShock.Players[proj.PlayerSlot]?.GetBPlayer();
             var oldType = proj.ProjType;
             proj.ProjType = 0;
-            plr.SendPacket(proj);
+            plr?.SendPacket(proj);
             proj.ProjType = oldType;
         }
         public static void SendTo(this Packet packet, BPlayer plr)

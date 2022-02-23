@@ -37,12 +37,13 @@ namespace TUIPlugin
         public static bool FakesEnabled = false;
         private static Timer RegionTimer = new Timer(1000) { AutoReset = true };
         private static int[] PlaceStyles = new int[Main.maxItemTypes];
+
         public static Command[] CommandList = new Command[]
         {
             new Command(TUI.ControlPermission, TUICommand, "tui")
         };
 
-        #endregion
+        #endregion Data
 
         #region Constructor
 
@@ -53,7 +54,8 @@ namespace TUIPlugin
             Order = -1000;
         }
 
-        #endregion
+        #endregion Constructor
+
         #region Initialize
 
         public override void Initialize()
@@ -110,7 +112,8 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion Initialize
+
         #region Dispose
 
         protected override void Dispose(bool disposing)
@@ -159,7 +162,7 @@ namespace TUIPlugin
             base.Dispose(disposing);
         }
 
-        #endregion
+        #endregion Dispose
 
         #region OnGamePostInitialize
 
@@ -182,7 +185,8 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion OnGamePostInitialize
+
         #region OnServerConnect
 
         private static void OnServerConnect(ConnectEventArgs args)
@@ -198,7 +202,8 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion OnServerConnect
+
         #region OnServerLeave
 
         private static void OnServerLeave(LeaveEventArgs args)
@@ -213,7 +218,8 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion OnServerLeave
+
         #region OnGetData
 
         private static void OnGetData(GetDataEventArgs args)
@@ -252,6 +258,7 @@ namespace TUIPlugin
                 TUI.HandleException(e);
             }
         }
+
         private static void OnProjDestroy(BEventArgs.ProjDestroyEventArgs args)
         {
             var owner = args.Player.Index;
@@ -264,7 +271,9 @@ namespace TUIPlugin
                 playerDesignState[owner] = DesignState.Waiting;
             }
         }
-        #endregion
+
+        #endregion OnGetData
+
         #region OnPlayerLogout
 
         private static void OnPlayerLogout(PlayerLogoutEventArgs args)
@@ -280,7 +289,8 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion OnPlayerLogout
+
         #region OnNewProjectile
 
         private static void OnNewProjectile(BEventArgs.ProjCreateEventArgs args)
@@ -325,7 +335,8 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion OnNewProjectile
+
         #region OnPostSaveWorld
 
         private static void OnPostSaveWorld(WorldPostSaveEventArgs args)
@@ -333,7 +344,7 @@ namespace TUIPlugin
             TUI.RequestDrawChanges();
         }
 
-        #endregion
+        #endregion OnPostSaveWorld
 
         #region FindNearPlayers
 
@@ -362,7 +373,7 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion FindNearPlayers
 
         #region OnLoadRoot
 
@@ -371,7 +382,8 @@ namespace TUIPlugin
             FindNearPlayers(args.Root);
         }
 
-        #endregion
+        #endregion OnLoadRoot
+
         #region OnCanTouch
 
         private static void OnCanTouch(CanTouchArgs args)
@@ -380,7 +392,7 @@ namespace TUIPlugin
             {
                 TSPlayer player = args.Touch.Player();
                 args.CanTouch = player?.HasPermission(permission) ?? false;
-                if (args.Touch.State == TouchState.Begin && player != null && args.CanTouch == false)
+                if (args.Touch.State == TouchState.Begin && player != null && !args.CanTouch)
                 {
                     args.Touch.Session.Enabled = false;
                     TUI.TrySetLockForObject(args.Node, args.Touch);
@@ -389,19 +401,14 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion OnCanTouch
+
         #region OnDrawObject
 
         private static void OnDrawObject(DrawObjectArgs args)
         {
             VisualObject node = args.Node;
             HashSet<int> players = args.TargetPlayers;
-
-            /*Console.WriteLine($"Name: {node.FullName}");
-            Console.WriteLine($"State: {node.Root.DrawState}");
-            Console.WriteLine($"PlayerStates: {string.Join(",", node.Root.PlayerApplyCounter.Select(pair => $"{pair.Key}-{pair.Value}"))}");
-            Console.WriteLine($"Players: {string.Join(",", players)}");
-            Console.WriteLine("StackTrace: '{0}'", Environment.StackTrace);*/
 
 #if DEBUG
             TUI.Log($"Draw ({node.Name} -> " +
@@ -448,7 +455,8 @@ namespace TUIPlugin
                 node.Root.PlayerApplyCounter[player] = node.Root.DrawState;
         }
 
-        #endregion
+        #endregion OnDrawObject
+
         #region OnDrawRectangle
 
         private static void OnDrawRectangle(DrawRectangleArgs args)
@@ -471,7 +479,8 @@ namespace TUIPlugin
                 NetMessage.SendData(20, args.PlayerIndex, args.ExceptPlayerIndex, null, args.X, args.Y, args.Width, args.Height);
         }
 
-        #endregion
+        #endregion OnDrawRectangle
+
         #region OnTouchCancel
 
         private static void OnTouchCancel(TouchCancelArgs args)
@@ -486,7 +495,8 @@ namespace TUIPlugin
             playerDesignState[args.UserIndex] = DesignState.Waiting;
         }
 
-        #endregion
+        #endregion OnTouchCancel
+
         #region OnGetTile
 
         private static void OnGetTile(GetTileArgs args)
@@ -497,7 +507,8 @@ namespace TUIPlugin
             args.Tile = Main.tile[args.X, args.Y];
         }
 
-        #endregion
+        #endregion OnGetTile
+
         #region OnGetPlaceStyle
 
         private void OnGetPlaceStyle(GetPlaceStyleArgs args)
@@ -505,7 +516,8 @@ namespace TUIPlugin
             args.PlaceStyle = PlaceStyles[args.Item];
         }
 
-        #endregion
+        #endregion OnGetPlaceStyle
+
         #region OnUpdateSign
 
         private static void OnUpdateSign(UpdateSignArgs args)
@@ -517,8 +529,6 @@ namespace TUIPlugin
                 int id = Sign.ReadSign(args.X, args.Y);
                 if (id >= 0)
                 {
-                    // Can lead to creating the same sign since ReadSign returns existing sign if there is one.
-                    // Console.WriteLine($"{args.Node.FullName} OnCreateSign: {id} ({args.X}, {args.Y})");
                     args.Sign = Main.sign[id];
                 }
                 else
@@ -537,7 +547,8 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion OnUpdateSign
+
         #region OnRemoveSign
 
         private static void OnRemoveSign(RemoveSignArgs args)
@@ -550,7 +561,8 @@ namespace TUIPlugin
                 provider.RemoveEntity(args.Sign);
         }
 
-        #endregion
+        #endregion OnRemoveSign
+
         #region OnUpdateChest
 
         private static void OnUpdateChest(UpdateChestArgs args)
@@ -590,7 +602,8 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion OnUpdateChest
+
         #region OnRemoveChest
 
         private static void OnRemoveChest(RemoveChestArgs args)
@@ -608,7 +621,8 @@ namespace TUIPlugin
                 provider.RemoveEntity(args.Chest);
         }
 
-        #endregion
+        #endregion OnRemoveChest
+
         #region OnLog
 
         private static void OnLog(LogArgs args)
@@ -621,12 +635,15 @@ namespace TUIPlugin
                     case LogType.Success:
                         log.ConsoleInfo(args.Text);
                         break;
+
                     case LogType.Info:
                         log.ConsoleInfo(args.Text);
                         break;
+
                     case LogType.Warning:
                         log.ConsoleError(args.Text);
                         break;
+
                     case LogType.Error:
                         log.ConsoleError(args.Text);
                         break;
@@ -640,12 +657,15 @@ namespace TUIPlugin
                             case LogType.Success:
                                 player.SendSuccessMessage(args.Text);
                                 break;
+
                             case LogType.Info:
                                 player.SendInfoMessage(args.Text);
                                 break;
+
                             case LogType.Warning:
                                 player.SendWarningMessage(args.Text);
                                 break;
+
                             case LogType.Error:
                                 player.SendErrorMessage(args.Text);
                                 break;
@@ -660,12 +680,15 @@ namespace TUIPlugin
                     case LogType.Success:
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         break;
+
                     case LogType.Info:
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         break;
+
                     case LogType.Warning:
                         Console.ForegroundColor = ConsoleColor.Red;
                         break;
+
                     case LogType.Error:
                         Console.ForegroundColor = ConsoleColor.Red;
                         break;
@@ -675,7 +698,8 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion OnLog
+
         #region OnDatabase
 
         private static void OnDatabase(DatabaseArgs args)
@@ -690,6 +714,7 @@ namespace TUIPlugin
                     else
                         args.Data = Database.GetData(args.Key);
                     break;
+
                 case DatabaseActionType.Set:
                     if (args.Number.HasValue)
                         Database.SetNumber(args.User.Value, args.Key, args.Number.Value);
@@ -698,6 +723,7 @@ namespace TUIPlugin
                     else
                         Database.SetData(args.Key, args.Data);
                     break;
+
                 case DatabaseActionType.Remove:
                     if (args.Number.HasValue)
                         Database.RemoveNumber(args.User.Value, args.Key);
@@ -706,13 +732,14 @@ namespace TUIPlugin
                     else
                         Database.RemoveData(args.Key);
                     break;
+
                 case DatabaseActionType.Select:
                     args.Numbers = Database.SelectNumbers(args.Key, args.Ascending, args.Count, args.Offset, args.RequestNames);
                     break;
             }
         }
 
-        #endregion
+        #endregion OnDatabase
 
         #region OnRegionTimer
 
@@ -781,7 +808,7 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion OnRegionTimer
 
         #region FindRoot
 
@@ -818,7 +845,8 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion FindRoot
+
         #region FindAppType
 
         public static bool FindAppType(string name, TSPlayer player, out ApplicationType found)
@@ -854,7 +882,8 @@ namespace TUIPlugin
             }
         }
 
-        #endregion
+        #endregion FindAppType
+
         #region TUICommand
 
         public static void TUICommand(CommandArgs args)
@@ -1239,6 +1268,6 @@ Draw state: {root.DrawState}");
             }
         }
 
-        #endregion
+        #endregion TUICommand
     }
 }
