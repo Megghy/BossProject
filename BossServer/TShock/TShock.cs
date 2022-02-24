@@ -1342,8 +1342,6 @@ namespace TShockAPI
 
             if (tsplr.ReceivedInfo)
             {
-                if (!tsplr.SilentKickInProgress && tsplr.State >= 3)
-                    Utils.Broadcast(tsplr.Name + " has left.", Color.Yellow);
                 Log.Info("{0} 已断开连接.", tsplr.Name);
 
                 if (tsplr.IsLoggedIn && !tsplr.IsDisabledPendingTrashRemoval && Main.ServerSideCharacter && (!tsplr.Dead || tsplr.TPlayer.difficulty != 2))

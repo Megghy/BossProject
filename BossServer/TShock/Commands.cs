@@ -699,7 +699,7 @@ namespace TShockAPI
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        private static List<String> ParseParameters(string str)
+        public static List<String> ParseParameters(string str)
         {
             var ret = new List<string>();
             var sb = new StringBuilder();
@@ -6670,11 +6670,7 @@ namespace TShockAPI
                 playerToGod = args.Player;
             }
 
-            playerToGod.GodMode = !playerToGod.GodMode;
-
-            var godPower = CreativePowerManager.Instance.GetPower<CreativePowers.GodmodePower>();
-
-            godPower.SetEnabledState(playerToGod.Index, playerToGod.GodMode);
+            playerToGod.SetGodMode(!playerToGod.GodMode);
 
             if (playerToGod != args.Player)
             {

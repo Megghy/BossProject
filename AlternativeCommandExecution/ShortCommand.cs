@@ -1,6 +1,7 @@
 ﻿using AlternativeCommandExecution.ShortCommand;
 using TerrariaApi.Server;
 using TShockAPI;
+using TShockAPI.Hooks;
 
 namespace AlternativeCommandExecution
 {
@@ -19,57 +20,19 @@ namespace AlternativeCommandExecution
 
             var commandText = IsValidCmd(args.Command) ? args.Command : Commands.Specifier + args.Command;
 
-            ShortCommandUtil.HandleCommand(TSPlayer.Server, commandText);
+            Commands.HandleCommand(TSPlayer.Server, commandText);
 
             args.Handled = true;
         }
 
-        private static void OnChat(ServerChatEventArgs args)
+        private static void OnChat(PlayerChatEventArgs args)
         {
             if (args.Handled)
                 return;
-
-            var tsplr = TShock.Players[args.Who];
-            if (tsplr == null)
+            if (IsValidCmd(args.RawText))
             {
-                args.Handled = true;
-                return;
+                args.Handled = ShortCommandUtil.HandleCommand(args.Player, args.RawText);
             }
-
-            if (args.Text.Length > 500)
-            {
-                tsplr.Kick("试图发送长聊天语句破坏服务器。", true);
-                args.Handled = true;
-                return;
-            }
-
-            var text = args.Text;
-
-            // Terraria now has chat commands on the client side.
-            // These commands remove the commands prefix (e.g. /me /playing) and send the command id instead
-            // In order for us to keep legacy code we must reverse this and get the prefix using the command id
-            foreach (var item in Terraria.UI.Chat.ChatManager.Commands._localizedCommands)
-            {
-                if (item.Value._name == args.CommandId._name)
-                {
-                    if (!string.IsNullOrEmpty(text))
-                    {
-                        text = item.Key.Value + ' ' + text;
-                    }
-                    else
-                    {
-                        text = item.Key.Value;
-                    }
-                    break;
-                }
-            }
-
-            if (!IsValidCmd(text))
-            {
-                return;
-            }
-
-            args.Handled = ShortCommandUtil.HandleCommand(tsplr, text);
         }
 
         private static void LoadShortCommands()

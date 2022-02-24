@@ -27,6 +27,7 @@ using System.Threading;
 using System.Timers;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.Localization;
 using TShockAPI.DB;
@@ -809,7 +810,7 @@ namespace TShockAPI
         /// <summary>
         /// Player cant die, unless onehit
         /// </summary>
-        public bool GodMode = false;
+        public bool GodMode { get; private set; } = false;
 
         /// <summary>
         /// Players controls are inverted if using SSC
@@ -1878,6 +1879,13 @@ namespace TShockAPI
         public bool HasPermission(TileBan bannedTile)
         {
             return TShock.TileBans.TileIsBanned(bannedTile.ID, this);
+        }
+        public void SetGodMode(bool enable)
+        {
+            GodMode = enable;
+            var godPower = CreativePowerManager.Instance.GetPower<CreativePowers.GodmodePower>();
+
+            godPower.SetEnabledState(Index, GodMode);
         }
     }
 

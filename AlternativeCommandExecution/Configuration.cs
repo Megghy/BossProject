@@ -16,9 +16,6 @@ namespace AlternativeCommandExecution
         [JsonProperty("简写指令")]
         public ShortCommandItem[] ShortCommands;
 
-        [JsonProperty("可跳过权限")]
-        public string[] SkipablePermissions;
-
         public static Configuration Read()
         {
             if (!File.Exists(ConfigPath))
@@ -68,24 +65,6 @@ namespace AlternativeCommandExecution
                                 "自杀"
                             }
                         }
-                    },
-                    SkipablePermissions = new[]
-                    {
-                        Permissions.item,
-                        Permissions.annoy,
-                        Permissions.wind,
-                        Permissions.rain,
-                        Permissions.slap,
-                        Permissions.kill,
-                        Permissions.bloodmoon,
-                        Permissions.buff,
-                        Permissions.buffplayer,
-                        Permissions.heal,
-                        Permissions.spawnmob,
-                        "scattering.tphome",
-                        "scattering.sethome",
-                        "pz.select",
-                        "pvp_team_cmd.use"
                     }
                 };
             }

@@ -9,25 +9,28 @@ namespace AlternativeCommandExecution.ShortCommand
 
         public static bool HandleCommand(TSPlayer player, string text)
         {
-            if (!Internal_ParseCmd(text, out var cmdText, out var cmdName, out var args, out var silent))
+            if (Internal_ParseCmd(text, out var cmdText, out var cmdName, out var args, out var silent))
             {
-                player.SendErrorMessage("指令无效；键入 {0}help 以获取可用指令。", Commands.Specifier);
+                RunCmd(cmdName, silent ? Commands.SilentSpecifier : Commands.Specifier, player, args.ToArray());
                 return true;
             }
+            return false;
+        }
+        public static bool RunCmd(string cmdName, string cmdPrefix, TSPlayer player, string[] args)
+        {
+            var oldTempGroup = player.tempGroup;
+            player.tempGroup = SuperAdminGroup.Default;
 
             var sc = Plugin.ShortCommands.Where(x => x.HasName(cmdName)).ToList();
-
             if (sc.Count != 0)
             {
-                var cmdPrefix = silent ? Commands.SilentSpecifier : Commands.Specifier;
-
                 foreach (var s in sc)
                 {
                     try
                     {
-                        foreach (var c in s.Convert(new CommandExectionContext(player), args.ToArray()))
+                        foreach (var c in s.Convert(new CommandExectionContext(player), args))
                         {
-                            Commands.HandleCommand(player, cmdPrefix + c);
+                            Internal_HandleCommand(player, c, cmdName, args.ToList(), cmdPrefix == TShock.Config.Settings.CommandSilentSpecifier);
                         }
                     }
                     catch (LackOfArgumentException ex)
@@ -35,53 +38,11 @@ namespace AlternativeCommandExecution.ShortCommand
                         player.SendErrorMessage(ex.Message);
                     }
                 }
+                player.tempGroup = oldTempGroup;
                 return true;
             }
-            else
-            {
-                return Commands.HandleCommand(player, text);
-            }
+            return false;
         }
-
-        public static bool HandleCommandIgnorePermission(TSPlayer player, string text)
-        {
-            if (!Internal_ParseCmd(text, out var cmdText, out var cmdName, out var args, out var silent))
-            {
-                player.SendErrorMessage("指令无效；键入 {0}help 以获取可用指令。", Commands.Specifier);
-                return false;
-            }
-
-            var sc = Plugin.ShortCommands.Where(x => x.HasName(cmdName)).ToList();
-
-            if (sc.Count == 0)
-            {
-                return Internal_HandleCommandIgnorePermission(player, cmdText, cmdName, args, silent);
-            }
-
-            var cmdPrefix = silent ? Commands.SilentSpecifier : Commands.Specifier;
-
-            foreach (var s in sc)
-            {
-                try
-                {
-                    foreach (var c in s.Convert(new CommandExectionContext(player), args.ToArray()))
-                    {
-                        if (!Internal_ParseCmd(cmdPrefix + c, out var ct, out var cn, out var ar, out var si))
-                        {
-                            continue;
-                        }
-                        Internal_HandleCommandIgnorePermission(player, ct, cn, ar, si);
-                    }
-                }
-                catch (LackOfArgumentException ex)
-                {
-                    player.SendErrorMessage(ex.Message);
-                }
-            }
-
-            return true;
-        }
-
         private static bool Internal_ParseCmd(string text, out string cmdText, out string cmdName, out List<string> args, out bool silent)
         {
             cmdText = text.Remove(0, 1);
@@ -110,8 +71,7 @@ namespace AlternativeCommandExecution.ShortCommand
                 CommandsType.CallPrivateStaticMethod<List<string>>("ParseParameters", cmdText.Substring(index));
             return true;
         }
-
-        private static bool Internal_HandleCommandIgnorePermission(TSPlayer player, string cmdText, string cmdName, List<string> args, bool silent)
+        private static bool Internal_HandleCommand(TSPlayer player, string cmdText, string cmdName, List<string> args, bool silent)
         {
             var cmds = Commands.ChatCommands.FindAll(x => x.HasAlias(cmdName));
 
@@ -129,14 +89,7 @@ namespace AlternativeCommandExecution.ShortCommand
             }
             foreach (var cmd in cmds)
             {
-                if (cmd.CanRun(player) || cmd.Permissions.Any(Plugin.Config.SkipablePermissions.Contains))
-                {
-                    cmd.CommandDelegate?.Invoke(new CommandArgs(cmdText, silent, player, args));
-                }
-                else
-                {
-                    player.SendErrorMessage("你没有权限执行该指令。", Commands.Specifier);
-                }
+                cmd.CommandDelegate?.Invoke(new CommandArgs(cmdText, silent, player, args));
             }
             return true;
         }

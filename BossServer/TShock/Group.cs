@@ -325,6 +325,7 @@ namespace TShockAPI
     /// </summary>
     public class SuperAdminGroup : Group
     {
+        public static readonly SuperAdminGroup Default = new SuperAdminGroup();
         /// <summary>
         /// The superadmin class has every permission, represented by '*'.
         /// </summary>

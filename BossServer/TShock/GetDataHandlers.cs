@@ -2435,6 +2435,8 @@ namespace TShockAPI
             bool happyFunTorchTime = torchFlags[1];
             bool unlockedBiomeTorches = torchFlags[2];
 
+            TShock.Log.ConsoleInfo($"{args.Player.IP} 的用户名为 [{name}]");
+
             if (OnPlayerInfo(args.Player, args.Data, playerid, hair, skinVariant, difficulty, name))
             {
                 TShock.Log.ConsoleDebug("GetDataHandlers / HandlePlayerInfo rejected plugin phase {0}", name);
@@ -4090,7 +4092,7 @@ namespace TShockAPI
             return false;
         }
 
-        private static bool HandlePlayerKillMeV2(GetDataHandlerArgs args)
+        internal static bool HandlePlayerKillMeV2(GetDataHandlerArgs args)
         {
             var id = args.Data.ReadInt8();
             PlayerDeathReason playerDeathReason = PlayerDeathReason.FromReader(args.Data);

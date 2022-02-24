@@ -98,11 +98,8 @@ namespace Chameleon
             var type = args.MsgID;
 
             var player = TShock.Players[args.Msg.whoAmI];
-            if (player == null || !player.ConnectionAlive)
-            {
-                args.Handled = true;
+            if (player?.IsLoggedIn == true)
                 return;
-            }
 
             if (player.RequiresPassword && type != PacketTypes.PasswordSend)
             {
@@ -110,23 +107,19 @@ namespace Chameleon
                 return;
             }
 
-            if ((player.State < 10 || player.Dead) && (int)type > 12 && (int)type != 16 && (int)type != 42 && (int)type != 50 &&
-                (int)type != 38 && (int)type != 21 && (int)type != 22)
+            if(type is PacketTypes.ContinueConnecting2 or PacketTypes.PasswordSend)
             {
-                args.Handled = true;
-                return;
-            }
-
-            using (var data = new MemoryStream(args.Msg.readBuffer, args.Index, args.Length - 1))
-            {
-                // ReSharper disable once ConvertIfStatementToSwitchStatement
-                if (type == PacketTypes.ContinueConnecting2)
+                using (var data = new MemoryStream(args.Msg.readBuffer, args.Index, args.Length - 1))
                 {
-                    args.Handled = HandleConnecting(player);
-                }
-                else if (type == PacketTypes.PasswordSend)
-                {
-                    args.Handled = HandlePassword(player, data.ReadString());
+                    // ReSharper disable once ConvertIfStatementToSwitchStatement
+                    if (type == PacketTypes.ContinueConnecting2)
+                    {
+                        args.Handled = HandleConnecting(player);
+                    }
+                    else if (type == PacketTypes.PasswordSend)
+                    {
+                        args.Handled = HandlePassword(player, data.ReadString());
+                    }
                 }
             }
         }

@@ -57,5 +57,43 @@ namespace BossFramework.BCore.Cmds
             else
                 args.SendErrorMsg($"格式错误. /bregion(br) listtag <区域名>");
         }
+
+        [SubCommand("setparent", Permission = "boss.bregion.admin.setparent")]
+        public static void SetParent(SubCommandArgs args)
+        {
+            if (args.Count() > 1)
+            {
+                if (BRegionSystem.FindBRegionByName(args[0]) is { } region)
+                {
+                    if (BRegionSystem.FindBRegionByName(args[0]) is { } parentRegion)
+                    {
+                        parentRegion.AddChild(region);
+                        args.SendSuccessMsg($"已设置 {region.Name} 为 {parentRegion.Name}, 此父区域共有以下子区域: {string.Join(", ", parentRegion.ChildRegion.Select(r => r.Name))}");
+                    }
+                    else
+                        args.SendErrorMsg($"未找到名为 {args[1]} 的父区域");
+                }
+                else
+                    args.SendErrorMsg($"未找到名为 {args[0]} 的区域");
+            }
+            else
+                args.SendErrorMsg($"格式错误. /bregion(br) {args.SubCommandName} <区域名> <标签名>");
+        }
+        [SubCommand("delparent", Permission = "boss.bregion.admin.delparent")]
+        public static void DelParent(SubCommandArgs args)
+        {
+            if (args.Count() > 1)
+            {
+                if (BRegionSystem.FindBRegionByName(args[0]) is { } region)
+                {
+                    region.SetParent(null);
+                    args.SendSuccessMsg($"已移除 {region.Name} 的父区域设置");
+                }
+                else
+                    args.SendErrorMsg($"未找到名为 {args[0]} 的区域");
+            }
+            else
+                args.SendErrorMsg($"格式错误. /bregion(br) {args.SubCommandName} <区域名> <标签名>");
+        }
     }
 }

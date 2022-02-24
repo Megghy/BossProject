@@ -1,6 +1,7 @@
 ﻿using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
+using TShockAPI.Hooks;
 
 namespace AlternativeCommandExecution
 {
@@ -27,30 +28,37 @@ namespace AlternativeCommandExecution
             }
             ReloadConfig();
 
-            ServerApi.Hooks.ServerChat.Register(this, OnChat, 1000);
             ServerApi.Hooks.ServerCommand.Register(this, OnServerCommand, 1000);
             ServerApi.Hooks.NetGetData.Register(this, OnGetData);
             ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInit, -1000);
 
             ServerApi.Hooks.GameUpdate.Register(this, OnUpdate);
 
-            TShockAPI.Hooks.GeneralHooks.ReloadEvent += args => ReloadConfig();
+            GeneralHooks.ReloadEvent += args => ReloadConfig();
+            PlayerHooks.PlayerChat += OnChat;
+            PlayerHooks.PlayerCommand += OnCommand;
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                ServerApi.Hooks.ServerChat.Deregister(this, OnChat);
                 ServerApi.Hooks.ServerCommand.Deregister(this, OnServerCommand);
                 ServerApi.Hooks.NetGetData.Deregister(this, OnGetData);
                 ServerApi.Hooks.GamePostInitialize.Deregister(this, OnPostInit);
 
                 ServerApi.Hooks.GameUpdate.Deregister(this, OnUpdate);
+                PlayerHooks.PlayerChat -= OnChat;
+                PlayerHooks.PlayerCommand -= OnCommand;
             }
             base.Dispose(disposing);
         }
-
+        private static void OnCommand(PlayerCommandEventArgs args)
+        {
+            if (args.Handled)
+                return;
+            args.Handled = ShortCommand.ShortCommandUtil.RunCmd(args.CommandName, args.CommandPrefix, args.Player, args.Parameters.ToArray());
+        }
         private static void OnPostInit(EventArgs args)
         {
             SwitchCmd_OnPostInit();

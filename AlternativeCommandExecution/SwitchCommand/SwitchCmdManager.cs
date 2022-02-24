@@ -21,7 +21,6 @@ namespace AlternativeCommandExecution.SwitchCommand
                 new SqlColumn("X", MySqlDbType.Int32) { Unique = true },
                 new SqlColumn("Y", MySqlDbType.Int32) { Unique = true },
                 new SqlColumn("Command", MySqlDbType.Text),
-                new SqlColumn("IgnorePermission", MySqlDbType.Int32),
                 new SqlColumn("AllPlayerCdSecond", MySqlDbType.Int32),
                 new SqlColumn("Wait", MySqlDbType.Int32),
                 new SqlColumn("WorldId", MySqlDbType.Int32) { Unique = true }
@@ -107,7 +106,6 @@ namespace AlternativeCommandExecution.SwitchCommand
                     Command = command,
                     X = x,
                     Y = y,
-                    IgnorePermission = false,
                     AllPlayerCdSecond = 0,
                     WaitTime = 0
                 };
@@ -147,23 +145,6 @@ namespace AlternativeCommandExecution.SwitchCommand
             }
         }
 
-        public bool SetIgnoreStatus(int x, int y, bool ignore)
-        {
-            var sc = SwitchCmds.FirstOrDefault(s => s.X == x && s.Y == y);
-            if (sc == null)
-            {
-                return false;
-            }
-
-            if (sc.IgnorePermission == ignore)
-                return true;
-
-            sc.IgnorePermission = ignore;
-            Update(sc);
-
-            return true;
-        }
-
         public bool SetAllPlyCd(int x, int y, int allPlyCd)
         {
             var sc = SwitchCmds.FirstOrDefault(s => s.X == x && s.Y == y);
@@ -185,8 +166,8 @@ namespace AlternativeCommandExecution.SwitchCommand
         {
             try
             {
-                _database.Query("INSERT INTO SwitchCommands (X, Y, Command, IgnorePermission, AllPlayerCdSecond, WorldId) VALUES (@0, @1, @2, @3, @4, @5);",
-                    cmd.X, cmd.Y, cmd.Command, cmd.IgnorePermission ? 1 : 0, cmd.AllPlayerCdSecond, Main.worldID);
+                _database.Query("INSERT INTO SwitchCommands (X, Y, Command, AllPlayerCdSecond, WorldId) VALUES (@0, @1, @2, @3, @4, @5);",
+                    cmd.X, cmd.Y, cmd.Command, cmd.AllPlayerCdSecond, Main.worldID);
             }
             catch (Exception ex)
             {
@@ -198,8 +179,8 @@ namespace AlternativeCommandExecution.SwitchCommand
         {
             try
             {
-                _database.Query("UPDATE SwitchCommands SET Command=@0, IgnorePermission=@1, WaitTime=@2,AllPlayerCdSecond=@3 WHERE X=@4 AND Y=@5 AND WorldId=@6",
-                    cmd.Command, cmd.IgnorePermission ? 1 : 0, cmd.WaitTime, cmd.AllPlayerCdSecond, cmd.X, cmd.Y, Main.worldID);
+                _database.Query("UPDATE SwitchCommands SET Command=@0, WaitTime=@1,AllPlayerCdSecond=@2 WHERE X=@3 AND Y=@4 AND WorldId=@5",
+                    cmd.Command, cmd.WaitTime, cmd.AllPlayerCdSecond, cmd.X, cmd.Y, Main.worldID);
             }
             catch (Exception ex)
             {

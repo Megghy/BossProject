@@ -222,7 +222,7 @@ namespace RegionTrigger
 
             if (region.HasEvent(Event.Godmode))
             {
-                player.GodMode = false;
+                player.SetGodMode(false);
                 player.SendInfoMessage("区域内的无敌模式失效。");
             }
 
@@ -270,7 +270,7 @@ namespace RegionTrigger
 
             if (rt.HasEvent(Event.Godmode))
             {
-                player.GodMode = true;
+                player.SetGodMode(true);
                 player.SendInfoMessage("你在区域内会受到服务器的庇护！");
             }
 
@@ -370,7 +370,6 @@ namespace RegionTrigger
             new[] {"tp", "perm", "tempperm", "temppermission", "权限"}
         };
 
-        [SuppressMessage("ReSharper", "SwitchStatementMissingSomeCases")]
         private void RegionSetProperties(CommandArgs args)
         {
             if (args.Parameters.Count == 0)

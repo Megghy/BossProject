@@ -11,8 +11,6 @@ namespace AlternativeCommandExecution.SwitchCommand
 
         public int Y;
 
-        public bool IgnorePermission;
-
         public int AllPlayerCdSecond;
 
         public int WaitTime;
@@ -47,7 +45,6 @@ namespace AlternativeCommandExecution.SwitchCommand
                 Command = reader.Get<string>("Command"),
                 X = reader.Get<int>("X"),
                 Y = reader.Get<int>("Y"),
-                IgnorePermission = reader.Get<int>("IgnorePermission") > 0,
                 AllPlayerCdSecond = reader.Get<int>("AllPlayerCdSecond"),
                 WaitTime = reader.Get<int>("Wait")
             };

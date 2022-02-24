@@ -318,14 +318,15 @@ namespace BossFramework
         public static void SendTo(this Packet packet, BPlayer plr)
             => plr.SendPacket(packet);
 
-        public static void SendPacketToAll(Packet packet, BPlayer ignore = null)
+        public static void SendPacketToAll(this Packet packet, params BPlayer[] ignore)
         {
-            BInfo.OnlinePlayers.Where(p => p != ignore).ForEach(p => p.SendPacket(packet));
+            BInfo.OnlinePlayers.Where(p => !(ignore?.Contains(p) == true))
+                .ForEach(p => p.SendPacket(packet));
         }
-        public static void SendPacketsToAll(this IEnumerable<Packet> packets, BPlayer ignore = null)
+        public static void SendPacketsToAll(this IEnumerable<Packet> packets, params BPlayer[] ignore)
         {
             var data = packets.GetPacketsByteData();
-            BInfo.OnlinePlayers.Where(p => p != ignore).ForEach(p => p.SendRawData(data));
+            BInfo.OnlinePlayers.Where(p => !(ignore?.Contains(p) == true)).ForEach(p => p.SendRawData(data));
         }
         public static void SendPacketsTo(this IEnumerable<Packet> packets, BPlayer plr)
             => plr.SendPackets(packets);

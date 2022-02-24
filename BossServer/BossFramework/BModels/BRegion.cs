@@ -33,16 +33,9 @@ namespace BossFramework.BModels
 
         public long WorldId { get; private set; }
         public Region OriginRegion { get; private set; }
-        public int ParentId { get; private set; }
-        private BRegion _parent;
+        public long ParentId { get; private set; } = -1;
         public BRegion Parent
-        {
-            get
-            {
-                _parent ??= BRegionSystem.AllBRegion.FirstOrDefault(r => r.Id == ParentId);
-                return _parent;
-            }
-        }
+            => BRegionSystem.AllBRegion.FirstOrDefault(r => r.Id == ParentId);
         [JsonMap]
         public List<long> ChildsId { get; private set; } = new();
         private List<BRegion> _childRegion;
@@ -80,6 +73,9 @@ namespace BossFramework.BModels
             _childRegion.Add(region);
             ChildsId.Add(region.Id);
             UpdateSingle(r => r.ChildsId);
+
+            region.ParentId = Id;
+            region.UpdateSingle(r => r.ParentId);
         }
         public void RemoveChild(BRegion region)
         {
@@ -88,19 +84,16 @@ namespace BossFramework.BModels
             _childRegion.Remove(region);
             ChildsId.Remove(region.Id);
             UpdateSingle(r => r.ChildsId);
+
+            region.ParentId = Id;
+            region.UpdateSingle(r => r.ParentId);
         }
         public void SetParent(BRegion region)
         {
             if (region is null)
-            {
                 UpdateSingle(r => r.ParentId, -1);
-                _parent = null;
-            }
             else
-            {
-                _parent = region;
-                UpdateSingle(r => r.ParentId, _parent.Id);
-            }
+                region.RemoveChild(this);
         }
 
         public bool IsPlayerInThis(BPlayer plr, bool includeChild = true)
