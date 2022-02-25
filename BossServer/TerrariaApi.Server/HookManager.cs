@@ -423,12 +423,18 @@ namespace TerrariaApi.Server
                 switch ((PacketTypes)msgId)
                 {
                     case PacketTypes.ConnectRequest:
-                        if (this.InvokeServerConnect(buffer.whoAmI))
+                        using (var stream = new MemoryStream(buffer.readBuffer))
                         {
-                            Netplay.Clients[buffer.whoAmI].PendingTermination = true;
-                            return true;
+                            stream.Position = index;
+                            using (var reader = new BinaryReader(stream))
+                            {
+                                if (this.InvokeServerConnect(reader.ReadString(), buffer.whoAmI))
+                                {
+                                    Netplay.Clients[buffer.whoAmI].PendingTermination = true;
+                                    return true;
+                                }
+                            }
                         }
-
                         break;
                     case PacketTypes.ContinueConnecting2:
                         if (this.InvokeServerJoin(buffer.whoAmI))
@@ -1017,19 +1023,20 @@ namespace TerrariaApi.Server
             get { return this.serverConnect; }
         }
 
-        public bool InvokeServerConnect(int who)
+        public bool InvokeServerConnect(string connectText, int who)
         {
             if (Netplay.Clients[who].State != 0)
             {
                 return false;
             }
 
-            ConnectEventArgs args = new ConnectEventArgs
+            ConnectEventArgs args = new()
             {
-                Who = who
+                Who = who,
+                ConnectMessage = connectText
             };
 
-            this.ServerConnect.Invoke(args);
+            ServerConnect.Invoke(args);
             return args.Handled;
         }
         #endregion

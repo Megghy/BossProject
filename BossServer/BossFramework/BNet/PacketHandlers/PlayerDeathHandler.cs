@@ -85,10 +85,10 @@ namespace BossFramework.BNet.PacketHandlers
 					result = NetworkText.FromKey("DeathText.Lava_" + (Main.rand.Next(4) + 1), name);
 					break;
 				case 3:
-					result = NetworkText.FromKey("DeathText.Default", NetworkText.Empty);
+					result = NetworkText.FromKey("DeathText.Default", result);
 					break;
 				case 4:
-					result = NetworkText.FromKey("DeathText.Slain", name);
+					result = NetworkText.FromKey("DeathText.Slain", result);
 					break;
 				case 5:
 					result = NetworkText.FromKey("DeathText.Petrified_" + (Main.rand.Next(4) + 1), name);
@@ -133,7 +133,7 @@ namespace BossFramework.BNet.PacketHandlers
 					result = NetworkText.FromKey("DeathText.Starved", name);
 					break;
 				case 254:
-					result = NetworkText.FromKey(Language.RandomFromCategory("DeathTextGeneric").Key, name, Main.worldName);
+					//result = result;
 					break;
 				case 255:
 					result = NetworkText.FromKey("DeathText.Slain", name);

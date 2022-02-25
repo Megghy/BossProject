@@ -19,6 +19,7 @@ namespace BossFramework
 {
     public static class BUtils
     {
+        public static readonly Random Rand = new();
         public static void ForEach<T>(this IEnumerable<T> source, Action<T, int> action)
         {
             if (source == null)
@@ -161,7 +162,6 @@ namespace BossFramework
 #pragma warning restore S1168 // Empty arrays and collections should be returned instead of null
             }
         }
-
         public static byte[] DecompressBytes(this byte[] data)
         {
             try
@@ -186,6 +186,7 @@ namespace BossFramework
 #pragma warning restore S1168 // Empty arrays and collections should be returned instead of null
             }
         }
+        public static T Random<T>(this IEnumerable<T> source) => source is null || !source.Any() ? default : source.ToList()[Rand.Next(0, source.Count())];
 
         public static WorldData GetCurrentWorldData(bool? ssc = null)
         {

@@ -20,7 +20,7 @@ namespace AlternativeCommandExecution
 
             var commandText = IsValidCmd(args.Command) ? args.Command : Commands.Specifier + args.Command;
 
-            Commands.HandleCommand(TSPlayer.Server, commandText);
+            ShortCommandUtil.HandleCommand(TSPlayer.Server, commandText);
 
             args.Handled = true;
         }

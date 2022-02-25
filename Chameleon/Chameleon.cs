@@ -101,7 +101,7 @@ namespace Chameleon
             if (player?.IsLoggedIn == true)
                 return;
 
-            if (player.RequiresPassword && type != PacketTypes.PasswordSend)
+            if (player?.RequiresPassword == true && type != PacketTypes.PasswordSend)
             {
                 args.Handled = true;
                 return;

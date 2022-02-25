@@ -1,4 +1,5 @@
-﻿using AlternativeCommandExecution.SwitchCommand;
+﻿using AlternativeCommandExecution.ShortCommand;
+using AlternativeCommandExecution.SwitchCommand;
 using System.IO.Streams;
 using Terraria;
 using Terraria.ID;
@@ -75,8 +76,11 @@ namespace AlternativeCommandExecution
                         foreach (string text in commandArr)
                         {
                             string command = text;
-                            if (command.Contains("@player")) { command = command.Replace("@player", player.Name); }
-                            Commands.HandleCommand(player, command);
+                            if (command.Contains("@player"))
+                            {
+                                command = command.Replace("@player", player.Name);
+                            }
+                            ShortCommandUtil.HandleCommand(player, command);
                             Task.Delay(wait).Wait();
                         }
                     });

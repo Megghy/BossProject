@@ -1610,8 +1610,6 @@ namespace TShockAPI
             {
                 Log.Info("{0} ({1}) 属于 '{2}' 已进入. ({3}/{4})", player.Name, player.IP,
                                        player.Group.Name, TShock.Utils.GetActivePlayerCount(), TShock.Config.Settings.MaxSlots);
-                if (!player.SilentJoinInProgress)
-                    Utils.Broadcast(player.Name + " 已进入.", Color.Yellow);
             }
 
             if (Config.Settings.DisplayIPToAdmins)

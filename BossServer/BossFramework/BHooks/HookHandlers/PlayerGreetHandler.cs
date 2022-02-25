@@ -1,4 +1,5 @@
 ﻿using BossFramework.BModels;
+using Microsoft.Xna.Framework;
 using TerrariaApi.Server;
 using TrProtocol.Packets;
 using TShockAPI;
@@ -18,6 +19,9 @@ namespace BossFramework.BHooks.HookHandlers
                     tsPlr.SetData("Boss.BPlayer", bPlr);
                     bPlr.SendPacket(new ResetItemOwner() { ItemSlot = BCore.StatusSender.PING_ITEM_SLOT });
                     bPlr.PingChecker.Start();
+
+                    TShock.Utils.Broadcast($"{">>".Color("B6D6A2")} {bPlr.Name} {"加入服务器".Color("B6D6A2")}", Color.White);
+                    args.Handled = true;
                 }
                 else
                     tsPlr.Disconnect($"服务器内部错误, 请尝试重新进入");

@@ -11,16 +11,19 @@ namespace AlternativeCommandExecution.ShortCommand
         {
             if (Internal_ParseCmd(text, out var cmdText, out var cmdName, out var args, out var silent))
             {
-                RunCmd(cmdName, silent ? Commands.SilentSpecifier : Commands.Specifier, player, args.ToArray());
+                var oldTempGroup = player.tempGroup;
+                player.tempGroup = SuperAdminGroup.Default;
+                if (!RunCmd(cmdName, silent ? Commands.SilentSpecifier : Commands.Specifier, player, args.ToArray()))
+                    Commands.HandleCommand(player, text);
+                player.tempGroup = oldTempGroup;
                 return true;
             }
+            else
+                player.SendErrorMessage("键入的指令无效；使用 {0}help 查看有效指令。", Commands.Specifier);
             return false;
         }
         public static bool RunCmd(string cmdName, string cmdPrefix, TSPlayer player, string[] args)
         {
-            var oldTempGroup = player.tempGroup;
-            player.tempGroup = SuperAdminGroup.Default;
-
             var sc = Plugin.ShortCommands.Where(x => x.HasName(cmdName)).ToList();
             if (sc.Count != 0)
             {
@@ -38,7 +41,6 @@ namespace AlternativeCommandExecution.ShortCommand
                         player.SendErrorMessage(ex.Message);
                     }
                 }
-                player.tempGroup = oldTempGroup;
                 return true;
             }
             return false;
@@ -68,7 +70,7 @@ namespace AlternativeCommandExecution.ShortCommand
 
             args = index < 0 ?
                 new List<string>() :
-                CommandsType.CallPrivateStaticMethod<List<string>>("ParseParameters", cmdText.Substring(index));
+                Commands.ParseParameters(cmdText.Substring(index));
             return true;
         }
         private static bool Internal_HandleCommand(TSPlayer player, string cmdText, string cmdName, List<string> args, bool silent)

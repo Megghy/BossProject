@@ -434,7 +434,7 @@ namespace TShockAPI
                     {
                         TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from (tb) {0} {1} {2}", args.Player.Name, action, editData);
                         args.Player.SendTileSquare(tileX, tileY, 1);
-                        args.Player.SendErrorMessage("无权放置此物块");
+                        //args.Player.SendErrorMessage("无权放置此物块");
                         args.Handled = true;
                         return;
                     }
@@ -958,7 +958,7 @@ namespace TShockAPI
             {
                 args.Player.Disable(String.Format("用户无权制造发射物 {0}.", type), DisableFlags.WriteToLogAndConsole);
                 TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile rejected from permission check from {0} {1}", args.Player.Name, type);
-                args.Player.SendErrorMessage("无权制造该发射物");
+                //args.Player.SendErrorMessage("无权制造该发射物");
                 args.Player.RemoveProjectile(ident, owner);
                 args.Handled = true;
                 return;
@@ -1934,7 +1934,7 @@ namespace TShockAPI
             {
                 TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected banned tiles from {0}", args.Player.Name);
                 args.Player.SendTileSquare(x, y, 1);
-                args.Player.SendErrorMessage("无权放置此物块");
+                //args.Player.SendErrorMessage("无权放置此物块");
                 args.Handled = true;
                 return;
             }

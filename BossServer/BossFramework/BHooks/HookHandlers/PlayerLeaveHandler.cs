@@ -6,7 +6,6 @@ namespace BossFramework.BHooks.HookHandlers
     {
         public static void OnPlayerLeave(LeaveEventArgs args)
         {
-
         }
     }
 }
