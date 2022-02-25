@@ -47,10 +47,11 @@ namespace BossFramework.BCore
         {
             if (!Directory.Exists(RegionTagPath))
                 Directory.CreateDirectory(RegionTagPath);
+
             RegionTagProcessers?.ForEach(t => t.Dispose());
             RegionTagProcessers = ScriptManager.LoadScripts<BaseRegionTagProcessor>(RegionTagPath);
+
             BLog.Success($"成功加载 {RegionTagProcessers.Length} 个区域标签处理器");
-            RegionTagProcessers = new BaseRegionTagProcessor[] { new testtag() };
         }
 
         public delegate void OnEnterBRegion(BRegionEventArgs args);
@@ -123,7 +124,7 @@ namespace BossFramework.BCore
                 CallBRegionEvent(parent, plr, isEnter);
             else
             {
-                BLog.DEBUG($"区域事件: [{(isEnter ? "进入" : "离开")}] - {region.Id} : {plr}");
+                BLog.DEBUG($"区域事件: [{(isEnter ? "进入" : "离开")}] - {region.Name}<{region.Id}> : {plr}");
                 var args = new BRegionEventArgs(region, plr);
                 if (isEnter)
                 {

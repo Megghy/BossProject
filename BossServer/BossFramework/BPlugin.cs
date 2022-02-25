@@ -6,6 +6,8 @@ using System.Linq;
 using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
+using TrProtocol;
+using TrProtocol.Packets;
 
 namespace BossFramework
 {
@@ -71,5 +73,10 @@ namespace BossFramework
             BLog.Success($"BossPlugin 加载完成");
         }
         #endregion
+        [SimpleTimer(Time = 1)]
+        private static void OnSecondUpdate()
+        {
+            var packets = new List<Packet>();
+        }
     }
 }

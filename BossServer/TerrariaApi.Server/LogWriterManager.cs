@@ -83,11 +83,11 @@ namespace TerrariaApi.Server
         {
             try
             {
-                this.WrappedLogWriter.ServerWriteLine(message, kind);
+                this.WrappedLogWriter?.ServerWriteLine(message, kind);
             }
             catch (Exception ex)
             {
-                this.DefaultLogWriter.ServerWriteLine(string.Format(
+                this.DefaultLogWriter?.ServerWriteLine(string.Format(
                     "The attached log writer \"{0}\" has thrown an unexpected exception:\n{1}", this.LogWriterName, ex),
                     TraceLevel.Error);
             }
@@ -97,11 +97,11 @@ namespace TerrariaApi.Server
         {
             try
             {
-                this.WrappedLogWriter.PluginWriteLine(plugin, message, kind);
+                this.WrappedLogWriter?.PluginWriteLine(plugin, message, kind);
             }
             catch (Exception ex)
             {
-                DefaultLogWriter.ServerWriteLine(string.Format(
+                DefaultLogWriter?.ServerWriteLine(string.Format(
                     "The attached log writer \"{0}\" has thrown an unexpected exception:\n{1}", this.LogWriterName, ex),
                     TraceLevel.Error);
             }

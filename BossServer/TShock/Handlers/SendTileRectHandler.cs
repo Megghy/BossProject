@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BossFramework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -62,6 +63,12 @@ namespace TShockAPI.Handlers
         {
             // By default, we'll handle everything
             args.Handled = true;
+
+            if (TShock.Config.Settings.DisableBuild && !args.Player.HasPermission(Permissions.canbuild))
+            {
+                args.Player.SendRawData(BUtils.GetSquareData(args.TileX, args.TileY, args.Width, args.Length).SerializePacket());
+                return;
+            }
 
             if (ShouldSkipProcessing(args))
             {

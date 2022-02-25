@@ -19,9 +19,9 @@ namespace BossFramework.BModels
                 PacketType = type;
                 Reader = reader;
             }
-            public PacketTypes PacketType { get; init; }
-            public BPlayer Player { get; init; }
-            private BinaryBufferReader Reader { get; init; }
+            public PacketTypes PacketType { get; private set; }
+            public BPlayer Player { get; private set; }
+            private BinaryBufferReader Reader { get; set; }
             private Packet _packet;
             /// <summary>
             /// 未确定是否要读取前只使用 <see cref="PacketType"/> 查看类型

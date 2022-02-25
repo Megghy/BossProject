@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using TrProtocol.Packets;
 
 namespace BossFramework.BCore
@@ -28,24 +27,27 @@ namespace BossFramework.BCore
                     Max = 0,
                     Flag = 0,
                 });
+                if (BInfo.GameTick - p.LastPingTime >= 50 && !p.WaitingPing)
+                {
+                    p.WaitingPing = true;
+                    p.PingChecker.Restart();
+                    p.SendPacket(new ResetItemOwner() { ItemSlot = PING_ITEM_SLOT });
+                }
             });
         }
         private static string DefaultStatus(BPlayer plr)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"Ping: {(plr.LastPing < 70 ? "[i:3738]" : "[i:3736]")} {plr.LastPing} ms");
+            sb.AppendLine($"Ping: {(plr.LastPing < 100 ? "[i:3738]" : "[i:3736]")} {plr.LastPing} ms");
             sb.AppendLine($"在线: {BInfo.OnlinePlayers.Length} 人");
             return sb.ToString();
         }
         internal static void GetPingBackPacket(BPlayer plr)
         {
-            Task.Run(() =>
-            {
-                plr.LastPing = (int)plr.PingChecker.ElapsedMilliseconds;
-                Task.Delay(500).Wait();
-                plr.PingChecker.Restart();
-                plr.SendPacket(new ResetItemOwner() { ItemSlot = PING_ITEM_SLOT });
-            });
+            plr.WaitingPing = false;
+            plr.LastPing = (int)plr.PingChecker.ElapsedMilliseconds;
+            plr.LastPingTime = BInfo.GameTick;
+            plr.PingChecker.Stop();
         }
         /// <summary>
         /// 注册状态信息

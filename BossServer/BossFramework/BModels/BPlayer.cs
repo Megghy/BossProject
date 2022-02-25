@@ -35,7 +35,12 @@ namespace BossFramework.BModels
 
         #region 变量
         public Stopwatch PingChecker { get; } = new();
+        [Column(IsIgnore = true)]
         public int LastPing { get; internal set; } = -1;
+        [Column(IsIgnore = true)]
+        public long LastPingTime { get; internal set; } = -1;
+        public bool WaitingPing { get; internal set; } = false;
+
         public TSPlayer TsPlayer { get; internal set; }
         public Player TrPlayer => TsPlayer?.TPlayer;
         public string Name => TsPlayer?.Name ?? "unknown";

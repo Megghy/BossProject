@@ -38,10 +38,10 @@ namespace BossFramework.BNet.PacketHandlers
             if(packet.Reason._sourcePlayerIndex is < 255 and >= 0 
                 || packet.Reason._sourceItemType > 0 
                 || packet.Reason._sourceProjectileType > 0)
-            text = $">{(item is null ? "" : TShock.Utils.ItemTag(item)) + " "}" +
+            text = $">{(item is null ? "" : " " + TShock.Utils.ItemTag(item)) + " "}" +
                 $"{death.Name.Color("C8E1C7")} " +
                 $"被 {targetName} " +
-                $"{(projName is null ? "" : $"的 {projName}")}" +
+                $"{(projName is null ? "" : $"的 {projName}")} " +
                 $"杀死了";
             else
                 text = $">{GetOtherDeathMsg(packet.Reason._sourceOtherIndex, death.Name).Replace(death.Name, $" {death.Name.Color("C8E1C7")} ")}";

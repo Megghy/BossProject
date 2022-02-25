@@ -80,7 +80,7 @@ namespace AlternativeCommandExecution
                             {
                                 command = command.Replace("@player", player.Name);
                             }
-                            ShortCommandUtil.HandleCommand(player, command);
+                            BossFramework.BUtils.HandleCommand(player, command, true);
                             Task.Delay(wait).Wait();
                         }
                     });

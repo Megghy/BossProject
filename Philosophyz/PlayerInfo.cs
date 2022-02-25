@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using BossFramework;
+using Terraria;
 using Terraria.Localization;
 using TShockAPI;
 
@@ -104,7 +105,9 @@ namespace Philosophyz
 
         public void ChangeCharacter(PlayerData data)
         {
+            _player.SendRawData(BUtils.GetCurrentWorldData(true).SerializePacket());
             data.RestoreCharacter(_player);
+            _player.SendRawData(BUtils.GetCurrentWorldData(Main.ServerSideCharacter).SerializePacket());
         }
 
         public void RestoreCharacter()

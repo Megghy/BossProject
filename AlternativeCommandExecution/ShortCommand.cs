@@ -20,7 +20,7 @@ namespace AlternativeCommandExecution
 
             var commandText = IsValidCmd(args.Command) ? args.Command : Commands.Specifier + args.Command;
 
-            ShortCommandUtil.HandleCommand(TSPlayer.Server, commandText);
+            BossFramework.BUtils.HandleCommand(TSPlayer.Server, commandText, false);
 
             args.Handled = true;
         }
@@ -31,7 +31,7 @@ namespace AlternativeCommandExecution
                 return;
             if (IsValidCmd(args.RawText))
             {
-                args.Handled = ShortCommandUtil.HandleCommand(args.Player, args.RawText);
+                args.Handled = BossFramework.BUtils.HandleCommand(args.Player, args.RawText, false);
             }
         }
 
@@ -64,7 +64,7 @@ namespace AlternativeCommandExecution
                        commandText.StartsWith(Config.CommandSpecifier) ||
                        commandText.StartsWith(Config.CommandSpecifier2)
                    )
-                   && !string.IsNullOrWhiteSpace(commandText.Substring(1));
+                   && !string.IsNullOrWhiteSpace(commandText[1..]);
         }
     }
 }

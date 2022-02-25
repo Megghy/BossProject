@@ -4,12 +4,14 @@ using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using Terraria;
 using Terraria.GameContent.Events;
 using TrProtocol;
+using TrProtocol.Models;
 using TrProtocol.Packets;
 using TShockAPI;
 using Color = Microsoft.Xna.Framework.Color;
@@ -192,7 +194,8 @@ namespace BossFramework
         {
             var worldInfo = new WorldData
             {
-                Time = (int)Main.time
+                Time = (int)Main.time,
+                GameMode = (byte)Main.GameMode
             };
             ProtocolBitsByte bb3 = 0;
             bb3[0] = Main.dayTime;
@@ -297,6 +300,62 @@ namespace BossFramework
             worldInfo.InvasionType = (sbyte)Main.invasionType;
             return worldInfo;
         }
+        public static TileSquare GetSquareData(int x, int y, int size, TileChangeType type = TileChangeType.None)
+            => GetSquareData(x, y, size, size, type);
+        public static TileSquare GetSquareData(int x, int y, int width, int height, TileChangeType type = TileChangeType.None)
+        {
+            var data = new TileSquare()
+            {
+                Data = new()
+                {
+                    ChangeType = type,
+                    Height = (byte)height,
+                    Width = (byte)width,
+                    TilePosX = (short)x,
+                    TilePosY = (short)y,
+                    Tiles = new SimpleTileData[width, height]
+                }
+            };
+
+            for (int tempX = x; tempX < x + width; tempX++)
+            {
+                for (int tempY = y; tempY < y + height; tempY++)
+                {
+                    var tile = Main.tile[tempX, tempY];
+                    BitsByte bb1 = 0;
+                    BitsByte bb2 = 0;
+
+                    bb1[0] = tile.active();
+                    bb1[2] = (tile.wall > 0);
+                    bb1[3] = (tile.liquid > 0);
+                    bb1[4] = tile.wire();
+                    bb1[5] = tile.halfBrick();
+                    bb1[6] = tile.actuator();
+                    bb1[7] = tile.inActive();
+
+                    bb2[0] = tile.wire2();
+                    bb2[1] = tile.wire3();
+                    bb2[2] = tile.active();
+                    bb2[3] = tile.wall > 0;
+                    bb2 += (byte)(tile.slope() << 4);
+                    bb2[7] = tile.wire4();
+                    data.Data.Tiles[tempX - x, tempY - y] = (new()
+                    {
+                        Flags1 = bb1,
+                        Flags2 = bb2,
+                        FrameX = tile.frameX,
+                        FrameY = tile.frameY,
+                        Liquid = tile.liquid,
+                        LiquidType = tile.liquid,
+                        TileColor = tile.color(),
+                        TileType = tile.type,
+                        WallColor = tile.wallColor(),
+                        WallType = tile.wall,
+                    });
+                }
+            }
+            return data;
+        }
         public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("Boss.BPlayer") ?? BPlayer.Default;
         public static byte[] SerializePacket(this Packet p) => PacketHandler.Serializer.Serialize(p);
         public static void Kill(this SyncProjectile proj)
@@ -347,6 +406,76 @@ namespace BossFramework
             color = color == default ? Color.White : color;
             Random random = new();
             TSPlayer.All.SendData(PacketTypes.CreateCombatTextExtended, msg, (int)color.PackedValue, x + (randomPosition ? random.Next(-75, 75) : 0), y + (randomPosition ? random.Next(-50, 50) : 0));
+        }
+        public static bool HandleCommand(TSPlayer player, string text, bool ignorePerm)
+        {
+            if (Internal_ParseCmd(text, out var cmdText, out var cmdName, out var args, out var silent))
+            {
+                HandleCommandDirect(player, cmdText, cmdName, args, silent, ignorePerm);
+                return true;
+            }
+            else
+                player.SendErrorMessage("键入的指令无效；使用 {0}help 查看有效指令。", Commands.Specifier);
+            return false;
+        }
+        private static bool Internal_ParseCmd(string text, out string cmdText, out string cmdName, out List<string> args, out bool silent)
+        {
+            cmdText = text.Remove(0, 1);
+            var cmdPrefix = text[0].ToString();
+            silent = cmdPrefix == Commands.SilentSpecifier;
+
+            var index = -1;
+            for (var i = 0; i < cmdText.Length; i++)
+            {
+                if (Commands.IsWhiteSpace(cmdText[i]))
+                {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == 0) // Space after the command specifier should not be supported
+            {
+                args = null;
+                cmdName = null;
+                return false;
+            }
+            cmdName = index < 0 ? cmdText.ToLower() : cmdText.Substring(0, index).ToLower();
+
+            args = index < 0 ?
+                new List<string>() :
+                Commands.ParseParameters(cmdText[index..]);
+            return true;
+        }
+        public static bool HandleCommandDirect(TSPlayer player, string cmdText, string cmdName, List<string> args, bool silent, bool ignorePerm)
+        {
+            var cmds = Commands.ChatCommands.FindAll(x => x.HasAlias(cmdName));
+
+            lock (player)
+            {
+                var oldTempGroup = player.tempGroup;
+                if (ignorePerm)
+                    player.tempGroup = SuperAdminGroup.Default;
+
+                if (cmds.Count == 0)
+                {
+                    if (player.AwaitingResponse.ContainsKey(cmdName))
+                    {
+                        Action<CommandArgs> call = player.AwaitingResponse[cmdName];
+                        player.AwaitingResponse.Remove(cmdName);
+                        call(new CommandArgs(cmdText, player, args));
+                        return true;
+                    }
+                    player.SendErrorMessage("键入的指令无效；使用 {0}help 查看有效指令。", Commands.Specifier);
+                    return true;
+                }
+                foreach (var cmd in cmds)
+                {
+                    cmd.CommandDelegate?.Invoke(new CommandArgs(cmdText, silent, player, args));
+                }
+
+                player.tempGroup = oldTempGroup;
+                return true;
+            }
         }
     }
 }

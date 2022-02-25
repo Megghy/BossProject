@@ -17,6 +17,8 @@ namespace BossFramework.BHooks.HookHandlers
                 {
                     bPlr.TsPlayer = tsPlr;
                     tsPlr.SetData("Boss.BPlayer", bPlr);
+
+                    bPlr.WaitingPing = true;
                     bPlr.SendPacket(new ResetItemOwner() { ItemSlot = BCore.StatusSender.PING_ITEM_SLOT });
                     bPlr.PingChecker.Start();
 

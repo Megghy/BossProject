@@ -21,7 +21,7 @@
 		<PackageReference Include="System.Data.SQLite.Core" Version="1.0.115.5" />
 		<PackageReference Include="SQLite" Version="3.13.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-		<PackageReference Include="CS-Script" Version="4.3.0" />
+		<PackageReference Include="CS-Script" Version="4.4.1" />
 		<PackageReference Include="OTAPI.Upcoming" Version="3.0.30-alpha" />
 	</ItemGroup>
 

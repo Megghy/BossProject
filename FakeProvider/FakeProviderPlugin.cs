@@ -170,7 +170,11 @@ namespace FakeProvider
         #region 箱子牌子
         private static T GetTopEntity<T>(int x, int y, int targetPlrIndex = -1) where T : IFake
         {
-            var providers = FakeProviderAPI.Tile.Providers.Where(p => p != null && p.Enabled && (!(p.Observers?.Any() == true) || (p.Observers?.Contains(targetPlrIndex) ?? true))).OrderBy(p => p.Order);
+            var providers = FakeProviderAPI.Tile.Providers.Where(p => p != null 
+            && p.Name != FakeProviderAPI.WorldProviderName 
+            && p.Enabled 
+            && (!(p.Observers?.Any() == true) || (p.Observers?.Contains(targetPlrIndex) ?? true)))
+                .OrderBy(p => p.Order);
             foreach (var p in providers)
             {
                 if (p.Entities.FirstOrDefault(e => e is T result && result.X == x && result.Y == y) is { } result)

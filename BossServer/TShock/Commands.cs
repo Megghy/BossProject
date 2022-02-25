@@ -745,7 +745,7 @@ namespace TShockAPI
             return ret;
         }
 
-        private static bool IsWhiteSpace(char c)
+        public static bool IsWhiteSpace(char c)
         {
             return c == ' ' || c == '\t' || c == '\n';
         }
@@ -2414,7 +2414,7 @@ namespace TShockAPI
 
             Main.GameMode = mode;
             args.Player.SendSuccessMessage("世界模式设置为 {0}", _worldModes.Keys.ElementAt(mode));
-            TSPlayer.All.SendData(PacketTypes.WorldInfo);
+            BossFramework.BUtils.SendPacketToAll(BossFramework.BUtils.GetCurrentWorldData(Main.ServerSideCharacter));
         }
 
         private static void Hardmode(CommandArgs args)

@@ -262,8 +262,8 @@ namespace TUIPlugin
         private static void OnProjDestroy(BEventArgs.ProjDestroyEventArgs args)
         {
             var owner = args.Player.Index;
-            Touch previousTouch = TUI.Session[owner].PreviousTouch;
-            if (TUI.Session[owner].ProjectileID == args.KillProj.ProjSlot && previousTouch != null && previousTouch.State != TouchState.End)
+            Touch previousTouch = TUI.Session[owner]?.PreviousTouch;
+            if (TUI.Session[owner]?.ProjectileID == args.KillProj.ProjSlot && previousTouch != null && previousTouch.State != TouchState.End)
             {
                 Touch simulatedEndTouch = previousTouch.SimulatedEndTouch();
                 simulatedEndTouch.Undo = true;

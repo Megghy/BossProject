@@ -661,7 +661,7 @@ namespace PlotMarker
                 case "goto":
                 case "前往":
                     {
-                        Cell[] cells = args.Player.HasPermission("pm.admin.gotoeverywhere")
+                        Cell[] cells = args.Player.HasPermission("pm.admin.gotoeverywhere") && args.Parameters.Count > 1
                         ? PlotManager.CurrentPlot.Cells.ToArray()
                         : PlotManager.GetCellsOfPlayer(args.Player.Name);
                         if (cells.Any())

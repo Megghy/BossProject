@@ -19,12 +19,17 @@ namespace BossFramework.BInterfaces
         {
             var sb = new StringBuilder();
             sb.AppendLine($"无效输入. 可用命令: {string.Join(',', Names)}");
-            SubCommands.ForEach(s => sb.AppendLine($"{string.Join(',', s.Names)} : {s.Description} {(args.TsPlayer.HasPermission("boss.admin") ? $"<{s.Permission}>" : "")}"));
+            SubCommands.ForEach(s => sb.AppendLine($"{string.Join(',', s.Names)} : {s.Description} {(args.TsPlayer.HasPermission("boss.admin") ? $"<{s.Permission}>" : "")} {s.Description}"));
             args.SendInfoMsg(sb.ToString());
+        }
+        public virtual void Default(SubCommandArgs args)
+        {
+            args.SendInfoMsg($"未实现此命令");
         }
 
         public IReadOnlyList<SubCommandAttribute> SubCommands { get; set; } = new List<SubCommandAttribute>();
-        public bool HasDefaultCommand => SubCommands.Any(s => !s.Names?.Any() ?? true);
+        public bool HasDefaultCommand 
+            => !(GetType().GetMethod("Default").DeclaringType == typeof(BaseCommand));
         public void RegisterAllSubCommands()
         {
             var t = GetType();

@@ -220,7 +220,7 @@ namespace BadgeSystem
             args.Handled = true;
             TSPlayer tSPlayer = args.Player;
             var playerData = PlayerData.GetPlayerData(tSPlayer);
-            TSPlayer.All.SendMessage(string.Format(TShock.Config.Settings.ChatFormat, tSPlayer.Group.Name, playerData.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix, args.RawText), Color.White);
+            TSPlayer.All.SendMessage(string.Format(TShock.Config.Settings.ChatFormat, tSPlayer.Group.Name, playerData.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix, args.RawText), new(tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B));
             var msg = $"{args.Player.Name}: {args.RawText}";
             Console.WriteLine(msg);
             TShock.Log.Write(msg, System.Diagnostics.TraceLevel.Info);
