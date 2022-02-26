@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class ItemTweaker : Packet, IItemSlot
+    public struct ItemTweaker : IPacket, IItemSlot
     {
-        public override MessageID Type => MessageID.ItemTweaker;
+        public MessageID Type => MessageID.ItemTweaker;
         public short ItemSlot { get; set; }
         public ProtocolBitsByte Bit1 { get; set; }
         [Condition("Bit1", 0)] public uint PackedColor { get; set; }

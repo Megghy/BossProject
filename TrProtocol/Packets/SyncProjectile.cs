@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class SyncProjectile : Packet, IProjSlot, IPlayerSlot
+    public struct SyncProjectile : IPacket, IProjSlot, IPlayerSlot
     {
-        public override MessageID Type => MessageID.SyncProjectile;
+        public MessageID Type => MessageID.SyncProjectile;
         public short ProjSlot { get; set; }
         public Vector2 Position { get; set; }
         public Vector2 Velocity { get; set; }

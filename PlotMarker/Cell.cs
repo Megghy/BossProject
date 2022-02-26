@@ -278,7 +278,7 @@ namespace PlotMarker
         }
         public void ClearEntities()
         {
-            List<Packet> packetData = new();
+            List<IPacket> packetData = new();
             Entities.ForEach(entity =>
             {
                 if (TileEntity.ByID.TryGetValue(entity.ID, out var placedEntity))

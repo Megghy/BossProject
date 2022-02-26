@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class ItemFrameTryPlacing : Packet
+    public struct ItemFrameTryPlacing : IPacket
     {
-        public override MessageID Type => MessageID.ItemFrameTryPlacing;
+        public MessageID Type => MessageID.ItemFrameTryPlacing;
         public ShortPosition Position { get; set; }
         public short ItemType { get; set; }
         public byte Prefix { get; set; }

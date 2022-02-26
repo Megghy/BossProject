@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class RequestChestOpen : Packet
+    public struct RequestChestOpen : IPacket
     {
-        public override MessageID Type => MessageID.RequestChestOpen;
+        public MessageID Type => MessageID.RequestChestOpen;
         public ShortPosition Position { get; set; }
     }
 }

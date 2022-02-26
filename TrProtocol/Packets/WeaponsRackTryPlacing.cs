@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class WeaponsRackTryPlacing : Packet
+    public struct WeaponsRackTryPlacing : IPacket
     {
-        public override MessageID Type => MessageID.WeaponsRackTryPlacing;
+        public MessageID Type => MessageID.WeaponsRackTryPlacing;
         public ShortPosition Position { get; set; }
         public short ItemType { get; set; }
         public byte Prefix { get; set; }

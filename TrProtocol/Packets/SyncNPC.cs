@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class SyncNPC : Packet
+    public struct SyncNPC : IPacket
     {
-        public override MessageID Type => MessageID.SyncNPC;
+        public MessageID Type => MessageID.SyncNPC;
         public short NPCSlot { get; set; }
         public Vector2 Offset { get; set; }
         public Vector2 Velocity { get; set; }

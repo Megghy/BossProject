@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class MenuSunMoon : Packet
+    public struct MenuSunMoon : IPacket
     {
-        public override MessageID Type => MessageID.MenuSunMoon;
+        public MessageID Type => MessageID.MenuSunMoon;
         public bool DayTime { get; set; }
         public int Time { get; set; }
         public short Sun { get; set; }

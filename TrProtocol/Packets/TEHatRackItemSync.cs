@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class TEHatRackItemSync : Packet, IPlayerSlot
+    public struct TEHatRackItemSync : IPacket, IPlayerSlot
     {
-        public override MessageID Type => MessageID.TEHatRackItemSync;
+        public MessageID Type => MessageID.TEHatRackItemSync;
         public byte PlayerSlot { get; set; }
         public int TileEntityID { get; set; }
         public byte ItemIndex { get; set; }

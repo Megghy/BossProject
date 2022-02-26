@@ -5,14 +5,14 @@ namespace BossFramework.BInterfaces
 {
     public interface IPacketHandler
     {
-        public bool GetPacket(BPlayer plr, Packet packet);
-        public bool SendPacket(BPlayer plr, Packet packet);
+        public bool GetPacket(BPlayer plr, IPacket packet);
+        public bool SendPacket(BPlayer plr, IPacket packet);
     }
-    public abstract class PacketHandlerBase<T> : IPacketHandler where T : Packet
+    public abstract class PacketHandlerBase<T> : IPacketHandler where T : IPacket
     {
-        public bool GetPacket(BPlayer plr, Packet packet) => OnGetPacket(plr, (T)packet);
+        public bool GetPacket(BPlayer plr, IPacket packet) => OnGetPacket(plr, (T)packet);
 
-        public bool SendPacket(BPlayer plr, Packet packet) => OnGetPacket(plr, (T)packet);
+        public bool SendPacket(BPlayer plr, IPacket packet) => OnGetPacket(plr, (T)packet);
         /// <summary>
         /// 接收到数据包
         /// </summary>

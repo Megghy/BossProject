@@ -205,9 +205,9 @@ namespace BossFramework.BCore
         {
             BUtils.SendPacketsToAll(GetChestItemPakcets(chest, chestSlot));
         }
-        private static List<Packet> GetChestItemPakcets(this BChest chest, short chestSlot)
+        private static List<IPacket> GetChestItemPakcets(this BChest chest, short chestSlot)
         {
-            List<Packet> list = new();
+            List<IPacket> list = new();
             40.ForEach(i =>
             {
                 chest.Items[i] ??= new();

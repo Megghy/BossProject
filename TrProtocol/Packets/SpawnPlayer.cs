@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class SpawnPlayer : Packet, IPlayerSlot
+    public struct SpawnPlayer : IPacket, IPlayerSlot
     {
-        public override MessageID Type => MessageID.SpawnPlayer;
+        public MessageID Type => MessageID.SpawnPlayer;
         public byte PlayerSlot { get; set; }
         public ShortPosition Position { get; set; }
         public int Timer { get; set; }

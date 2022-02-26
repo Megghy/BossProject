@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class MinionAttackTargetUpdate : Packet, IPlayerSlot
+    public struct MinionAttackTargetUpdate : IPacket, IPlayerSlot
     {
-        public override MessageID Type => MessageID.MinionAttackTargetUpdate;
+        public MessageID Type => MessageID.MinionAttackTargetUpdate;
         public byte PlayerSlot { get; set; }
         public short MinionAttackTarget { get; set; }
     }

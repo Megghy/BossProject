@@ -28,7 +28,7 @@ namespace BossFramework.BNet
                         {
                             if (t.BaseType?.Name == "PacketHandlerBase`1")
                                 Handlers.Add(
-                                    (PacketTypes)((Packet)Activator.CreateInstance(t.BaseType.GetGenericArguments().First())!).Type,
+                                    (PacketTypes)((IPacket)Activator.CreateInstance(t.BaseType.GetGenericArguments().First())!).Type,
                                     (IPacketHandler)Activator.CreateInstance(t, Array.Empty<object>())!);
                         });
         }
@@ -36,12 +36,12 @@ namespace BossFramework.BNet
         {
             var type = (PacketTypes)args.Buffer[2];
             var plr = TShock.Players[args.Socket.Id]?.GetBPlayer() ?? new(TShock.Players[args.Socket.Id]);
-            var reader = new BinaryBufferReader(args.Buffer);
+            using var reader = new BinaryBufferReader(args.Buffer);
             if (Handlers.TryGetValue(type, out var handler))
             {
                 try
                 {
-                    args.Handled = handler.GetPacket(plr, Serializer.Deserialize(reader));
+                    args.Handled = handler.SendPacket(plr, Serializer.Deserialize(reader));
                 }
                 catch (Exception ex)
                 {
@@ -62,7 +62,7 @@ namespace BossFramework.BNet
             }
             var type = args.MsgID;
             var plr = TShock.Players[args.Msg.whoAmI]?.GetBPlayer() ?? new(TShock.Players[args.Msg.whoAmI]);
-            var reader = new BinaryBufferReader(args.Msg.readBuffer, args.Index - 3, BitConverter.ToInt16(args.Msg.readBuffer, args.Index - 3));
+            using var reader = new BinaryBufferReader(args.Msg.readBuffer, args.Index - 3, BitConverter.ToInt16(args.Msg.readBuffer, args.Index - 3));
             if (Handlers.TryGetValue(type, out var handler))
             {
                 try
@@ -80,8 +80,8 @@ namespace BossFramework.BNet
             }
         }
 
-        private readonly static Dictionary<PacketTypes, List<Action<PacketEventArgs>>> SendPacketHandlers = new();
-        private readonly static Dictionary<PacketTypes, List<Action<PacketEventArgs>>> GetPacketHandlers = new();
+        internal readonly static Dictionary<PacketTypes, List<Action<PacketEventArgs>>> SendPacketHandlers = new();
+        internal readonly static Dictionary<PacketTypes, List<Action<PacketEventArgs>>> GetPacketHandlers = new();
         public static void RegisteSendPacketHandler(PacketTypes type, Action<PacketEventArgs> action)
         {
             if (!SendPacketHandlers.ContainsKey(type))

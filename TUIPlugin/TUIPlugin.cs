@@ -255,13 +255,15 @@ namespace TUIPlugin
             }
             catch (Exception e)
             {
-                TUI.HandleException(e);
+                BossFramework.BLog.Warn(e);
             }
         }
 
         private static void OnProjDestroy(BEventArgs.ProjDestroyEventArgs args)
         {
             var owner = args.Player.Index;
+            if (owner is < 0 or > 254)
+                return;
             Touch previousTouch = TUI.Session[owner]?.PreviousTouch;
             if (TUI.Session[owner]?.ProjectileID == args.KillProj.ProjSlot && previousTouch != null && previousTouch.State != TouchState.End)
             {

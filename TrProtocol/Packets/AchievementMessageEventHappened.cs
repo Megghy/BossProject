@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class AchievementMessageEventHappened : Packet
+    public struct AchievementMessageEventHappened : IPacket
     {
-        public override MessageID Type => MessageID.AchievementMessageEventHappened;
+        public MessageID Type => MessageID.AchievementMessageEventHappened;
         public short EventType { get; set; }
     }
 }

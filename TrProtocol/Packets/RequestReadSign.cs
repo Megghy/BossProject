@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class RequestReadSign : Packet
+    public struct RequestReadSign : IPacket
     {
-        public override MessageID Type => MessageID.RequestReadSign;
+        public MessageID Type => MessageID.RequestReadSign;
         public ShortPosition Position { get; set; }
     }
 }

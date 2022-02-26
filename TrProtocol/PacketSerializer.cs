@@ -39,9 +39,9 @@ namespace TrProtocol
         private delegate void Serializer(object o, BinaryWriter bw);
         private delegate void Deserializer(object o, BinaryBufferReader br);
 
-        private readonly Dictionary<Type, Action<BinaryWriter, Packet>> serializers = new();
+        private readonly Dictionary<Type, Action<BinaryWriter, IPacket>> serializers = new();
 
-        private readonly Dictionary<MessageID, Func<BinaryBufferReader, Packet>> deserializers = new();
+        private readonly Dictionary<MessageID, Func<BinaryBufferReader, IPacket>> deserializers = new();
         private readonly Dictionary<NetModuleType, Func<BinaryBufferReader, NetModulesPacket>> moduledeserializers = new();
 
         private readonly Dictionary<Type, Type> enumSerializers = new()
@@ -60,7 +60,7 @@ namespace TrProtocol
             }
         }
 
-        public void RegisterPacket<T>() where T : Packet
+        public void RegisterPacket<T>() where T : IPacket
         {
             RegisterPacket(typeof(T));
         }
@@ -170,7 +170,8 @@ namespace TrProtocol
 
         private void RegisterPacket(Type type)
         {
-            if (type.IsAbstract || !type.IsSubclassOf(typeof(Packet))) return;
+            if (type.IsAbstract || type.GetInterface(typeof(IPacket).Name) is null)
+                return;
 
             var inst = Activator.CreateInstance(type);
             var (serializer, deserializer) = GenerateSerializers(type);
@@ -189,11 +190,11 @@ namespace TrProtocol
                         return result;
                     });
                 }
-                else if (inst is Packet p2)
+                else if (inst is IPacket p2)
                 {
                     deserializers.Add(p2.Type, br =>
                     {
-                        var result = Activator.CreateInstance(type) as Packet;
+                        var result = Activator.CreateInstance(type) as IPacket;
                         deserializer?.Invoke(result, br);
                         return result;
                     });
@@ -211,10 +212,10 @@ namespace TrProtocol
             this.version = version;
             LoadPackets(Assembly.GetExecutingAssembly());
         }
-        public Packet Deserialize(BinaryBufferReader br)
+        public IPacket Deserialize(BinaryBufferReader br)
         {
             var l = br.ReadInt16();
-            Packet result = null;
+            IPacket result = null;
             var msgid = (MessageID)br.ReadByte();
             if (msgid == MessageID.NetModules)
             {
@@ -236,7 +237,7 @@ namespace TrProtocol
             return result;
         }
 
-        public byte[] Serialize(Packet p)
+        public byte[] Serialize(IPacket p)
         {
             using var ms = new MemoryStream();
             using var bw = new BinaryWriter(ms);

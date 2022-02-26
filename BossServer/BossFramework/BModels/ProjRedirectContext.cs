@@ -11,7 +11,7 @@ namespace BossFramework.BModels
         {
             BindingRegion = bindingRegion;
         }
-        public SyncProjectile[] Projs { get; private set; } = new SyncProjectile[1001];
+        public SyncProjectile?[] Projs { get; private set; } = new SyncProjectile?[1001];
         public BRegion BindingRegion { get; private set; }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace BossFramework.BModels
             if (Projs[killProj.ProjSlot]?.PlayerSlot != killProj.PlayerSlot)
                 return;
             BLog.DEBUG($"弹幕移除: {BindingRegion}:[{killProj.ProjSlot}]");
-            Projs[killProj.ProjSlot] = null;
+            Projs[killProj.ProjSlot] = default;
             var rawData = killProj.SerializePacket();
             var plrs = BindingRegion.GetAllPlayerInRegion();
             if (ignoreSelf)

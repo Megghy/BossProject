@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class PlayerTeam : Packet, IPlayerSlot
+    public struct PlayerTeam : IPacket, IPlayerSlot
     {
-        public override MessageID Type => MessageID.PlayerTeam;
+        public MessageID Type => MessageID.PlayerTeam;
         public byte PlayerSlot { get; set; }
         public byte Team { get; set; }
     }

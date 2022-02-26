@@ -66,14 +66,14 @@ namespace BossFramework.BCore
         }
         public static void OnEnterRegion(BEventArgs.BRegionEventArgs args)
         {
-            Task.Run(() => args.Region.ProjContext.Projs
+            Task.Run(() => BUtils.SendPacketsTo(args.Region.ProjContext.Projs
                 .Where(p => p != null)
-                .SendPacketsTo(args.Player)); //同步当前区域弹幕
+                .Select(p => p.Value), args.Player)); //同步当前区域弹幕
         }
         public static void OnLeaveRegion(BEventArgs.BRegionEventArgs args)
         {
             Task.Run(() => args.Region.ProjContext.Projs.Where(p => p?.PlayerSlot == args.Player.Index)
-                .ForEach(p => args.Region.ProjContext.DestroyProj(p, false))); //移除所有之前区域的弹幕
+                .ForEach(p => args.Region.ProjContext.DestroyProj(p.Value, false))); //移除所有之前区域的弹幕
         }
     }
 }

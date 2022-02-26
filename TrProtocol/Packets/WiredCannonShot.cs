@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class WiredCannonShot : Packet, IPlayerSlot
+    public struct WiredCannonShot : IPacket, IPlayerSlot
     {
-        public override MessageID Type => MessageID.WiredCannonShot;
+        public MessageID Type => MessageID.WiredCannonShot;
         public short Damage { get; set; }
         public float Knockback { get; set; }
         public ShortPosition Position { get; set; }

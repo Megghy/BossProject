@@ -1,10 +1,10 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class MurderSomeoneElsesProjectile : Packet, IOtherPlayerSlot
+    public struct MurderSomeoneElsesProjectile : IPacket, IOtherPlayerSlot
     {
-        public override MessageID Type => MessageID.MurderSomeoneElsesProjectile;
+        public MessageID Type => MessageID.MurderSomeoneElsesProjectile;
         public byte OtherPlayerSlot { get; set; }
-        public byte HighBitOfPlayerIsAlwaysZero { get; set; } = 0;
+        public byte HighBitOfPlayerIsAlwaysZero { get; set; }
         public byte AI1 { get; set; }
     }
 }

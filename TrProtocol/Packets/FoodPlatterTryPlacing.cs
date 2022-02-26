@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class FoodPlatterTryPlacing : Packet
+    public struct FoodPlatterTryPlacing : IPacket
     {
-        public override MessageID Type => MessageID.FoodPlatterTryPlacing;
+        public MessageID Type => MessageID.FoodPlatterTryPlacing;
         public ShortPosition Position { get; set; }
         public short ItemType { get; set; }
         public byte Prefix { get; set; }

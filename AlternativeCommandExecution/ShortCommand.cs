@@ -20,7 +20,7 @@ namespace AlternativeCommandExecution
 
             var commandText = IsValidCmd(args.Command) ? args.Command : Commands.Specifier + args.Command;
 
-            BossFramework.BUtils.HandleCommand(TSPlayer.Server, commandText, false);
+            Commands.HandleCommand(TSPlayer.Server, commandText);
 
             args.Handled = true;
         }
@@ -31,7 +31,7 @@ namespace AlternativeCommandExecution
                 return;
             if (IsValidCmd(args.RawText))
             {
-                args.Handled = BossFramework.BUtils.HandleCommand(args.Player, args.RawText, false);
+                args.Handled = Commands.HandleCommand(args.Player, args.RawText);
             }
         }
 

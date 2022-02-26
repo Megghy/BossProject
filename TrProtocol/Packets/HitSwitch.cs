@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class HitSwitch : Packet
+    public struct HitSwitch : IPacket
     {
-        public override MessageID Type => MessageID.HitSwitch;
+        public MessageID Type => MessageID.HitSwitch;
         public ShortPosition Position { get; set; }
     }
 }

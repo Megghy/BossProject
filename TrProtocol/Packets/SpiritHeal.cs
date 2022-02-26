@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class SpiritHeal : Packet, IOtherPlayerSlot
+    public struct SpiritHeal : IPacket, IOtherPlayerSlot
     {
-        public override MessageID Type => MessageID.SpiritHeal;
+        public MessageID Type => MessageID.SpiritHeal;
         public byte OtherPlayerSlot { get; set; }
         public short Amount { get; set; }
     }

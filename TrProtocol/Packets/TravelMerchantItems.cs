@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class TravelMerchantItems : Packet
+    public struct TravelMerchantItems : IPacket
     {
-        public override MessageID Type => MessageID.TravelMerchantItems;
+        public MessageID Type => MessageID.TravelMerchantItems;
         [ArraySize(40)] public short[] ShopItems { get; set; }
     }
 }

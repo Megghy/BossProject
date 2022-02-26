@@ -55,7 +55,7 @@ namespace BossFramework.BCore
                         plr.WatchingSign = null; //超出范围则未在编辑标牌.
 
                     plr.LastWatchingSignIndex = (short)(plr.WatchingSign == null ? -1 : 0); //从第一个开始, 第零个一般是当前正在看的
-                    var packets = new List<Packet>();
+                    var packets = new List<IPacket>();
 
                     AllSign().Where(s => BUtils.IsPointInCircle(s.X, s.Y, plr.TileX, plr.TileY, BConfig.Instance.SignRefreshRadius))
                         .ForEach(s => packets.Add(new ReadSign()

@@ -357,7 +357,7 @@ namespace BossFramework
             return data;
         }
         public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("Boss.BPlayer") ?? BPlayer.Default;
-        public static byte[] SerializePacket(this Packet p) => PacketHandler.Serializer.Serialize(p);
+        public static byte[] SerializePacket(this IPacket p) => PacketHandler.Serializer.Serialize(p);
         public static void Kill(this SyncProjectile proj)
         {
             var plr = TShock.Players[proj.PlayerSlot]?.GetBPlayer();
@@ -375,22 +375,18 @@ namespace BossFramework
             plr?.SendPacket(proj);
             proj.ProjType = oldType;
         }
-        public static void SendTo(this Packet packet, BPlayer plr)
+        public static void SendTo(this IPacket packet, BPlayer plr)
             => plr.SendPacket(packet);
 
-        public static void SendPacketToAll(this Packet packet, params BPlayer[] ignore)
-        {
-            BInfo.OnlinePlayers.Where(p => !(ignore?.Contains(p) == true))
+        public static void SendPacketToAll(this IPacket packet, params BPlayer[] ignore)
+            => BInfo.OnlinePlayers.Where(p => !(ignore?.Contains(p) == true))
                 .ForEach(p => p.SendPacket(packet));
-        }
-        public static void SendPacketsToAll(this IEnumerable<Packet> packets, params BPlayer[] ignore)
-        {
-            var data = packets.GetPacketsByteData();
-            BInfo.OnlinePlayers.Where(p => !(ignore?.Contains(p) == true)).ForEach(p => p.SendRawData(data));
-        }
-        public static void SendPacketsTo(this IEnumerable<Packet> packets, BPlayer plr)
+        public static void SendPacketsToAll(this IEnumerable<IPacket> packets, params BPlayer[] ignore)
+            => BInfo.OnlinePlayers.Where(p => !(ignore?.Contains(p) == true))
+            .ForEach(p => p.SendPackets(packets));
+        public static void SendPacketsTo<T>(this IEnumerable<T> packets, BPlayer plr) where T : TrProtocol.IPacket
             => plr.SendPackets(packets);
-        public static byte[] GetPacketsByteData(this IEnumerable<Packet> packets)
+        public static byte[] GetPacketsByteData(this IEnumerable<IPacket> packets)
         {
             List<byte> packetData = new();
             packets.TForEach(packet => packetData.AddRange(packet.SerializePacket()));
@@ -452,28 +448,37 @@ namespace BossFramework
 
             lock (player)
             {
-                var oldTempGroup = player.tempGroup;
-                if (ignorePerm)
-                    player.tempGroup = SuperAdminGroup.Default;
-
-                if (cmds.Count == 0)
+                try
                 {
-                    if (player.AwaitingResponse.ContainsKey(cmdName))
+                    if (ignorePerm)
+                        player.IgnorePerm = true;
+
+                    if (cmds.Count == 0)
                     {
-                        Action<CommandArgs> call = player.AwaitingResponse[cmdName];
-                        player.AwaitingResponse.Remove(cmdName);
-                        call(new CommandArgs(cmdText, player, args));
+                        if (player.AwaitingResponse.ContainsKey(cmdName))
+                        {
+                            Action<CommandArgs> call = player.AwaitingResponse[cmdName];
+                            player.AwaitingResponse.Remove(cmdName);
+                            call(new CommandArgs(cmdText, player, args));
+                            return true;
+                        }
+                        player.SendErrorMessage("键入的指令无效；使用 {0}help 查看有效指令。", Commands.Specifier);
                         return true;
                     }
-                    player.SendErrorMessage("键入的指令无效；使用 {0}help 查看有效指令。", Commands.Specifier);
-                    return true;
+                    foreach (var cmd in cmds)
+                    {
+                        cmd.CommandDelegate?.Invoke(new CommandArgs(cmdText, silent, player, args));
+                    }
                 }
-                foreach (var cmd in cmds)
+                catch (Exception ex)
                 {
-                    cmd.CommandDelegate?.Invoke(new CommandArgs(cmdText, silent, player, args));
+                    BLog.Warn(ex);
+                    player.SendErrorMessage($"指令执行失败");
                 }
-
-                player.tempGroup = oldTempGroup;
+                finally
+                {
+                    player.IgnorePerm = false;
+                }
                 return true;
             }
         }

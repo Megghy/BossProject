@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class SyncEquipment : Packet, IPlayerSlot
+    public struct SyncEquipment : IPacket, IPlayerSlot
     {
-        public override MessageID Type => MessageID.SyncEquipment;
+        public MessageID Type => MessageID.SyncEquipment;
         public byte PlayerSlot { get; set; }
         public short ItemSlot { get; set; }
         public short Stack { get; set; }

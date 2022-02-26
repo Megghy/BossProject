@@ -201,7 +201,7 @@ namespace FakeProvider
             {
                 args.Handled = true;
 
-                List<Packet> list = new();
+                List<IPacket> list = new();
                 40.ForEach(i =>
                 {
                     if (i < chest.item.Length)

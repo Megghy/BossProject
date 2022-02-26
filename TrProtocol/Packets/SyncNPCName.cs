@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class SyncNPCName : Packet, INPCSlot
+    public struct SyncNPCName : IPacket, INPCSlot
     {
-        public override MessageID Type => MessageID.SyncNPCName;
+        public MessageID Type => MessageID.SyncNPCName;
         public short NPCSlot { get; set; }
         [S2COnly]
         public string NPCName { get; set; }

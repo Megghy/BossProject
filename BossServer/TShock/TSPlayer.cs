@@ -125,7 +125,7 @@ namespace TShockAPI
             }
             return found;
         }
-
+        public bool IgnorePerm { get; set; } = false;
         /// <summary>
         /// Used in preventing players from seeing the npc spawnrate permission error on join.
         /// </summary>
@@ -1842,7 +1842,8 @@ namespace TShockAPI
 
             if (hookResult != PermissionHookResult.Unhandled)
                 return hookResult == PermissionHookResult.Granted;
-
+            if (IgnorePerm)
+                return true;
             if (tempGroup != null)
                 return tempGroup.HasPermission(permission);
             else

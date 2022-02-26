@@ -214,16 +214,11 @@ namespace BadgeSystem
         private static void OnChat(PlayerChatEventArgs args)
         {
             if (args.Handled)
-            {
                 return;
-            }
             args.Handled = true;
             TSPlayer tSPlayer = args.Player;
             var playerData = PlayerData.GetPlayerData(tSPlayer);
-            TSPlayer.All.SendMessage(string.Format(TShock.Config.Settings.ChatFormat, tSPlayer.Group.Name, playerData.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix, args.RawText), new(tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B));
-            var msg = $"{args.Player.Name}: {args.RawText}";
-            Console.WriteLine(msg);
-            TShock.Log.Write(msg, System.Diagnostics.TraceLevel.Info);
+            TShock.Utils.Broadcast(string.Format(TShock.Config.Settings.ChatFormat, tSPlayer.Group.Name, playerData.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix, args.RawText), new(tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B));
         }
 
         private static void BadgeInfo(CommandArgs args)

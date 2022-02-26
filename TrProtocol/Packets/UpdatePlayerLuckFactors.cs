@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class UpdatePlayerLuckFactors : Packet, IPlayerSlot
+    public struct UpdatePlayerLuckFactors : IPacket, IPlayerSlot
     {
-        public override MessageID Type => MessageID.UpdatePlayerLuckFactors;
+        public MessageID Type => MessageID.UpdatePlayerLuckFactors;
         public byte PlayerSlot { get; set; }
         public int Time { get; set; }
         public float Luck { get; set; }

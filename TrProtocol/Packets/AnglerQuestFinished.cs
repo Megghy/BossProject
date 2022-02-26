@@ -1,7 +1,7 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class AnglerQuestFinished : Packet
+    public struct AnglerQuestFinished : IPacket
     {
-        public override MessageID Type => MessageID.AnglerQuestFinished;
+        public MessageID Type => MessageID.AnglerQuestFinished;
     }
 }

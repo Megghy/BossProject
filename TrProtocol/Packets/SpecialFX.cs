@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class SpecialFX : Packet
+    public struct SpecialFX : IPacket
     {
-        public override MessageID Type => MessageID.SpecialFX;
+        public MessageID Type => MessageID.SpecialFX;
         public byte GrowType { get; set; }
         public Point Position { get; set; }
         public byte Height { get; set; }

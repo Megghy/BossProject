@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class MoonlordCountdown : Packet
+    public struct MoonlordCountdown : IPacket
     {
-        public override MessageID Type => MessageID.MoonlordCountdown;
+        public MessageID Type => MessageID.MoonlordCountdown;
         public int Countdown { get; set; }
     }
 }

@@ -107,6 +107,8 @@ namespace Philosophyz
         {
             _player.SendRawData(BUtils.GetCurrentWorldData(true).SerializePacket());
             data.RestoreCharacter(_player);
+            if (_player.GetBPlayer() is { IsCustomWeaponMode: true } bplr)
+                BossFramework.BCore.BWeaponSystem.ChangeItemsToBWeapon(bplr);
             _player.SendRawData(BUtils.GetCurrentWorldData(Main.ServerSideCharacter).SerializePacket());
         }
 

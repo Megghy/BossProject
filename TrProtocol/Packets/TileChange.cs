@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class TileChange : Packet
+    public struct TileChange : IPacket
     {
-        public override MessageID Type => MessageID.TileChange;
+        public MessageID Type => MessageID.TileChange;
         public byte ChangeType { get; set; }
         public ShortPosition Position { get; set; }
         [BoundWith("MaxTileType")]

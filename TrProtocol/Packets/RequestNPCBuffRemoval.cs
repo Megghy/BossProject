@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class RequestNPCBuffRemoval : Packet, INPCSlot
+    public struct RequestNPCBuffRemoval : IPacket, INPCSlot
     {
-        public override MessageID Type => MessageID.RequestNPCBuffRemoval;
+        public MessageID Type => MessageID.RequestNPCBuffRemoval;
         public short NPCSlot { get; set; }
         public ushort BuffType { get; set; }
     }

@@ -1,4 +1,5 @@
-﻿using BossFramework.BInterfaces;
+﻿using BossFramework.BCore;
+using BossFramework.BInterfaces;
 using BossFramework.DB;
 using FreeSql.DataAnnotations;
 using Microsoft.Xna.Framework;
@@ -10,6 +11,7 @@ using Terraria;
 using TrProtocol;
 using TrProtocol.Packets;
 using TShockAPI;
+using static BossFramework.BModels.BEventArgs;
 
 namespace BossFramework.BModels
 {
@@ -85,19 +87,36 @@ namespace BossFramework.BModels
 
         #region 常用方法
         public override string ToString() => $"{Name}";
+        internal bool CheckSendPacket(IPacket p)
+        {
+            if (BNet.PacketHandler.SendPacketHandlers.TryGetValue((PacketTypes)p.Type, out var list) && list.Any())
+            {
+                var args = new PacketEventArgs(this, p);
+
+                list.ForEach(h => h.Invoke(args));
+                BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnSendPacket(r, args)));
+                return args.Handled;
+            }
+            return false;
+        }
         /// <summary>
         /// 向玩家发送数据包
         /// </summary>
         /// <param name="p"></param>
-        public void SendPacket(Packet p)
+        public void SendPacket(IPacket p)
         {
-            TsPlayer?.SendRawData(p.SerializePacket());
+            if (!CheckSendPacket(p))
+                TsPlayer?.SendRawData(p.SerializePacket());
         }
-        public void SendPackets(IEnumerable<Packet> p)
+        public void SendPackets<T>(IEnumerable<T> p) where T : IPacket
         {
-            List<byte> packetData = new();
-            p.TForEach(packet => packetData.AddRange(packet.SerializePacket()));
-            TsPlayer?.SendRawData(packetData.ToArray());
+            var packets = new List<IPacket>();
+            p.ForEach(packet =>
+            {
+                if (!CheckSendPacket(packet))
+                    packets.Add(packet);
+            });
+            TsPlayer?.SendRawData(packets.GetPacketsByteData());
         }
         public void SendRawData(byte[] data) => TsPlayer?.SendRawData(data);
         public void SendCombatMessage(string msg, Color color = default, bool randomPosition = true)
@@ -138,25 +157,20 @@ namespace BossFramework.BModels
             TsPlayer?.SendErrorMessage("Use \"my query\" for items with spaces.");
             TsPlayer?.SendErrorMessage("Use tsi:[number] or tsn:[username] to distinguish between user IDs and usernames.");
         }
-        private SyncEquipment _emptyItemPacket = new()
-        {
-            ItemType = 0,
-            Prefix = 0,
-            Stack = 0
-        };
         public SyncEquipment RemoveItemPacket(int slot, bool clearServerSideItem = true)
-        {
-            _emptyItemPacket.ItemSlot = (short)slot;
-            _emptyItemPacket.PlayerSlot = Index;
-            return _emptyItemPacket;
-        }
+            => new()
+            {
+                ItemType = 0,
+                Prefix = 0,
+                Stack = 0,
+                ItemSlot = (short)slot,
+                PlayerSlot = Index
+            };
         public void RemoveItem(int slot, bool clearServerSideItem = true)
         {
             if (clearServerSideItem)
                 TrPlayer.inventory[slot]?.SetDefaults();
-            _emptyItemPacket.ItemSlot = (short)slot;
-            _emptyItemPacket.PlayerSlot = Index;
-            SendPacket(_emptyItemPacket);
+            SendPacket(RemoveItemPacket(slot));
         }
 
         public bool GivePoint(int num, string from = "未知")

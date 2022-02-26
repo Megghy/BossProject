@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class SyncChestItem : Packet
+    public struct SyncChestItem : IPacket
     {
-        public override MessageID Type => MessageID.SyncChestItem;
+        public MessageID Type => MessageID.SyncChestItem;
         public short ChestSlot { get; set; }
         public byte ChestItemSlot { get; set; }
         public short Stack { get; set; }

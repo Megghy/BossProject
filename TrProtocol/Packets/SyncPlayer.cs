@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class SyncPlayer : Packet, IPlayerSlot
+    public struct SyncPlayer : IPacket, IPlayerSlot
     {
-        public override MessageID Type => MessageID.SyncPlayer;
+        public MessageID Type => MessageID.SyncPlayer;
         public byte PlayerSlot { get; set; }
         public byte SkinVariant { get; set; }
         public byte Hair { get; set; }

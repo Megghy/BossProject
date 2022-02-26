@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class PlayerDeathV2 : Packet, IPlayerSlot
+    public struct PlayerDeathV2 : IPacket, IPlayerSlot
     {
-        public override MessageID Type => MessageID.PlayerDeathV2;
+        public MessageID Type => MessageID.PlayerDeathV2;
         public byte PlayerSlot { get; set; }
         public PlayerDeathReason Reason { get; set; }
         public short Damage { get; set; }

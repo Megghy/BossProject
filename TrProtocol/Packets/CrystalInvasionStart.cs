@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class CrystalInvasionStart : Packet
+    public struct CrystalInvasionStart : IPacket
     {
-        public override MessageID Type => MessageID.CrystalInvasionStart;
+        public MessageID Type => MessageID.CrystalInvasionStart;
         public ShortPosition Position { get; set; }
     }
 }

@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class UpdateTowerShieldStrengths : Packet
+    public struct UpdateTowerShieldStrengths : IPacket
     {
-        public override MessageID Type => MessageID.UpdateTowerShieldStrengths;
+        public MessageID Type => MessageID.UpdateTowerShieldStrengths;
         [ArraySize(4)] public ushort[] ShieldStrength { get; set; }
     }
 }

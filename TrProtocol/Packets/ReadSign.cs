@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class ReadSign : Packet, IPlayerSlot
+    public struct ReadSign : IPacket, IPlayerSlot
     {
-        public override MessageID Type => MessageID.ReadSign;
+        public MessageID Type => MessageID.ReadSign;
         public short SignSlot { get; set; }
         public ShortPosition Position { get; set; }
         public string Text { get; set; }

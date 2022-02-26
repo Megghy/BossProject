@@ -3,9 +3,9 @@ using TrProtocol.Models;
 
 namespace TrProtocol.Packets
 {
-    public class WorldData : Packet
+    public struct WorldData : IPacket
     {
-        public override MessageID Type => MessageID.WorldData;
+        public MessageID Type => MessageID.WorldData;
         public int Time { get; set; }
         public ProtocolBitsByte DayAndMoonInfo { get; set; }
         public byte MoonPhase { get; set; }

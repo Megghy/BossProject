@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class NPCKillCountDeathTally : Packet
+    public struct NPCKillCountDeathTally : IPacket
     {
-        public override MessageID Type => MessageID.NPCKillCountDeathTally;
+        public MessageID Type => MessageID.NPCKillCountDeathTally;
         public short NPCType { get; set; }
         public int Count { get; set; }
     }

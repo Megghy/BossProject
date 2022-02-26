@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class PlayLegacySound : Packet
+    public struct PlayLegacySound : IPacket
     {
-        public override MessageID Type => MessageID.PlayLegacySound;
+        public MessageID Type => MessageID.PlayLegacySound;
         public Vector2 Point { get; set; }
         public ushort Sound { get; set; }
         public ProtocolBitsByte Bits1 { get; set; }

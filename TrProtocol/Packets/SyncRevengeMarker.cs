@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class SyncRevengeMarker : Packet
+    public struct SyncRevengeMarker : IPacket
     {
-        public override MessageID Type => MessageID.SyncRevengeMarker;
+        public MessageID Type => MessageID.SyncRevengeMarker;
         public int ID { get; set; }
         public Vector2 Position { get; set; }
         public int NetID { get; set; }

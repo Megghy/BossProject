@@ -2,7 +2,7 @@
 
 namespace TrProtocol
 {
-    public abstract class Packet
+    public interface IPacket
     {
         public abstract MessageID Type { get; }
     }
@@ -26,8 +26,9 @@ namespace TrProtocol
     {
         short ProjSlot { get; set; }
     }
-    public abstract class NetModulesPacket : Packet
+    public abstract class NetModulesPacket : IPacket
     {
+        public abstract MessageID Type { get; }
         public abstract NetModuleType ModuleType { get; }
     }
 }

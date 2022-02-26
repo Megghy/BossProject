@@ -76,7 +76,7 @@ namespace BossFramework
         [SimpleTimer(Time = 1)]
         private static void OnSecondUpdate()
         {
-            var packets = new List<Packet>();
+            var packets = new List<IPacket>();
         }
     }
 }

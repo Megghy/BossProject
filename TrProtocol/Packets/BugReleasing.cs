@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class BugReleasing : Packet
+    public struct BugReleasing : IPacket
     {
-        public override MessageID Type => MessageID.BugReleasing;
+        public MessageID Type => MessageID.BugReleasing;
         public Point Position { get; set; }
         public short NPCType { get; set; }
         public byte Style { get; set; }

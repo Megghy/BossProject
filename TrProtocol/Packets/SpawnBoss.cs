@@ -1,10 +1,10 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class SpawnBoss : Packet, IOtherPlayerSlot
+    public struct SpawnBoss : IPacket, IOtherPlayerSlot
     {
-        public override MessageID Type => MessageID.SpawnBoss;
+        public MessageID Type => MessageID.SpawnBoss;
         public byte OtherPlayerSlot { get; set; }
-        public byte HighBitOfPlayerIsAlwaysZero { get; set; } = 0;
+        public byte HighBitOfPlayerIsAlwaysZero { get; set; }
         public short NPCType { get; set; }
     }
 }

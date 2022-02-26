@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class PlaceObject : Packet
+    public struct PlaceObject : IPacket
     {
-        public override MessageID Type => MessageID.PlaceObject;
+        public MessageID Type => MessageID.PlaceObject;
         public ShortPosition Position { get; set; }
         public short ObjectType { get; set; }
         public short Style { get; set; }

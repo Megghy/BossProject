@@ -445,7 +445,7 @@ namespace Philosophyz
         {
             if (PlayerInfo.GetPlayerInfo(args.Player.TsPlayer) is { } plr)
             {
-                var bb = (args.Packet as WorldData).EventInfo1;
+                var bb = ((WorldData)args.Packet).EventInfo1;
                 bb[6] = plr.FakeSscStatus ?? DefaultFakeSscStatus;
 
             }

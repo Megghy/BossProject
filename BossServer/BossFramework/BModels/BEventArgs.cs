@@ -19,14 +19,20 @@ namespace BossFramework.BModels
                 PacketType = type;
                 Reader = reader;
             }
+            public PacketEventArgs(BPlayer plr, IPacket packet)
+            {
+                Player = plr;
+                PacketType = (PacketTypes)packet.Type;
+                _packet = packet;
+            }
             public PacketTypes PacketType { get; private set; }
             public BPlayer Player { get; private set; }
             private BinaryBufferReader Reader { get; set; }
-            private Packet _packet;
+            private IPacket _packet;
             /// <summary>
             /// 未确定是否要读取前只使用 <see cref="PacketType"/> 查看类型
             /// </summary>
-            public Packet Packet
+            public IPacket Packet
             {
                 get
                 {

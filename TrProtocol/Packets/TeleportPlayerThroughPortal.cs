@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class TeleportPlayerThroughPortal : Packet, IOtherPlayerSlot
+    public struct TeleportPlayerThroughPortal : IPacket, IOtherPlayerSlot
     {
-        public override MessageID Type => MessageID.TeleportPlayerThroughPortal;
+        public MessageID Type => MessageID.TeleportPlayerThroughPortal;
         public byte OtherPlayerSlot { get; set; }
         public ushort Extra { get; set; }
         public Vector2 Position { get; set; }

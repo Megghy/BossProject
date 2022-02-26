@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class SyncPlayerChest : Packet
+    public struct SyncPlayerChest : IPacket
     {
-        public override MessageID Type => MessageID.SyncPlayerChest;
+        public MessageID Type => MessageID.SyncPlayerChest;
         public short ChestSlot { get; set; }
         public ShortPosition Position { get; set; }
         public byte ChestNameLength { get; set; }

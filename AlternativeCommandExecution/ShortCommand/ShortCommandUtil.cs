@@ -1,5 +1,4 @@
-﻿using AlternativeCommandExecution.Extensions;
-using TShockAPI;
+﻿using TShockAPI;
 
 namespace AlternativeCommandExecution.ShortCommand
 {
@@ -17,7 +16,7 @@ namespace AlternativeCommandExecution.ShortCommand
                     {
                         foreach (var c in s.Convert(new CommandExectionContext(player), args))
                         {
-                            BossFramework.BUtils.HandleCommandDirect(player, c, cmdName, args.ToList(), cmdPrefix == TShock.Config.Settings.CommandSilentSpecifier, false);
+                            Commands.HandleCommand(player, c);
                         }
                     }
                     catch (LackOfArgumentException ex)

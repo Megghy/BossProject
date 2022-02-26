@@ -24,9 +24,9 @@ public class testtag : BaseRegionTagProcessor
             plrs.ForEach(p => p.SendRawData(data));
         }
     }
-    private static WorldData ChangePacket(BRegion region, WorldData worldData = null)
+    private static WorldData ChangePacket(BRegion region, WorldData? data = default)
     {
-        worldData ??= BUtils.GetCurrentWorldData();
+        var worldData = data.HasValue ? data.Value : BUtils.GetCurrentWorldData();
 
         region.Tags.ForEach(t =>
         {
@@ -58,7 +58,7 @@ public class testtag : BaseRegionTagProcessor
         if (args.PacketType == PacketTypes.WorldInfo)
         {
             args.Handled = true;
-            args.Player.SendPacket(ChangePacket(region, args.Packet as WorldData));
+            args.Player.SendRawData(ChangePacket(region, (WorldData)args.Packet).SerializePacket());
         }
     }
     public override void LeaveRegion(BRegion region, BPlayer plr)

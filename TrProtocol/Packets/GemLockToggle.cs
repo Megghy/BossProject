@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class GemLockToggle : Packet
+    public struct GemLockToggle : IPacket
     {
-        public override MessageID Type => MessageID.GemLockToggle;
+        public MessageID Type => MessageID.GemLockToggle;
         public ShortPosition Position { get; set; }
         public bool Flag { get; set; }
     }

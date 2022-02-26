@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class RequestTileEntityInteraction : Packet, IPlayerSlot
+    public struct RequestTileEntityInteraction : IPacket, IPlayerSlot
     {
-        public override MessageID Type => MessageID.RequestTileEntityInteraction;
+        public MessageID Type => MessageID.RequestTileEntityInteraction;
         public int TileEntityID { get; set; }
         public byte PlayerSlot { get; set; }
     }

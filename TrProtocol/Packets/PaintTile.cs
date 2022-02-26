@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class PaintTile : Packet
+    public struct PaintTile : IPacket
     {
-        public override MessageID Type => MessageID.PaintTile;
+        public MessageID Type => MessageID.PaintTile;
         public ShortPosition Position { get; set; }
         public byte Color { get; set; }
     }

@@ -8,7 +8,7 @@ namespace BossFramework.BInterfaces
 {
     public abstract class BaseBWeapon
     {
-        private ItemTweaker _tweakePacket;
+        private ItemTweaker? _tweakePacket;
         public ItemTweaker TweakePacket
         {
             get
@@ -52,7 +52,7 @@ namespace BossFramework.BInterfaces
                         NotAmmo = NotAmmo ?? item.notAmmo,
                     };
                 }
-                return _tweakePacket;
+                return (ItemTweaker)_tweakePacket;
             }
         }
         public abstract string Name { get; }

@@ -6,9 +6,8 @@ namespace TrProtocol
 {
     public class BinaryBufferReader : BinaryReader
     {
-        private static readonly MemoryStream emptyStream = new(Array.Empty<byte>());
         private byte[] _data;
-        private int startIndex;
+        private readonly int startIndex;
         private long _position
         {
             get
@@ -46,17 +45,15 @@ namespace TrProtocol
             get => BaseStream.Position;
             set
             {
-                var newPos = _position + value;
-                if (newPos > _length)
+                if (value > _length)
                     throw new ArgumentOutOfRangeException(nameof(value), "The new position cannot be larger than the length");
-                if (newPos < 0)
+                if (value < 0)
                     throw new ArgumentOutOfRangeException(nameof(value), "The new position is invalid");
                 BaseStream.Position = value;
-                _position = newPos;
             }
         }
         public byte ReadInt8()
-            => InternalReadSpan(1)[0];
+            => InternalReadByte();
         public override short ReadInt16() => BinaryPrimitives.ReadInt16LittleEndian(InternalReadSpan(2));
 
         public override ushort ReadUInt16() => BinaryPrimitives.ReadUInt16LittleEndian(InternalReadSpan(2));
@@ -119,34 +116,21 @@ namespace TrProtocol
 
         protected byte InternalReadByte()
         {
-            var origPos = _position;
-            var newPos = origPos + 1;
-
             if (Position + 1 > _length)
-            {
-                _position = _length;
-                throw new EndOfStreamException("Reached to end of data");
-            }
-
-            var b = _data[origPos];
-            _position = newPos;
-            return b;
+                throw new EndOfStreamException($"Reached to end of data [Length: {_length}, Target: {_position + 1}]");
+            var originPos = _position;
+            _position += 1;
+            return _data[originPos];
         }
 
-        protected ReadOnlySpan<byte> InternalReadSpan(long count)
+        protected ReadOnlySpan<byte> InternalReadSpan(int count)
         {
-            var origPos = _position;
-            var newPos = origPos + count;
-
             if (Position + count > _length)
-            {
-                _position = _length;
-                throw new EndOfStreamException("Reached to end of data");
-            }
+                throw new EndOfStreamException($"Reached to end of data [Length: {_length}, InnerPosition: {_position}, Target: {_position + count}]");
 
-            var span = new ReadOnlySpan<byte>(_data, (int)origPos, (int)count);
-            _position = newPos;
-            return span;
+            var originPos = _position;
+            _position += count;
+            return new ReadOnlySpan<byte>(_data, (int)originPos, count);
         }
         protected override void Dispose(bool disposing)
         {

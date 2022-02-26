@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class StrikeNPC : Packet, INPCSlot
+    public struct StrikeNPC : IPacket, INPCSlot
     {
-        public override MessageID Type => MessageID.StrikeNPC;
+        public MessageID Type => MessageID.StrikeNPC;
         public short NPCSlot { get; set; }
         public short Damage { get; set; }
         public float Knockback { get; set; }

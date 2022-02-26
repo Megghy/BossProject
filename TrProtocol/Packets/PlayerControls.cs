@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class PlayerControls : Packet, IPlayerSlot
+    public struct PlayerControls : IPacket, IPlayerSlot
     {
-        public override MessageID Type => MessageID.PlayerControls;
+        public MessageID Type => MessageID.PlayerControls;
         public byte PlayerSlot { get; set; }
         public ProtocolBitsByte Bit1 { get; set; }
         public ProtocolBitsByte Bit2 { get; set; }

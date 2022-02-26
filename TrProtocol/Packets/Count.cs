@@ -1,7 +1,7 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class Count : Packet
+    public struct Count : IPacket
     {
-        public override MessageID Type => MessageID.Count;
+        public MessageID Type => MessageID.Count;
     }
 }

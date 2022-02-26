@@ -132,7 +132,9 @@ namespace BossFramework.BCore
                 var selectItem = args.Player.TsPlayer.SelectedItem;
                 if (weapon.OnShootProj(args.Player, args.Proj, args.Proj.Velocity, (weapon.ShootProj ?? selectItem.shoot) == args.Proj.ProjType)) //如果返回true则关闭客户端对应弹幕
                 {
-                    args.Proj.ProjType = 0;
+                    var proj = args.Proj;
+                    proj.ProjType = 0;
+                    args.Proj = proj;
                     args.Player.SendPacket(args.Proj);
                 }
                 else
@@ -152,41 +154,45 @@ namespace BossFramework.BCore
         #region 物品操作
         private static void FillInventory(this BPlayer plr)
         {
-            var slotPacket = new SyncEquipment()
+            List<IPacket> packetData = new();
+            lock (plr.TrPlayer)
             {
-                ItemType = FillItem,
-                PlayerSlot = plr.Index,
-                Prefix = 80,
-                Stack = 1,
-            };
-            List<Packet> packetData = new();
-            plr.TrPlayer.inventory.ForEach((item, i) =>
-            {
-                if (i < 50 && (item is null || item?.type == 0))
+                plr.TrPlayer.inventory.ForEach((item, i) =>
                 {
-                    plr.TsPlayer.TPlayer.inventory[i] ??= new();
-                    plr.TsPlayer.TPlayer.inventory[i].SetDefaults(FillItem);
-                    plr.TsPlayer.TPlayer.inventory[i].prefix = 80;
-                    slotPacket.ItemSlot = (short)i;
-                    packetData.Add(slotPacket);
-                }
-            });
+                    if (i < 50 && (item is null || item?.type == 0))
+                    {
+                        plr.TsPlayer.TPlayer.inventory[i] ??= new();
+                        plr.TsPlayer.TPlayer.inventory[i].SetDefaults(FillItem);
+                        packetData.Add(new SyncEquipment()
+                        {
+                            ItemType = FillItem,
+                            PlayerSlot = plr.Index,
+                            Prefix = 0,
+                            Stack = 1,
+                            ItemSlot = (short)i
+                        });
+                    }
+                });
+            }
             plr.SendPackets(packetData);
         }
         private static void RemoveFillItems(this BPlayer plr)
         {
-            var slotPacket = new SyncEquipment()
-            {
-                ItemType = 0,
-                PlayerSlot = plr.Index,
-                Prefix = 0,
-                Stack = 0,
-            };
-            List<Packet> packetData = new();
+            List<IPacket> packetData = new();
             plr.TsPlayer?.TPlayer.inventory.ForEach((item, i) =>
             {
-                slotPacket.ItemSlot = (short)i;
-                packetData.Add(slotPacket);
+                if (item is { type: FillItem })
+                {
+                    packetData.Add(new SyncEquipment()
+                    {
+                        ItemType = 0,
+                        PlayerSlot = plr.Index,
+                        Prefix = 0,
+                        Stack = 0,
+                        ItemSlot = (short)i
+                    });
+                    plr.TsPlayer.TPlayer.inventory[i].SetDefaults();
+                }
             });
             plr.SendPackets(packetData);
         }
@@ -197,8 +203,8 @@ namespace BossFramework.BCore
             plr.TrPlayer.inventory[slot].prefix = (byte)weapon.Prefix;
             plr.TrPlayer.inventory[slot].stack = weapon.Stack; //将玩家背标目标位置更改为指定物品
 
-            var packets = new List<Packet>();
-            var itemID = 400 - slot;
+            var packets = new List<IPacket>();
+            var itemID = 400 - 399;
             packets.Add(new InstancedItem()
             {
                 ItemSlot = (short)itemID,
@@ -231,26 +237,33 @@ namespace BossFramework.BCore
             Task.Delay(200).Wait();
             plr.IsChangingWeapon = false;
         }
-        private static void ChangeItemsToBWeapon(this BPlayer plr)
+        public static void ChangeItemsToBWeapon(this BPlayer plr)
         {
             if (!plr.IsCustomWeaponMode || plr.IsChangingWeapon)
                 return;
             plr.IsChangingWeapon = true;
+
+            plr.TsPlayer.SetBuff(BuffID.Webbed, 60, true); //冻结
+            plr.TsPlayer.SetBuff(BuffID.Stoned, 60, true); //石化
+            plr.SendPacket(BUtils.GetCurrentWorldData(true)); //强制开启ssc
 
             plr.FillInventory(); //先填满没东西的格子
             for (int i = 49; i >= 0; i--)
             {
                 var item = plr.TsPlayer?.TPlayer?.inventory[i];
                 if (BWeapons.FirstOrDefault(w => w.Equals(item)) is { } bweapon)
+                {
                     plr.SpawnBWeapon(bweapon, i);
-                Task.Delay(10).Wait();
+                    Task.Delay(BConfig.Instance.ChangWeaponDelay).Wait();
+                }
             }
             plr.RemoveFillItems(); //清理占位物品
+            plr.SendPacket(BUtils.GetCurrentWorldData(Terraria.Main.ServerSideCharacter)); //关闭ssc
 
             Task.Delay(200).Wait();
             plr.IsChangingWeapon = false;
         }
-        private static void BackToNormalItem(this BPlayer plr)
+        public static void BackToNormalItem(this BPlayer plr)
         {
             plr.TrPlayer.inventory.ForEach((item, i) =>
             {
@@ -269,8 +282,6 @@ namespace BossFramework.BCore
         {
             var oldMode = plr.IsCustomWeaponMode;
             plr.IsCustomWeaponMode = enable ?? !plr.IsCustomWeaponMode;
-            plr.TsPlayer.SetBuff(BuffID.Webbed, 60, true); //冻结
-            plr.TsPlayer.SetBuff(BuffID.Stoned, 60, true); //石化
             if (oldMode != plr.IsCustomWeaponMode && !plr.IsChangingWeapon)
             {
                 plr.SendPacket(BUtils.GetCurrentWorldData(true));

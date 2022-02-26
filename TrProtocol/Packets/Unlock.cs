@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class Unlock : Packet, IPlayerSlot
+    public struct Unlock : IPacket, IPlayerSlot
     {
-        public override MessageID Type => MessageID.Unlock;
+        public MessageID Type => MessageID.Unlock;
         public byte PlayerSlot { get; set; }
         public ShortPosition Position { get; set; }
     }

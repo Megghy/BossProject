@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class InstancedItem : Packet, IItemSlot
+    public struct InstancedItem : IPacket, IItemSlot
     {
-        public override MessageID Type => MessageID.InstancedItem;
+        public MessageID Type => MessageID.InstancedItem;
         public short ItemSlot { get; set; }
         public Vector2 Position { get; set; }
         public Vector2 Velocity { get; set; }

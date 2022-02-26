@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class TeleportationPotion : Packet
+    public struct TeleportationPotion : IPacket
     {
-        public override MessageID Type => MessageID.TeleportationPotion;
+        public MessageID Type => MessageID.TeleportationPotion;
         public byte Style { get; set; }
     }
 }

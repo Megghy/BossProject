@@ -1,7 +1,7 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class RequestWorldInfo : Packet
+    public struct RequestWorldInfo : IPacket
     {
-        public override MessageID Type => MessageID.RequestWorldInfo;
+        public MessageID Type => MessageID.RequestWorldInfo;
     }
 }

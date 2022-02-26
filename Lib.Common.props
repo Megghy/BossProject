@@ -1,5 +1,5 @@
 ﻿<Project>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="xcopy /Y $(TargetDir)*.dll $(SolutionDir)Output\Lib\&#xD;&#xA;xcopy /Y $(TargetDir)*.json $(SolutionDir)Output\&#xD;&#xA;xcopy /Y $(TargetDir)BossServer.dll $(SolutionDir)Output\&#xD;&#xA;xcopy /Y $(TargetDir)BossServer.exe $(SolutionDir)Output\" />
+      <Exec Command="xcopy /Y $(TargetDir)*.dll $(SolutionDir)Output\Lib\&#xD;&#xA;xcopy /Y $(TargetDir)*.json $(SolutionDir)Output\&#xD;&#xA;xcopy /Y $(TargetDir)BossServer.dll $(SolutionDir)Output\&#xD;&#xA;xcopy /Y $(TargetDir)BossServer.exe $(SolutionDir)Output\&#xD;&#xA;xcopy /Y $(TargetDir)BossServer.pdb $(SolutionDir)Output\" />
     </Target>
 </Project>

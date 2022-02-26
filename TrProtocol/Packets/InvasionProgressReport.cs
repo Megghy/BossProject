@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class InvasionProgressReport : Packet
+    public struct InvasionProgressReport : IPacket
     {
-        public override MessageID Type => MessageID.InvasionProgressReport;
+        public MessageID Type => MessageID.InvasionProgressReport;
         public int Progress { get; set; }
         public int ProgressMax { get; set; }
         public sbyte Icon { get; set; }

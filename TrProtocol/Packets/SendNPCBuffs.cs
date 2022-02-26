@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class SendNPCBuffs : Packet, INPCSlot
+    public struct SendNPCBuffs : IPacket, INPCSlot
     {
-        public override MessageID Type => MessageID.SendNPCBuffs;
+        public MessageID Type => MessageID.SendNPCBuffs;
         public short NPCSlot { get; set; }
         public ushort BuffType1 { get; set; }
         public short BuffTime1 { get; set; }

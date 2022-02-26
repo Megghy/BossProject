@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class ShopOverride : Packet
+    public struct ShopOverride : IPacket
     {
-        public override MessageID Type => MessageID.ShopOverride;
+        public MessageID Type => MessageID.ShopOverride;
         public byte ItemSlot { get; set; }
         public short ItemType { get; set; }
         public short Stack { get; set; }

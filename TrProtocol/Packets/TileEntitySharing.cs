@@ -2,9 +2,9 @@
 
 namespace TrProtocol.Packets
 {
-    public class TileEntitySharing : Packet
+    public struct TileEntitySharing : IPacket
     {
-        public override MessageID Type => MessageID.TileEntitySharing;
+        public MessageID Type => MessageID.TileEntitySharing;
         public int ID { get; set; }
         public bool IsNew { get; set; }
         public TileEntityType EntityType => Entity?.EntityType ?? TileEntityType.Unknown;

@@ -1,8 +1,8 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class CombatTextString : Packet
+    public struct CombatTextString : IPacket
     {
-        public override MessageID Type => MessageID.CombatTextString;
+        public MessageID Type => MessageID.CombatTextString;
         public Vector2 Position { get; set; }
         public Color Color { get; set; }
         public NetworkText Text { get; set; }

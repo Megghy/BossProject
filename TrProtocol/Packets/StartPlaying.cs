@@ -1,7 +1,7 @@
 ﻿namespace TrProtocol.Packets
 {
-    public class StartPlaying : Packet
+    public struct StartPlaying : IPacket
     {
-        public override MessageID Type => MessageID.StartPlaying;
+        public MessageID Type => MessageID.StartPlaying;
     }
 }
