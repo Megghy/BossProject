@@ -1,5 +1,4 @@
-﻿using AlternativeCommandExecution.ShortCommand;
-using AlternativeCommandExecution.SwitchCommand;
+﻿using AlternativeCommandExecution.SwitchCommand;
 using System.IO.Streams;
 using Terraria;
 using Terraria.ID;

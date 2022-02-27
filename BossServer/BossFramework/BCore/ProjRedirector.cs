@@ -56,7 +56,6 @@ namespace BossFramework.BCore
                 {
                     BLog.Error(ex);
                 }
-                Task.Delay(1).Wait();
             }
         }
         public static void OnProjDestory(BPlayer plr, KillProjectile killProj)

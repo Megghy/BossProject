@@ -107,7 +107,7 @@ namespace Chameleon
                 return;
             }
 
-            if(type is PacketTypes.ContinueConnecting2 or PacketTypes.PasswordSend)
+            if (type is PacketTypes.ContinueConnecting2 or PacketTypes.PasswordSend)
             {
                 using (var data = new MemoryStream(args.Msg.readBuffer, args.Index, args.Length - 1))
                 {

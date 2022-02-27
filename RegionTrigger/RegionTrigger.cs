@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System.Diagnostics.CodeAnalysis;
 using System.IO.Streams;
 using Terraria;
 using TerrariaApi.Server;

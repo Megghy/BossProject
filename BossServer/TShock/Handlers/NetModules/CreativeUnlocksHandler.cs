@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.IO.Streams;
-using Terraria;
+﻿using Terraria;
 using Terraria.GameContent.NetModules;
 using Terraria.Net;
 using TrProtocol;

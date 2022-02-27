@@ -356,7 +356,7 @@ namespace BossFramework
             }
             return data;
         }
-        public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("Boss.BPlayer") ?? BPlayer.Default;
+        public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("Boss.BPlayer") ?? new(plr);
         public static byte[] SerializePacket(this IPacket p) => PacketHandler.Serializer.Serialize(p);
         public static void Kill(this SyncProjectile proj)
         {

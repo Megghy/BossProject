@@ -1,13 +1,10 @@
 ﻿using BossFramework;
-using BossFramework.BNet;
 using Philosophyz.Hooks;
 using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
-using TrProtocol.Packets;
 using TShockAPI;
 using TShockAPI.Hooks;
-using static BossFramework.BModels.BEventArgs;
 
 namespace Philosophyz
 {
@@ -41,8 +38,6 @@ namespace Philosophyz
 
             RegionHooks.RegionDeleted += OnRegionDeleted;
 
-            PacketHandler.RegisteSendPacketHandler(PacketTypes.WorldInfo, OnSendWorldInfo);
-
             ServerApi.Hooks.NetSendData.Register(this, OnOtapiSendData);
         }
 
@@ -54,8 +49,6 @@ namespace Philosophyz
                 ServerApi.Hooks.GamePostInitialize.Deregister(this, OnPostInit);
 
                 RegionHooks.RegionDeleted -= OnRegionDeleted;
-
-                PacketHandler.DeregistePacketHandler(OnSendWorldInfo);
 
                 ServerApi.Hooks.NetSendData.Deregister(this, OnOtapiSendData);
             }
@@ -122,51 +115,20 @@ namespace Philosophyz
 
             _lastCheck = DateTime.UtcNow;
         }
-
         private void OnOtapiSendData(SendDataEventArgs args)
         {
             if (args.MsgId != PacketTypes.WorldInfo)
-            {
                 return;
-            }
+            args.Handled = true;
+
             var remoteClient = args.remoteClient;
             if (remoteClient == -1)
-            {
-                var onData = PackInfo(true);
-                var offData = PackInfo(false);
-
-                foreach (var tsPlayer in TShock.Players.Where(p => p?.Active ?? false))
-                {
-                    if (!SendDataHooks.InvokePreSendData(remoteClient, tsPlayer.Index))
-                        continue;
-                    try
-                    {
-                        tsPlayer.SendRawData(PlayerInfo.GetPlayerInfo(tsPlayer).FakeSscStatus ?? DefaultFakeSscStatus ? onData : offData);
-                        args.Handled = true;
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
-                    SendDataHooks.InvokePostSendData(remoteClient, tsPlayer.Index);
-                }
-            }
+                BInfo.OnlinePlayers.ForEach(p => p.SendPacket(BUtils.GetCurrentWorldData(PlayerInfo.GetPlayerInfo(p.TsPlayer).FakeSscStatus ?? DefaultFakeSscStatus)));
             else
             {
-                var player = TShock.Players.ElementAtOrDefault(remoteClient);
-
-                if (player != null)
-                {
-                    var info = PlayerInfo.GetPlayerInfo(player);
-
-                    /* 如果在区域内，收到了来自别的插件的发送请求
-					 * 保持默认 ssc = true 并发送(也就是不需要改什么)
-					 * 如果在区域外，收到了来自别的插件的发送请求
-					 * 需要 fake ssc = false 并发送
-					 */
-                    SendInfo(remoteClient, info.FakeSscStatus ?? DefaultFakeSscStatus);
-                    args.Handled = true;
-                }
+                var plr = TShock.Players[args.remoteClient]?.GetBPlayer();
+                if (plr is not null)
+                    plr.SendPacket(BUtils.GetCurrentWorldData(PlayerInfo.GetPlayerInfo(plr.TsPlayer).FakeSscStatus ?? DefaultFakeSscStatus));
             }
         }
 
@@ -439,17 +401,6 @@ namespace Philosophyz
                     args.Player.SendErrorMessage("语法无效! 键入 /pz help 以获取帮助.");
                     return;
             }
-        }
-
-        private static void OnSendWorldInfo(PacketEventArgs args)
-        {
-            if (PlayerInfo.GetPlayerInfo(args.Player.TsPlayer) is { } plr)
-            {
-                var bb = ((WorldData)args.Packet).EventInfo1;
-                bb[6] = plr.FakeSscStatus ?? DefaultFakeSscStatus;
-
-            }
-
         }
         private static byte[] PackInfo(bool ssc)
         {

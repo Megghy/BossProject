@@ -13,6 +13,7 @@ namespace FakeProvider
 
         public TileProviderCollection ProviderCollection { get; internal set; }
         internal StructTile[,] Data;
+        internal TileReference[,] RefData;
         public string Name { get; private set; }
         public int X { get; private set; }
         public int Y { get; private set; }
@@ -23,9 +24,9 @@ namespace FakeProvider
         public int Layer { get; private set; }
         public bool Enabled { get; private set; } = false;
         public HashSet<int> Observers { get; private set; }
-        private List<IFake> _Entities = new();
-        public ReadOnlyCollection<IFake> Entities => new ReadOnlyCollection<IFake>(_Entities.ToList());
-        private object Locker = new object();
+        private readonly List<IFake> _Entities = new();
+        public ReadOnlyCollection<IFake> Entities => new(_Entities.ToList());
+        private readonly object Locker = new();
 
         #endregion
 
@@ -36,10 +37,24 @@ namespace FakeProvider
         #endregion
         #region Initialize
 
+        private TileReference[,] GetRefTileData(int width, int height)
+        {
+            var result = new TileReference[width, height];
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    result[x, y] = new TileReference(Data, x, y);
+                }
+            }
+            return result;
+        }
+
         internal void Initialize(string Name, int X, int Y, int Width, int Height, int Layer, HashSet<int> Observers = null)
         {
             this.Name = Name;
             this.Data = new StructTile[Width, Height];
+            RefData = GetRefTileData(Width, Height);
             this.X = X;
             this.Y = Y;
             this.Width = Width;
@@ -52,6 +67,7 @@ namespace FakeProvider
         {
             this.Name = Name;
             this.Data = new StructTile[Width, Height];
+            RefData = GetRefTileData(Width, Height);
             this.X = X;
             this.Y = Y;
             this.Width = Width;
@@ -72,6 +88,7 @@ namespace FakeProvider
         {
             this.Name = Name;
             this.Data = new StructTile[Width, Height];
+            RefData = GetRefTileData(Width, Height);
             this.X = X;
             this.Y = Y;
             this.Width = Width;
@@ -94,27 +111,27 @@ namespace FakeProvider
 
         ITile ModFramework.ICollection<ITile>.this[int X, int Y]
         {
-            get => new TileReference(Data, X, Y);
-            set => new TileReference(Data, X, Y).CopyFrom(value);
+            get => RefData[X, Y];
+            set => RefData[X, Y].CopyFrom(value);
         }
 
         public ITile this[int X, int Y]
         {
-            get => new TileReference(Data, X, Y);
-            set => new TileReference(Data, X, Y).CopyFrom(value);
+            get => RefData[X, Y];
+            set => RefData[X, Y].CopyFrom(value);
         }
 
         #endregion
         #region GetIncapsulatedTile
 
         public ITile GetIncapsulatedTile(int X, int Y) =>
-            new TileReference(Data, X - this.X, Y - this.Y);
+            this[X - this.X, Y - this.Y];
 
         #endregion
         #region SetIncapsulatedTile
 
         public void SetIncapsulatedTile(int X, int Y, ITile Tile) =>
-            new TileReference(Data, X - this.X, Y - this.Y).CopyFrom(Tile);
+            this[X - this.X, Y - this.Y].CopyFrom(Tile);
 
         #endregion
         #region GetTileSafe
@@ -157,7 +174,8 @@ namespace FakeProvider
                     for (int j = 0; j < Height; j++)
                         if ((i < this.Width) && (j < this.Height))
                             newData[i, j] = Data[i, j];
-                this.Data = newData;
+                Data = newData;
+                RefData = GetRefTileData(Width, Height);
                 this.Width = Width;
                 this.Height = Height;
             }
@@ -915,6 +933,7 @@ namespace FakeProvider
                 return;
             Disable();
             Data = null;
+            RefData = null;
         }
 
         #endregion

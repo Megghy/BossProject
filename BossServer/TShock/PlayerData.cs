@@ -507,6 +507,7 @@ namespace TShockAPI
                     NetManager.Instance.SendToClient(response, player.Index);
                 }
             }
+            player.IgnoreSSCPackets = false;
         }
     }
 }

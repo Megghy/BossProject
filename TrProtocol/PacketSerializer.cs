@@ -251,7 +251,7 @@ namespace TrProtocol
                 bw.Write((short)l);
                 return ms.ToArray();
             }
-
+            Console.WriteLine(p);
             Console.WriteLine($"[Warning] packet {p} not defined, ignoring");
             return Array.Empty<byte>();
         }

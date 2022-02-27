@@ -166,12 +166,12 @@ namespace AlternativeCommandExecution.SwitchCommand
         {
             try
             {
-                _database.Query("INSERT INTO SwitchCommands (X, Y, Command, AllPlayerCdSecond, WorldId) VALUES (@0, @1, @2, @3, @4, @5);",
+                _database.Query("INSERT INTO SwitchCommands (X, Y, Command, AllPlayerCdSecond, WorldId) VALUES (@0, @1, @2, @3, @4);",
                     cmd.X, cmd.Y, cmd.Command, cmd.AllPlayerCdSecond, Main.worldID);
             }
             catch (Exception ex)
             {
-                TShock.Log.Error(ex.ToString());
+                TShock.Log.ConsoleError(ex.ToString());
             }
         }
 
@@ -179,12 +179,12 @@ namespace AlternativeCommandExecution.SwitchCommand
         {
             try
             {
-                _database.Query("UPDATE SwitchCommands SET Command=@0, WaitTime=@1,AllPlayerCdSecond=@2 WHERE X=@3 AND Y=@4 AND WorldId=@5",
+                _database.Query("UPDATE SwitchCommands SET Command=@0, Wait=@1,AllPlayerCdSecond=@2 WHERE X=@3 AND Y=@4 AND WorldId=@5",
                     cmd.Command, cmd.WaitTime, cmd.AllPlayerCdSecond, cmd.X, cmd.Y, Main.worldID);
             }
             catch (Exception ex)
             {
-                TShock.Log.Error(ex.ToString());
+                TShock.Log.ConsoleError(ex.ToString());
             }
         }
     }

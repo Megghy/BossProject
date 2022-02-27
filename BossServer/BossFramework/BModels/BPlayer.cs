@@ -92,7 +92,6 @@ namespace BossFramework.BModels
             if (BNet.PacketHandler.SendPacketHandlers.TryGetValue((PacketTypes)p.Type, out var list) && list.Any())
             {
                 var args = new PacketEventArgs(this, p);
-
                 list.ForEach(h => h.Invoke(args));
                 BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnSendPacket(r, args)));
                 return args.Handled;

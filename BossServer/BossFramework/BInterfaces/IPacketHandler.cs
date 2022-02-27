@@ -12,7 +12,7 @@ namespace BossFramework.BInterfaces
     {
         public bool GetPacket(BPlayer plr, IPacket packet) => OnGetPacket(plr, (T)packet);
 
-        public bool SendPacket(BPlayer plr, IPacket packet) => OnGetPacket(plr, (T)packet);
+        public bool SendPacket(BPlayer plr, IPacket packet) => OnSendPacket(plr, (T)packet);
         /// <summary>
         /// 接收到数据包
         /// </summary>

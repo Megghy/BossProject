@@ -1,5 +1,4 @@
-﻿using System.IO;
-using TrProtocol;
+﻿using TrProtocol;
 
 namespace TShockAPI.Handlers.NetModules
 {

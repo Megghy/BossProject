@@ -24,7 +24,7 @@ namespace FakeProvider
         public byte bTileHeader2;
         public byte bTileHeader3;
         public ushort type;
-        public ushort wall;        
+        public ushort wall;
         public short sTileHeader;
         public short frameX;
         public short frameY;
@@ -118,7 +118,7 @@ namespace FakeProvider
 
         public bool isTheSameAs(ITile compTile)
         {
-            if (this.sTileHeader != compTile.sTileHeader)
+            if (this.sTileHeader != compTile?.sTileHeader)
             {
                 return false;
             }

@@ -1,10 +1,8 @@
 ﻿using BossFramework;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using System;
 using Terraria;
 using TrProtocol.Packets;
-using TShockAPI.DB;
 
 public class testtag : BaseRegionTagProcessor
 {

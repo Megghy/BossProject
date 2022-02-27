@@ -28,7 +28,7 @@ namespace BossFramework.BInterfaces
         }
 
         public IReadOnlyList<SubCommandAttribute> SubCommands { get; set; } = new List<SubCommandAttribute>();
-        public bool HasDefaultCommand 
+        public bool HasDefaultCommand
             => !(GetType().GetMethod("Default").DeclaringType == typeof(BaseCommand));
         public void RegisterAllSubCommands()
         {

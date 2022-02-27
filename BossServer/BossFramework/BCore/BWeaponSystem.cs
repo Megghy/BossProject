@@ -135,7 +135,8 @@ namespace BossFramework.BCore
                     var proj = args.Proj;
                     proj.ProjType = 0;
                     args.Proj = proj;
-                    args.Player.SendPacket(args.Proj);
+                    var data = args.Proj.SerializePacket();
+                    args.Player.CurrentRegion.GetAllPlayerInRegion().ForEach(plr => plr.SendRawData(data));
                 }
                 else
                     weapon.CreateProj(args.Player, args.Proj);

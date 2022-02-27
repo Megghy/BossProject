@@ -24,31 +24,27 @@ namespace BossFramework.BModels
         {
             try
             {
-                lock (Projs)
-                {
-                    int slot = proj.ProjSlot;
+                int slot = proj.ProjSlot;
 
-                    if (slot >= 1000) //创建弹幕
+                if (slot >= 1000) //创建弹幕
+                {
+                    for (int i = 0; i < 1000; i++)
                     {
-                        for (int i = 0; i < 1000; i++)
+                        if (Projs[i] is null)
                         {
-                            if (Projs[i] is null)
-                            {
-                                slot = i;
-                                break;
-                            }
+                            slot = i;
+                            break;
                         }
-                        if (slot >= 1000)
-                            slot = 0;
-                        proj.ProjSlot = (short)slot;
                     }
-                    BLog.DEBUG($"弹幕同步: {BindingRegion}:[{proj.ProjSlot}] {Projs.Where(p => p != null).Count()}");
-                    Projs[slot] = proj;
-                    var rawData = proj.SerializePacket();
-                    var all = BindingRegion.GetAllPlayerInRegion();
-                    (sendToSelf ? all : all.Where(p => p != from))
-                        .ForEach(p => p.TsPlayer?.SendRawData(rawData));
+                    if (slot >= 1000)
+                        slot = 0;
+                    proj.ProjSlot = (short)slot;
                 }
+                BLog.DEBUG($"弹幕同步: {BindingRegion}:[{proj.ProjSlot}] {Projs.Where(p => p != null).Count()}");
+                Projs[slot] = proj;
+                var all = BindingRegion.GetAllPlayerInRegion();
+                (sendToSelf ? all : all.Where(p => p != from))
+                    .ForEach(p => p.TsPlayer?.SendRawData(proj.SerializePacket()));
             }
             catch (Exception ex)
             {

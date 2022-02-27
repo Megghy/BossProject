@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using System.IO.Streams;
 using TrProtocol;
 using static TShockAPI.GetDataHandlers;
 

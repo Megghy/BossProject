@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System.IO.Streams;
 using Terraria;
 using Terraria.ObjectData;
 using TrProtocol;

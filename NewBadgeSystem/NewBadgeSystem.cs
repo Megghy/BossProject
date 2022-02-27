@@ -1,4 +1,3 @@
-using Microsoft.Xna.Framework;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
@@ -218,7 +217,7 @@ namespace BadgeSystem
             args.Handled = true;
             TSPlayer tSPlayer = args.Player;
             var playerData = PlayerData.GetPlayerData(tSPlayer);
-            TShock.Utils.Broadcast(string.Format(TShock.Config.Settings.ChatFormat, tSPlayer.Group.Name, playerData.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix, args.RawText), new(tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B));
+            TShock.Utils.Broadcast(string.Format(TShock.Config.Settings.ChatFormat, tSPlayer.Group.Name, tSPlayer.Group.Prefix + playerData.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix, args.RawText), new(tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B));
         }
 
         private static void BadgeInfo(CommandArgs args)

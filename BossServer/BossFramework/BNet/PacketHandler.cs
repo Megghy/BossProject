@@ -1,7 +1,6 @@
 ﻿using BossFramework.BAttributes;
 using BossFramework.BCore;
 using BossFramework.BInterfaces;
-using BossFramework.BModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,23 +33,23 @@ namespace BossFramework.BNet
         }
         public static void OnSendData(SendBytesEventArgs args)
         {
-            var type = (PacketTypes)args.Buffer[2];
-            var plr = TShock.Players[args.Socket.Id]?.GetBPlayer() ?? new(TShock.Players[args.Socket.Id]);
-            using var reader = new BinaryBufferReader(args.Buffer);
-            if (Handlers.TryGetValue(type, out var handler))
+            try
             {
-                try
+                var packetArgs = new PacketEventArgs(TShock.Players[args.Socket.Id]?.GetBPlayer() ?? new(TShock.Players[args.Socket.Id]),
+                    (PacketTypes)args.Buffer[2],
+                    new BinaryBufferReader(args.Buffer));
+                if (Handlers.TryGetValue(packetArgs.PacketType, out var handler))
+                    packetArgs.Handled = handler.SendPacket(packetArgs.Player, packetArgs.Packet);
+                if (SendPacketHandlers.TryGetValue(packetArgs.PacketType, out var list))
                 {
-                    args.Handled = handler.SendPacket(plr, Serializer.Deserialize(reader));
+                    list.ForEach(h => h.Invoke(packetArgs));
+                    BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnSendPacket(r, packetArgs)));
                 }
-                catch (Exception ex)
-                {
-                    BLog.Error($"数据包处理失败{Environment.NewLine}{ex}");
-                }
+                args.Handled = packetArgs.Handled;
             }
-            else
+            catch (Exception ex)
             {
-                args.Handled = OnSendPacket(plr, type, reader);
+                BLog.Error($"数据包发送处理失败{Environment.NewLine}{ex}");
             }
         }
         public static void OnGetData(GetDataEventArgs args)
@@ -60,23 +59,23 @@ namespace BossFramework.BNet
                 args.Handled = true; //很怪
                 return;
             }
-            var type = args.MsgID;
-            var plr = TShock.Players[args.Msg.whoAmI]?.GetBPlayer() ?? new(TShock.Players[args.Msg.whoAmI]);
-            using var reader = new BinaryBufferReader(args.Msg.readBuffer, args.Index - 3, BitConverter.ToInt16(args.Msg.readBuffer, args.Index - 3));
-            if (Handlers.TryGetValue(type, out var handler))
+            try
             {
-                try
+                var packetArgs = new PacketEventArgs(TShock.Players[args.Msg.whoAmI]?.GetBPlayer() ?? new(TShock.Players[args.Msg.whoAmI]),
+                    args.MsgID,
+                    new BinaryBufferReader(args.Msg.readBuffer, args.Index - 3, BitConverter.ToInt16(args.Msg.readBuffer, args.Index - 3)));
+                if (Handlers.TryGetValue(packetArgs.PacketType, out var handler))
+                    packetArgs.Handled = handler.GetPacket(packetArgs.Player, packetArgs.Packet);
+                if (GetPacketHandlers.TryGetValue(packetArgs.PacketType, out var list))
                 {
-                    args.Handled = handler.GetPacket(plr, Serializer.Deserialize(reader));
+                    list.ForEach(h => h.Invoke(packetArgs));
+                    BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnGetPacket(r, packetArgs)));
                 }
-                catch (Exception ex)
-                {
-                    BLog.Error($"数据包处理失败{Environment.NewLine}{ex}");
-                }
+                args.Handled = packetArgs.Handled;
             }
-            else
+            catch (Exception ex)
             {
-                args.Handled = OnGetPacket(plr, type, reader);
+                BLog.Error($"数据包接收处理失败{Environment.NewLine}{ex}");
             }
         }
 
@@ -100,46 +99,6 @@ namespace BossFramework.BNet
                 GetPacketHandlers.Add(type, new() { action });
             else
                 GetPacketHandlers[type].Add(action);
-        }
-        internal static bool OnSendPacket(BPlayer plr, PacketTypes type, BinaryBufferReader reader)
-        {
-            if (SendPacketHandlers.TryGetValue(type, out var list) && list.Any())
-            {
-                try
-                {
-                    var args = new PacketEventArgs(plr, type, reader);
-
-                    list.ForEach(h => h.Invoke(args));
-                    BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnSendPacket(r, args)));
-
-                    return args.Handled;
-                }
-                catch (Exception ex)
-                {
-                    BLog.Error($"发送数据包处理失败{Environment.NewLine}{ex}");
-                }
-            }
-            return false;
-        }
-        internal static bool OnGetPacket(BPlayer plr, PacketTypes type, BinaryBufferReader reader)
-        {
-            if (GetPacketHandlers.TryGetValue(type, out var list) && list.Any())
-            {
-                try
-                {
-                    var args = new PacketEventArgs(plr, type, reader);
-
-                    list.ForEach(h => h.Invoke(args));
-                    BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnGetPacket(r, args)));
-
-                    return args.Handled;
-                }
-                catch (Exception ex)
-                {
-                    BLog.Error($"发送数据包处理失败{Environment.NewLine}{ex}");
-                }
-            }
-            return false;
         }
     }
 }

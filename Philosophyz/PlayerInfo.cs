@@ -18,7 +18,7 @@ namespace Philosophyz
             get => _fakeSscStatus;
             internal set
             {
-                if (value == _fakeSscStatus)
+                if (value == _fakeSscStatus || _player.Index is < 0 or > 254)
                     return;
                 Philosophyz.SendInfo(_player.Index, value ?? Main.ServerSideCharacter);
                 _fakeSscStatus = value;
@@ -95,11 +95,6 @@ namespace Philosophyz
             for (var k = 0; k < NetItem.InventorySlots; k++)
             {
                 NetMessage.SendData(5, -1, -1, NetworkText.FromLiteral(Main.player[_player.Index].inventory[k].Name), _player.Index, k, Main.player[_player.Index].inventory[k].prefix);
-            }
-
-            for (var k = 0; k < NetItem.InventorySlots; k++)
-            {
-                NetMessage.SendData(5, _player.Index, -1, NetworkText.FromLiteral(Main.player[_player.Index].inventory[k].Name), _player.Index, k, Main.player[_player.Index].inventory[k].prefix);
             }
         }
 

@@ -27,7 +27,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Terraria;
-using Terraria.GameContent.Creative;
 using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.Localization;

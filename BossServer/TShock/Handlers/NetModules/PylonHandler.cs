@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.IO.Streams;
-using Terraria.GameContent;
+﻿using Terraria.GameContent;
 using TrProtocol;
 using static Terraria.GameContent.NetModules.NetTeleportPylonModule;
 

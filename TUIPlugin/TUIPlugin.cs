@@ -131,7 +131,7 @@ namespace TUIPlugin
                     ServerApi.Hooks.ServerLeave.Deregister(this, OnServerLeave);
                     ServerApi.Hooks.NetGetData.Deregister(this, OnGetData);
                     BossFramework.BCore.ProjRedirector.ProjDestroy -= OnProjDestroy;
-                    BossFramework.BCore.ProjRedirector.ProjCreate += OnNewProjectile;
+                    BossFramework.BCore.ProjRedirector.ProjCreate -= OnNewProjectile;
 
                     PlayerHooks.PlayerLogout -= OnPlayerLogout;
                     if (FakesEnabled)

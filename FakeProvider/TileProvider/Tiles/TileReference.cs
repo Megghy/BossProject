@@ -1,12 +1,13 @@
 ﻿#region Using
 using Microsoft.Xna.Framework;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using Terraria;
 using Terraria.DataStructures;
 #endregion
 namespace FakeProvider
 {
-    public struct TileReference : ITile
+    public class TileReference : ITile
     {
         #region Constants
 
@@ -611,6 +612,10 @@ namespace FakeProvider
             if (obj is ITile t)
                 return t.isTheSameAs(this);
             return false;
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

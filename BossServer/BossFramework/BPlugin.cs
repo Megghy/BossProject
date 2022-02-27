@@ -7,7 +7,6 @@ using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
 using TrProtocol;
-using TrProtocol.Packets;
 
 namespace BossFramework
 {

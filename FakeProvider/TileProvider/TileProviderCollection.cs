@@ -70,18 +70,8 @@ namespace FakeProvider
 
         public ITile this[int X, int Y]
         {
-            get
-            {
-                X -= OffsetX;
-                Y -= OffsetY;
-                return _Providers[ProviderIndexes[X, Y]].GetIncapsulatedTile(X, Y);
-            }
-            set
-            {
-                X -= OffsetX;
-                Y -= OffsetY;
-                _Providers[ProviderIndexes[X, Y]].SetIncapsulatedTile(X, Y, value);
-            }
+            get => _Providers[ProviderIndexes[X - OffsetX, Y - OffsetY]].GetIncapsulatedTile(X - OffsetX, Y - OffsetY);
+            set => _Providers[ProviderIndexes[X - OffsetX, Y - OffsetY]].SetIncapsulatedTile(X - OffsetX, Y - OffsetY, value);
         }
 
         #endregion
@@ -347,7 +337,7 @@ namespace FakeProvider
                     for (int j = 0; j < height; j++)
                     {
                         TileProvider provider = _Providers[ProviderIndexes[x + i, y + j]];
-                        if (provider[x + i, y + j] == null || provider.Order <= order || !provider.Enabled)
+                        if (provider.GetTileSafe(x + i, y + j) == VoidTile || provider.Order <= order || !provider.Enabled)
                             ProviderIndexes[x + i, y + j] = providerIndex;
                     }
 
