@@ -2533,7 +2533,7 @@ namespace TShockAPI
                 return true;
             if (args.Player.IgnoreSSCPackets)
             {
-                //Shock.Log.ConsoleDebug("GetDataHandlers / HandlePlayerSlot rejected ignore ssc packets");
+                //TShock.Log.ConsoleDebug("GetDataHandlers / HandlePlayerSlot rejected ignore ssc packets");
                 //args.Player.SendData(PacketTypes.PlayerSlot, "", args.Player.Index, slot, prefix); 完全不知道意义何在
                 //return true;
             }

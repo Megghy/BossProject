@@ -44,10 +44,10 @@ namespace BossFramework.DB
         /// <typeparam name="T"></typeparam>
         /// <param name="target"></param>
         /// <returns></returns>
-        public static long Insert<T>(T target) where T : UserConfigBase<T>
+        public static T Insert<T>(T target) where T : UserConfigBase<T>
         {
             target.Id = SQL.Insert(target).ExecuteIdentity();
-            return target.Id;
+            return target;
         }
 
         public static int Delete<T>(T target) where T : UserConfigBase<T>

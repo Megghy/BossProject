@@ -22,7 +22,7 @@ public class testtag : BaseRegionTagProcessor
             plrs.ForEach(p => p.SendRawData(data));
         }
     }
-    private static WorldData ChangePacket(BRegion region, WorldData? data = default)
+    private static WorldData ChangePacket(BRegion region, WorldData? data = null)
     {
         var worldData = data.HasValue ? data.Value : BUtils.GetCurrentWorldData();
 

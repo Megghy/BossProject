@@ -11,6 +11,7 @@ namespace Scattering
         private readonly IDbConnection _database;
 
         private readonly List<PlayerHome> _homes = new List<PlayerHome>();
+        internal static List<PlayerSpawn> _spawns;
 
         public HomeManager(IDbConnection db)
         {
@@ -54,6 +55,7 @@ namespace Scattering
                 {
                     _homes.Add(PlayerHome.FromReader(queryResult));
                 }
+                _spawns = BossFramework.DB.DBTools.GetAll<PlayerSpawn>().ToList();
             }
             catch (Exception ex)
             {

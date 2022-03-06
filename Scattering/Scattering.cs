@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using BossFramework.DB;
+using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
@@ -27,6 +28,8 @@ namespace Scattering
         public override void Initialize()
         {
             ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInit);
+            BossFramework.BNet.PacketHandler.RegisteGetPacketHandler(PacketTypes.PlayerSpawn, OnPlayerSpawn);
+
             Commands.ChatCommands.Add(new Command("scattering.tphome", TpHome, "tph", "tphome")
             {
                 AllowServer = false
@@ -35,6 +38,8 @@ namespace Scattering
             {
                 AllowServer = false
             });
+            Commands.ChatCommands.Add(new Command("scattering.setspawn", SetSpawn, "ss", "setspawn"));
+            Commands.ChatCommands.Add(new Command("scattering.restorespawn", RestoreSpawn, "rs", "restorespawn"));
         }
 
         protected override void Dispose(bool disposing)
@@ -42,6 +47,7 @@ namespace Scattering
             if (disposing)
             {
                 ServerApi.Hooks.GamePostInitialize.Deregister(this, OnPostInit);
+                BossFramework.BNet.PacketHandler.DeregistePacketHandler(OnPlayerSpawn);
             }
             base.Dispose(disposing);
         }
@@ -51,7 +57,81 @@ namespace Scattering
             Hm = new HomeManager(TShock.DB);
             Hm.Reload();
         }
-
+        private void OnPlayerSpawn(BossFramework.BModels.BEventArgs.PacketEventArgs args)
+        {
+            if (HomeManager._spawns.FirstOrDefault(s => s.Id == args.Player.TsPlayer.Account?.ID) is { } spawn)
+            {
+                args.Player.TsPlayer.Spawn(spawn.X, spawn.Y, PlayerSpawnContext.ReviveFromDeath);
+            }
+        }
+        private void SetSpawn(CommandArgs args)
+        {
+            var param = args.Parameters;
+            if (param.Count > 2)
+            {
+                var users = TShock.UserAccounts.GetUserAccountsByName(param[0]);
+                if (users.Any())
+                {
+                    if (users.Count > 1)
+                        args.Player.SendMultipleMatchError(users.Select(u => u.Name));
+                    else
+                    {
+                        var user = users.First();
+                        if (int.TryParse(param[1], out var x) && int.TryParse(param[2], out var y))
+                        {
+                            if (HomeManager._spawns.FirstOrDefault(s => s.Id == user.ID) is { } spawn)
+                            {
+                                spawn.X = x;
+                                spawn.Y = y;
+                                spawn.UpdateMany(s => s.X, s => s.Y);
+                            }
+                            else
+                            {
+                                HomeManager._spawns.Add(DBTools.Insert(new PlayerSpawn()
+                                {
+                                    Id = user.ID,
+                                    X = x,
+                                    Y = y,
+                                    WorldId = Main.worldID
+                                }));
+                                args.Player.SendSuccessMessage($"{user.Name} 的出生点已被设定为 <{x} - {y}>");
+                            }
+                        }
+                        else
+                            args.Player.SendErrorMessage($"无效的坐标: {param[1]} - {param[2]}");
+                    }
+                }
+                else
+                    args.Player.SendErrorMessage($"未找到名为 {param[0]} 的已注册玩家");
+            }
+            else
+                args.Player.SendErrorMessage($"无效格式. /setspawn 玩家名 x y");
+        }
+        private void RestoreSpawn(CommandArgs args)
+        {
+            var param = args.Parameters;
+            if (param.Count > 0)
+            {
+                var users = TShock.UserAccounts.GetUserAccountsByName(param[0]);
+                if (users.Any())
+                {
+                    if (users.Count > 1)
+                        args.Player.SendMultipleMatchError(users.Select(u => u.Name));
+                    else if (HomeManager._spawns.FirstOrDefault(s => s.Id == users.First().ID) is { } spawn)
+                    {
+                        HomeManager._spawns.Remove(spawn);
+                        DBTools.Delete(spawn);
+                        args.Player.SendSuccessMessage($"已还原 {users.First().Name} 的出生点");
+                    }
+                    else
+                        args.Player.SendErrorMessage($"{users.First()} 未设定出生点");
+                }
+                else
+                    args.Player.SendErrorMessage($"未找到名为 {param[0]} 的已注册玩家");
+            }
+            else
+                args.Player.SendErrorMessage($"无效格式. /setspawn 玩家名 x y");
+        }
         private void SetHome(CommandArgs args)
         {
             if (args.Parameters.Count == 0)

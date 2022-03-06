@@ -22,6 +22,8 @@ namespace BossFramework.BHooks.HookHandlers
                     bPlr.SendPacket(new ResetItemOwner() { ItemSlot = BCore.StatusSender.PING_ITEM_SLOT });
                     bPlr.PingChecker.Start();
 
+                    Terraria.NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, null, bPlr.Index);
+
                     TShock.Utils.Broadcast($"{">>".Color("B6D6A2")} {bPlr.Name} {"加入服务器".Color("B6D6A2")}", Color.White);
                     args.Handled = true;
                 }

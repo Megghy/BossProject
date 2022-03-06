@@ -31,28 +31,33 @@ namespace BossFramework.BNet
                                     (IPacketHandler)Activator.CreateInstance(t, Array.Empty<object>())!);
                         });
         }
-        public static void OnSendData(SendBytesEventArgs args)
+        internal static void OnSendData(SendBytesEventArgs args)
         {
             try
             {
-                var packetArgs = new PacketEventArgs(TShock.Players[args.Socket.Id]?.GetBPlayer() ?? new(TShock.Players[args.Socket.Id]),
+                args.Handled = HandleSendData(new PacketEventArgs(TShock.Players[args.Socket.Id]?.GetBPlayer() ?? new(TShock.Players[args.Socket.Id]),
                     (PacketTypes)args.Buffer[2],
-                    new BinaryBufferReader(args.Buffer));
-                if (Handlers.TryGetValue(packetArgs.PacketType, out var handler))
-                    packetArgs.Handled = handler.SendPacket(packetArgs.Player, packetArgs.Packet);
-                if (SendPacketHandlers.TryGetValue(packetArgs.PacketType, out var list))
+                    new BinaryBufferReader(args.Buffer))
                 {
-                    list.ForEach(h => h.Invoke(packetArgs));
-                    BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnSendPacket(r, packetArgs)));
-                }
-                args.Handled = packetArgs.Handled;
+                    Handled = args.Handled
+                });
             }
             catch (Exception ex)
             {
                 BLog.Error($"数据包发送处理失败{Environment.NewLine}{ex}");
             }
         }
-        public static void OnGetData(GetDataEventArgs args)
+        internal static bool HandleSendData(PacketEventArgs args)
+        {
+            if (Handlers.TryGetValue(args.PacketType, out var handler))
+                args.Handled = handler.SendPacket(args.Player, args.Packet);
+            if (SendPacketHandlers.TryGetValue(args.PacketType, out var list))
+                list.ForEach(h => h.Invoke(args));
+            BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnSendPacket(r, args)));
+
+            return args.Handled;
+        }
+        internal static void OnGetData(GetDataEventArgs args)
         {
             if (Netplay.Clients[args.Msg.whoAmI].State < 10 && args.MsgID == PacketTypes.ItemOwner)
             {
@@ -63,14 +68,17 @@ namespace BossFramework.BNet
             {
                 var packetArgs = new PacketEventArgs(TShock.Players[args.Msg.whoAmI]?.GetBPlayer() ?? new(TShock.Players[args.Msg.whoAmI]),
                     args.MsgID,
-                    new BinaryBufferReader(args.Msg.readBuffer, args.Index - 3, BitConverter.ToInt16(args.Msg.readBuffer, args.Index - 3)));
+                    new BinaryBufferReader(args.Msg.readBuffer, args.Index - 3, BitConverter.ToInt16(args.Msg.readBuffer, args.Index - 3)))
+                {
+                    Handled = args.Handled
+                };
+
                 if (Handlers.TryGetValue(packetArgs.PacketType, out var handler))
                     packetArgs.Handled = handler.GetPacket(packetArgs.Player, packetArgs.Packet);
                 if (GetPacketHandlers.TryGetValue(packetArgs.PacketType, out var list))
-                {
                     list.ForEach(h => h.Invoke(packetArgs));
-                    BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnGetPacket(r, packetArgs)));
-                }
+                BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnGetPacket(r, packetArgs)));
+
                 args.Handled = packetArgs.Handled;
             }
             catch (Exception ex)

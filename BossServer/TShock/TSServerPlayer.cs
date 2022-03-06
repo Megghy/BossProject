@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.Localization;
 using Terraria.Utilities;
 using TShockAPI.DB;
@@ -164,7 +165,7 @@ namespace TShockAPI
                 int spawnTileY;
                 TShock.Utils.GetRandomClearTileWithInRange(startTileX, startTileY, tileXRange, tileYRange, out spawnTileX,
                                                              out spawnTileY);
-                NPC.NewNPC(spawnTileX * 16, spawnTileY * 16, type);
+                NPC.NewNPC(new EntitySource_SpawnNPC(), spawnTileX * 16, spawnTileY * 16, type);
             }
         }
 

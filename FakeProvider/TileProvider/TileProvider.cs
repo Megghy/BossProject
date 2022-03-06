@@ -13,7 +13,7 @@ namespace FakeProvider
 
         public TileProviderCollection ProviderCollection { get; internal set; }
         internal StructTile[,] Data;
-        internal TileReference[,] RefData;
+        //internal TileReference[,] RefData;
         public string Name { get; private set; }
         public int X { get; private set; }
         public int Y { get; private set; }
@@ -54,7 +54,7 @@ namespace FakeProvider
         {
             this.Name = Name;
             this.Data = new StructTile[Width, Height];
-            RefData = GetRefTileData(Width, Height);
+            //RefData = GetRefTileData(Width, Height);
             this.X = X;
             this.Y = Y;
             this.Width = Width;
@@ -67,7 +67,7 @@ namespace FakeProvider
         {
             this.Name = Name;
             this.Data = new StructTile[Width, Height];
-            RefData = GetRefTileData(Width, Height);
+            //RefData = GetRefTileData(Width, Height);
             this.X = X;
             this.Y = Y;
             this.Width = Width;
@@ -88,7 +88,7 @@ namespace FakeProvider
         {
             this.Name = Name;
             this.Data = new StructTile[Width, Height];
-            RefData = GetRefTileData(Width, Height);
+            //RefData = GetRefTileData(Width, Height);
             this.X = X;
             this.Y = Y;
             this.Width = Width;
@@ -111,14 +111,14 @@ namespace FakeProvider
 
         ITile ModFramework.ICollection<ITile>.this[int X, int Y]
         {
-            get => RefData[X, Y];
-            set => RefData[X, Y].CopyFrom(value);
+            get => new TileReference(Data, X, Y);
+            set => Data[X, Y].CopyFrom(value);
         }
 
         public ITile this[int X, int Y]
         {
-            get => RefData[X, Y];
-            set => RefData[X, Y].CopyFrom(value);
+            get => new TileReference(Data, X, Y);
+            set => Data[X, Y].CopyFrom(value);
         }
 
         #endregion
@@ -175,7 +175,7 @@ namespace FakeProvider
                         if ((i < this.Width) && (j < this.Height))
                             newData[i, j] = Data[i, j];
                 Data = newData;
-                RefData = GetRefTileData(Width, Height);
+                //RefData = GetRefTileData(Width, Height);
                 this.Width = Width;
                 this.Height = Height;
             }
@@ -933,7 +933,7 @@ namespace FakeProvider
                 return;
             Disable();
             Data = null;
-            RefData = null;
+            //RefData = null;
         }
 
         #endregion

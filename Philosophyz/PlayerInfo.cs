@@ -100,11 +100,27 @@ namespace Philosophyz
 
         public void ChangeCharacter(PlayerData data)
         {
-            _player.SendRawData(BUtils.GetCurrentWorldData(true).SerializePacket());
-            data.RestoreCharacter(_player);
-            if (_player.GetBPlayer() is { IsCustomWeaponMode: true } bplr)
-                BossFramework.BCore.BWeaponSystem.ChangeItemsToBWeapon(bplr);
-            _player.SendRawData(BUtils.GetCurrentWorldData(Main.ServerSideCharacter).SerializePacket());
+            var worldData = BUtils.GetCurrentWorldData(true);
+            if (_player.GetBPlayer() is { } bplr)
+            {
+                bplr.SendPacket(worldData);
+                data.RestoreCharacter(_player);
+                if (bplr.IsCustomWeaponMode)
+                    BossFramework.BCore.BWeaponSystem.ChangeItemsToBWeapon(bplr);
+                var bb = worldData.EventInfo4;
+                bb[6] = Main.ServerSideCharacter;
+                worldData.EventInfo4 = bb;
+                bplr.SendPacket(worldData);
+            }
+            else
+            {
+                _player.SendRawData(worldData.SerializePacket());
+                data.RestoreCharacter(_player);
+                var bb = worldData.EventInfo4;
+                bb[6] = Main.ServerSideCharacter;
+                worldData.EventInfo4 = bb;
+                _player.SendRawData(worldData.SerializePacket());
+            }
         }
 
         public void RestoreCharacter()

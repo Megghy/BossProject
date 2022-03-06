@@ -88,16 +88,7 @@ namespace BossFramework.BModels
         #region 常用方法
         public override string ToString() => $"{Name}";
         internal bool CheckSendPacket(IPacket p)
-        {
-            if (BNet.PacketHandler.SendPacketHandlers.TryGetValue((PacketTypes)p.Type, out var list) && list.Any())
-            {
-                var args = new PacketEventArgs(this, p);
-                list.ForEach(h => h.Invoke(args));
-                BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnSendPacket(r, args)));
-                return args.Handled;
-            }
-            return false;
-        }
+            => BNet.PacketHandler.HandleSendData(new PacketEventArgs(this, p));
         /// <summary>
         /// 向玩家发送数据包
         /// </summary>

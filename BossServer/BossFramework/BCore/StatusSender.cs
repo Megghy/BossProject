@@ -10,6 +10,7 @@ namespace BossFramework.BCore
 {
     public static class StatusSender
     {
+        public static readonly byte[] PingPacketData = new ResetItemOwner() { ItemSlot = PING_ITEM_SLOT }.SerializePacket();
         public const int PING_ITEM_SLOT = 400;
         internal static readonly Dictionary<Func<BPlayer, string>, int> _statusCallback = new() { { DefaultStatus, 99 } };
         [SimpleTimer(Time = 1)]
@@ -31,7 +32,7 @@ namespace BossFramework.BCore
                 {
                     p.WaitingPing = true;
                     p.PingChecker.Restart();
-                    p.SendPacket(new ResetItemOwner() { ItemSlot = PING_ITEM_SLOT });
+                    p.SendRawData(PingPacketData);
                 }
             });
         }

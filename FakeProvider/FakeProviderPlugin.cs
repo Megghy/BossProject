@@ -2898,11 +2898,8 @@ Custom valid : {ValidateWorldData(array, num)}";
                         int num = reader.ReadInt32();
                         for (int i = 0; i < num; i++)
                         {
-                            DeprecatedClassLeftInForLoading.dummies[i] = new DeprecatedClassLeftInForLoading(reader.ReadInt16(), reader.ReadInt16());
-                        }
-                        for (int j = num; j < 1000; j++)
-                        {
-                            DeprecatedClassLeftInForLoading.dummies[j] = null;
+                            reader.ReadInt16();
+                            reader.ReadInt16();
                         }
                     }
                     void LoadTileEntities(UnsafeBinaryReader reader)
