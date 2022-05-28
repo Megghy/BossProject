@@ -1,8 +1,10 @@
-﻿using BossFramework.BCore;
+﻿using BossFramework;
+using BossFramework.BCore;
 using BossFramework.DB;
 using FakeProvider;
 using Microsoft.Xna.Framework;
 using System.Reflection;
+using System.Reflection.Emit;
 using Terraria;
 using TerrariaApi.Server;
 using TrProtocol;
@@ -132,77 +134,6 @@ namespace PlotMarker
                 args.Handled = Handlers.HandleGetData(type, player, data);
             }
         }
-        internal sealed class tempPlot
-        {
-            /// <summary> 属地在数据库中的Id </summary>
-            public int Id { get; set; }
-
-            /// <summary> 属地的名字 </summary>
-            public string Name { get; set; }
-
-            /// <summary> 属地的起始X坐标 </summary>
-            public int X { get; set; }
-
-            /// <summary> 属地的起始Y坐标 </summary>
-            public int Y { get; set; }
-
-            /// <summary> 属地的宽 </summary>
-            public int Width { get; set; }
-
-            /// <summary> 属地的高 </summary>
-            public int Height { get; set; }
-
-            /// <summary> 小块区域的宽 </summary>
-            public int CellWidth { get; set; }
-
-            /// <summary> 小块区域的高 </summary>
-            public int CellHeight { get; set; }
-
-            /// <summary> 整片属地的拥有者 </summary>
-            public string Owner { get; set; }
-
-            /// <summary>
-            /// 小块区域的引用. 其中数组索引就是 <see cref="Cell.Id"/> ,
-            /// 而顺序(数组索引)是按照 <see cref="Plot.GenerateCells"/> 中添加列表的顺序来
-            /// </summary>
-            public Cell[] Cells { get; internal set; }
-        }
-
-        internal sealed class tempCell
-        {
-            /// <summary> Cell在 <see cref="Plot.Cells"/> 的索引 </summary>
-            public int Id { get; set; }
-
-            /// <summary> Cell所属的 <see cref="Plot"/> 引用 </summary>
-            public Plot Parent { get; set; }
-
-            /// <summary> Cell的起始X坐标 </summary>
-            public int X { get; set; }
-
-            /// <summary> Cell的起始X坐标 </summary>
-            public int Y { get; set; }
-
-            public Point Center => new Point(X + Parent.CellWidth / 2, Y + Parent.CellHeight / 2);
-
-            /// <summary> 属地的主人 </summary>
-            public string Owner { get; set; }
-
-            /// <summary>
-            /// 玩家 <see cref="Owner"/> 领取属地的时间
-            /// 用于判定过期 
-            /// </summary>
-            public DateTime GetTime { get; set; }
-
-            public DateTime LastAccess { get; set; }
-
-            /// <summary> 有权限动属地者 </summary>
-            public List<int> AllowedIDs { get; set; }
-
-            public bool Contains(int x, int y)
-            {
-                return X <= x && x < X + Parent.CellWidth && Y <= y && y < Y + Parent.CellHeight;
-            }
-        }
         private static void AreaManage(CommandArgs args)
         {
             var cmd = args.Parameters.Count > 0 ? args.Parameters[0].ToLower() : "help";
@@ -210,98 +141,6 @@ namespace PlotMarker
 
             switch (cmd)
             {
-                case "upload":
-                    try
-                    {
-                        if (PlotManager.CurrentPlot is null)
-                        {
-                            args.Player.SendErrorMessage($"还没属地");
-                            return;
-                        }
-                        using (var reader = TShock.DB.QueryReader("SELECT * FROM Plots WHERE WorldId = @0", Main.worldID.ToString()))
-                        {
-                            while (reader.Read())
-                            {
-                                var plot = new tempPlot
-                                {
-                                    Id = reader.Get<int>("Id"),
-                                    Name = reader.Get<string>("Name"),
-                                    X = reader.Get<int>("X"),
-                                    Y = reader.Get<int>("Y"),
-                                    Width = reader.Get<int>("Width"),
-                                    Height = reader.Get<int>("Height"),
-                                    CellWidth = reader.Get<int>("CellWidth"),
-                                    CellHeight = reader.Get<int>("CellHeight"),
-                                    Owner = reader.Get<string>("Owner"),
-                                };
-                                if (reader.Get<string>("WorldId") == Main.worldID.ToString())
-                                {
-                                    var cells = LoadCells(plot);
-                                    cells.TForEach(c =>
-                                    {
-                                        var posIndex = PlotManager.CurrentPlot.CellsPosition.FirstOrDefault(pos =>
-                                        {
-                                            var rec = new Rectangle(pos.TileX, pos.TileY, pos.Width, pos.Height);
-                                            return rec.Contains(c.X + 1, c.Y + 1);
-                                        });
-                                        var newCell = new Cell()
-                                        {
-                                            AllowedIDs = c.AllowedIDs,
-                                            LastAccess = c.LastAccess,
-                                            Level = 1,
-                                            Owner = c.Owner,
-                                            PlotId = PlotManager.CurrentPlot.Id,
-                                            LastPositionIndex = posIndex.Index,
-                                            UsingCellPositionIndex = new List<int>() { posIndex.Index }
-                                        };
-                                        DBTools.Insert(newCell);
-                                        newCell.SaveCellData();
-                                        newCell.CellChests.ForEach(c => ChestRedirector.RemoveChest(c.TileX, c.TileY));
-                                        newCell.CellSigns.ForEach(c => SignRedirector.RemoveSign(c.TileX, c.TileY));
-                                        PlotManager.CurrentPlot.Cells.Add(newCell);
-                                        Console.WriteLine($"已添加 {newCell.Id}, 属于 {newCell.Owner}");
-                                    });
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                    }
-                    tempCell[] LoadCells(tempPlot parent)
-                    {
-                        var list = new List<tempCell>();
-                        using (var reader = TShock.DB.QueryReader("SELECT * FROM `cells` WHERE `cells`.`PlotId` = @0 ORDER BY `cells`.`CellId` ASC",
-                            parent.Id))
-                        {
-                            while (reader.Read())
-                            {
-                                var cell = new tempCell
-                                {
-                                    Id = reader.Get<int>("CellId"),
-                                    X = reader.Get<int>("X"),
-                                    Y = reader.Get<int>("Y"),
-                                    Owner = reader.Get<string>("Owner"),
-                                    GetTime = DateTime.TryParse(reader.Get<string>("GetTime"), out DateTime dt) ? dt : default(DateTime),
-                                    LastAccess = DateTime.TryParse(reader.Get<string>("LastAccess"), out dt) ? dt : default(DateTime),
-                                    AllowedIDs = new List<int>()
-                                };
-                                var mergedids = reader.Get<string>("UserIds") ?? "";
-                                var splitids = mergedids.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                                foreach (var t in splitids)
-                                {
-                                    if (int.TryParse(t, out int userid))
-                                        cell.AllowedIDs.Add(userid);
-                                    else
-                                        TShock.Log.Warn("UserIDs 有一列不可用数据: " + t);
-                                }
-                                list.Add(cell);
-                            }
-                        }
-                        return list.ToArray();
-                    }
-                    break;
                 case "点":
                 case "point":
                     {
@@ -543,7 +382,7 @@ namespace PlotMarker
 
                         if (PlotManager.CreateNewCell(args.Player) is { } newCell)
                         {
-                            newCell.ShowCell(args.Player);
+                            newCell.Visiable(args.Player);
                             args.Player.Teleport(newCell.Center.X * 16, newCell.Center.Y * 16);
                         }
                     }
@@ -655,8 +494,13 @@ namespace PlotMarker
                     }
                     break;
                 case "save":
-                    if (args.Player.HasPermission("pm.player.save") && PlotManager.CurrentPlot.Cells.FirstOrDefault(c => c.Owner == args.Player.Name) is { } saveCell)
-                        saveCell.SaveCellData();
+                    if (args.Player.HasPermission(permission: "pm.admin.save"))
+                    {
+                        if (args.Player.GetCurrentCell() is { } cell)
+                        {
+                            args.Player.SendInfoMessage($"保存{(cell.SaveCellData() ? "成功" : "失败")}");
+                        }
+                    }
                     break;
                 case "goto":
                 case "前往":
@@ -688,7 +532,7 @@ namespace PlotMarker
                         void GotoCell(TSPlayer plr, Cell cell)
                         {
                             plr.SendInfoMessage($"正在前往属地 [{cell.Id}]");
-                            if (!cell.IsVisiable && !cell.ShowCell(plr))
+                            if (!cell.IsVisiable && !cell.Visiable(plr))
                                 return;
                             plr.Teleport(cell.AbsloteSpawnX * 16, (cell.AbsloteSpawnY - 3) * 16);
                             plr.SendSuccessMessage($"已传送至属地 [{cell.Id}]");
@@ -916,7 +760,7 @@ namespace PlotMarker
                                 args.Player.SendErrorMessage($"未指定属地编号");
                         }
                         else
-                            args.Player.SendInfoMessage($"未找到任何, 请输入 {"/mp get".Color("7FDFDE")} 来获取属地");
+                            args.Player.SendInfoMessage($"没有可用属地对象");
                     }
                     void HideCell(TSPlayer plr, Cell cell)
                     {
@@ -941,7 +785,7 @@ namespace PlotMarker
                             {
                                 if (showCells.FirstOrDefault(c => c.Id == cellIndex) is { } cell)
                                 {
-                                    cell.ShowCell(args.Player);
+                                    cell.Visiable(args.Player);
                                     args.Player.SendSuccessMessage($"已显示 {cell.Id}");
                                 }
                                 else
@@ -954,7 +798,7 @@ namespace PlotMarker
                             args.Player.SendErrorMessage($"未指定属地编号");
                     }
                     else
-                        args.Player.SendInfoMessage($"未找到任何, 请输入 {"/mp get".Color("7FDFDE")} 来获取属地");
+                        args.Player.SendInfoMessage($"没有可用属地对象");
                     break;
                 case "info":
                     {
@@ -1039,6 +883,32 @@ namespace PlotMarker
                         args.Player.SendSuccessMessage("完成");
                     }
                     break;
+                case "fix":
+                    {
+                        var count = 0;
+                        PlotManager.CurrentPlot?.Cells.OrderByDescending(c => c.LastAccess).ForEach(c =>
+                        {
+                            if (c.UsingCellPositionIndex.Any())
+                            {
+                                if (PlotManager.CurrentPlot?.Cells.Where(temp => temp != c
+                                    && temp.UsingCellPositionIndex.SequenceEqual(c.UsingCellPositionIndex)).ToArray() is { Length: > 0 } shouldHide)
+                                {
+                                    shouldHide.ForEach(c =>
+                                    {
+                                        c.UsingCellPositionIndex.Clear();
+                                        DBTools.SQL.Update<Cell>(c)
+                                            .Set(c => c.UsingCellPositionIndex, c.UsingCellPositionIndex)
+                                            .ExecuteAffrows();
+                                        BLog.Info($"隐藏重叠的属地 [{c.Id}]");
+                                        count++;
+                                    });
+                                    c.ReDraw();
+                                }
+                            }
+                        });
+                        args.Player.SendInfoMessage($"修复 {count} 个重叠的属地");
+                    }
+                    break;
                 case "help":
                     {
                         if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out var pageNumber))
@@ -1048,6 +918,7 @@ namespace PlotMarker
                         var list = new List<string>
                         {
                             "info <id> - 获取指定区域信息, 未填写id则默认为玩家所处属地",
+                            "fix - 修复因为某些原因重叠而无法使用的属地",
                             "fuck <id> - 重置指定区域, 未填写id则默认为玩家所处属地",
                             "chown <id> - 更改指定区域所有者(未完成)",
                             "del <id> - 删除指定区域, 未填写id则默认为玩家所处属地",
@@ -1101,7 +972,7 @@ namespace PlotMarker
                 return false;
             else if (PlotManager.CurrentPlot.FindCell(tileX, tileY) is { } cell)
             {
-                if (string.Equals(cell.Owner, player.Name, StringComparison.Ordinal)
+                if (cell.Owner == player.Name
                     || cell.AllowedIDs?.Contains(player.Account.ID) == true
                     || player.HasPermission("pm.build.everywhere"))
                 {

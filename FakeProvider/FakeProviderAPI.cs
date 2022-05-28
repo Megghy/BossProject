@@ -7,7 +7,7 @@ namespace FakeProvider
         #region Data
 
         public const string WorldProviderName = "__world__";
-        public static TileProviderCollection Tile { get; internal set; }
+        public static TileProviderCollection Tile { get; internal set; } = new();
         public static TileProvider World { get; internal set; }
         private static ObserversEqualityComparer OEC = new();
 

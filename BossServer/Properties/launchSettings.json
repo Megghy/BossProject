@@ -3,7 +3,7 @@
     "Boss_Megghy": {
       "commandName": "Executable",
       "executablePath": "D:\\Code\\BossPlugin\\Output\\BossServer.exe",
-      "commandLineArgs": "-language zh-Hans -ip 127.0.0.1 -port 7777 -maxplayers 8 -world C:/Users/Megghy/Documents/My Games/Terraria/Worlds/BOSS工作室.wld",
+      "commandLineArgs": "-language zh-Hans -ip 127.0.0.1 -port 7777 -maxplayers 8 -world C:/Users/MegghyUwU/Documents/My Games/Terraria/Worlds/BOSS工作室.wld",
       "workingDirectory": "D:\\Code\\BossPlugin\\Output\\"
     },
     "Boss_Jeoi": {

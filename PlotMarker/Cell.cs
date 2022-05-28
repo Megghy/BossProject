@@ -170,9 +170,10 @@ namespace PlotMarker
                 $" | 箱子数量: {CellChests.Count}" +
                 $" | 牌子数量: {CellSigns.Count}" +
                 $" | 物块数量: {(TileData ?? GetDeserializedTildData()).To1D().Count(t => !t.isTheSameAs(StructTile.Empty))}";
-        public bool SaveCellData()
+
+        public bool SaveCellData(bool force = false)
         {
-            if (!IsVisiable)
+            if (!IsVisiable && !force)
                 return false;
 
             short startX = X;
@@ -247,13 +248,15 @@ namespace PlotMarker
         #region 管理
 
         #region 隐藏
-        public void Invisiable(bool sendSection = true)
+        public void Invisiable(bool sendSection = true, bool saveData = true)
         {
             if (!IsVisiable)
                 return;
+
             UsingCellPositionIndex.Clear(); //移除占用的位置
 
-            SaveCellData(); //先保存数据
+            if (saveData)
+                SaveCellData(true); //先保存数据
 
             ClearTiles(false); //清除物块, 这里不需要同步section
 
@@ -324,15 +327,28 @@ namespace PlotMarker
         #endregion
 
         #region 展示
-        public bool ShowCell(TSPlayer plr = null)
+        public void ReDraw()
         {
-            if (IsVisiable)
+            TileData ??= GetDeserializedTildData();
+            Entities ??= GetDeserializedEntitiesData();
+
+            //还原物块
+            RestoreCellTileData(false);
+
+            //还原entity
+            RestoreEntities();
+
+            //还原箱子牌子
+            RegisteChestAndSign();
+
+            TileHelper.ResetSection(X, Y, Width, Height); //发送更改后的区块数据
+        }
+        public bool Visiable(TSPlayer plr = null, bool force = false)
+        {
+            if (IsVisiable && !force)
                 return false;
             if (this.FindUseableArea() is { } pos)
             {
-                TileData ??= GetDeserializedTildData();
-                Entities ??= GetDeserializedEntitiesData();
-
                 LastPositionIndex = pos.Index;
                 UsingCellPositionIndex.Clear();
                 UsingCellPositionIndex.Add(pos.Index);
@@ -340,16 +356,7 @@ namespace PlotMarker
                 UpdateSingle(c => c.LastPositionIndex);
                 UpdateSingle(c => c.UsingCellPositionIndex);
 
-                //还原物块
-                RestoreCellTileData(false);
-
-                //还原entity
-                RestoreEntities();
-
-                //还原箱子牌子
-                RegisteChestAndSign();
-
-                TileHelper.ResetSection(X, Y, Width, Height); //发送更改后的区块数据
+                ReDraw();
 
                 BLog.Info($"属地 [{Id}]<{Owner}> 现在处于展示状态");
 

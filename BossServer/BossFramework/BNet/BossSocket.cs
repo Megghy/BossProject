@@ -44,7 +44,7 @@ namespace BossFramework.BNet
 
         public void AsyncSend(byte[] data, int offset, int size, SocketSendCallback callback, object state = null)
         {
-            _client?._sendQueue.Add(delegate
+            _client?._sendQueue.Enqueue(delegate
             {
                 _client?.Send(data, offset, size);
                 callback?.Invoke(state);

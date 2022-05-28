@@ -6,7 +6,8 @@ namespace BossFramework.BHooks.HookHandlers
     {
         public static void OnSocketCreate(object o, CreateTcpListenerEventArgs args)
         {
-            args.Result = new BNet.BossSocket();
+            if (BConfig.Instance.EnableNewSocketService)
+                args.Result = new BNet.BossSocket();
         }
     }
 }

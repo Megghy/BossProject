@@ -110,7 +110,7 @@ namespace PlotMarker
         /// </summary>
         /// <param name="count"></param>
         /// <returns>左上角的子区域位置</returns>
-        public static CellPosition FindUseableArea(this Cell cell, bool isFirstRun = true)
+        public static CellPosition FindUseableArea(this Cell cell, bool hide = true)
         {
             if (CurrentPlot?.CellsPosition.FirstOrDefault(p => !p.IsUsed) is { } pos)
                 return pos;
@@ -119,7 +119,8 @@ namespace PlotMarker
                     .FirstOrDefault() is { } oldest)
             {
                 var index = oldest.LastPositionIndex;
-                oldest.Invisiable();
+                if (hide)
+                    oldest.Invisiable();
                 return CurrentPlot?.CellsPosition[index];
             }
             return null;

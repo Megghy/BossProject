@@ -15,7 +15,7 @@ namespace BossFramework.BNet
         private readonly SocketConnectionAccepted _callback;
         private bool _shouldStop = false;
 
-        internal readonly BlockingCollection<Action> _sendQueue = new();
+        internal readonly ConcurrentQueue<Action> _sendQueue = new();
 
         public BossSocketClient(BossSocketServer server, SocketConnectionAccepted callback) : base(server)
         {
@@ -25,11 +25,10 @@ namespace BossFramework.BNet
         {
             while (!_shouldStop && !Netplay.Disconnect)
             {
-                try
-                {
-                    _sendQueue.Take()();
-                }
-                catch (Exception ex) { BLog.Error(ex); }
+                if (_sendQueue.TryDequeue(out var action))
+                    action();
+                else
+                    Thread.Sleep(1);
             }
         }
         protected override void OnConnecting()
@@ -81,7 +80,7 @@ namespace BossFramework.BNet
         }
         protected override void Dispose(bool disposingManagedResources)
         {
-            _sendQueue.Dispose();
+            _sendQueue.Clear();
             _shouldStop = true;
             base.Dispose(disposingManagedResources);
         }

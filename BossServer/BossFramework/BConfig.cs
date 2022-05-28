@@ -11,5 +11,6 @@ namespace BossFramework
         public bool DebugInfo { get; set; } = true;
         public int SignRefreshRadius { get; set; } = 200;
         public int ChangWeaponDelay { get; set; } = 10;
+        public bool EnableNewSocketService { get; set; } = false;
     }
 }

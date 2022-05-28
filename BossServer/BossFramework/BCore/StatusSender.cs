@@ -31,8 +31,8 @@ namespace BossFramework.BCore
                 if (BInfo.GameTick - p.LastPingTime >= 50 && !p.WaitingPing)
                 {
                     p.WaitingPing = true;
-                    p.PingChecker.Restart();
                     p.SendRawData(PingPacketData);
+                    p.PingChecker.Restart();
                 }
             });
         }
