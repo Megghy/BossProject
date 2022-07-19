@@ -1,12 +1,9 @@
-﻿using TrProtocol.Models;
+﻿namespace TrProtocol.Packets;
 
-namespace TrProtocol.Packets
+public class MassWireOperation : Packet
 {
-    public struct MassWireOperation : IPacket
-    {
-        public MessageID Type => MessageID.MassWireOperation;
-        public ShortPosition Start { get; set; }
-        public ShortPosition End { get; set; }
-        public MultiToolMode Mode { get; set; }
-    }
+    public override MessageID Type => MessageID.MassWireOperation;
+    public ShortPosition Start { get; set; }
+    public ShortPosition End { get; set; }
+    public MultiToolMode Mode { get; set; }
 }

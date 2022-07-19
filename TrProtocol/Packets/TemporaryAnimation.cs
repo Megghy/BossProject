@@ -1,12 +1,9 @@
-﻿using TrProtocol.Models;
+﻿namespace TrProtocol.Packets;
 
-namespace TrProtocol.Packets
+public class TemporaryAnimation : Packet
 {
-    public struct TemporaryAnimation : IPacket
-    {
-        public MessageID Type => MessageID.TemporaryAnimation;
-        public short AniType { get; set; }
-        public short TileType { get; set; }
-        public ShortPosition Position { get; set; }
-    }
+    public override MessageID Type => MessageID.TemporaryAnimation;
+    public short AniType { get; set; }
+    public short TileType { get; set; }
+    public ShortPosition Position { get; set; }
 }

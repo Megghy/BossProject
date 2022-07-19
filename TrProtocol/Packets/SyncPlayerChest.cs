@@ -1,15 +1,13 @@
-﻿using TrProtocol.Models;
+﻿namespace TrProtocol.Packets;
 
-namespace TrProtocol.Packets
+public class SyncPlayerChest : Packet
 {
-    public struct SyncPlayerChest : IPacket
-    {
-        public MessageID Type => MessageID.SyncPlayerChest;
-        public short ChestSlot { get; set; }
-        public ShortPosition Position { get; set; }
-        public byte ChestNameLength { get; set; }
-        private bool _shouldGetName => ChestNameLength < 21 && ChestNameLength > 0;
-        [Condition("_shouldGetName")]
-        public string ChestName { get; set; }
-    }
+    public override MessageID Type => MessageID.SyncPlayerChest;
+    public short Chest { get; set; }
+    public ShortPosition Position { get; set; }
+    public byte NameLength { get; set; }
+    private bool _shouldSerializeName
+        => NameLength is > 0 and <= 20;
+    [Condition(nameof(_shouldSerializeName))]
+    public string Name { get; set; }
 }

@@ -6,6 +6,8 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using TrProtocol;
 using TrProtocol.Models;
+using TrProtocol.Models.TileEntities;
+using TileEntity = Terraria.DataStructures.TileEntity;
 #endregion
 namespace FakeProvider
 {
@@ -188,12 +190,22 @@ namespace FakeProvider
 
         #endregion
         #region CompressTileBlock_Inner
-
+        private static readonly Dictionary<TileEntityType, Type> tileEntityDict = new()
+    {
+        { TileEntityType.TETrainingDummy, typeof(TETrainingDummy) },
+        { TileEntityType.TEItemFrame, typeof(TEItemFrame) },
+        { TileEntityType.TELogicSensor, typeof(TELogicSensor) },
+        { TileEntityType.TEDisplayDoll, typeof(TEDisplayDoll) },
+        { TileEntityType.TEWeaponsRack, typeof(TEWeaponsRack) },
+        { TileEntityType.TEHatRack, typeof(TEHatRack) },
+        { TileEntityType.TEFoodPlatter, typeof(TEFoodPlatter) },
+        { TileEntityType.TETeleportationPylon, typeof(TETeleportationPylon) }
+    };
         private static void CompressTileBlock_Inner(IEnumerable<TileProvider> providers,
             BinaryWriter writer, int xStart, int yStart, int width, int height)
         {
             var rec = new Rectangle(xStart, yStart, width, height);
-            var eneities = TileEntity.ByPosition.Where(e => rec.Contains(e.Key.X, e.Key.Y)).Select(e => Activator.CreateInstance(Constants.tileEntityDict[(TileEntityType)e.Value.type], new object[] { e.Value }) as IProtocolTileEntity).ToArray();
+            var eneities = TileEntity.ByPosition.Where(e => rec.Contains(e.Key.X, e.Key.Y)).Select(e => BossFramework.BUtils.ToProtocalTileEntity(e.Value)).ToArray();
             short num4 = 0;
             int num5 = 0;
             int num6 = 0;
@@ -379,7 +391,7 @@ namespace FakeProvider
             writer.Write((short)eneities.Length);
             for (int m = 0; m < eneities.Length; m++)
             {
-                IProtocolTileEntity.Write(writer, eneities[m]);
+                TrProtocol.Models.TileEntity.Write(writer, eneities[m]);
             }
         }
 

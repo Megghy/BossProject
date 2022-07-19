@@ -1,7 +1,6 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class ToggleParty : Packet
 {
-    public struct ToggleParty : IPacket
-    {
-        public MessageID Type => MessageID.ToggleParty;
-    }
+    public override MessageID Type => MessageID.ToggleParty;
 }

@@ -1,10 +1,7 @@
-﻿using TrProtocol.Models;
+﻿namespace TrProtocol.Packets;
 
-namespace TrProtocol.Packets
+public class RequestReadSign : Packet
 {
-    public struct RequestReadSign : IPacket
-    {
-        public MessageID Type => MessageID.RequestReadSign;
-        public ShortPosition Position { get; set; }
-    }
+    public override MessageID Type => MessageID.RequestReadSign;
+    public ShortPosition Position { get; set; }
 }

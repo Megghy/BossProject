@@ -24,7 +24,7 @@ namespace BossFramework.BCore
                  + text + RepeatLineBreaks(50);
                 p.SendPacket(new StatusText()
                 {
-                    Text = Terraria.Localization.NetworkText.FromLiteral(text),
+                    Text = TrProtocol.Models.NetworkText.FromLiteral(text),
                     Max = 0,
                     Flag = 0,
                 });

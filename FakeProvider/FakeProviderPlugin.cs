@@ -201,7 +201,7 @@ namespace FakeProvider
             {
                 args.Handled = true;
 
-                List<IPacket> list = new();
+                List<Packet> list = new();
                 40.ForEach(i =>
                 {
                     if (i < chest.item.Length)
@@ -230,10 +230,10 @@ namespace FakeProvider
 
                 args.Player.SendPacket(new SyncPlayerChest()
                 {
-                    ChestSlot = 7998,
-                    ChestName = chest.name,
-                    ChestNameLength = (byte)(chest.name?.Length ?? 0),
-                    Position = new(chest.X, chest.Y)
+                    Chest = 7998,
+                    Name = chest.name,
+                    NameLength = (byte)(chest.name?.Length ?? 0),
+                    Position = new((short)chest.X, (short)chest.Y)
                 });  //同步箱子信息
 
                 args.Player.SendPackets(list); //同步物品

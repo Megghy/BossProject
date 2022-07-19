@@ -105,7 +105,7 @@ namespace BossFramework.BCore.Cmds
             {
                 if (money.TotalCoin >= recipe.RequireCoin && plr.TrPlayer.BuyItem(recipe.RequireCoin))
                 {
-                    var packets = new List<IPacket>();
+                    var packets = new List<Packet>();
                     plrData.CopyCharacter(plr.TsPlayer);
                     plrData.inventory.ForEach((i, slot) =>
                     {

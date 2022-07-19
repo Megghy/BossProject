@@ -1,5 +1,4 @@
-﻿using BossFramework.BCore;
-using BossFramework.BInterfaces;
+﻿using BossFramework.BInterfaces;
 using BossFramework.DB;
 using FreeSql.DataAnnotations;
 using Microsoft.Xna.Framework;
@@ -87,20 +86,20 @@ namespace BossFramework.BModels
 
         #region 常用方法
         public override string ToString() => $"{Name}";
-        internal bool CheckSendPacket(IPacket p)
+        internal bool CheckSendPacket(Packet p)
             => BNet.PacketHandler.HandleSendData(new PacketEventArgs(this, p));
         /// <summary>
         /// 向玩家发送数据包
         /// </summary>
         /// <param name="p"></param>
-        public void SendPacket(IPacket p)
+        public void SendPacket(Packet p)
         {
             if (!CheckSendPacket(p))
                 TsPlayer?.SendRawData(p.SerializePacket());
         }
-        public void SendPackets<T>(IEnumerable<T> p) where T : IPacket
+        public void SendPackets<T>(IEnumerable<T> p) where T : Packet
         {
-            var packets = new List<IPacket>();
+            var packets = new List<Packet>();
             p.ForEach(packet =>
             {
                 if (!CheckSendPacket(packet))

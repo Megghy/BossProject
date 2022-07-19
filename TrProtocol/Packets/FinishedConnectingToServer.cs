@@ -1,7 +1,6 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class FinishedConnectingToServer : Packet
 {
-    public struct FinishedConnectingToServer : IPacket
-    {
-        public MessageID Type => MessageID.FinishedConnectingToServer;
-    }
+    public override MessageID Type => MessageID.FinishedConnectingToServer;
 }

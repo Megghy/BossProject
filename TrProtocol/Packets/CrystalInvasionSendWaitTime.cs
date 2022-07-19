@@ -1,8 +1,7 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class CrystalInvasionSendWaitTime : Packet
 {
-    public struct CrystalInvasionSendWaitTime : IPacket
-    {
-        public MessageID Type => MessageID.CrystalInvasionSendWaitTime;
-        public int WaitTime { get; set; }
-    }
+    public override MessageID Type => MessageID.CrystalInvasionSendWaitTime;
+    public int WaitTime { get; set; }
 }

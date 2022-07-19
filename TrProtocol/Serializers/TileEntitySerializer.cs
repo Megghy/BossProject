@@ -1,18 +1,17 @@
-﻿using System.IO;
-using TrProtocol.Models;
+﻿namespace TrProtocol.Models;
 
-namespace TrProtocol.Serializers
+public abstract partial class TileEntity
 {
-    public class TileEntitySerializer : FieldSerializer<IProtocolTileEntity>
+    public class TileEntitySerializer : FieldSerializer<TileEntity>
     {
-        protected override IProtocolTileEntity _Read(BinaryBufferReader br)
+        protected override TileEntity ReadOverride(BinaryReader br)
         {
-            return IProtocolTileEntity.Read(br);
+            return TileEntity.Read(br);
         }
 
-        protected override void _Write(BinaryWriter bw, IProtocolTileEntity t)
+        protected override void WriteOverride(BinaryWriter bw, TileEntity t)
         {
-            IProtocolTileEntity.Write(bw, t);
+            TileEntity.Write(bw, t);
         }
     }
 }

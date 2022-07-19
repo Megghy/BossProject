@@ -1,7 +1,6 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class ClientSyncedInventory : Packet
 {
-    public struct ClientSyncedInventory : IPacket
-    {
-        public MessageID Type => MessageID.ClientSyncedInventory;
-    }
+    public override MessageID Type => MessageID.ClientSyncedInventory;
 }

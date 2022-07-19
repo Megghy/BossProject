@@ -1,7 +1,8 @@
-﻿using Terraria;
+﻿using System.IO;
+using System.IO.Streams;
+using Terraria;
 using Terraria.GameContent.NetModules;
 using Terraria.Net;
-using TrProtocol;
 
 namespace TShockAPI.Handlers.NetModules
 {
@@ -27,12 +28,12 @@ namespace TShockAPI.Handlers.NetModules
         /// Reads the unlock data from the stream
         /// </summary>
         /// <param name="data"></param>
-        public void Deserialize(BinaryBufferReader data)
+        public void Deserialize(MemoryStream data)
         {
             // For whatever reason Terraria writes '0' to the stream at the beginning of this packet.
             // If this value is not 0 then its been crafted by a non-vanilla client.
             // We don't actually know why the 0 is written, so we're just going to call this UnknownField for now
-            UnknownField = data.ReadInt8();
+            UnknownField = (byte)data.ReadByte();
             if (UnknownField == 0)
             {
                 ItemId = data.ReadUInt16();

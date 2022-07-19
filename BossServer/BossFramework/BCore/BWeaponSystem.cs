@@ -130,7 +130,7 @@ namespace BossFramework.BCore
             {
                 args.Handled = true;
                 var selectItem = args.Player.TsPlayer.SelectedItem;
-                if (weapon.OnShootProj(args.Player, args.Proj, args.Proj.Velocity, (weapon.ShootProj ?? selectItem.shoot) == args.Proj.ProjType)) //如果返回true则关闭客户端对应弹幕
+                if (weapon.OnShootProj(args.Player, args.Proj, new(args.Proj.Velocity.X, args.Proj.Velocity.Y), (weapon.ShootProj ?? selectItem.shoot) == args.Proj.ProjType)) //如果返回true则关闭客户端对应弹幕
                 {
                     var proj = args.Proj;
                     proj.ProjType = 0;
@@ -155,7 +155,7 @@ namespace BossFramework.BCore
         #region 物品操作
         private static void FillInventory(this BPlayer plr)
         {
-            List<IPacket> packetData = new();
+            List<Packet> packetData = new();
             lock (plr.TrPlayer)
             {
                 plr.TrPlayer.inventory.ForEach((item, i) =>
@@ -179,7 +179,7 @@ namespace BossFramework.BCore
         }
         private static void RemoveFillItems(this BPlayer plr)
         {
-            List<IPacket> packetData = new();
+            List<Packet> packetData = new();
             plr.TsPlayer?.TPlayer.inventory.ForEach((item, i) =>
             {
                 if (item is { type: FillItem })
@@ -204,7 +204,7 @@ namespace BossFramework.BCore
             plr.TrPlayer.inventory[slot].prefix = (byte)weapon.Prefix;
             plr.TrPlayer.inventory[slot].stack = weapon.Stack; //将玩家背标目标位置更改为指定物品
 
-            var packets = new List<IPacket>();
+            var packets = new List<Packet>();
             var itemID = 400 - 399;
             packets.Add(new InstancedItem()
             {
@@ -212,7 +212,7 @@ namespace BossFramework.BCore
                 Owner = 0,
                 Prefix = (byte)weapon.Prefix,
                 ItemType = (short)weapon.ItemID,
-                Position = plr.TrPlayer.position,
+                Position = new(plr.TrPlayer.position.X, plr.TrPlayer.position.Y),
                 Stack = (short)weapon.Stack,
                 Velocity = default
             }); //生成普通物品

@@ -27,7 +27,7 @@ namespace BossFramework.BCore
             {
                 if (!Chests.Exists(c => c.X == chest.x && c.Y == chest.y))
                 {
-                    CreateChest(chest.x, chest.y, chest.name, chest.item.Select(i => ItemData.Get(i)).ToArray(), null); //不存在则新建
+                    CreateChest(chest.x, chest.y, chest.name, chest.item.Select(i => i.Get()).ToArray(), null); //不存在则新建
                 }
             });
 
@@ -50,13 +50,13 @@ namespace BossFramework.BCore
             if (FindChestFromPos(packet.Position.X, packet.Position.Y) is { } c)
             {
                 packet.Name = c.Name;
-                packet.NameLength = (byte)(c.Name?.Length ?? 0);
+                //packet.NameLength = (byte)(c.Name?.Length ?? 0);
                 plr.SendPacket(packet);
             }
         }
         public static void OnRequestChestOpen(BPlayer plr, RequestChestOpen packet)
         {
-            var args = new BEventArgs.ChestOpenEventArgs(plr, packet.Position);
+            var args = new BEventArgs.ChestOpenEventArgs(plr, packet.Position.ToPoint());
             ChestOpen?.Invoke(args);
             if (!args.Handled)
             {
@@ -107,13 +107,13 @@ namespace BossFramework.BCore
             ChestSyncActive?.Invoke(args);
             if (!args.Handled)
             {
-                if (packet.ChestSlot == -1 && plr.WatchingChest.HasValue) //-1时为退出箱子
+                if (packet.Chest == -1 && plr.WatchingChest.HasValue) //-1时为退出箱子
                 {
                     var chest = plr.WatchingChest?.chest;
                     plr.WatchingChest = null;
-                    if (chest.Name != packet.ChestName && !string.IsNullOrEmpty(packet.ChestName))
+                    if (chest.Name != packet.Name && !string.IsNullOrEmpty(packet.Name))
                     {
-                        chest.Name = packet.ChestName;
+                        chest.Name = packet.Name;
                         plr.SendSuccessMsg($"已修改箱子名称为 {chest.Name}");
                     }
                     DBTools.SQL.Update<BChest>(chest)
@@ -131,7 +131,7 @@ namespace BossFramework.BCore
         {
             if (packet.Operation is 1 or 3 or 5 && FindChestFromPos(packet.Position.X, packet.Position.Y) is { } chest) //破坏箱子
             {
-                var args = new BEventArgs.ChestRemoveEventArgs(plr, packet.Position);
+                var args = new BEventArgs.ChestRemoveEventArgs(plr, packet.Position.ToPoint());
                 ChestRemove?.Invoke(args);
                 if (!args.Handled)
                 {
@@ -195,9 +195,9 @@ namespace BossFramework.BCore
         {
             return new()
             {
-                ChestSlot = slot == -1 ? plr.GetNextChestIndex() : slot,
-                ChestName = chest.Name,
-                ChestNameLength = (byte)(chest.Name?.Length ?? 0),
+                Chest = slot == -1 ? plr.GetNextChestIndex() : slot,
+                Name = chest.Name,
+                NameLength = (byte)(chest.Name?.Length ?? 0),
                 Position = new(chest.X, chest.Y)
             };
         }
@@ -205,9 +205,9 @@ namespace BossFramework.BCore
         {
             BUtils.SendPacketsToAll(GetChestItemPakcets(chest, chestSlot));
         }
-        private static List<IPacket> GetChestItemPakcets(this BChest chest, short chestSlot)
+        private static List<Packet> GetChestItemPakcets(this BChest chest, short chestSlot)
         {
-            List<IPacket> list = new();
+            List<Packet> list = new();
             40.ForEach(i =>
             {
                 chest.Items[i] ??= new();

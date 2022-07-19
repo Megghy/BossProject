@@ -1,8 +1,7 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class PoofOfSmoke : Packet
 {
-    public struct PoofOfSmoke : IPacket
-    {
-        public MessageID Type => MessageID.PoofOfSmoke;
-        public uint PackedHalfVector2 { get; set; }
-    }
+    public override MessageID Type => MessageID.PoofOfSmoke;
+    public uint PackedHalfVector2 { get; set; }
 }

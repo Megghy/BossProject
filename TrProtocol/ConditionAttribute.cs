@@ -1,104 +1,86 @@
-﻿using System;
-using System.Reflection;
+﻿namespace TrProtocol;
 
-namespace TrProtocol
+public class OutOfBoundsException : Exception
 {
-    public class BadBoundException : Exception
-    {
-        public BadBoundException(string message) : base(message)
-        {
-
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public sealed class BoundWithAttribute : Attribute
-    {
-        public PropertyInfo property;
-
-        public BoundWithAttribute(string property)
-        {
-            this.property = typeof(Constants).GetProperty(property);
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-    public sealed class BoundAttribute : Attribute
-    {
-        public int upper, lower;
-        public string version;
-        public bool interrupt;
-
-        public BoundAttribute(string version, int upper, int lower = int.MinValue, bool interrupt = true)
-        {
-            this.upper = upper;
-            this.lower = lower;
-            this.version = version;
-            this.interrupt = interrupt;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public sealed class ForceSerializeAttribute : Attribute
+    public OutOfBoundsException(string message) : base(message)
     {
 
     }
+}
 
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-    public sealed class ProtocolVersionAttribute : Attribute
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+public sealed class BoundsAttribute : Attribute
+{
+    public int UpperBound { get; set; }
+    public int LowerBound { get; set; }
+    public string Version { get; set; }
+    public bool Interrupt { get; set; }
+
+    public BoundsAttribute(string version, int upperBound, int lowerBound = int.MinValue, bool interrupt = true)
     {
-        public string version;
-
-        public ProtocolVersionAttribute(string version)
-        {
-            this.version = version;
-        }
+        UpperBound = upperBound;
+        LowerBound = lowerBound;
+        Version = version;
+        Interrupt = interrupt;
     }
+}
 
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
-    public sealed class S2COnlyAttribute : Attribute
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class ForceSerializeAttribute : Attribute
+{
+
+}
+
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class ProtocolVersionAttribute : Attribute
+{
+    public string Version { get; set; }
+
+    public ProtocolVersionAttribute(string version)
     {
-
+        Version = version;
     }
+}
 
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
-    public sealed class C2SOnlyAttribute : Attribute
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = false)]
+public sealed class S2COnlyAttribute : Attribute
+{
+
+}
+
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = false)]
+public sealed class C2SOnlyAttribute : Attribute
+{
+
+}
+
+
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+public sealed class ArraySizeAttribute : Attribute
+{
+    public int Size { get; set; }
+
+    public ArraySizeAttribute(int size)
     {
-
+        Size = size;
     }
+}
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class ConditionAttribute : Attribute
+{
+    public string FieldName { get; set; }
+    public sbyte BitIndex { get; set; }
+    public bool Prediction { get; set; }
 
-    [AttributeUsage(AttributeTargets.Property)]
-    public sealed class ArraySizeAttribute : Attribute
+    public ConditionAttribute(string field, sbyte bit = -1, bool pred = true)
     {
-        public object[] size;
-
-        public ArraySizeAttribute(params object[] size)
-        {
-            this.size = size;
-        }
+        BitIndex = bit;
+        FieldName = field;
+        Prediction = pred;
     }
-    [AttributeUsage(AttributeTargets.Property)]
-    public sealed class ConditionAttribute : Attribute
-    {
-        public string field;
-        public sbyte bit;
-        public bool pred;
+}
 
-        public ConditionAttribute(string field, sbyte bit = -1, bool pred = true)
-        {
-            this.bit = bit;
-            this.field = field;
-            this.pred = pred;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public sealed class IgnoreAttribute : Attribute
-    {
-    }
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-    public sealed class LegacySerializerAttribute : Attribute
-    {
-    }
-
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class IgnoreAttribute : Attribute
+{
 }

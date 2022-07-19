@@ -1,8 +1,7 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class QuickStackChests : Packet
 {
-    public struct QuickStackChests : IPacket
-    {
-        public MessageID Type => MessageID.QuickStackChests;
-        public byte ChestSlot { get; set; }
-    }
+    public override MessageID Type => MessageID.QuickStackChests;
+    public byte ChestSlot { get; set; }
 }

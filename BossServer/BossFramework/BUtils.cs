@@ -10,12 +10,13 @@ using System.IO.Compression;
 using System.Linq;
 using Terraria;
 using Terraria.GameContent.Events;
+using Terraria.GameContent.Tile_Entities;
 using TrProtocol;
 using TrProtocol.Models;
 using TrProtocol.Packets;
 using TShockAPI;
 using Color = Microsoft.Xna.Framework.Color;
-using ProtocolBitsByte = TrProtocol.Models.ProtocolBitsByte;
+using ProtocolBitsByte = TrProtocol.Models.BitsByte;
 
 namespace BossFramework
 {
@@ -322,8 +323,8 @@ namespace BossFramework
                 for (int tempY = y; tempY < y + height; tempY++)
                 {
                     var tile = Main.tile[tempX, tempY];
-                    BitsByte bb1 = 0;
-                    BitsByte bb2 = 0;
+                    ProtocolBitsByte bb1 = 0;
+                    ProtocolBitsByte bb2 = 0;
 
                     bb1[0] = tile.active();
                     bb1[2] = (tile.wall > 0);
@@ -357,7 +358,7 @@ namespace BossFramework
             return data;
         }
         public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("Boss.BPlayer") ?? new(plr);
-        public static byte[] SerializePacket(this IPacket p) => PacketHandler.Serializer.Serialize(p);
+        public static byte[] SerializePacket(this Packet p) => PacketHandler.Serializer.Serialize(p);
         public static void Kill(this SyncProjectile proj)
         {
             var plr = TShock.Players[proj.PlayerSlot]?.GetBPlayer();
@@ -375,18 +376,18 @@ namespace BossFramework
             plr?.SendPacket(proj);
             proj.ProjType = oldType;
         }
-        public static void SendTo(this IPacket packet, BPlayer plr)
+        public static void SendTo(this Packet packet, BPlayer plr)
             => plr.SendPacket(packet);
 
-        public static void SendPacketToAll(this IPacket packet, params BPlayer[] ignore)
+        public static void SendPacketToAll(this Packet packet, params BPlayer[] ignore)
             => BInfo.OnlinePlayers.Where(p => !(ignore?.Contains(p) == true))
                 .ForEach(p => p.SendPacket(packet));
-        public static void SendPacketsToAll(this IEnumerable<IPacket> packets, params BPlayer[] ignore)
+        public static void SendPacketsToAll(this IEnumerable<Packet> packets, params BPlayer[] ignore)
             => BInfo.OnlinePlayers.Where(p => !(ignore?.Contains(p) == true))
             .ForEach(p => p.SendPackets(packets));
-        public static void SendPacketsTo<T>(this IEnumerable<T> packets, BPlayer plr) where T : TrProtocol.IPacket
+        public static void SendPacketsTo<T>(this IEnumerable<T> packets, BPlayer plr) where T : Packet
             => plr.SendPackets(packets);
-        public static byte[] GetPacketsByteData(this IEnumerable<IPacket> packets)
+        public static byte[] GetPacketsByteData(this IEnumerable<Packet> packets)
         {
             List<byte> packetData = new();
             packets.TForEach(packet => packetData.AddRange(packet.SerializePacket()));
@@ -469,6 +470,7 @@ namespace BossFramework
                     {
                         cmd.CommandDelegate?.Invoke(new CommandArgs(cmdText, silent, player, args));
                     }
+                    BLog.Info($"{player.Name} 使用命令 {cmdText}");
                 }
                 catch (Exception ex)
                 {
@@ -481,6 +483,139 @@ namespace BossFramework
                 }
                 return true;
             }
+        }
+
+
+        public static Point ToPoint(this ShortPosition posision)
+            => new(posision.X, posision.Y);
+        public static Terraria.DataStructures.Point16 ToPoint16(this ShortPosition posision)
+            => new(posision.X, posision.Y);
+        public static ShortPosition ToShortPosition(this Point posision)
+            => new((short)posision.X, (short)posision.Y);
+        public static ShortPosition ToShortPosition(this Terraria.DataStructures.Point16 posision)
+            => new((short)posision.X, (short)posision.Y);
+        public static Item Get(this ItemData item)
+        {
+            var i = new Item();
+            i.SetDefaults(item.ItemID);
+            i.stack = item.Stack;
+            i.prefix = item.Prefix;
+            return i;
+        }
+        public static ItemData Get(this Item item)
+            => new()
+            {
+                ItemID = (short)item.type,
+                Prefix = item.prefix,
+                Stack = (short)item.stack
+            };
+        public static TrProtocol.Models.Vector2 Get(this Microsoft.Xna.Framework.Vector2 vector)
+            => new(vector.X, vector.Y);
+        public static Microsoft.Xna.Framework.Vector2 Get(this TrProtocol.Models.Vector2 vector)
+            => new(vector.X, vector.Y);
+        public static Terraria.DataStructures.TileEntity ToTrTileEntity(this TileEntity entity)
+        {
+            var result = entity switch
+            {
+                TrProtocol.Models.TileEntities.TEDisplayDoll e => new TEDisplayDoll
+                {
+                    Position = e.Position.ToPoint16(),
+                    _dyes = e.Dyes.Select(i => i.Get()).ToArray(),
+                    _items = e.Items.Select(i => i.Get()).ToArray(),
+                },
+                TrProtocol.Models.TileEntities.TEFoodPlatter e => new TEFoodPlatter()
+                {
+                    item = e.Item.Get(),
+                    Position = e.Position.ToPoint16()
+                },
+                TrProtocol.Models.TileEntities.TEHatRack e => new TEHatRack()
+                {
+                    ID = e.ID,
+                    Position = e.Position.ToPoint16(),
+                    _dyes = e.Dyes.Select(i => i.Get()).ToArray(),
+                    _items = e.Items.Select(i => i.Get()).ToArray(),
+                },
+                TrProtocol.Models.TileEntities.TEItemFrame e => new TEItemFrame()
+                {
+                    ID = e.ID,
+                    Position = e.Position.ToPoint16(),
+                    item = e.Item.Get()
+                },
+                TrProtocol.Models.TileEntities.TELogicSensor e => new TELogicSensor()
+                {
+                    ID = e.ID,
+                    Position = e.Position.ToPoint16(),
+                    logicCheck = (TELogicSensor.LogicCheckType)e.LogicCheck,
+                    On = e.On
+                },
+                TrProtocol.Models.TileEntities.TETeleportationPylon e => new TETeleportationPylon()
+                {
+                    ID = e.ID,
+                    Position = e.Position.ToPoint16()
+                },
+                TrProtocol.Models.TileEntities.TETrainingDummy e => new TETrainingDummy()
+                {
+                    ID = e.ID,
+                    Position = e.Position.ToPoint16(),
+                    npc = e.NPC
+                },
+                TrProtocol.Models.TileEntities.TEWeaponsRack e => (Terraria.DataStructures.TileEntity)new TEWeaponsRack()
+                {
+                    ID = e.ID,
+                    Position = e.Position.ToPoint16(),
+                    item = e.Item.Get()
+                },
+                _ => null,
+            };
+            result.type = (byte)entity.EntityType;
+            result.Position = entity.Position.ToPoint16();
+            result.ID = entity.ID;
+            return result;
+        }
+        public static TileEntity ToProtocalTileEntity(this Terraria.DataStructures.TileEntity entity)
+        {
+            var result = entity switch
+            {
+                TEDisplayDoll e => new TrProtocol.Models.TileEntities.TEDisplayDoll 
+                {
+                    Dyes = e._dyes.Select(i => i.Get()).ToArray(),
+                    Items = e._items.Select(i => i.Get()).ToArray(),
+                },
+                TEFoodPlatter e => new TrProtocol.Models.TileEntities.TEFoodPlatter()
+                {
+                    Item = e.item.Get(),
+                    Position = e.Position.ToShortPosition()
+                },
+                TEHatRack e => new TrProtocol.Models.TileEntities.TEHatRack()
+                {
+                    Dyes = e._dyes.Select(i => i.Get()).ToArray(),
+                    Items = e._items.Select(i => i.Get()).ToArray(),
+                },
+                TEItemFrame e => new TrProtocol.Models.TileEntities.TEItemFrame()
+                {
+                    Item = e.item.Get()
+                },
+                TELogicSensor e => new TrProtocol.Models.TileEntities.TELogicSensor()
+                {
+                    LogicCheck = (LogicCheckType)e.logicCheck,
+                    On = e.On
+                },
+                TETeleportationPylon e => new TrProtocol.Models.TileEntities.TETeleportationPylon()
+                {
+                },
+                TETrainingDummy e => new TrProtocol.Models.TileEntities.TETrainingDummy()
+                {
+                    NPC = e.npc
+                },
+                TEWeaponsRack e => (TrProtocol.Models.TileEntity)new TrProtocol.Models.TileEntities.TEWeaponsRack()
+                {
+                    Item = e.item.Get()
+                },
+                _ => null,
+            };
+            result.Position = entity.Position.ToShortPosition();
+            result.ID = entity.ID;
+            return result;
         }
     }
 }

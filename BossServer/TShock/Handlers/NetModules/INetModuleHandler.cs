@@ -1,4 +1,4 @@
-﻿using TrProtocol;
+﻿using System.IO;
 
 namespace TShockAPI.Handlers.NetModules
 {
@@ -11,7 +11,7 @@ namespace TShockAPI.Handlers.NetModules
         /// Reads the net module's data from the given stream
         /// </summary>
         /// <param name="data"></param>
-        void Deserialize(BinaryBufferReader data);
+        void Deserialize(MemoryStream data);
 
         /// <summary>
         /// Provides handling for the packet and determines if it should be accepted or rejected

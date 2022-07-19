@@ -1,6 +1,7 @@
 ﻿using BossFramework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Terraria;
@@ -8,7 +9,6 @@ using Terraria.DataStructures;
 using Terraria.GameContent.Tile_Entities;
 using Terraria.ID;
 using Terraria.ObjectData;
-using TrProtocol;
 using TShockAPI.Net;
 
 namespace TShockAPI.Handlers
@@ -423,7 +423,7 @@ namespace TShockAPI.Handlers
         /// <param name="width"></param>
         /// <param name="length"></param>
         /// <returns></returns>
-        static NetTile[,] ReadNetTilesFromStream(BinaryBufferReader stream, byte width, byte length)
+        static NetTile[,] ReadNetTilesFromStream(MemoryStream stream, byte width, byte length)
         {
             NetTile[,] tiles = new NetTile[width, length];
             for (int x = 0; x < width; x++)

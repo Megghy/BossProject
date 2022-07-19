@@ -1,9 +1,7 @@
-﻿using TrProtocol.Models;
-namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class TileSection : Packet
 {
-    public struct TileSection : IPacket
-    {
-        public MessageID Type => MessageID.TileSection;
-        public SectionData Data { get; set; }
-    }
+    public override MessageID Type => MessageID.TileSection;
+    public SectionData Data { get; set; }
 }

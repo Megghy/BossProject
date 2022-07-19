@@ -13,6 +13,12 @@ namespace PlotMarker
 
             return obj;
         }
+        public static bool CanEdit(this Cell cell, TSPlayer plr)
+        {
+            return cell.Owner == plr.Name
+                    || cell.AllowedIDs?.Contains(plr.Account?.ID ?? -1) == true
+                    || plr.HasPermission("pm.build.everywhere");
+        }
 
         public static int GetMaxCells(this TSPlayer player)
         {

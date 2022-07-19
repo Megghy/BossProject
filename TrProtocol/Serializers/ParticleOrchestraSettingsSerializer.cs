@@ -1,21 +1,18 @@
-﻿using System.IO;
+﻿namespace TrProtocol.Models;
 
-namespace TrProtocol.Models
+[Serializer(typeof(ParticleOrchestraSettingsSerializer))]
+public partial class ParticleOrchestraSettings
 {
-    [Serializer(typeof(ParticleOrchestraSettingsSerializer))]
-    public partial class ParticleOrchestraSettings
+    private class ParticleOrchestraSettingsSerializer : FieldSerializer<ParticleOrchestraSettings>
     {
-        private class ParticleOrchestraSettingsSerializer : FieldSerializer<ParticleOrchestraSettings>
+        protected override ParticleOrchestraSettings ReadOverride(BinaryReader br)
         {
-            protected override ParticleOrchestraSettings _Read(BinaryBufferReader br)
-            {
-                return DeserializeFrom(br);
-            }
+            return DeserializeFrom(br);
+        }
 
-            protected override void _Write(BinaryWriter bw, ParticleOrchestraSettings t)
-            {
-                t.Serialize(bw);
-            }
+        protected override void WriteOverride(BinaryWriter bw, ParticleOrchestraSettings t)
+        {
+            t.Serialize(bw);
         }
     }
 }

@@ -1,66 +1,44 @@
-﻿using System.IO;
-using System.Linq;
+﻿namespace TrProtocol.Models.TileEntities;
 
-namespace TrProtocol.Models.TileEntities
+public partial class TEHatRack : TileEntity
 {
-    public partial class ProtocolTEHatRack : ProtocolTileEntity<TEHatRack>
+    public override TileEntityType EntityType => TileEntityType.TEHatRack;
+    public override void WriteExtraData(BinaryWriter writer)
     {
-        public ProtocolTEHatRack(TEHatRack entity) : base(entity)
+        BitsByte bb = 0;
+        bb[0] = Items[0] != null;
+        bb[1] = Items[1] != null;
+        bb[2] = Dyes[0] != null;
+        bb[3] = Dyes[1] != null;
+        writer.Write(bb);
+        for (int i = 0; i < 2; i++)
         {
-            Dyes = entity?._dyes.Select(i => ItemData.Get(i)).ToArray() ?? new ItemData[2];
-            Items = entity?._items.Select(i => ItemData.Get(i)).ToArray() ?? new ItemData[2];
+            if (Items[i] != null)
+                Items[i].Write(writer);
         }
-
-        public override TileEntityType EntityType => TileEntityType.TEHatRack;
-        public override void WriteExtraData(BinaryWriter writer)
+        for (int j = 0; j < 2; j++)
         {
-            ProtocolBitsByte bb = 0;
-            bb[0] = Items[0] != null;
-            bb[1] = Items[1] != null;
-            bb[2] = Dyes[0] != null;
-            bb[3] = Dyes[1] != null;
-            writer.Write(bb);
-            for (int i = 0; i < 2; i++)
-            {
-                if (Items[i] != null)
-                    Items[i].Write(writer);
-            }
-            for (int j = 0; j < 2; j++)
-            {
-                if (Dyes[j] != null)
-                    Dyes[j].Write(writer);
-            }
+            if (Dyes[j] != null)
+                Dyes[j].Write(writer);
         }
-
-        public override ProtocolTEHatRack ReadExtraData(BinaryBufferReader reader)
-        {
-            ProtocolBitsByte bitsByte = reader.ReadByte();
-            for (int i = 0; i < 2; i++)
-            {
-                if (bitsByte[i])
-                    Items[i] = new ItemData(reader);
-            }
-            for (int j = 0; j < 2; j++)
-            {
-                if (bitsByte[j + 2])
-                    Dyes[j] = new ItemData(reader);
-            }
-            return this;
-        }
-
-        protected override TEHatRack ToTrTileEntityInternal()
-        {
-            return new()
-            {
-                ID = ID,
-                Position = Position,
-                _dyes = Dyes.Select(i => i.ToItem()).ToArray(),
-                _items = Items.Select(i => i.ToItem()).ToArray(),
-            };
-        }
-
-        public ItemData[] Items { get; set; } = new ItemData[2];
-
-        public ItemData[] Dyes { get; set; } = new ItemData[2];
     }
+
+    public override TEHatRack ReadExtraData(BinaryReader reader)
+    {
+        BitsByte bitsByte = reader.ReadByte();
+        for (int i = 0; i < 2; i++)
+        {
+            if (bitsByte[i])
+                Items[i] = new ItemData(reader);
+        }
+        for (int j = 0; j < 2; j++)
+        {
+            if (bitsByte[j + 2])
+                Dyes[j] = new ItemData(reader);
+        }
+        return this;
+    }
+    public ItemData[] Items { get; set; } = new ItemData[2];
+
+    public ItemData[] Dyes { get; set; } = new ItemData[2];
 }

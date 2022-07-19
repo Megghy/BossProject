@@ -1,12 +1,9 @@
-﻿using TrProtocol.Models;
+﻿namespace TrProtocol.Packets;
 
-namespace TrProtocol.Packets
+public class SyncTilePicking : Packet, IPlayerSlot
 {
-    public struct SyncTilePicking : IPacket, IPlayerSlot
-    {
-        public MessageID Type => MessageID.SyncTilePicking;
-        public byte PlayerSlot { get; set; }
-        public ShortPosition Position { get; set; }
-        public byte Damage { get; set; }
-    }
+    public override MessageID Type => MessageID.SyncTilePicking;
+    public byte PlayerSlot { get; set; }
+    public ShortPosition Position { get; set; }
+    public byte Damage { get; set; }
 }

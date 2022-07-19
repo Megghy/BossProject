@@ -1,8 +1,7 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class RemoveRevengeMarker : Packet
 {
-    public struct RemoveRevengeMarker : IPacket
-    {
-        public MessageID Type => MessageID.RemoveRevengeMarker;
-        public int ID { get; set; }
-    }
+    public override MessageID Type => MessageID.RemoveRevengeMarker;
+    public int ID { get; set; }
 }

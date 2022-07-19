@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using System.IO.Streams;
 using Terraria;
 using Terraria.ObjectData;
-using TrProtocol;
 using TShockAPI;
 using TShockAPI.Net;
 
@@ -22,7 +22,7 @@ namespace PlotMarker
                 { PacketTypes.PlaceTileEntity, HandlePlaceTileEntity },
                 { PacketTypes.TileSendSquare, HandleSendTileSquare }
             };
-        public static bool HandleGetData(PacketTypes type, TSPlayer player, BinaryBufferReader data)
+        public static bool HandleGetData(PacketTypes type, TSPlayer player, MemoryStream data)
         {
             if (GetDataHandlerDelegates.TryGetValue(type, out var handler))
             {
@@ -126,7 +126,7 @@ namespace PlotMarker
         {
             var x = args.Data.ReadInt16();
             var y = args.Data.ReadInt16();
-            var t = args.Data.ReadInt8();
+            var t = args.Data.ReadByte();
 
             if (x < 0 || y < 0 || x >= Main.maxTilesX || y >= Main.maxTilesY || t > Main.numTileColors)
             {
@@ -146,7 +146,7 @@ namespace PlotMarker
         {
             var x = args.Data.ReadInt16();
             var y = args.Data.ReadInt16();
-            var t = args.Data.ReadInt8();
+            var t = args.Data.ReadByte();
 
             if (x < 0 || y < 0 || x >= Main.maxTilesX || y >= Main.maxTilesY || t > Main.numTileColors)
             {

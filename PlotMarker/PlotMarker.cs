@@ -1,15 +1,13 @@
 ﻿using BossFramework;
 using BossFramework.BCore;
+using BossFramework.BModels;
 using BossFramework.DB;
 using FakeProvider;
 using Microsoft.Xna.Framework;
 using System.Reflection;
-using System.Reflection.Emit;
 using Terraria;
 using TerrariaApi.Server;
-using TrProtocol;
 using TShockAPI;
-using TShockAPI.DB;
 
 namespace PlotMarker
 {
@@ -33,6 +31,8 @@ namespace PlotMarker
             ServerApi.Hooks.ServerLeave.Register(this, OnLeave);
             ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInitialize);
             ServerApi.Hooks.WorldSave.Register(this, (args) => { Task.Run(() => PlotManager.CurrentPlot?.Cells.Where(c => c.IsVisiable).TForEach(c => c.SaveCellData())); });
+
+            SignRedirector.SignUpdate += OnUpdateSign;
         }
 
         protected override void Dispose(bool disposing)
@@ -44,6 +44,8 @@ namespace PlotMarker
                 ServerApi.Hooks.NetGreetPlayer.Deregister(this, OnGreet);
                 ServerApi.Hooks.ServerLeave.Deregister(this, OnLeave);
                 ServerApi.Hooks.GamePostInitialize.Deregister(this, OnPostInitialize);
+
+                SignRedirector.SignUpdate -= OnUpdateSign;
             }
             base.Dispose(disposing);
         }
@@ -108,6 +110,19 @@ namespace PlotMarker
             FakeProviderAPI.World.ScanEntities(); //fakeprovider重新获取entity
         }
 
+        private static void OnUpdateSign(BEventArgs.SignUpdateEventArgs args)
+        {
+            var plr = args.Player.TsPlayer;
+            if (plr.GetCurrentCell() is { } cell)
+            {
+                if (!cell.CanEdit(plr) && !plr.HasPermission("pm.admin.updatesign"))
+                {
+                    args.Handled = true;
+                    plr.SendInfoMessage($"你没有权限修改其他属地的牌子");
+                }
+            }
+        }
+
         private static void OnGreet(GreetPlayerEventArgs args)
         {
             var player = TShock.Players[args.Who];
@@ -128,11 +143,8 @@ namespace PlotMarker
             {
                 return;
             }
-
-            using (var data = new BinaryBufferReader(args.Msg.readBuffer, args.Index, args.Length - 1))
-            {
-                args.Handled = Handlers.HandleGetData(type, player, data);
-            }
+            using var stream = new MemoryStream(args.Msg.readBuffer, args.Index, args.Length - 1);
+            args.Handled = Handlers.HandleGetData(type, player, stream);
         }
         private static void AreaManage(CommandArgs args)
         {
@@ -384,6 +396,10 @@ namespace PlotMarker
                         {
                             newCell.Visiable(args.Player);
                             args.Player.Teleport(newCell.Center.X * 16, newCell.Center.Y * 16);
+                        }
+                        else
+                        {
+                            args.Player.SendErrorMessage("获取失败, 请联系管理员", count, max);
                         }
                     }
                     break;
@@ -972,9 +988,7 @@ namespace PlotMarker
                 return false;
             else if (PlotManager.CurrentPlot.FindCell(tileX, tileY) is { } cell)
             {
-                if (cell.Owner == player.Name
-                    || cell.AllowedIDs?.Contains(player.Account.ID) == true
-                    || player.HasPermission("pm.build.everywhere"))
+                if (cell.CanEdit(player))
                 {
                     cell.LastAccess = DateTime.Now;
                     return false;

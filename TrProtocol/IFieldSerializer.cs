@@ -1,23 +1,14 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 
-namespace TrProtocol
+namespace TrProtocol;
+
+public interface IFieldSerializer
 {
-    public interface IFieldSerializer
-    {
-        protected static object[] empty = Array.Empty<object>();
-        object Read(BinaryBufferReader br);
-        void Write(BinaryWriter bw, object o);
-    }
+    object Read(BinaryReader br);
+    void Write(BinaryWriter bw, object o);
+}
 
-    public interface IInstanceConfigurable
-    {
-        void Configure(PropertyInfo prop, string version, object @base);
-    }
-
-    public interface IConfigurable
-    {
-        IFieldSerializer Configure(PropertyInfo prop, string version, Func<string, Func<object, object>> valGetter);
-    }
+public interface IConfigurable
+{
+    IConfigurable Configure(PropertyInfo prop, string version);
 }

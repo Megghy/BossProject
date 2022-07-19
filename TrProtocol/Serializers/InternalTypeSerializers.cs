@@ -1,186 +1,91 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using TrProtocol.Models;
+﻿using System.Reflection;
 
-namespace TrProtocol
+namespace TrProtocol;
+
+public partial class PacketSerializer
 {
-    public partial class PacketSerializer
+    static PacketSerializer()
     {
-        static PacketSerializer()
-        {
-            RegisterSerializer(new GuidSerializer());
-            RegisterSerializer(new BoolSerializer());
-            RegisterSerializer(new ByteSerializer());
-            RegisterSerializer(new SByteSerializer());
-            RegisterSerializer(new ShortSerializer());
-            RegisterSerializer(new UShortSerializer());
-            RegisterSerializer(new IntSerializer());
-            RegisterSerializer(new UIntSerializer());
-            RegisterSerializer(new LongSerializer());
-            RegisterSerializer(new ULongSerializer());
-            RegisterSerializer(new FloatSerializer());
-            RegisterSerializer(new StringSerializer());
+        // put all predefined serializers here
+        RegisterSerializer(new GuidSerializer());
+        RegisterSerializer(new StringSerializer());
+        RegisterSerializer(new ByteArraySerializer());
+    }
 
-            RegisterSerializer(new ByteArraySerializer());
+    private readonly static Dictionary<Type, IFieldSerializer> fieldSerializers = new();
 
-            RegisterSerializer(new ColorSerailizer());
-            RegisterSerializer(new PlayerDeathReasonSerializer());
-            RegisterSerializer(new NetworkSerializer());
-            RegisterSerializer(new Vector2Serailizer());
-            RegisterSerializer(new PositionSerializer());
-            RegisterSerializer(new TrackedProjectileReferenceSerializer());
-        }
+    private static IFieldSerializer RequestFieldSerializer(Type t)
+    {
+        if (fieldSerializers.TryGetValue(t, out IFieldSerializer value))
+            return value;
+        if (t.IsPrimitive || t.IsEnum)
+            return fieldSerializers[t] = Activator.CreateInstance(typeof(PrimitiveFieldSerializer<>).MakeGenericType(t)) as IFieldSerializer;
+        else if (t.IsArray)
+            return fieldSerializers[t] = Activator.CreateInstance(typeof(ArraySerializer<>).MakeGenericType(t.GetElementType())) as IFieldSerializer;
+        else
+            throw new Exception($"No valid field serializer for type: {t.FullName} can be found or generated");
+    }
+    private static void RegisterSerializer<T>(FieldSerializer<T> serializer)
+    {
+        fieldSerializers[typeof(T)] = serializer;
+    }
 
-        private static readonly Dictionary<Type, IFieldSerializer> fieldSerializers = new();
-        private static void RegisterSerializer<T>(FieldSerializer<T> serializer)
-        {
-            fieldSerializers.Add(typeof(T), serializer);
-        }
+    private class GuidSerializer : FieldSerializer<Guid>
+    {
+        protected override Guid ReadOverride(BinaryReader br) => new(br.ReadBytes(16));
+        protected override void WriteOverride(BinaryWriter bw, Guid t) => bw.Write(t.ToByteArray());
+    }
+    private class StringSerializer : FieldSerializer<string>
+    {
+        protected override string ReadOverride(BinaryReader br) => br.ReadString();
+        protected override void WriteOverride(BinaryWriter bw, string t) => bw.Write(t);
+    }
 
-        private class GuidSerializer : FieldSerializer<Guid>
-        {
-            protected override Guid _Read(BinaryBufferReader br) => new(br.ReadBytes(16));
-            protected override void _Write(BinaryWriter bw, Guid t) => bw.Write(t.ToByteArray());
-        }
+    private class ByteArraySerializer : FieldSerializer<byte[]>
+    {
+        protected override byte[] ReadOverride(BinaryReader br) => br.ReadBytes((int)(br.BaseStream.Length - br.BaseStream.Position));
 
-        private class BoolSerializer : FieldSerializer<bool>
+        protected override void WriteOverride(BinaryWriter bw, byte[] t) => bw.Write(t);
+    }
+
+    private class ArraySerializer<T> : FieldSerializer<T[]>, IConfigurable
+    {
+        private int size;
+        private IFieldSerializer elementSerializer;
+        public ArraySerializer() : this(0)
         {
-            protected override bool _Read(BinaryBufferReader br) => br.ReadBoolean();
-            protected override void _Write(BinaryWriter bw, bool t) => bw.Write(t);
-        }
-        private class ByteSerializer : NumFieldSerializer<byte>
-        {
-            protected override byte _Read(BinaryBufferReader br) => br.ReadByte();
-            protected override void _Write(BinaryWriter bw, byte t) => bw.Write(t);
-        }
-        private class SByteSerializer : NumFieldSerializer<sbyte>
-        {
-            protected override sbyte _Read(BinaryBufferReader br) => br.ReadSByte();
-            protected override void _Write(BinaryWriter bw, sbyte t) => bw.Write(t);
-        }
-        private class ShortSerializer : NumFieldSerializer<short>
-        {
-            protected override short _Read(BinaryBufferReader br) => br.ReadInt16();
-            protected override void _Write(BinaryWriter bw, short t) => bw.Write(t);
-        }
-        private class UShortSerializer : NumFieldSerializer<ushort>
-        {
-            protected override ushort _Read(BinaryBufferReader br) => br.ReadUInt16();
-            protected override void _Write(BinaryWriter bw, ushort t) => bw.Write(t);
-        }
-        private class IntSerializer : NumFieldSerializer<int>
-        {
-            protected override int _Read(BinaryBufferReader br) => br.ReadInt32();
-            protected override void _Write(BinaryWriter bw, int t) => bw.Write(t);
-        }
-        private class UIntSerializer : NumFieldSerializer<uint>
-        {
-            protected override uint _Read(BinaryBufferReader br) => br.ReadUInt32();
-            protected override void _Write(BinaryWriter bw, uint t) => bw.Write(t);
-        }
-        private class LongSerializer : FieldSerializer<long>
-        {
-            protected override long _Read(BinaryBufferReader br) => br.ReadInt64();
-            protected override void _Write(BinaryWriter bw, long t) => bw.Write(t);
-        }
-        private class ULongSerializer : FieldSerializer<ulong>
-        {
-            protected override ulong _Read(BinaryBufferReader br) => br.ReadUInt64();
-            protected override void _Write(BinaryWriter bw, ulong t) => bw.Write(t);
+
         }
 
-        private class FloatSerializer : FieldSerializer<float>
+        private ArraySerializer(int size)
         {
-            protected override float _Read(BinaryBufferReader br) => br.ReadSingle();
-            protected override void _Write(BinaryWriter bw, float t) => bw.Write(t);
+            this.size = size;
+            elementSerializer = RequestFieldSerializer(typeof(T));
         }
 
-        private class StringSerializer : FieldSerializer<string>
+        protected override T[] ReadOverride(BinaryReader br)
         {
-            protected override string _Read(BinaryBufferReader br) => br.ReadString();
-            protected override void _Write(BinaryWriter bw, string t) => bw.Write(t);
+            var t = new T[size];
+            for (var i = 0; i < size; ++i)
+                t[i] = (T)elementSerializer.Read(br);
+            return t;
         }
 
-        private class ByteArraySerializer : FieldSerializer<byte[]>
+        protected override void WriteOverride(BinaryWriter bw, T[] t)
         {
-            protected override byte[] _Read(BinaryBufferReader br)
+            foreach (var x in t)
+                elementSerializer.Write(bw, x);
+        }
+
+        public IConfigurable Configure(PropertyInfo prop, string version)
+        {
+            if (elementSerializer is IConfigurable conf)
+                conf.Configure(prop, version);
+            return new ArraySerializer<T>()
             {
-                return br.ReadBytes((int)(br.BaseStream.Length - br.BaseStream.Position));
-            }
-
-            protected override void _Write(BinaryWriter bw, byte[] t)
-            {
-                bw.Write(t);
-            }
-        }
-
-        private class ArraySerializer : FieldSerializer<Array>, IConfigurable, IInstanceConfigurable
-        {
-            private readonly Func<object, int>[] sizeGetter;
-            private readonly int[] size;
-            private readonly IFieldSerializer @base;
-            private readonly Type type;
-
-            public ArraySerializer()
-            {
-
-            }
-
-            private ArraySerializer(Type type, params Func<object, int>[] sizeGetter)
-            {
-                this.sizeGetter = sizeGetter;
-                this.size = new int[sizeGetter.Length];
-                @base = fieldSerializers[type];
-                this.type = type;
-            }
-
-            protected override Array _Read(BinaryBufferReader br)
-            {
-                var t = Array.CreateInstance(type, size);
-                var n = size.Length;
-                var s = t.Length;
-                var i = new int[n];
-                while (--s >= 0)
-                {
-                    t.SetValue(@base.Read(br), i);
-                    var k = n - 1;
-                    ++i[k];
-                    while (i[k] == t.GetLength(k) && k > 0)
-                    {
-                        i[k] = 0;
-                        ++i[--k];
-                    }
-                }
-                return t;
-            }
-
-            protected override void _Write(BinaryWriter bw, Array t)
-            {
-                foreach (var x in t)
-                    @base.Write(bw, x);
-            }
-
-            public IFieldSerializer Configure(PropertyInfo prop, string version, Func<string, Func<object, object>> valGetter)
-            {
-                if (@base is IConfigurable conf) conf.Configure(prop, version, valGetter);
-                var type = prop.PropertyType.GetInterface("IEnumerable`1").GenericTypeArguments[0];
-                return new ArraySerializer(type, prop.GetCustomAttribute<ArraySizeAttribute>().size
-                    .Select<object, Func<object, int>>(o => o switch
-                {
-                    string s => (o => ((int)Convert.ChangeType(valGetter(s)(o), typeof(int)))),
-                    int i => (_ => i),
-                    _ => (_ => 1)
-                }).ToArray());
-            }
-
-            public void Configure(PropertyInfo prop, string version, object @base)
-            {
-                for (int i = 0; i < sizeGetter.Length; ++i)
-                    size[i] = sizeGetter[i](@base);
-            }
+                size = prop.GetCustomAttribute<ArraySizeAttribute>().Size,
+                elementSerializer = elementSerializer
+            };
         }
     }
 }

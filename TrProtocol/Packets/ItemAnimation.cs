@@ -1,10 +1,9 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class ItemAnimation : Packet, IPlayerSlot
 {
-    public struct ItemAnimation : IPacket, IPlayerSlot
-    {
-        public MessageID Type => MessageID.ItemAnimation;
-        public byte PlayerSlot { get; set; }
-        public float Rotation { get; set; }
-        public short Animation { get; set; }
-    }
+    public override MessageID Type => MessageID.ItemAnimation;
+    public byte PlayerSlot { get; set; }
+    public float Rotation { get; set; }
+    public short Animation { get; set; }
 }

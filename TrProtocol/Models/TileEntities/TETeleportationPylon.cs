@@ -1,27 +1,15 @@
-﻿using System.IO;
+﻿namespace TrProtocol.Models.TileEntities;
 
-namespace TrProtocol.Models.TileEntities
+public partial class TETeleportationPylon : TileEntity
 {
-    public partial class ProtocolTETeleportationPylon : ProtocolTileEntity<TETeleportationPylon>
+    public override TileEntityType EntityType => TileEntityType.TETeleportationPylon;
+
+    public override TileEntity ReadExtraData(BinaryReader reader)
     {
-        public ProtocolTETeleportationPylon(TETeleportationPylon entity) : base(entity)
-        {
-        }
+        return this;
+    }
 
-        public override TileEntityType EntityType => TileEntityType.TETeleportationPylon;
-
-        public override ProtocolTETeleportationPylon ReadExtraData(BinaryBufferReader reader)
-        {
-            return this;
-        }
-
-        public override void WriteExtraData(BinaryWriter writer)
-        {
-        }
-
-        protected override TETeleportationPylon ToTrTileEntityInternal()
-        {
-            return new() { ID = ID, Position = Position };
-        }
+    public override void WriteExtraData(BinaryWriter writer)
+    {
     }
 }

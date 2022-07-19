@@ -1,8 +1,7 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class Kick : Packet
 {
-    public struct Kick : IPacket
-    {
-        public MessageID Type => MessageID.Kick;
-        public NetworkText Reason { get; set; }
-    }
+    public override MessageID Type => MessageID.Kick;
+    public NetworkText Reason { get; set; }
 }

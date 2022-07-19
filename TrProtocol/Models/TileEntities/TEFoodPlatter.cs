@@ -1,35 +1,17 @@
-﻿using System.IO;
+﻿namespace TrProtocol.Models.TileEntities;
 
-namespace TrProtocol.Models.TileEntities
+public partial class TEFoodPlatter : TileEntity
 {
-    public partial class ProtocolTEFoodPlatter : ProtocolTileEntity<TEFoodPlatter>
+    public override void WriteExtraData(BinaryWriter writer)
     {
-        public ProtocolTEFoodPlatter(TEFoodPlatter entity) : base(entity)
-        {
-            Item = entity?.item ?? new();
-        }
-
-        public override void WriteExtraData(BinaryWriter writer)
-        {
-            Item.Write(writer);
-        }
-
-        public override ProtocolTEFoodPlatter ReadExtraData(BinaryBufferReader reader)
-        {
-            Item = new ItemData(reader);
-            return this;
-        }
-
-        protected override TEFoodPlatter ToTrTileEntityInternal()
-        {
-            return new()
-            {
-                item = Item,
-                Position = Position
-            };
-        }
-
-        public override TileEntityType EntityType => TileEntityType.TEFoodPlatter;
-        public ItemData Item { get; set; }
+        Item.Write(writer);
     }
+
+    public override TEFoodPlatter ReadExtraData(BinaryReader reader)
+    {
+        Item = new ItemData(reader);
+        return this;
+    }
+    public override TileEntityType EntityType => TileEntityType.TEFoodPlatter;
+    public ItemData Item { get; set; }
 }

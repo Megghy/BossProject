@@ -55,7 +55,7 @@ namespace BossFramework.BCore
                         plr.WatchingSign = null; //超出范围则未在编辑标牌.
 
                     plr.LastWatchingSignIndex = (short)(plr.WatchingSign == null ? -1 : 0); //从第一个开始, 第零个一般是当前正在看的
-                    var packets = new List<IPacket>();
+                    var packets = new List<Packet>();
 
                     AllSign().Where(s => BUtils.IsPointInCircle(s.X, s.Y, plr.TileX, plr.TileY, BConfig.Instance.SignRefreshRadius))
                         .ForEach(s => packets.Add(new ReadSign()
@@ -91,24 +91,21 @@ namespace BossFramework.BCore
                     SignUpdate?.Invoke(args);
                     if (!args.Handled)
                     {
-                        s.Text = sign.Text;
-                        s.UpdateSingle(s => s.LastUpdateUser, plr.Index);
-                        s.UpdateSingle(s => s.Text, sign.Text);
-
-                        BInfo.OnlinePlayers.Where(p => p.WatchingSign?.sign == s)
-                            .ForEach(p =>
-                            {
-                                sign.SignSlot = plr.WatchingSign.Value.slot;
-                                p.SendPacket(sign); //同步给其他正在看这个牌子的玩家
-                            });
-
-                        plr?.SendSuccessMsg($"已更新标牌");
+                        if (plr.TsPlayer.HasPermission("boss.player.sign.update"))
+                        {
+                            UpdateSignDirect(plr, s, sign.Text);
+                            plr?.SendSuccessMsg($"已更新标牌");
+                        }
+                        else
+                        {
+                            plr.SendInfoMsg($"你没有权限修改这个标牌");
+                        }
                     }
                 }
             }
             else
             {
-                var args = new BEventArgs.SignCreateEventArgs(plr, sign.Position);
+                var args = new BEventArgs.SignCreateEventArgs(plr, sign.Position.ToPoint());
                 SignCreate?.Invoke(args);
                 if (!args.Handled)
                 {
@@ -119,7 +116,7 @@ namespace BossFramework.BCore
         }
         internal static void OnOpenSign(BPlayer plr, RequestReadSign readSign)
         {
-            var args = new BEventArgs.SignReadEventArgs(plr, readSign.Position);
+            var args = new BEventArgs.SignReadEventArgs(plr, readSign.Position.ToPoint());
             SignRead?.Invoke(args);
             if (!args.Handled)
             {
@@ -135,6 +132,20 @@ namespace BossFramework.BCore
         #endregion
 
         #region 标牌操作
+
+        public static void UpdateSignDirect(BPlayer plr, BSign sign, string text)
+        {
+            sign.Text = text;
+            sign.UpdateSingle(s => s.LastUpdateUser, plr.Index);
+            sign.UpdateSingle(s => s.Text, sign.Text);
+
+            BInfo.OnlinePlayers.Where(p => p.WatchingSign?.sign == sign)
+                .ForEach(p =>
+                {
+                    sign.SendSign(p, true); //同步给其他正在看这个牌子的玩家
+                });
+        }
+
         public static BSign CreateSign(int tileX, int tileY, string text, BPlayer plr = null)
         {
 

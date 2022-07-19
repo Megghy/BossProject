@@ -39,7 +39,6 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.Utilities;
 using TerrariaApi.Server;
-using TrProtocol;
 using TShockAPI.CLI;
 using TShockAPI.Configuration;
 using TShockAPI.DB;
@@ -1578,11 +1577,8 @@ namespace TShockAPI
             {
                 length = 0;
             }
-            using (var data = new BinaryBufferReader(e.Msg.readBuffer, e.Index, length))
-            {
-                // Exceptions are already handled
-                e.Handled = GetDataHandlers.HandlerGetData(type, player, data);
-            }
+            using var stream = new MemoryStream(e.Msg.readBuffer, e.Index, length);
+            e.Handled = GetDataHandlers.HandlerGetData(type, player, stream);
         }
 
         /// <summary>OnGreetPlayer - Fired when a player is greeted by the server. Handles things like the MOTD, join messages, etc.</summary>

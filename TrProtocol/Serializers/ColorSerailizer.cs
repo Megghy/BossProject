@@ -1,19 +1,21 @@
-﻿using System.IO;
+﻿namespace TrProtocol.Models;
 
-namespace TrProtocol.Models
+
+[Serializer(typeof(ColorSerailizer))]
+public partial struct Color
 {
-    public class ColorSerailizer : FieldSerializer<Color>
+    private class ColorSerailizer : FieldSerializer<Color>
     {
-        protected override Color _Read(BinaryBufferReader br)
+        protected override Color ReadOverride(BinaryReader br)
         {
             return new Color(br.ReadByte(), br.ReadByte(), br.ReadByte());
         }
 
-        protected override void _Write(BinaryWriter bw, Color c)
+        protected override void WriteOverride(BinaryWriter bw, Color t)
         {
-            bw.Write(c.R);
-            bw.Write(c.G);
-            bw.Write(c.B);
+            bw.Write((byte)t.R);
+            bw.Write((byte)t.G);
+            bw.Write((byte)t.B);
         }
     }
 }

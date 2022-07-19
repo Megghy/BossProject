@@ -1,12 +1,9 @@
-﻿using TrProtocol.Serializers;
+﻿namespace TrProtocol.Models;
 
-namespace TrProtocol.Models
+[Serializer(typeof(PrimitiveFieldSerializer<PylonPacketType>))]
+public enum PylonPacketType : byte
 {
-    [Serializer(typeof(ByteEnumSerializer<PylonPacketType>))]
-    public enum PylonPacketType : byte
-    {
-        PylonWasAdded,
-        PylonWasRemoved,
-        PlayerRequestsTeleport
-    }
+    PylonWasAdded,
+    PylonWasRemoved,
+    PlayerRequestsTeleport
 }

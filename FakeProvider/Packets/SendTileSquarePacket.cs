@@ -3,6 +3,7 @@ using BossFramework;
 using Terraria;
 using TrProtocol.Models;
 using TrProtocol.Packets;
+using BitsByte = TrProtocol.Models.BitsByte;
 #endregion
 namespace FakeProvider
 {

@@ -1,21 +1,19 @@
-﻿namespace TrProtocol.Models
+﻿using System.Runtime.InteropServices;
+
+namespace TrProtocol.Models;
+
+[StructLayout(LayoutKind.Sequential)]
+public partial struct ShortPosition
 {
-    public partial struct ShortPosition
+    public ShortPosition(short x, short y)
     {
-        public ShortPosition(short x, short y)
-        {
-            X = x;
-            Y = y;
-        }
-        public ShortPosition(int x, int y)
-        {
-            X = (short)x;
-            Y = (short)y;
-        }
-        public short X, Y;
-        public override string ToString()
-        {
-            return $"[{X}, {Y}]";
-        }
+        X = x;
+        Y = y;
+    }
+    public short X;
+    public short Y;
+    public override string ToString()
+    {
+        return $"[{X}, {Y}]";
     }
 }

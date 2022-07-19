@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System.IO;
 using TrProtocol;
 using TrProtocol.Packets;
 
@@ -13,13 +14,13 @@ namespace BossFramework.BModels
     {
         public class PacketEventArgs : IEventArgs
         {
-            public PacketEventArgs(BPlayer plr, PacketTypes type, BinaryBufferReader reader)
+            public PacketEventArgs(BPlayer plr, PacketTypes type, BinaryReader reader)
             {
                 Player = plr;
                 PacketType = type;
                 Reader = reader;
             }
-            public PacketEventArgs(BPlayer plr, IPacket packet)
+            public PacketEventArgs(BPlayer plr, Packet packet)
             {
                 Player = plr;
                 PacketType = (PacketTypes)packet.Type;
@@ -27,12 +28,12 @@ namespace BossFramework.BModels
             }
             public PacketTypes PacketType { get; private set; }
             public BPlayer Player { get; private set; }
-            private BinaryBufferReader Reader { get; set; }
-            private IPacket _packet;
+            private BinaryReader Reader { get; set; }
+            private Packet _packet;
             /// <summary>
             /// 未确定是否要读取前只使用 <see cref="PacketType"/> 查看类型
             /// </summary>
-            public IPacket Packet
+            public Packet Packet
             {
                 get
                 {
@@ -116,7 +117,8 @@ namespace BossFramework.BModels
             public bool Handled { get; set; } = false;
             public BPlayer Player { get; private set; }
             public ReadSign Data { get; private set; }
-            public Point Position => Data.Position;
+            public Point Position
+                => Data.Position.ToPoint();
         }
         public class SignRmoveEventArgs
         {
@@ -185,7 +187,7 @@ namespace BossFramework.BModels
             public bool Handled { get; set; } = false;
             public BPlayer Player { get; private set; }
             public SyncPlayerChest Data { get; private set; }
-            public Point Position => Data.Position;
+            public Point Position => Data.Position.ToPoint();
         }
     }
 }

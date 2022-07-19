@@ -1,11 +1,10 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class InvasionProgressReport : Packet
 {
-    public struct InvasionProgressReport : IPacket
-    {
-        public MessageID Type => MessageID.InvasionProgressReport;
-        public int Progress { get; set; }
-        public int ProgressMax { get; set; }
-        public sbyte Icon { get; set; }
-        public sbyte Wave { get; set; }
-    }
+    public override MessageID Type => MessageID.InvasionProgressReport;
+    public int Progress { get; set; }
+    public int ProgressMax { get; set; }
+    public sbyte Icon { get; set; }
+    public sbyte Wave { get; set; }
 }

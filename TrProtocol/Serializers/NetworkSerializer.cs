@@ -1,15 +1,16 @@
-﻿using System.IO;
+﻿namespace TrProtocol.Models;
 
-namespace TrProtocol.Models
+[Serializer(typeof(NetworkSerializer))]
+public partial class NetworkText
 {
-    class NetworkSerializer : FieldSerializer<NetworkText>
+    private class NetworkSerializer : FieldSerializer<NetworkText>
     {
-        protected override NetworkText _Read(BinaryBufferReader br)
+        protected override NetworkText ReadOverride(BinaryReader br)
         {
-            return NetworkText.Deserialize(br);
+            return Deserialize(br);
         }
 
-        protected override void _Write(BinaryWriter bw, NetworkText t)
+        protected override void WriteOverride(BinaryWriter bw, NetworkText t)
         {
             t.Serialize(bw);
         }

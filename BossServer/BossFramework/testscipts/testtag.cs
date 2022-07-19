@@ -1,8 +1,11 @@
 ﻿using BossFramework;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
+using System;
 using Terraria;
 using TrProtocol.Packets;
+using ProtocalBitByte = TrProtocol.Models.BitsByte;
+using TShockAPI.DB;
 
 public class testtag : BaseRegionTagProcessor
 {
@@ -15,7 +18,7 @@ public class testtag : BaseRegionTagProcessor
     }
     public override void GameUpdate(BRegion region, long gameTime)
     {
-        if (gameTime % 150 == 0 && region.GetPlayers() is { } plrs && plrs.Length > 0 && region.Tags.Exists(t => t.StartsWith("world")))
+        if (gameTime % 60 == 0 && region.GetPlayers() is { } plrs && plrs.Length > 0 && region.Tags.Exists(t => t.StartsWith("world")))
         {
             var worldData = ChangePacket(region);
             var data = worldData.SerializePacket();
@@ -24,14 +27,14 @@ public class testtag : BaseRegionTagProcessor
     }
     private static WorldData ChangePacket(BRegion region, WorldData? data = null)
     {
-        var worldData = data.HasValue ? data.Value : BUtils.GetCurrentWorldData();
+        var worldData = data == null ? data : BUtils.GetCurrentWorldData();
 
         region.Tags.ForEach(t =>
         {
             switch (t.ToLower())
             {
                 case "world.lockday":
-                    var bb = new BitsByte();
+                    var bb = new ProtocalBitByte();
                     bb[0] = true;
                     worldData.DayAndMoonInfo = bb;
                     worldData.Time = 30000;
@@ -44,7 +47,7 @@ public class testtag : BaseRegionTagProcessor
                     break;
                 case "world.nobackground":
                     worldData.WorldSurface = (short)region.OriginRegion.Area.Bottom;
-                    worldData.RockLayer = (short)(worldData.WorldSurface + 10);
+                    worldData.RockLayer = (short)(worldData.WorldSurface + 20);
                     break;
             }
         });

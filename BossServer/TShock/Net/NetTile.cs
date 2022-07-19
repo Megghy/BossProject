@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System.IO;
 using System.IO.Streams;
 using Terraria;
-using TrProtocol;
 
 namespace TShockAPI.Net
 {
@@ -111,7 +110,7 @@ namespace TShockAPI.Net
             Slope3 = false;
         }
 
-        public NetTile(BinaryBufferReader stream)
+        public NetTile(Stream stream)
             : this()
         {
             Unpack(stream);
@@ -202,10 +201,10 @@ namespace TShockAPI.Net
             }
         }
 
-        public void Unpack(BinaryBufferReader stream)
+        public void Unpack(Stream stream)
         {
-            var flags = (BitsByte)stream.ReadInt8();
-            var flags2 = (BitsByte)stream.ReadInt8();
+            var flags = (BitsByte)stream.ReadByte();
+            var flags2 = (BitsByte)stream.ReadByte();
 
             Wire2 = flags2[0];
             Wire3 = flags2[1];

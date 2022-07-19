@@ -5,13 +5,13 @@ using FakeProvider;
 using FreeSql.DataAnnotations;
 using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.GameContent.Tile_Entities;
 using TrProtocol;
 using TrProtocol.Models;
-using TrProtocol.Models.TileEntities;
 using TrProtocol.Packets;
 using TShockAPI;
+using IProtocolTileEntity = TrProtocol.Models.TileEntity;
+using TileEntity = Terraria.DataStructures.TileEntity;
 
 namespace PlotMarker
 {
@@ -20,7 +20,7 @@ namespace PlotMarker
         public string Name { get; set; }
         public short TileX { get; set; }
         public short TileY { get; set; }
-        public ItemData[] Items { get; set; }
+        public TrProtocol.Models.ItemData[] Items { get; set; }
     }
     struct SimpleSignData
     {
@@ -28,8 +28,20 @@ namespace PlotMarker
         public short TileY { get; set; }
         public string Text { get; set; }
     }
+
     internal sealed class Cell : UserConfigBase<Cell>
     {
+        public static readonly Dictionary<TileEntityType, Type> tileEntityDict = new()
+        {
+            { TileEntityType.TETrainingDummy, typeof(TETrainingDummy) },
+            { TileEntityType.TEItemFrame, typeof(TEItemFrame) },
+            { TileEntityType.TELogicSensor, typeof(TELogicSensor) },
+            { TileEntityType.TEDisplayDoll, typeof(TEDisplayDoll) },
+            { TileEntityType.TEWeaponsRack, typeof(TEWeaponsRack) },
+            { TileEntityType.TEHatRack, typeof(TEHatRack) },
+            { TileEntityType.TEFoodPlatter, typeof(TEFoodPlatter) },
+            { TileEntityType.TETeleportationPylon, typeof(TETeleportationPylon) }
+        };
         public override void Init()
         {
             if (SerializedEntitiesData != null)
@@ -131,14 +143,14 @@ namespace PlotMarker
             SerializedEntitiesData.DecompressBytes().DeserializeBytes<TempSavedEntityData[]>()
                 .TForEach(entityInfo => list.Add(entityInfo.Type switch
                 {
-                    TileEntityType.TEHatRack => entityInfo.EntityData.DeserializeBytes<ProtocolTEHatRack>(),
-                    TileEntityType.TEWeaponsRack => entityInfo.EntityData.DeserializeBytes<ProtocolTEWeaponsRack>(),
-                    TileEntityType.TEFoodPlatter => entityInfo.EntityData.DeserializeBytes<ProtocolTEFoodPlatter>(),
-                    TileEntityType.TEItemFrame => entityInfo.EntityData.DeserializeBytes<ProtocolTEItemFrame>(),
-                    TileEntityType.TETeleportationPylon => entityInfo.EntityData.DeserializeBytes<ProtocolTEItemFrame>(),
-                    TileEntityType.TEDisplayDoll => entityInfo.EntityData.DeserializeBytes<ProtocolTEDisplayDoll>(),
-                    TileEntityType.TETrainingDummy => entityInfo.EntityData.DeserializeBytes<ProtocolTETrainingDummy>(),
-                    TileEntityType.TELogicSensor => entityInfo.EntityData.DeserializeBytes<ProtocolTELogicSensor>(),
+                    TrProtocol.Models.TileEntityType.TEHatRack => entityInfo.EntityData.DeserializeBytes<TrProtocol.Models.TileEntities.TEHatRack>(),
+                    TrProtocol.Models.TileEntityType.TEWeaponsRack => entityInfo.EntityData.DeserializeBytes<TrProtocol.Models.TileEntities.TEWeaponsRack>(),
+                    TrProtocol.Models.TileEntityType.TEFoodPlatter => entityInfo.EntityData.DeserializeBytes<TrProtocol.Models.TileEntities.TEFoodPlatter>(),
+                    TrProtocol.Models.TileEntityType.TEItemFrame => entityInfo.EntityData.DeserializeBytes<TrProtocol.Models.TileEntities.TEItemFrame>(),
+                    TrProtocol.Models.TileEntityType.TETeleportationPylon => entityInfo.EntityData.DeserializeBytes<TrProtocol.Models.TileEntities.TEItemFrame>(),
+                    TrProtocol.Models.TileEntityType.TEDisplayDoll => entityInfo.EntityData.DeserializeBytes<TrProtocol.Models.TileEntities.TEDisplayDoll>(),
+                    TrProtocol.Models.TileEntityType.TETrainingDummy => entityInfo.EntityData.DeserializeBytes<TrProtocol.Models.TileEntities.TETrainingDummy>(),
+                    TrProtocol.Models.TileEntityType.TELogicSensor => entityInfo.EntityData.DeserializeBytes<TrProtocol.Models.TileEntities.TELogicSensor>(),
                     _ => throw new NotImplementedException()
                 }));
             return list;
@@ -185,8 +197,8 @@ namespace PlotMarker
             TileEntity.ByPosition.Where(t => rec.Contains(t.Key.X, t.Key.Y))
                 .TForEach(entity =>
                 {
-                    var e = Activator.CreateInstance(Constants.tileEntityDict[(TileEntityType)entity.Value.type], new object[] { entity.Value }) as IProtocolTileEntity;
-                    e.Position = new(entity.Key.X - startX, entity.Key.Y - startY); //转换为相对坐标
+                    var e = entity.Value.ToProtocalTileEntity();
+                    e.Position = new((short)(entity.Key.X - startX), (short)(entity.Key.Y - startY)); //转换为相对坐标
                     Entities.Add(e);
                 });
             SerializedEntitiesData = GetSerializedEntitiesData();
@@ -281,7 +293,7 @@ namespace PlotMarker
         }
         public void ClearEntities()
         {
-            List<IPacket> packetData = new();
+            List<Packet> packetData = new();
             Entities.ForEach(entity =>
             {
                 if (TileEntity.ByID.TryGetValue(entity.ID, out var placedEntity))
@@ -296,7 +308,7 @@ namespace PlotMarker
                         npc.active = false;
                         NetMessage.SendData((int)PacketTypes.NpcUpdate, -1, -1, null, dummy.npc);
                         dummy.npc = -1;
-                        (entity as ProtocolTETrainingDummy).NPC = -1;
+                        (entity as TrProtocol.Models.TileEntities.TETrainingDummy).NPC = -1;
                     }
 
                     packetData.Add(new TileEntitySharing()
@@ -415,19 +427,19 @@ namespace PlotMarker
                 {
                     var trEntity = entity.ToTrTileEntity();
                     trEntity.ID = placedEntity.ID;
-                    trEntity.Position = placedEntity.Position;
+                    trEntity.Position = new(placedEntity.Position.X, placedEntity.Position.Y);
                     TileEntity.ByID[placedEntity.ID] = trEntity;
                     TileEntity.ByPosition[placedEntity.Position] = trEntity;
 
                     entity.ID = placedEntity.ID;
-                    entity.Position = new(entityX, entityY); //位置信息为绝对坐标
+                    entity.Position = new((short)entityX, (short)entityY); //位置信息为绝对坐标
                     packetData.AddRange(new TileEntitySharing()
                     {
                         ID = placedEntity.ID,
                         IsNew = true,
                         Entity = entity
                     }.SerializePacket());
-                    entity.Position = new(entityX - X, entityY - Y); //更换位置信息为相对坐标
+                    entity.Position = new((short)(entityX - X), (short)(entityY - Y)); //更换位置信息为相对坐标
                 }
             });
             if (reScanEntity)

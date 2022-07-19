@@ -1,14 +1,9 @@
-﻿using TrProtocol.Models;
+﻿namespace TrProtocol.Packets;
 
-namespace TrProtocol.Packets
+public class TileEntitySharing : Packet
 {
-    public struct TileEntitySharing : IPacket
-    {
-        public MessageID Type => MessageID.TileEntitySharing;
-        public int ID { get; set; }
-        public bool IsNew { get; set; }
-        public TileEntityType EntityType => Entity?.EntityType ?? TileEntityType.Unknown;
-        [Condition("IsNew")]
-        public IProtocolTileEntity Entity { get; set; }
-    }
+    public override MessageID Type => MessageID.TileEntitySharing;
+    public int ID { get; set; }
+    public bool IsNew { get; set; }
+    [Condition(nameof(IsNew))] public TileEntity Entity { get; set; }
 }

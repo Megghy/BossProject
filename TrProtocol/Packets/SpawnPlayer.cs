@@ -1,13 +1,10 @@
-﻿using TrProtocol.Models;
+﻿namespace TrProtocol.Packets;
 
-namespace TrProtocol.Packets
+public class SpawnPlayer : Packet, IPlayerSlot
 {
-    public struct SpawnPlayer : IPacket, IPlayerSlot
-    {
-        public MessageID Type => MessageID.SpawnPlayer;
-        public byte PlayerSlot { get; set; }
-        public ShortPosition Position { get; set; }
-        public int Timer { get; set; }
-        public PlayerSpawnContext Context { get; set; }
-    }
+    public override MessageID Type => MessageID.SpawnPlayer;
+    public byte PlayerSlot { get; set; }
+    public ShortPosition Position { get; set; }
+    public int Timer { get; set; }
+    public PlayerSpawnContext Context { get; set; }
 }

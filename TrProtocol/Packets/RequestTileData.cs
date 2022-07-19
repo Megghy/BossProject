@@ -1,8 +1,7 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class RequestTileData : Packet
 {
-    public struct RequestTileData : IPacket
-    {
-        public MessageID Type => MessageID.RequestTileData;
-        public Point Position { get; set; }
-    }
+    public override MessageID Type => MessageID.RequestTileData;
+    public Position Position { get; set; }
 }

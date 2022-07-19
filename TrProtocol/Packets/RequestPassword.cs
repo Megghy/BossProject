@@ -1,7 +1,6 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class RequestPassword : Packet
 {
-    public struct RequestPassword : IPacket
-    {
-        public MessageID Type => MessageID.RequestPassword;
-    }
+    public override MessageID Type => MessageID.RequestPassword;
 }

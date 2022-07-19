@@ -1,10 +1,9 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class MassWireOperationPay : Packet, IPlayerSlot
 {
-    public struct MassWireOperationPay : IPacket, IPlayerSlot
-    {
-        public MessageID Type => MessageID.MassWireOperationPay;
-        public short ItemType { get; set; }
-        public short Stack { get; set; }
-        public byte PlayerSlot { get; set; }
-    }
+    public override MessageID Type => MessageID.MassWireOperationPay;
+    public short ItemType { get; set; }
+    public short Stack { get; set; }
+    public byte PlayerSlot { get; set; }
 }

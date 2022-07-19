@@ -1,8 +1,7 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class AchievementMessageNPCKilled : Packet
 {
-    public struct AchievementMessageNPCKilled : IPacket
-    {
-        public MessageID Type => MessageID.AchievementMessageNPCKilled;
-        public short NPCType { get; set; }
-    }
+    public override MessageID Type => MessageID.AchievementMessageNPCKilled;
+    public short NPCType { get; set; }
 }

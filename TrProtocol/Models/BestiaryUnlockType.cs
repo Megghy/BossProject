@@ -1,12 +1,7 @@
-﻿using TrProtocol.Serializers;
-
-namespace TrProtocol.Models
+﻿namespace TrProtocol.Models;
+public enum BestiaryUnlockType : byte
 {
-    [Serializer(typeof(ByteEnumSerializer<BestiaryUnlockType>))]
-    public enum BestiaryUnlockType : byte
-    {
-        Kill,
-        Sight,
-        Chat
-    }
+    Kill,
+    Sight,
+    Chat
 }

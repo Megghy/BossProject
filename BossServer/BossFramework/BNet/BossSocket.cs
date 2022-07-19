@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Net;
-using System.Threading;
+﻿using System.Net;
 using Terraria;
 using Terraria.Net;
 using Terraria.Net.Sockets;
@@ -34,7 +31,7 @@ namespace BossFramework.BNet
             IPEndPoint iPEndPoint = (IPEndPoint)session.Socket.RemoteEndPoint;
             _remoteAddress = new TcpAddress(iPEndPoint.Address, iPEndPoint.Port);
             IsServer = false;
-            
+
         }
 
         public void AsyncReceive(byte[] data, int offset, int size, SocketReceiveCallback callback, object state = null)

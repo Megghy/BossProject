@@ -3,6 +3,7 @@ using BossFramework.BCore;
 using BossFramework.BInterfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Terraria;
@@ -27,7 +28,7 @@ namespace BossFramework.BNet
                         {
                             if (t.BaseType?.Name == "PacketHandlerBase`1")
                                 Handlers.Add(
-                                    (PacketTypes)((IPacket)Activator.CreateInstance(t.BaseType.GetGenericArguments().First())!).Type,
+                                    (PacketTypes)((Packet)Activator.CreateInstance(t.BaseType.GetGenericArguments().First())!).Type,
                                     (IPacketHandler)Activator.CreateInstance(t, Array.Empty<object>())!);
                         });
         }
@@ -35,9 +36,11 @@ namespace BossFramework.BNet
         {
             try
             {
+                using var stream = new MemoryStream(args.Buffer);
+                using var reader = new BinaryReader(stream);
                 args.Handled = HandleSendData(new PacketEventArgs(TShock.Players[args.Socket.Id]?.GetBPlayer() ?? new(TShock.Players[args.Socket.Id]),
-                    (PacketTypes)args.Buffer[2],
-                    new BinaryBufferReader(args.Buffer))
+                    (PacketTypes)args.Buffer[2], reader
+                    )
                 {
                     Handled = args.Handled
                 });
@@ -66,9 +69,11 @@ namespace BossFramework.BNet
             }
             try
             {
+                using var stream = new MemoryStream(args.Msg.readBuffer, args.Index - 3, BitConverter.ToInt16(args.Msg.readBuffer, args.Index - 3));
+                using var reader = new BinaryReader(stream);
                 var packetArgs = new PacketEventArgs(TShock.Players[args.Msg.whoAmI]?.GetBPlayer() ?? new(TShock.Players[args.Msg.whoAmI]),
                     args.MsgID,
-                    new BinaryBufferReader(args.Msg.readBuffer, args.Index - 3, BitConverter.ToInt16(args.Msg.readBuffer, args.Index - 3)))
+                    reader)
                 {
                     Handled = args.Handled
                 };

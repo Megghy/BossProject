@@ -1,14 +1,10 @@
-﻿using TrProtocol.Models;
+﻿namespace TrProtocol.Packets;
 
-namespace TrProtocol.Packets
+public class TileChange : Packet
 {
-    public struct TileChange : IPacket
-    {
-        public MessageID Type => MessageID.TileChange;
-        public byte ChangeType { get; set; }
-        public ShortPosition Position { get; set; }
-        [BoundWith("MaxTileType")]
-        public short TileType { get; set; }
-        public byte Style { get; set; }
-    }
+    public override MessageID Type => MessageID.TileChange;
+    public byte ChangeType { get; set; }
+    public ShortPosition Position { get; set; }
+    public short TileType { get; set; }
+    public byte Style { get; set; }
 }

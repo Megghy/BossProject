@@ -1,8 +1,7 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class ClientUUID : Packet
 {
-    public struct ClientUUID : IPacket
-    {
-        public MessageID Type => MessageID.ClientUUID;
-        public string UUID { get; set; }
-    }
+    public override MessageID Type => MessageID.ClientUUID;
+    public string UUID { get; set; }
 }

@@ -1,8 +1,8 @@
 ﻿using BossFramework.BModels;
-using Microsoft.Xna.Framework;
 using TrProtocol.Models;
 using TrProtocol.Packets;
 using TShockAPI;
+using Vector2 = TrProtocol.Models.Vector2;
 
 namespace BossFramework.BInterfaces
 {
@@ -15,7 +15,7 @@ namespace BossFramework.BInterfaces
             {
                 if (_tweakePacket is null)
                 {
-                    var b1 = new ProtocolBitsByte();
+                    var b1 = new BitsByte();
                     b1[0] = Color.HasValue;
                     b1[1] = Damage.HasValue;
                     b1[2] = KnockBack.HasValue;
@@ -24,7 +24,7 @@ namespace BossFramework.BInterfaces
                     b1[5] = ShootProj.HasValue;
                     b1[6] = ShootSpeed.HasValue;
                     b1[7] = true;
-                    var b2 = new ProtocolBitsByte();
+                    var b2 = new BitsByte();
                     b2[0] = Width.HasValue;
                     b2[1] = Height.HasValue;
                     b2[2] = Size.HasValue;
@@ -139,7 +139,7 @@ namespace BossFramework.BInterfaces
         public void CreateProj(BPlayer plr, int projID, Vector2 position, Vector2 velocity, int damage = -1, float knockBack = -1, float ai0 = -1, float ai1 = -1)
         {
             _proj.SetDefaults(projID);
-            var bb = new ProtocolBitsByte();
+            var bb = new BitsByte();
             bb[0] = ai0 != -1;
             bb[1] = ai1 != -1;
             bb[3] = true; //bannerid

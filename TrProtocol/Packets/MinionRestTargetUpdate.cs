@@ -1,9 +1,8 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class MinionRestTargetUpdate : Packet, IPlayerSlot
 {
-    public struct MinionRestTargetUpdate : IPacket, IPlayerSlot
-    {
-        public MessageID Type => MessageID.MinionRestTargetUpdate;
-        public byte PlayerSlot { get; set; }
-        public Vector2 MinionRestTargetPoint { get; set; }
-    }
+    public override MessageID Type => MessageID.MinionRestTargetUpdate;
+    public byte PlayerSlot { get; set; }
+    public Vector2 MinionRestTargetPoint { get; set; }
 }

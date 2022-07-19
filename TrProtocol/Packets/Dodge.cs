@@ -1,9 +1,8 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class Dodge : Packet, IPlayerSlot
 {
-    public struct Dodge : IPacket, IPlayerSlot
-    {
-        public MessageID Type => MessageID.Dodge;
-        public byte PlayerSlot { get; set; }
-        public byte DodgeType { get; set; }
-    }
+    public override MessageID Type => MessageID.Dodge;
+    public byte PlayerSlot { get; set; }
+    public byte DodgeType { get; set; }
 }

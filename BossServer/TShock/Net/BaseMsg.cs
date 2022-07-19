@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.IO;
 using System.IO.Streams;
-using TrProtocol;
 
 namespace TShockAPI.Net
 {
@@ -42,7 +41,7 @@ namespace TShockAPI.Net
             stream.Position = end;
         }
 
-        public virtual void Unpack(BinaryBufferReader stream)
+        public virtual void Unpack(Stream stream)
         {
             throw new NotImplementedException();
         }

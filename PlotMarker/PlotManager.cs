@@ -5,6 +5,7 @@ using Terraria;
 using TrProtocol.Models;
 using TShockAPI;
 using TShockAPI.DB;
+using IProtocolTileEntity = TrProtocol.Models.TileEntity;
 
 namespace PlotMarker
 {

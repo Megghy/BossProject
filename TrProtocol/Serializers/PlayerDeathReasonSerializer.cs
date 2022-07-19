@@ -1,15 +1,16 @@
-﻿using System.IO;
+﻿namespace TrProtocol.Models;
 
-namespace TrProtocol.Models
+[Serializer(typeof(PlayerDeathReasonSerializer))]
+public partial class PlayerDeathReason
 {
-    public class PlayerDeathReasonSerializer : FieldSerializer<PlayerDeathReason>
+    private class PlayerDeathReasonSerializer : FieldSerializer<PlayerDeathReason>
     {
-        protected override PlayerDeathReason _Read(BinaryBufferReader br)
+        protected override PlayerDeathReason ReadOverride(BinaryReader br)
         {
-            return PlayerDeathReason.FromReader(br);
+            return FromReader(br);
         }
 
-        protected override void _Write(BinaryWriter bw, PlayerDeathReason t)
+        protected override void WriteOverride(BinaryWriter bw, PlayerDeathReason t)
         {
             t.WriteSelfTo(bw);
         }

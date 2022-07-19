@@ -1,10 +1,9 @@
-﻿namespace TrProtocol.Packets
+﻿namespace TrProtocol.Packets;
+
+public class NebulaLevelupRequest : Packet, IPlayerSlot
 {
-    public struct NebulaLevelupRequest : IPacket, IPlayerSlot
-    {
-        public MessageID Type => MessageID.NebulaLevelupRequest;
-        public byte PlayerSlot { get; set; }
-        public ushort NebulaType { get; set; }
-        public Vector2 Position { get; set; }
-    }
+    public override MessageID Type => MessageID.NebulaLevelupRequest;
+    public byte PlayerSlot { get; set; }
+    public ushort NebulaType { get; set; }
+    public Vector2 Position { get; set; }
 }
