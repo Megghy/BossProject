@@ -211,7 +211,7 @@ namespace Crossplay
                 if ((int)args.MsgID == 1)
                 {
                     string clientVersion = reader.ReadString();
-                    if (!int.TryParse(clientVersion.Substring(clientVersion.Length - 3), out int versionNum))
+                    if (!int.TryParse(clientVersion.AsSpan(clientVersion.Length - 3), out int versionNum))
                     {
                         return;
                     }
@@ -224,7 +224,7 @@ namespace Crossplay
                         return;
                     }
                     ClientVersions[index] = versionNum;
-                    NetMessage.SendData(9, args.Msg.whoAmI, -1, NetworkText.FromLiteral("Fixing Version..."), 1);
+                    NetMessage.SendData(9, args.Msg.whoAmI, -1, NetworkText.FromLiteral("正在修正版本"), 1);
                     byte[] connectRequest = new PacketFactory()
                         .SetType(1)
                         .PackString($"Terraria{ServerVersion}")

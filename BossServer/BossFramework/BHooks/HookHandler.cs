@@ -14,13 +14,13 @@ namespace BossFramework.BHooks
             GeneralHooks.ReloadEvent += HookHandlers.ReloadHandler.OnReload;
             AccountHooks.AccountCreate += HookHandlers.CreateAccountHandler.OnCreateAccount;
 
-            ServerApi.Hooks.ServerConnect.Register(BossPlugin.Instance, HookHandlers.PlayerConnectHandler.OnConnect, int.MinValue);
+            //ServerApi.Hooks.ServerConnect.Register(BossPlugin.Instance, HookHandlers.PlayerConnectHandler.OnConnect, int.MinValue);
             ServerApi.Hooks.NetGreetPlayer.Register(BossPlugin.Instance, HookHandlers.PlayerGreetHandler.OnGreetPlayer, int.MinValue);
             ServerApi.Hooks.ServerLeave.Register(BossPlugin.Instance, HookHandlers.PlayerLeaveHandler.OnPlayerLeave);
-            ServerApi.Hooks.GamePostInitialize.Register(BossPlugin.Instance, HookHandlers.PostInitializeHandler.OnGamePostInitialize, int.MinValue);
+            ServerApi.Hooks.GamePostInitialize.Register(BossPlugin.Instance, HookHandlers.PostInitializeHandler.OnGamePostInitialize, int.MaxValue);
             ServerApi.Hooks.GameUpdate.Register(BossPlugin.Instance, HookHandlers.GameUpdateHandler.OnGameUpdate);
-            ServerApi.Hooks.NetGetData.Register(BossPlugin.Instance, BNet.PacketHandler.OnGetData, int.MaxValue);
-            ServerApi.Hooks.NetSendBytes.Register(BossPlugin.Instance, BNet.PacketHandler.OnSendData, int.MaxValue);
+            ServerApi.Hooks.NetGetData.Register(BossPlugin.Instance, BNet.PacketHandler.OnGetData, int.MinValue);
+            ServerApi.Hooks.NetSendBytes.Register(BossPlugin.Instance, BNet.PacketHandler.OnSendData, int.MinValue);
         }
     }
 }

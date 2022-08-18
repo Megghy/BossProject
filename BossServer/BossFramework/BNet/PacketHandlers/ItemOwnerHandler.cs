@@ -13,12 +13,12 @@ namespace BossFramework.BNet.PacketHandlers
                 BCore.StatusSender.GetPingBackPacket(plr);
                 return false;
             }
-            return false;
+            return base.OnGetPacket(plr, packet);
         }
 
         public override bool OnSendPacket(BPlayer plr, ItemOwner packet)
         {
-            return false;
+            return base.OnSendPacket(plr, packet);
         }
     }
 }

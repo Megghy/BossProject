@@ -14,7 +14,7 @@ namespace BossFramework.BNet.PacketHandlers
 
         public override bool OnSendPacket(BPlayer plr, SyncPlayerChest packet)
         {
-            return false;
+            return base.OnSendPacket(plr, packet);
         }
     }
 }

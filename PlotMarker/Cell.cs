@@ -15,14 +15,14 @@ using TileEntity = Terraria.DataStructures.TileEntity;
 
 namespace PlotMarker
 {
-    struct SimpleChestData
+    record SimpleChestData
     {
         public string Name { get; set; }
         public short TileX { get; set; }
         public short TileY { get; set; }
         public TrProtocol.Models.ItemData[] Items { get; set; }
     }
-    struct SimpleSignData
+    record SimpleSignData
     {
         public short TileX { get; set; }
         public short TileY { get; set; }

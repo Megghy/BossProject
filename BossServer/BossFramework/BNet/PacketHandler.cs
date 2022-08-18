@@ -56,7 +56,7 @@ namespace BossFramework.BNet
                 args.Handled = handler.SendPacket(args.Player, args.Packet);
             if (SendPacketHandlers.TryGetValue(args.PacketType, out var list))
                 list.ForEach(h => h.Invoke(args));
-            BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnSendPacket(r, args)));
+            BRegionSystem.AllBRegion.Where(r => r.IsPlayerInThis(args.Player)).ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnSendPacket(r, args)));
 
             return args.Handled;
         }
@@ -82,7 +82,7 @@ namespace BossFramework.BNet
                     packetArgs.Handled = handler.GetPacket(packetArgs.Player, packetArgs.Packet);
                 if (GetPacketHandlers.TryGetValue(packetArgs.PacketType, out var list))
                     list.ForEach(h => h.Invoke(packetArgs));
-                BRegionSystem.AllBRegion.ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnGetPacket(r, packetArgs)));
+                BRegionSystem.AllBRegion.Where(r => r.IsPlayerInThis(packetArgs.Player)).ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnGetPacket(r, packetArgs)));
 
                 args.Handled = packetArgs.Handled;
             }
@@ -107,6 +107,13 @@ namespace BossFramework.BNet
             GetPacketHandlers.ForEach(s => s.Value.Remove(action));
         }
         public static void RegisteGetPacketHandler(PacketTypes type, Action<PacketEventArgs> action)
+        {
+            if (!GetPacketHandlers.ContainsKey(type))
+                GetPacketHandlers.Add(type, new() { action });
+            else
+                GetPacketHandlers[type].Add(action);
+        }
+        public static void RegisteGetPacketHandler<T>(PacketTypes type, Action<PacketEventArgs> action)
         {
             if (!GetPacketHandlers.ContainsKey(type))
                 GetPacketHandlers.Add(type, new() { action });

@@ -74,6 +74,17 @@ namespace BossFramework.BModels
             public BRegion Region { get; set; }
             public BPlayer Player { get; set; }
         }
+        public class PacketHookArgs<T> : IEventArgs where T : Packet
+        {
+            public PacketHookArgs(T packet, BPlayer plr)
+            {
+                Packet = packet;
+                Player = plr;
+            }
+            public T Packet { get; set; }
+            public BPlayer Player { get; set; }
+            public bool Handled { get; set; } = false;
+        }
         public class PlayerDamageEventArgs : IEventArgs
         {
             public PlayerDamageEventArgs(PlayerHurtV2 hurt, BPlayer plr)
@@ -82,6 +93,17 @@ namespace BossFramework.BModels
                 Player = plr;
             }
             public PlayerHurtV2 Hurt { get; set; }
+            public BPlayer Player { get; set; }
+            public bool Handled { get; set; } = false;
+        }
+        public class PlayerDeathEventArgs : IEventArgs
+        {
+            public PlayerDeathEventArgs(PlayerDeathV2 death, BPlayer plr)
+            {
+                Death = Death;
+                Player = plr;
+            }
+            public PlayerHurtV2 Death { get; set; }
             public BPlayer Player { get; set; }
             public bool Handled { get; set; } = false;
         }

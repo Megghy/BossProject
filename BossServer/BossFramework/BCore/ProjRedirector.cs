@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
+using TrProtocol;
 using TrProtocol.Packets;
 
 namespace BossFramework.BCore
@@ -20,7 +21,15 @@ namespace BossFramework.BCore
         private static void InitProjRedirect()
         {
             BLog.DEBUG("初始化弹幕重定向");
+            if (!BConfig.Instance.EnableProjRedirect)
+            {
+                BLog.Info("根据配置文件 禁用弹幕重定向");
+                return;
+            }
             DefaultProjContext = new(null);
+
+            BNet.PacketHandlers.DestroyProjectileHandler.Get += OnProjDestory;
+            BNet.PacketHandlers.SyncProjectileHandler.Get += OnProjSync;
 
             BRegionSystem.EnterBRegion += OnEnterRegion;
             BRegionSystem.LeaveBRegion += OnLeaveRegion;
@@ -58,10 +67,12 @@ namespace BossFramework.BCore
                 }
             }
         }
-        public static void OnProjDestory(BPlayer plr, KillProjectile killProj)
+        public static void OnProjSync(BEventArgs.PacketHookArgs<SyncProjectile> args)
+            => SyncProjsQueue.Enqueue((args.Player, args.Packet));
+        public static void OnProjDestory(BEventArgs.PacketHookArgs<KillProjectile> args)
         {
-            ProjDestroy?.Invoke(new(killProj, plr));
-            plr.CurrentRegion.ProjContext.DestroyProj(killProj);
+            ProjDestroy?.Invoke(new(args.Packet, args.Player));
+            args.Player.CurrentRegion.ProjContext.DestroyProj(args.Packet);
         }
         public static void OnEnterRegion(BEventArgs.BRegionEventArgs args)
         {

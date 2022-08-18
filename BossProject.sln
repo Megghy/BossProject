@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomWeapon", "CustomWeapo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegionTrigger", "RegionTrigger\RegionTrigger.csproj", "{1045A1C6-2C2F-460D-B20E-22320DDA91F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crossplay", "Crossplay\Crossplay.csproj", "{1C4574FF-5391-4E28-8D89-03A22C90BFA3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crossplay", "Crossplay\Crossplay.csproj", "{1C4574FF-5391-4E28-8D89-03A22C90BFA3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chameleon", "Chameleon\Chameleon.csproj", "{FC979086-75DC-412E-ADEE-C7D7F0509358}"
 EndProject
@@ -36,6 +36,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TUI", "TUI\TUI.csproj", "{945D64AF-1170-4E25-9265-E47971E495C3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TUIPlugin", "TUIPlugin\TUIPlugin.csproj", "{34008A1F-6228-4B82-9DF6-29BAF500C17F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nanami", "Nanami\Nanami.csproj", "{4C1A2A76-F8F3-470B-8F2A-B67672385AE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -181,6 +183,14 @@ Global
 		{34008A1F-6228-4B82-9DF6-29BAF500C17F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{34008A1F-6228-4B82-9DF6-29BAF500C17F}.Release|x86.ActiveCfg = Release|Any CPU
 		{34008A1F-6228-4B82-9DF6-29BAF500C17F}.Release|x86.Build.0 = Release|Any CPU
+		{4C1A2A76-F8F3-470B-8F2A-B67672385AE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C1A2A76-F8F3-470B-8F2A-B67672385AE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C1A2A76-F8F3-470B-8F2A-B67672385AE9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4C1A2A76-F8F3-470B-8F2A-B67672385AE9}.Debug|x86.Build.0 = Debug|Any CPU
+		{4C1A2A76-F8F3-470B-8F2A-B67672385AE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C1A2A76-F8F3-470B-8F2A-B67672385AE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C1A2A76-F8F3-470B-8F2A-B67672385AE9}.Release|x86.ActiveCfg = Release|Any CPU
+		{4C1A2A76-F8F3-470B-8F2A-B67672385AE9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,13 +8,12 @@ namespace BossFramework.BNet.PacketHandlers
     {
         public override bool OnGetPacket(BPlayer plr, SyncProjectile packet)
         {
-            BCore.ProjRedirector.SyncProjsQueue.Enqueue((plr, packet));
-            return true;
+            return base.OnGetPacket(plr, packet);
         }
 
         public override bool OnSendPacket(BPlayer plr, SyncProjectile packet)
         {
-            return false;
+            return base.OnSendPacket(plr, packet);
         }
     }
 }

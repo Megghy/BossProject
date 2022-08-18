@@ -9,12 +9,12 @@ namespace BossFramework.BNet.PacketHandlers
         public override bool OnGetPacket(BPlayer plr, ChestUpdates packet)
         {
             BCore.ChestRedirector.OnPlaceOrDestroyChest(plr, packet);
-            return false;
+            return base.OnGetPacket(plr, packet);
         }
 
         public override bool OnSendPacket(BPlayer plr, ChestUpdates packet)
         {
-            return false;
+            return base.OnSendPacket(plr, packet);
         }
     }
 }

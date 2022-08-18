@@ -238,14 +238,14 @@ namespace BossFramework.BCore
         /// 包含注册的牌子在内的所有牌子
         /// </summary>
         /// <returns></returns>
-        public static BSign[] AllSign()
+        public static List<BSign> AllSign()
         {
             var result = new List<BSign>();
             result.AddRange(Signs);
             result.AddRange(_overrideSign);
-            return result.ToArray();
+            return result;
         }
-        public static BSign[] RegistedSigns
-            => _overrideSign.ToArray();
+        public static List<BSign> RegistedSigns
+            => _overrideSign;
     }
 }

@@ -33,7 +33,7 @@ namespace BossFramework.BCore
             ProjRedirector.ProjCreate += OnProjCreate;
             ProjRedirector.ProjDestroy += OnProjDestroy;
 
-            BNet.PacketHandlers.PlayerDamageHandler.PlayerDamage += OnPlayerHurt;
+            BNet.PacketHandlers.PlayerDamageHandler.Get += OnPlayerHurt;
         }
         [Reloadable]
         private static void LoadWeapon()
@@ -97,12 +97,12 @@ namespace BossFramework.BCore
             }
             return false;
         }
-        public static void OnPlayerHurt(BEventArgs.PlayerDamageEventArgs args)
+        public static void OnPlayerHurt(BEventArgs.PacketHookArgs<PlayerHurtV2> args)
         {
             var plr = args.Player;
             if (plr.IsCustomWeaponMode)
             {
-                var hurt = args.Hurt;
+                var hurt = args.Packet;
                 var targetPlayer = TShock.Players[hurt.OtherPlayerSlot]?.GetBPlayer();
                 var deathReason = hurt.Reason;
                 if (plr.RelesedProjs.FirstOrDefault(p => p.Proj.ProjSlot == deathReason._sourceProjectileIndex) is { } projInfo)

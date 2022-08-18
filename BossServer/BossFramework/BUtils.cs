@@ -39,7 +39,7 @@ namespace BossFramework
             foreach (T obj in source)
             {
                 action(obj, count);
-                count++;
+                count++; 
             }
         }
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action) => source.ForEach((obj, _) => action(obj));

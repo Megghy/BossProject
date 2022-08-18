@@ -25,7 +25,7 @@ namespace BossFramework.BNet.PacketHandlers
 
         public override bool OnSendPacket(BPlayer plr, RequestReadSign packet)
         {
-            return false;
+            return base.OnSendPacket(plr, packet);
         }
     }
 }

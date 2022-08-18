@@ -12,14 +12,14 @@ namespace BossFramework.BNet.PacketHandlers
                 plr.ItemInHand = new(packet.ItemType, packet.Stack, packet.Prefix);
             if (BCore.BWeaponSystem.CheckIncomeItem(plr, packet))
                 return true;
-            return false;
+            return base.OnGetPacket(plr, packet);
         }
 
         public override bool OnSendPacket(BPlayer plr, SyncEquipment packet)
         {
             if (plr.IsChangingWeapon)
                 return true;
-            return false;
+            return base.OnSendPacket(plr, packet);
         }
     }
 }

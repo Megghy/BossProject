@@ -29,10 +29,11 @@ namespace PlotMarker
             ServerApi.Hooks.NetGetData.Register(this, OnGetData, 1000);
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreet);
             ServerApi.Hooks.ServerLeave.Register(this, OnLeave);
-            ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInitialize);
+            ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInitialize, 100);
             ServerApi.Hooks.WorldSave.Register(this, (args) => { Task.Run(() => PlotManager.CurrentPlot?.Cells.Where(c => c.IsVisiable).TForEach(c => c.SaveCellData())); });
 
             SignRedirector.SignUpdate += OnUpdateSign;
+            //SignRedirector.SignCreate += SignRedirector_SignCreate;
         }
 
         protected override void Dispose(bool disposing)
@@ -46,9 +47,11 @@ namespace PlotMarker
                 ServerApi.Hooks.GamePostInitialize.Deregister(this, OnPostInitialize);
 
                 SignRedirector.SignUpdate -= OnUpdateSign;
+                //SignRedirector.SignCreate -= SignRedirector_SignCreate;
             }
             base.Dispose(disposing);
         }
+
 
         private static void OnLeave(LeaveEventArgs args)
         {
@@ -92,6 +95,13 @@ namespace PlotMarker
         {
             PlotManager.Reload();
 
+            if (PlotManager.CurrentPlot != null)
+            {
+                var rect = new Rectangle(PlotManager.CurrentPlot.X, PlotManager.CurrentPlot.Y, PlotManager.CurrentPlot.Width, PlotManager.CurrentPlot.Height);
+                var count = SignRedirector.Signs.RemoveAll(s => rect.Contains(s.X, s.Y));
+                if (count > 0)
+                    TShock.Log.ConsoleInfo($"[PlotMarker] 忽略 {count} 个属地中的标牌");
+            }
             //设置未隐藏的属地的信息
             PlotManager.CurrentPlot?.Cells?.ForEach(c =>
             {
@@ -107,6 +117,7 @@ namespace PlotMarker
                     c.Entities = null;
                 }
             });
+
             FakeProviderAPI.World.ScanEntities(); //fakeprovider重新获取entity
         }
 
