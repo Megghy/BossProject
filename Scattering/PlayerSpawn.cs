@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Scattering
 {
-    public class PlayerSpawn : UserConfigBase<PlayerSpawn>
+    public class PlayerSpawn : DBStructBase<PlayerSpawn>
     {
         public long WorldId { get; set; }
         public int X { get; set; }

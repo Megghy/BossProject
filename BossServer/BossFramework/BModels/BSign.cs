@@ -3,7 +3,7 @@ using FreeSql.DataAnnotations;
 
 namespace BossFramework.BModels
 {
-    public class BSign : UserConfigBase<BSign>
+    public class BSign : DBStructBase<BSign>
     {
         /// <summary>
         /// 所属世界

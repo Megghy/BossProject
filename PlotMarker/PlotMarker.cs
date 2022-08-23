@@ -397,7 +397,7 @@ namespace PlotMarker
 
                         var count = PlotManager.GetTotalCells(args.Player.Account.Name);
                         var max = args.Player.GetMaxCells();
-                        if (max != -1 && count >= args.Player.GetMaxCells())
+                        if (max != -1 && count > max)
                         {
                             args.Player.SendErrorMessage("你无法获取更多属地. (你当前有{0}个/最多{1}个)", count, max);
                             return;
@@ -494,29 +494,26 @@ namespace PlotMarker
                 case "查询":
                 case "info":
                     {
-                        if (args.Parameters.Count != 1)
+                        if (args.Parameters.Count > 1)
                         {
-                            args.Player.SendErrorMessage("语法无效. 正确语法: {0}", TShock.Utils.ColorTag("/属地 信息", Color.Cyan));
-                            return;
-                        }
-                        info.Status = PlayerInfo.PointStatus.Delegate;
-                        info.OnGetPoint = InternalGetInfo;
-                        args.Player.SendInfoMessage("在你的属地内放置任意物块, 来查看你的属地信息.");
-
-                        void InternalGetInfo(int tileX, int tileY, TSPlayer player)
-                        {
-                            var cell = PlotManager.GetCellByPosition(tileX, tileY);
-                            if (cell != null)
+                            if (int.TryParse(args.Parameters[1], out var cellIndex))
                             {
-                                if (cell.Owner != player.Account.Name && !player.HasPermission("pm.admin.editall"))
+                                if (PlotManager.CurrentPlot.Cells.FirstOrDefault(c => c.Id == cellIndex) is { } tempCellInfo)
                                 {
-                                    player.SendErrorMessage("你不是该属地的主人.");
-                                    return;
+                                    args.Player.SendInfoMessage(tempCellInfo.GetInfo());
                                 }
-                                player.SendInfoMessage(cell.GetInfo());
-                                return;
+                                else
+                                    args.Player.SendErrorMessage($"未找到id为 {cellIndex} 的子属地");
                             }
-                            player.SendErrorMessage("选择点不在属地内.");
+                            else
+                                args.Player.SendErrorMessage("语法无效. 正确语法: /gm info <指定区域ID>");
+                        }
+                        else
+                        {
+                            if (args.Player.GetCurrentCell() is { } tempCellInfo2)
+                                args.Player.SendInfoMessage(tempCellInfo2.GetInfo());
+                            else
+                                args.Player.SendErrorMessage("你未处于某个子属地内");
                         }
                     }
                     break;
@@ -827,6 +824,29 @@ namespace PlotMarker
                     else
                         args.Player.SendInfoMessage($"没有可用属地对象");
                     break;
+                case "here":
+                    if (args.Parameters.Count > 0)
+                    {
+                        if (args.Player.GetCurrentCell() is { } here)
+                        {
+                            if (int.TryParse(args.Parameters[1], out var cellIndex))
+                            {
+                                if (PlotManager.CurrentPlot.Cells.FirstOrDefault(c => c.Id == cellIndex) is { } tempCellInfo)
+                                {
+                                    args.Player.SendInfoMessage(tempCellInfo.GetInfo());
+                                }
+                                else
+                                    args.Player.SendErrorMessage($"未找到id为 {cellIndex} 的子区域");
+                            }
+                            else
+                                args.Player.SendErrorMessage("语法无效. 正确语法: /gm here <指定区域ID>");
+                        }
+                        else
+                            args.Player.SendErrorMessage("你未处于某个属地内");
+                    }
+                    else
+                        args.Player.SendErrorMessage("语法无效. 正确语法: /gm here <指定区域ID>");
+                    break;
                 case "info":
                     {
                         if (args.Parameters.Count > 1)
@@ -945,11 +965,13 @@ namespace PlotMarker
                         var list = new List<string>
                         {
                             "info <id> - 获取指定区域信息, 未填写id则默认为玩家所处属地",
+                            "show <id> - 展示指定区域, 替换掉最久没人使用过的属地",
+                            "here <id> - 展示指定区域, 替换点当前所在属地",
+                            "del <id> - 隐藏指定区域, 未填写id则默认为玩家所处属地",
                             "fix - 修复因为某些原因重叠而无法使用的属地",
                             "fuck <id> - 重置指定区域, 未填写id则默认为玩家所处属地",
                             "chown <id> - 更改指定区域所有者(未完成)",
                             "del <id> - 删除指定区域, 未填写id则默认为玩家所处属地",
-                            "del <id> - 隐藏指定区域, 未填写id则默认为玩家所处属地",
                             "help [页码] - 获取帮助"
                         };
                         PaginationTools.SendPage(args.Player, pageNumber, list,

@@ -6,6 +6,7 @@ using Terraria;
 using TrProtocol.Packets;
 using ProtocalBitByte = TrProtocol.Models.BitsByte;
 using TShockAPI.DB;
+using System.Linq;
 
 public class testtag : BaseRegionTagProcessor
 {
@@ -28,7 +29,6 @@ public class testtag : BaseRegionTagProcessor
     private static WorldData ChangePacket(BRegion region, WorldData? data = null)
     {
         var worldData = data == null ? data : BUtils.GetCurrentWorldData();
-
         region.Tags.ForEach(t =>
         {
             switch (t.ToLower())
@@ -84,5 +84,77 @@ public class testtag : BaseRegionTagProcessor
         });
 
         plr.SendPacket(worldData);
+    }
+}
+public class playertag : BaseRegionTagProcessor
+{
+    public override void Dispose()
+    {
+    }
+
+    public override void Init()
+    {
+    }
+
+    public override void GameUpdate(BRegion region, long gameTime)
+    {
+        base.GameUpdate(region, gameTime);
+    }
+    public override void EnterRegion(BRegion region, BPlayer plr)
+    {
+        var result = CheckBuff(region, plr.TrPlayer.buffType);
+        if (result.Item1)
+        {
+            plr.SendPacket(BUtils.GetCurrentWorldData(true));
+            plr.SendPacket(new PlayerBuffs() { BuffTypes = result.Item2, PlayerSlot = plr.Index });
+        }
+    }
+
+    public override void OnGetPacket(BRegion region, BEventArgs.PacketEventArgs args)
+    {
+        if(args.PacketType == PacketTypes.PlayerAddBuff)
+        {
+            var bannedBuffs = region.Tags.Where(t => t.StartsWith("player.banbuff.")).Select(t => int.TryParse(t.Replace("player.banbuff.", ""), out var buffId) ? buffId : -1);
+            if (bannedBuffs.Contains(((AddPlayerBuff)args.Packet).BuffType))
+            {
+                var result = CheckBuff(region, args.Player.TrPlayer.buffType);
+                if (result.Item1)
+                {
+                    args.Player.SendPacket(BUtils.GetCurrentWorldData(true));
+                    args.Player.SendPacket(new PlayerBuffs() { BuffTypes = result.Item2, PlayerSlot = args.Player.Index });
+                    args.Handled = true;
+                }
+            }
+        }
+        if(args.PacketType == PacketTypes.PlayerBuff)
+        {
+            Console.WriteLine(String.Join(", ", ((PlayerBuffs)args.Packet).BuffTypes.Select(b => b.ToString())));
+            var result = CheckBuff(region, ((PlayerBuffs)args.Packet).BuffTypes.Select(b => (int)b).ToArray());
+            if (result.Item1)
+            {
+                args.Player.SendPacket(BUtils.GetCurrentWorldData(true));
+                BUtils.SendPacketToAll(new PlayerBuffs() { BuffTypes = result.Item2, PlayerSlot = args.Player.Index });
+                args.Handled = true;
+            }
+        }
+    }
+    public (bool, ushort[]) CheckBuff(BRegion region, int[] buffIds)
+    {
+        var bannedBuff = region.Tags.Where(t => t.StartsWith("player.banbuff.")).Select(t => int.TryParse(t.Replace("player.banbuff.", ""), out var buffId) ? buffId : -1);
+        if (!bannedBuff.Any())
+            return (false, Array.Empty<ushort>());
+        var list = new ushort[22];
+        bool have = false;
+        for (var i = 0; i < 22; i++)
+        {
+            if (bannedBuff.Contains(buffIds[i]))
+            {
+                have = true;
+                list[i] = 0;
+            }
+            else
+                list[i] = (ushort)buffIds[i];
+        }
+        return (have, list);
     }
 }

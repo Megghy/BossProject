@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace PlotMarker
 {
-    internal sealed class Plot : UserConfigBase<Plot>
+    internal sealed class Plot : DBStructBase<Plot>
     {
         /// <summary>
         /// 所属世界

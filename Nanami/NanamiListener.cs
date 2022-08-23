@@ -54,7 +54,8 @@ namespace Nanami
                 var killerData = PlayerPvpData.GetPlayerData(killer);
                 if(killerData.Kill() is { } killMessage)
                 {
-                    TSPlayer.All.SendMessage(killMessage, color: Color.White);
+                    args.Player.CurrentRegion?.GetPlayers().TForEach(p => p.SendMsg(killMessage, new Color(190, 110, 110)));
+                    //TSPlayer.All.SendMessage(killMessage, color: Color.White);
                 }
             }
 

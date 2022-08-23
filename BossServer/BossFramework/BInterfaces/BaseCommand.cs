@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System;
 
 namespace BossFramework.BInterfaces
 {
@@ -14,6 +15,10 @@ namespace BossFramework.BInterfaces
     public abstract class BaseCommand : ICommand
     {
         public abstract string[] Names { get; }
+
+        public virtual string Description { get; } = "";
+        public virtual void Init() { }
+        public virtual void Dispose() { }
         [SubCommand("help")]
         public virtual void Help(SubCommandArgs args)
         {
@@ -39,20 +44,23 @@ namespace BossFramework.BInterfaces
             {
                 var attrs = method.GetCustomAttributes(typeof(SubCommandAttribute), false);
                 if (attrs.Any())
-                    attrs.ForEach(a => list.Add(new SubCommandAttribute()
+                    attrs.ForEach(a =>
                     {
-                        Names = ((SubCommandAttribute)a).Names,
+                        var sub = ((SubCommandAttribute)a);
+                        sub.Permission ??= method.GetCustomAttribute<NeedPermissionAttribute>()?.Perms?.FirstOrDefault();
+                        sub.Description ??= method.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>()?.Description;
+                        list.Add(sub);
+                    });
+                else if (method.IsPublic)
+                {
+                    var sub = new SubCommandAttribute()
+                    {
+                        Names = new[] { method.Name.ToLower() },
                         Method = method,
                         Permission = method.GetCustomAttribute<NeedPermissionAttribute>()?.Perms?.FirstOrDefault()
-                    }));
-                else if (method.IsStatic)
-                {
-                    var attr = new SubCommandAttribute()
-                    {
-                        Names = new string[] { method.Name.ToLower() },
-                        Method = method,
                     };
-                    list.Add(attr);
+                    sub.Description ??= method.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>()?.Description;
+                    list.Add(sub);
                 }
             });
             SubCommands = list;

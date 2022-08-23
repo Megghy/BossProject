@@ -72,7 +72,7 @@ namespace BossFramework.BCore.Cmds
                 plrData.inventory.Where(i => i.NetId == 72).Sum(i => i.Stack),
                 plrData.inventory.Where(i => i.NetId == 71).Sum(i => i.Stack));
             Dictionary<int, (NetItem item, bool beEmpty)> items = new();
-            recipe.RequireItem.ForEach(item =>
+            recipe.RequireItem?.ForEach(item =>
             {
                 int slot = 0;
                 foreach (var i in plr.TrPlayer.inventory)
@@ -86,61 +86,69 @@ namespace BossFramework.BCore.Cmds
                 }
             });
             var blankSlot = plr.TrPlayer.inventory.Take(50).Count(i => i == null || i.type == 0) + items.Count(i => i.Value.beEmpty);
-            foreach (var item in recipe.GiveItem)
-            {
-                if (blankSlot > 0)
-                    blankSlot--;
-                else if (plr.TrPlayer.inventory.FirstOrDefault(i => i?.type == item.NetId) is { } existItem)
+            if (recipe.GiveItem?.Any() == true)
+                foreach (var item in recipe.GiveItem)
                 {
-                    if (existItem.stack + item.Stack > existItem.maxStack)
-                        blankSlot++;
+                    if (blankSlot > 0)
+                        blankSlot--;
+                    else if (plr.TrPlayer.inventory.FirstOrDefault(i => i?.type == item.NetId) is { } existItem)
+                    {
+                        if (existItem.stack + item.Stack > existItem.maxStack)
+                            blankSlot++;
+                    }
+                    else
+                    {
+                        plr.SendErrorMsg($"背包剩余空间不足以放下物品. 所需空间: {recipe.GiveItem.Length}");
+                        return;
+                    }
                 }
-                else
-                {
-                    plr.SendErrorMsg($"背包剩余空间不足以放下物品. 所需空间: {recipe.GiveItem.Length}");
-                    return;
-                }
-            }
             if (items.Count == recipe.RequireItem.Length)
             {
                 if (money.TotalCoin >= recipe.RequireCoin && plr.TrPlayer.BuyItem(recipe.RequireCoin))
                 {
                     var packets = new List<Packet>();
                     plrData.CopyCharacter(plr.TsPlayer);
-                    plrData.inventory.ForEach((i, slot) =>
+                    plrData.inventory?.ForEach((i, slot) =>
                     {
-                        if (items.TryGetValue(slot, out var itemInfo))
+                        try
                         {
-                            if (itemInfo.beEmpty)
-                                plr.TrPlayer.inventory[slot].SetDefaults();
-                            else
-                                plr.TrPlayer.inventory[slot].stack -= itemInfo.item.Stack;
-                            packets.Add(new SyncEquipment()
+                            if (items.TryGetValue(slot, out var itemInfo))
                             {
-                                ItemSlot = (short)slot,
-                                ItemType = (short)(itemInfo.beEmpty ? 0 : itemInfo.item.NetId),
-                                PlayerSlot = plr.Index,
-                                Prefix = plr.TrPlayer.inventory[slot].prefix,
-                                Stack = (short)plr.TrPlayer.inventory[slot].stack
-                            });
+                                if (itemInfo.beEmpty)
+                                    plr.TrPlayer.inventory[slot].SetDefaults();
+                                else
+                                    plr.TrPlayer.inventory[slot].stack -= itemInfo.item.Stack;
+                                packets.Add(new SyncEquipment()
+                                {
+                                    ItemSlot = (short)slot,
+                                    ItemType = (short)(itemInfo.beEmpty ? 0 : itemInfo.item.NetId),
+                                    PlayerSlot = plr.Index,
+                                    Prefix = plr.TrPlayer.inventory[slot].prefix,
+                                    Stack = (short)plr.TrPlayer.inventory[slot].stack
+                                });
+                            }
+                            else if (plr.TrPlayer.inventory[slot].type is 71 or 72 or 73 or 74)
+                                packets.Add(new SyncEquipment()
+                                {
+                                    ItemSlot = (short)slot,
+                                    ItemType = (short)plr.TrPlayer.inventory[slot].type,
+                                    PlayerSlot = plr.Index,
+                                    Prefix = plr.TrPlayer.inventory[slot].prefix,
+                                    Stack = (short)plr.TrPlayer.inventory[slot].stack
+                                });
                         }
-                        else
-                            packets.Add(new SyncEquipment()
-                            {
-                                ItemSlot = (short)slot,
-                                ItemType = (short)i.NetId,
-                                PlayerSlot = plr.Index,
-                                Prefix = i.PrefixId,
-                                Stack = (short)i.Stack
-                            });
+                        catch(System.Exception ex)
+                        {
+                            BLog.Error($"slot: {slot}, ex: {ex}");
+                        }
                     });
                     plr.SendPacket(BUtils.GetCurrentWorldData(true));
                     packets.SendPacketsToAll();
                     if (!Terraria.Main.ServerSideCharacter)
                         plr.SendPacket(BUtils.GetCurrentWorldData(false));
 
-                    recipe.GiveItem.ForEach(i => plr.TsPlayer.GiveItem(i.NetId, i.Stack, i.PrefixId));
-                    recipe.ExcuteCommands.ForEach(c => Commands.HandleCommand(plr.TsPlayer, c));
+                    recipe.GiveItem?.ForEach(i => plr.TsPlayer.GiveItem(i.NetId, i.Stack, i.PrefixId));
+                    recipe.ExcuteCommands?.ForEach(c => Commands.HandleCommand(plr.TsPlayer, c));
 
                     plr.SendSuccessMsg($"成功兑换配方 {recipe.Name}");
                 }

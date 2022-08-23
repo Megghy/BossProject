@@ -27,7 +27,7 @@ namespace BossFramework.BHooks.HookHandlers
             }
             catch (Exception ex)
             {
-                args.Player.SendInfoMessage(ex.Message);
+                Caller?.SendInfoMessage(ex.Message);
             }
             finally
             {

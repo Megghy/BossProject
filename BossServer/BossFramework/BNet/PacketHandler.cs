@@ -1,6 +1,7 @@
 ﻿using BossFramework.BAttributes;
 using BossFramework.BCore;
 using BossFramework.BInterfaces;
+using BossFramework.BModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -113,12 +114,9 @@ namespace BossFramework.BNet
             else
                 GetPacketHandlers[type].Add(action);
         }
-        public static void RegisteGetPacketHandler<T>(PacketTypes type, Action<PacketEventArgs> action)
+
+        public static void RegisteGetPacketHandler<T>(Action<PacketHookArgs<Packet>> action) where T : Packet
         {
-            if (!GetPacketHandlers.ContainsKey(type))
-                GetPacketHandlers.Add(type, new() { action });
-            else
-                GetPacketHandlers[type].Add(action);
         }
     }
 }

@@ -72,6 +72,22 @@ namespace BossFramework.BCore
             });
         }
 
+        public static string TryFormatSignText(this string text, BPlayer plr)
+        {
+            if (string.IsNullOrEmpty(text) || !text.Contains('\n'))
+                return text;
+            var lines = text.Split("\n");
+            var type = lines.First().Trim().ToLower() is { } firstLine && firstLine.StartsWith("```") ? firstLine.Remove(0, 3) : "";
+
+            switch (type)
+            {
+                case "placeholder":
+                case "ph":
+                    return CommandPlaceholder.Placeholders.Where(p => p.Match($"{{{type}}}")).FirstOrDefault()?.Replace(new(plr), $"{{{type}}}");
+            }
+            return "";
+        }
+
         #region 事件
         public delegate void OnSignRead(BEventArgs.SignReadEventArgs args);
         public static event OnSignRead SignRead;
@@ -136,8 +152,8 @@ namespace BossFramework.BCore
         public static void UpdateSignDirect(BPlayer plr, BSign sign, string text)
         {
             sign.Text = text;
-            sign.UpdateSingle(s => s.LastUpdateUser, plr.Index);
-            sign.UpdateSingle(s => s.Text, sign.Text);
+            sign.Update(s => s.LastUpdateUser, plr.Index);
+            sign.Update(s => s.Text, sign.Text);
 
             BInfo.OnlinePlayers.Where(p => p.WatchingSign?.sign == sign)
                 .ForEach(p =>

@@ -5,7 +5,7 @@ using TrProtocol.Models;
 
 namespace BossFramework.BModels
 {
-    public class BChest : UserConfigBase<BChest>
+    public class BChest : DBStructBase<BChest>
     {
         public override void Init()
         {

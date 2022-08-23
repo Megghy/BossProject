@@ -1,7 +1,10 @@
 ﻿using BossFramework.BInterfaces;
 using Microsoft.Xna.Framework;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Terraria;
 using TShockAPI;
 
 namespace BossFramework.BModels
@@ -15,9 +18,11 @@ namespace BossFramework.BModels
         {
             OriginArg = args;
             CommandName = cmdName;
-            SubCommandName = args.Parameters[0];
-            args.Parameters.RemoveAt(0); //第一个已经被默认读取为子命令名字
-            Param = args.Parameters.ToArray();
+            if (args.Parameters.Any())
+            {
+                SubCommandName = args.Parameters.FirstOrDefault();
+                Param = args.Parameters.Skip(1)?.ToArray() ?? Array.Empty<string>();//第一个已经被默认读取为子命令名字
+            }
             Player = args.Player.GetBPlayer();
         }
         public CommandArgs OriginArg { get; private set; }
@@ -26,8 +31,9 @@ namespace BossFramework.BModels
         public BPlayer Player { get; private set; }
         public string FullCommand => OriginArg.Message;
         public TSPlayer TsPlayer => Player?.TsPlayer;
+        public Player TrPlayer => Player?.TrPlayer;
         public string this[int index] => Param.Length > index && index >= 0 ? Param[index] : null;
-        public string[] Param { get; internal set; }
+        public string[] Param { get; internal set; } = Array.Empty<string>();
 
         public IEnumerator<string> GetEnumerator()
         {

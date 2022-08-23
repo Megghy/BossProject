@@ -29,7 +29,7 @@ namespace PlotMarker
         public string Text { get; set; }
     }
 
-    internal sealed class Cell : UserConfigBase<Cell>
+    internal sealed class Cell : DBStructBase<Cell>
     {
         public static readonly Dictionary<TileEntityType, Type> tileEntityDict = new()
         {
@@ -365,8 +365,8 @@ namespace PlotMarker
                 UsingCellPositionIndex.Clear();
                 UsingCellPositionIndex.Add(pos.Index);
 
-                UpdateSingle(c => c.LastPositionIndex);
-                UpdateSingle(c => c.UsingCellPositionIndex);
+                Update(c => c.LastPositionIndex);
+                Update(c => c.UsingCellPositionIndex);
 
                 ReDraw();
 

@@ -42,9 +42,12 @@ namespace BossFramework.BCore
                             .ForEach(t =>
                             {
                                 var tempCMD = (BaseCommand)Activator.CreateInstance(t)!;
+                                tempCMD.Init();
                                 tempCMD.RegisterAllSubCommands();
                                 Cmds.Add(tempCMD);
                                 RegisteToTS(tempCMD);
+
+                                BLog.Info($"加载命令 [{string.Join(", ", tempCMD.Names)}]");
                             });
 
                         loaded.Add(a);
@@ -55,10 +58,13 @@ namespace BossFramework.BCore
                 ScriptManager.LoadScripts<BaseCommand>(ScriptCmdPath)?
                     .ForEach(s =>
                     {
+                        s.Init();
                         s.RegisterAllSubCommands();
                         Cmds.Add(s);
                         RegisteToTS(s);
+                        BLog.Info($"加载命令 [{string.Join(", ", s.Names)}]");
                     });
+                BLog.Success($"共加载 {Cmds.Count} 个命令");
             }
             catch (Exception ex) { BLog.Error($"注册命令失败\r\n{ex}"); }
         }
@@ -68,7 +74,10 @@ namespace BossFramework.BCore
         /// <param name="cmd"></param>
         private static void RegisteToTS(BaseCommand cmd)
         {
-            var tscmd = new Command(OnBCmd, cmd.Names);
+            var tscmd = new Command(OnBCmd, cmd.Names)
+            {
+                HelpText = cmd.Description
+            };
             Commands.ChatCommands.Add(tscmd);
             _tsCmds.Add(tscmd);
         }
@@ -77,6 +86,7 @@ namespace BossFramework.BCore
         {
             _tsCmds.ForEach(c => Commands.ChatCommands.Remove(c));
             _tsCmds.Clear();
+            Cmds.ForEach(c => c.Dispose());
             Cmds.Clear();
             RegisteAllCommands();
             BLog.Success("指令已重载");
@@ -86,12 +96,12 @@ namespace BossFramework.BCore
             CommandPlaceholder.Placeholders.Where(p => p.Match(args.CommandText))
                 .TForEach(p =>
                 {
-                    args.CommandText = p.Replace(args, args.CommandText);
+                    args.CommandText = p.Replace(new(args.Player.GetBPlayer()), args.CommandText);
                     if (args.Parameters.Any())
                         for (int i = 0; i < args.Parameters.Count; i++)
                         {
                             if (p.Match(args.Parameters[i]))
-                                args.Parameters[i] = p.Replace(args, args.Parameters[i]);
+                                args.Parameters[i] = p.Replace(new(args.Player.GetBPlayer()), args.Parameters[i]);
                         }
                 });
         }
@@ -123,6 +133,8 @@ namespace BossFramework.BCore
                     else
                         cmd.Help(new(args, cmdName));
                 }
+                else if (cmd.HasDefaultCommand)
+                    cmd.Default(new(args, cmdName));
                 else
                     cmd.Help(new(args, cmdName));
             }

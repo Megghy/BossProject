@@ -5,11 +5,11 @@ using TShockAPI;
 
 namespace BossFramework.BModels
 {
-    public class PlaceholderInfo : UserConfigBase<PlaceholderInfo>
+    public class PlaceholderInfo : DBStructBase<PlaceholderInfo>
     {
         public override void Init()
         {
-            ResultDelegate = CSScript.Evaluator.CreateDelegate<string>(@"string placeholder(TShockAPI.Hooks.PlayerCommandEventArgs args){" + EvalString + "}");
+            ResultDelegate = CSScript.Evaluator.CreateDelegate<string>(@"string placeholder(BossFramework.BModels.BEventArgs.BaseEventArgs args){" + EvalString + "}");
             _regex = new Regex(@"\{\s*" + Name + @"\s*\}");
         }
         private Regex _regex;
@@ -20,9 +20,9 @@ namespace BossFramework.BModels
             => _regex is null
             ? text.Contains($"{{{Name}}}")
             : _regex.IsMatch(text);
-        public string Replace(TShockAPI.Hooks.PlayerCommandEventArgs args, string text)
+        public string Replace(BEventArgs.BaseEventArgs args, string text)
         {
-            var result = ResultDelegate.Invoke(new object[] { args });
+            var result = ResultDelegate?.Invoke(new object[] { args });
             if (_regex is null)
                 return text.Replace($"{{{Name}}}", result);
             else

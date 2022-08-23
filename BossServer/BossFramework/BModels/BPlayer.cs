@@ -14,9 +14,9 @@ using static BossFramework.BModels.BEventArgs;
 
 namespace BossFramework.BModels
 {
-    public partial class BPlayer : UserConfigBase<BPlayer>, ISendMsg
+    public partial class BPlayer : DBStructBase<BPlayer>, ISendMsg
     {
-        public static readonly BPlayer Default = new(new(255) { })
+        public static readonly BPlayer Default = new(new(256) { })
         {
             Id = -1
         };
@@ -35,11 +35,17 @@ namespace BossFramework.BModels
         }
 
         #region 变量
+        public long OnlineTicks { get; set; } = 0;
+        public TimeSpan OnlineTime
+            => new(OnlineTicks);
+
+
         public Stopwatch PingChecker { get; } = new();
         [Column(IsIgnore = true)]
         public int LastPing { get; internal set; } = -1;
         [Column(IsIgnore = true)]
         public long LastPingTime { get; internal set; } = -1;
+        [Column(IsIgnore = true)]
         public bool WaitingPing { get; internal set; } = false;
 
         public TSPlayer TsPlayer { get; internal set; }
@@ -52,8 +58,11 @@ namespace BossFramework.BModels
         public int TileX => TsPlayer.TileX;
         public int TileY => TsPlayer.TileY;
 
+        public readonly Dictionary<Func<BaseEventArgs, string>, int> PlayerStatusCallback = new();
+
         public BaseBWeapon[] Weapons { get; internal set; }
-        public BRegion CurrentRegion { get; internal set; } = BRegion.Default;
+        public BRegion CurrentRegion
+            => BCore.BRegionSystem.FindBRegionForRegion(TsPlayer?.CurrentRegion) ?? BRegion.Default;
         public ProjRedirectContext ProjContext => CurrentRegion?.ProjContext;
         /// <summary>
         /// 是否处于使用自定义武器的状态, 修改需使用 <see cref="BCore.BWeaponSystem.ChangeCustomWeaponMode(BPlayer, bool?)"/>
@@ -62,6 +71,7 @@ namespace BossFramework.BModels
         public bool IsCustomWeaponMode { get; internal set; } = false;
         [Column(IsIgnore = true)]
         public bool IsChangingWeapon { get; internal set; } = false;
+        [Column(IsIgnore = true)]
         public NetItem ItemInHand { get; internal set; } = new(0, 0, 0);
 
         public List<BWeaponRelesedProj> RelesedProjs { get; } = new();
@@ -166,6 +176,16 @@ namespace BossFramework.BModels
             => BCore.BPointSystem.ChangePoint(Index, num, from);
         public bool TakePoint(int num, string from = "未知")
             => BCore.BPointSystem.ChangePoint(Index, -num, from);
+
+        public void SetData(string key, object data)
+            => TsPlayer?.SetData(key, data);
+        public bool ContainsData(string key)
+            => TsPlayer?.ContainsData(key) ?? false;
+        public T GetData<T>(string key)
+            => TsPlayer.GetData<T>(key) ?? default;
+        public void RemoveData(string key)
+            => TsPlayer?.RemoveData(key);
+
         #region 玩家状态
         /// <summary>
         /// 增加或减少玩家魔法值, 如果不足的话返回 false

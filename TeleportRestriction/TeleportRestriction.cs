@@ -71,9 +71,9 @@ namespace TeleportRestriction
 
             if (Trm.ShouldRes(player.TileX, player.TileY, (int)e.X / 16, (int)e.Y / 16))
             {
-                player.SendErrorMessage("无法传送.");
                 player.Teleport(player.TPlayer.position.X, player.TPlayer.position.Y);
                 player.Disable("禁止传送区域内传送", DisableFlags.None);
+                player.SendErrorMessage("无法传送.");
                 e.Handled = true;
             }
         }

@@ -8,6 +8,8 @@ namespace BossFramework.BHooks.HookHandlers
 {
     public static class PlayerGreetHandler
     {
+        public delegate void OnJoin(BEventArgs.BaseEventArgs args);
+        public static event OnJoin Join;
         public static void OnGreetPlayer(GreetPlayerEventArgs args)
         {
             var tsPlr = TShock.Players[args.Who];
@@ -25,6 +27,7 @@ namespace BossFramework.BHooks.HookHandlers
                     Terraria.NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, null, bPlr.Index);
 
                     TShock.Utils.Broadcast($"{">>".Color("B6D6A2")} {bPlr.Name} {"加入服务器".Color("B6D6A2")}", Color.White);
+                    Join?.Invoke(new BEventArgs.BaseEventArgs(bPlr));
                     args.Handled = true;
                 }
                 else

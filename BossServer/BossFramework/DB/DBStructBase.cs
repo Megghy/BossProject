@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace BossFramework.DB
 {
-    public abstract class UserConfigBase<T> : BaseEntity<UserConfigBase<T>, long> where T : UserConfigBase<T>
+    public abstract class DBStructBase<T> : BaseEntity<DBStructBase<T>, long> where T : DBStructBase<T>
     {
         [Column(IsPrimary = true, IsIdentity = true)]
         public override long Id { get => base.Id; set => base.Id = value; }
@@ -15,7 +15,7 @@ namespace BossFramework.DB
         {
 
         }
-        public int UpdateSingle<TV>(Expression<Func<T, TV>> extract, TV value, bool updateProp = true)
+        public int Update<TV>(Expression<Func<T, TV>> extract, TV value, bool updateProp = true)
         {
             var prop = extract.Body
                 .GetType()
@@ -37,7 +37,7 @@ namespace BossFramework.DB
             }
             return 0;
         }
-        public int UpdateSingle<TV>(Expression<Func<T, TV>> extract)
+        public int Update<TV>(Expression<Func<T, TV>> extract)
         {
             try
             {

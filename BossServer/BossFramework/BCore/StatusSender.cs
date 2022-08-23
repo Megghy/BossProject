@@ -12,23 +12,29 @@ namespace BossFramework.BCore
     {
         public static readonly byte[] PingPacketData = new ResetItemOwner() { ItemSlot = PING_ITEM_SLOT }.SerializePacket();
         public const int PING_ITEM_SLOT = 400;
-        internal static readonly Dictionary<Func<BPlayer, string>, int> _statusCallback = new() { { DefaultStatus, 99 } };
+        internal static readonly Dictionary<Func<BEventArgs.BaseEventArgs, string>, int> _statusCallback = new() { { DefaultStatus, 99 } };
         [SimpleTimer(Time = 1)]
         public static void UpdateStatus()
         {
+            var sb = new StringBuilder();
             BInfo.OnlinePlayers.ForEach(p =>
             {
-                var text = _statusCallback.OrderByDescending(s => s.Value)
-                .First().Key(p);
-                text = "                                                                           \r\n"
-                 + text + RepeatLineBreaks(50);
+                sb.Clear();
+                sb.AppendLine("                                                                           ");
+                var dict = p.PlayerStatusCallback.Concat(_statusCallback).OrderByDescending(i => i.Value);
+                dict.OrderByDescending(s => s.Value)
+                .ForEach(callback =>
+                {
+                    sb.AppendLine(callback.Key(new(p)));
+                });
+                sb.AppendLine(RepeatLineBreaks(50));
                 p.SendPacket(new StatusText()
                 {
-                    Text = TrProtocol.Models.NetworkText.FromLiteral(text),
+                    Text = TrProtocol.Models.NetworkText.FromLiteral(sb.ToString()),
                     Max = 0,
                     Flag = 0,
                 });
-                if (BInfo.GameTick - p.LastPingTime >= 50 && !p.WaitingPing)
+                if (!p.WaitingPing)
                 {
                     p.WaitingPing = true;
                     p.SendRawData(PingPacketData);
@@ -36,10 +42,12 @@ namespace BossFramework.BCore
                 }
             });
         }
-        private static string DefaultStatus(BPlayer plr)
+        private static string DefaultStatus(BEventArgs.BaseEventArgs args)
         {
+            if (args.Handled)
+                return string.Empty;
             var sb = new StringBuilder();
-            sb.AppendLine($"Ping: {(plr.LastPing < 100 ? "[i:3738]" : "[i:3736]")} {plr.LastPing} ms");
+            sb.AppendLine($"Ping: {(args.Player.LastPing < 100 ? "[i:3738]" : "[i:3736]")} {args.Player.LastPing} ms");
             sb.AppendLine($"在线: {BInfo.OnlinePlayers.Length} 人");
             return sb.ToString();
         }
@@ -55,16 +63,32 @@ namespace BossFramework.BCore
         /// </summary>
         /// <param name="func"></param>
         /// <param name="order">越高越靠前</param>
-        public static void RegisteStatus(Func<BPlayer, string> func, int order = 100)
+        public static void RegisteStatus(Func<BEventArgs.BaseEventArgs, string> func, int order = 100)
         {
             if (_statusCallback.ContainsKey(func))
                 return;
             _statusCallback.Add(func, order);
         }
-        public static void DeregisteStatus(Func<BPlayer, string> func)
+        public static void DeregisteStatus(Func<BEventArgs.BaseEventArgs, string> func)
         {
             if (_statusCallback.ContainsKey(func))
                 _statusCallback.Remove(func);
+        }
+        /// <summary>
+        /// 注册状态信息
+        /// </summary>
+        /// <param name="func"></param>
+        /// <param name="order">越高越靠前</param>
+        public static void RegistePlayerStatus(this BPlayer plr, Func<BEventArgs.BaseEventArgs, string> func, int order = 100)
+        {
+            if (plr.PlayerStatusCallback.ContainsKey(func))
+                return;
+            plr.PlayerStatusCallback.Add(func, order);
+        }
+        public static void DeregistePlayerStatus(this BPlayer plr, Func<BEventArgs.BaseEventArgs, string> func)
+        {
+            if (plr.PlayerStatusCallback.ContainsKey(func))
+                plr.PlayerStatusCallback.Remove(func);
         }
         private static string RepeatLineBreaks(int v)
         {

@@ -13,6 +13,7 @@ namespace BossFramework.BHooks
             OTAPI.Hooks.Netplay.CreateTcpListener += HookHandlers.SocketCreateHandler.OnSocketCreate;
             GeneralHooks.ReloadEvent += HookHandlers.ReloadHandler.OnReload;
             AccountHooks.AccountCreate += HookHandlers.CreateAccountHandler.OnCreateAccount;
+            PlayerHooks.PlayerChat += HookHandlers.PlayerChatHandler.OnChat;
 
             //ServerApi.Hooks.ServerConnect.Register(BossPlugin.Instance, HookHandlers.PlayerConnectHandler.OnConnect, int.MinValue);
             ServerApi.Hooks.NetGreetPlayer.Register(BossPlugin.Instance, HookHandlers.PlayerGreetHandler.OnGreetPlayer, int.MinValue);

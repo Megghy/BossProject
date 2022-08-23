@@ -382,6 +382,9 @@ namespace BossFramework
         public static void SendPacketToAll(this Packet packet, params BPlayer[] ignore)
             => BInfo.OnlinePlayers.Where(p => !(ignore?.Contains(p) == true))
                 .ForEach(p => p.SendPacket(packet));
+        public static void SendPacketToAll(this Packet packet, int ignoreIndex)
+            => BInfo.OnlinePlayers.Where(p => p.Index != ignoreIndex)
+                .ForEach(p => p.SendPacket(packet));
         public static void SendPacketsToAll(this IEnumerable<Packet> packets, params BPlayer[] ignore)
             => BInfo.OnlinePlayers.Where(p => !(ignore?.Contains(p) == true))
             .ForEach(p => p.SendPackets(packets));
@@ -470,7 +473,7 @@ namespace BossFramework
                     {
                         cmd.CommandDelegate?.Invoke(new CommandArgs(cmdText, silent, player, args));
                     }
-                    BLog.Info($"{player.Name} 使用命令 {cmdText}");
+                    BLog.Info($"{player.Name} 使用命令 {TShock.Config.Settings.CommandSpecifier}{cmdText}");
                 }
                 catch (Exception ex)
                 {

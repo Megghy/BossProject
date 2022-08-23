@@ -32,5 +32,10 @@ namespace BossFramework.BCore.Cmds
             else
                 args.Player.SendErrorMsg($"格式错误. /boss ncw <玩家名> (on/off)");
         }
+        [NeedPermission("boss.admin.reload")]
+        public static void reload(SubCommandArgs args)
+        {
+            BHooks.HookHandlers.ReloadHandler.OnReload(new(args.TsPlayer));
+        }
     }
 }

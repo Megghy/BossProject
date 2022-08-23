@@ -11,8 +11,6 @@ namespace BossFramework.BNet.PacketHandlers
 {
     public class PlayerDeathHandler : PacketHandlerBase<PlayerDeathV2>
     {
-        public delegate void OnPlayerDeath(BEventArgs.PlayerDamageEventArgs hurt);
-        public static event OnPlayerDeath PlayerDamage;
         public override bool OnGetPacket(BPlayer plr, PlayerDeathV2 packet)
         {
             var death = TShock.Players[packet.PlayerSlot]?.GetBPlayer();

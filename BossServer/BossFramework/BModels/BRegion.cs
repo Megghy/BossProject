@@ -7,7 +7,7 @@ using TShockAPI.DB;
 
 namespace BossFramework.BModels
 {
-    public class BRegion : UserConfigBase<BRegion>
+    public class BRegion : DBStructBase<BRegion>
     {
         public const string DefaultRegionName = "DefaultBRegion";
         public static BRegion Default { get; } = new(null);
@@ -72,10 +72,10 @@ namespace BossFramework.BModels
                 return;
             _childRegion.Add(region);
             ChildsId.Add(region.Id);
-            UpdateSingle(r => r.ChildsId);
+            Update(r => r.ChildsId);
 
             region.ParentId = Id;
-            region.UpdateSingle(r => r.ParentId);
+            region.Update(r => r.ParentId);
         }
         public void RemoveChild(BRegion region)
         {
@@ -83,15 +83,15 @@ namespace BossFramework.BModels
                 return;
             _childRegion.Remove(region);
             ChildsId.Remove(region.Id);
-            UpdateSingle(r => r.ChildsId);
+            Update(r => r.ChildsId);
 
             region.ParentId = Id;
-            region.UpdateSingle(r => r.ParentId);
+            region.Update(r => r.ParentId);
         }
         public void SetParent(BRegion region)
         {
             if (region is null)
-                UpdateSingle(r => r.ParentId, -1);
+                Update(r => r.ParentId, -1);
             else
                 region.RemoveChild(this);
         }
@@ -120,7 +120,7 @@ namespace BossFramework.BModels
             if (Tags.Contains(tagName))
                 return false;
             Tags.Add(tagName);
-            if (UpdateSingle(r => r.Tags) > 0)
+            if (Update(r => r.Tags) > 0)
                 return true;
             else
             {
@@ -132,7 +132,7 @@ namespace BossFramework.BModels
         {
             if (!Tags.Contains(tagName))
                 return;
-            if (!Tags.Remove(tagName) || UpdateSingle(r => r.Tags) == 0)
+            if (!Tags.Remove(tagName) || Update(r => r.Tags) == 0)
                 Tags.Add(tagName);
         }
         #endregion

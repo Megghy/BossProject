@@ -11,9 +11,9 @@ public class SyncProjectile : Packet, IProjSlot, IPlayerSlot
     public short ProjType { get; set; }
     public BitsByte Bit1 { get; set; }
     [Condition(nameof(Bit1), 0)]
-    public float AI1 { get; set; }
+    public float AI1 { get; set; } = 0f;
     [Condition(nameof(Bit1), 1)]
-    public float AI2 { get; set; }
+    public float AI2 { get; set; } = 0f;
     [Condition(nameof(Bit1), 3)]
     public ushort BannerId { get; set; }
     [Condition(nameof(Bit1), 4)]

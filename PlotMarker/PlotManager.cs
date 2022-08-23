@@ -101,7 +101,7 @@ namespace PlotMarker
                     }
                 }
                 plot.CellsPosition = cellsPos.ToList();
-                plot.UpdateSingle(p => p.CellsPosition);
+                plot.Update(p => p.CellsPosition);
             });
         }
 
@@ -174,7 +174,7 @@ namespace PlotMarker
             realCell.AllowedIDs.Add(user.ID);
             cell.AllowedIDs = realCell.AllowedIDs;
 
-            return cell.UpdateSingle(c => c.AllowedIDs) == 1;
+            return cell.Update(c => c.AllowedIDs) == 1;
         }
 
         public static bool RemoveCellUser(Cell cell, UserAccount user)
@@ -186,14 +186,14 @@ namespace PlotMarker
                     return false;
                 }
 
-                return cell.UpdateSingle(c => c.AllowedIDs) == 1;
+                return cell.Update(c => c.AllowedIDs) == 1;
             }
 
             return false;
         }
 
         public static void UpdateLastAccess(Cell cell)
-            => Task.Run(() => cell.UpdateSingle(c => c.LastAccess, DateTime.Now));
+            => Task.Run(() => cell.Update(c => c.LastAccess, DateTime.Now));
 
         public static Cell GetCellByPosition(int tileX, int tileY)
         {

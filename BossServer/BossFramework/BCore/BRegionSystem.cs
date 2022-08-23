@@ -64,7 +64,7 @@ namespace BossFramework.BCore
         {
             if (region is null)
                 return null;
-            return AllBRegion.FirstOrDefault(r => r.Name == region.Name && r.WorldId.ToString() == region.WorldID);
+            return AllBRegion.Find(r => r.Name == region.Name && r.WorldId.ToString() == region.WorldID);
         }
         /// <summary>
         /// 返回指定领地中的所有玩家, 提供参数为null时返回所有未在领地中的玩家
@@ -129,13 +129,13 @@ namespace BossFramework.BCore
                 if (isEnter)
                 {
                     EnterBRegion?.Invoke(args);
-                    plr.CurrentRegion = region;
+                    //plr.CurrentRegion = region;
                 }
                 else
                 {
                     LeaveBRegion?.Invoke(args);
-                    if (plr.CurrentRegion == region)
-                        plr.CurrentRegion = BRegion.Default;
+                    //if (plr.CurrentRegion == region)
+                        //plr.CurrentRegion = BRegion.Default;
                 }
             }
         }

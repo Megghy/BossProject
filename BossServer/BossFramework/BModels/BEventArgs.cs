@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using System.IO;
+using Terraria;
 using TrProtocol;
 using TrProtocol.Packets;
+using TShockAPI;
 
 namespace BossFramework.BModels
 {
@@ -12,6 +14,15 @@ namespace BossFramework.BModels
     }
     public static class BEventArgs
     {
+        public class BaseEventArgs : IEventArgs
+        {
+            public BaseEventArgs(BPlayer plr)
+            {
+                Player = plr;
+            }
+            public bool Handled { get; set; } = false;
+            public BPlayer Player { get; private set; }
+        }
         public class PacketEventArgs : IEventArgs
         {
             public PacketEventArgs(BPlayer plr, PacketTypes type, BinaryReader reader)
