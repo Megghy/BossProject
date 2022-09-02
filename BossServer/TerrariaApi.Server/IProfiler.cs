@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TerrariaApi.Server
+﻿namespace TerrariaApi.Server
 {
     /// <summary>
     ///   Implements a server profiler. Methods of this implementation are generally expected to be thread safe. Note that

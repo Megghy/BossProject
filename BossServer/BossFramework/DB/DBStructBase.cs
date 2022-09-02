@@ -1,6 +1,5 @@
 ﻿using FreeSql;
 using FreeSql.DataAnnotations;
-using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;

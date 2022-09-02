@@ -1,19 +1,25 @@
-﻿using TShockAPI;
+﻿using FreeSql.DataAnnotations;
+using TShockAPI;
 using TShockAPI.DB;
 
 namespace AlternativeCommandExecution.SwitchCommand
 {
-    internal sealed class SwitchCmd
+    [Table(Name = "switchcommands")]
+    internal class SwitchCmd
     {
-        public string Command;
+        public long worldId { get; set; }
+        [Column(DbType = "text")]
+        public string Command { get; set; }
 
-        public int X;
+        public int X { get; set; }
 
-        public int Y;
+        public int Y { get; set; }
 
-        public int AllPlayerCdSecond;
+        public int AllPlayerCdSecond { get; set; }
 
-        public int WaitTime;
+        public bool IgnorePermission { get; set; } = true;
+
+        public int WaitTime { get; set; }
 
         private int _currentCd;
 
@@ -36,18 +42,6 @@ namespace AlternativeCommandExecution.SwitchCommand
 
             _currentCd = AllPlayerCdSecond;
             return true;
-        }
-
-        public static SwitchCmd FromReader(QueryResult reader)
-        {
-            return new SwitchCmd
-            {
-                Command = reader.Get<string>("Command"),
-                X = reader.Get<int>("X"),
-                Y = reader.Get<int>("Y"),
-                AllPlayerCdSecond = reader.Get<int>("AllPlayerCdSecond"),
-                WaitTime = reader.Get<int>("Wait")
-            };
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BossFramework.BAttributes
+﻿namespace BossFramework.BAttributes
 {
     /// <summary>
     /// 将在使用/reload时调用的方法

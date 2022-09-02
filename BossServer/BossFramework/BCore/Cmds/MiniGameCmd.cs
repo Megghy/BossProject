@@ -37,14 +37,22 @@ namespace BossFramework.BCore.Cmds
                     {
                         if (games.Length > 1)
                             args.Player.SendMultipleMatchError(games.Select(g => g.Names.FirstOrDefault()));
-                        else if (MiniGameManager.CreateGame(games.First(), args.Player) is { } game)
-                        {
-                            game.Join(args.Player);
-                            args.Player.SendSuccessMsg($"成功创建小游戏 [{game.Name}]");
-                            BLog.Success($"[{args.Player}] 申请创建小游戏 => [{game}]");
-                        }
                         else
-                            args.Player.SendErrorMsg($"当前无法创建小游戏 [{games.First().Names.First()}]");
+                        {
+                            if (args.Player.PlayingGame != null && !args.TsPlayer.HasPermission("boss.minigame.admin.multigame"))
+                                args.SendErrorMsg("你已处于一场游戏中");
+                            else
+                            {
+                                if (MiniGameManager.CreateGame(games.First(), args.Player) is { } game)
+                                {
+                                    game.Join(args.Player);
+                                    args.Player.SendSuccessMsg($"成功创建小游戏 [{game.Name}]");
+                                    BLog.Success($"[{args.Player}] 申请创建小游戏 => [{game}]");
+                                }
+                                else
+                                    args.Player.SendErrorMsg($"当前无法创建小游戏 [{games.First().Names.First()}]");
+                            }
+                        }
                     }
                 }
                 else
@@ -56,7 +64,15 @@ namespace BossFramework.BCore.Cmds
         #endregion
 
         #region 管理员命令
-
+        [SubCommand("delpannel", "dp", "removepanel", Permission = "boss.minigame.admin.delpanel")]
+        public void DelGame(SubCommandArgs args)
+        {
+            args.Player.WantDelGame = !args.Player.WantDelGame;
+            if (args.Player.WantDelGame)
+                args.SendSuccessMsg($"点击想要删除的小游戏面板");
+            else
+                args.SendErrorMsg("已取消");
+        }
         #endregion
     }
 }

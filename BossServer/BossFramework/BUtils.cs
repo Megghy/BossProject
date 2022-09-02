@@ -1,8 +1,8 @@
-﻿using BossFramework.BModels;
+﻿using BossFramework.BCore;
+using BossFramework.BModels;
 using BossFramework.BNet;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -39,7 +39,7 @@ namespace BossFramework
             foreach (T obj in source)
             {
                 action(obj, count);
-                count++; 
+                count++;
             }
         }
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action) => source.ForEach((obj, _) => action(obj));
@@ -108,11 +108,11 @@ namespace BossFramework
                 return default;
             }
         }
-        public static string SerializeToJson(this object obj)
+        public static string SerializeToJson(this object obj, bool format = false)
         {
             try
             {
-                return JsonConvert.SerializeObject(obj);
+                return JsonConvert.SerializeObject(obj, format ? Formatting.Indented : Formatting.None);
             }
             catch (Exception ex)
             {
@@ -448,6 +448,17 @@ namespace BossFramework
         }
         public static bool HandleCommandDirect(TSPlayer player, string cmdText, string cmdName, List<string> args, bool silent, bool ignorePerm)
         {
+            CommandPlaceholder.Placeholders.Where(p => p.Match(cmdText))
+                .TForEach(p =>
+                {
+                    cmdText = p.Replace(new(player.GetBPlayer()), cmdText);
+                    if (args.Any())
+                        for (int i = 0; i < args.Count; i++)
+                        {
+                            if (p.Match(args[i]))
+                                args[i] = p.Replace(new(player.GetBPlayer()), args[i]);
+                        }
+                });
             var cmds = Commands.ChatCommands.FindAll(x => x.HasAlias(cmdName));
 
             lock (player)
@@ -579,7 +590,7 @@ namespace BossFramework
         {
             var result = entity switch
             {
-                TEDisplayDoll e => new TrProtocol.Models.TileEntities.TEDisplayDoll 
+                TEDisplayDoll e => new TrProtocol.Models.TileEntities.TEDisplayDoll
                 {
                     Dyes = e._dyes.Select(i => i.Get()).ToArray(),
                     Items = e._items.Select(i => i.Get()).ToArray(),

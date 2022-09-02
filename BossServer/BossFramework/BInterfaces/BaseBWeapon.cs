@@ -151,7 +151,7 @@ namespace BossFramework.BInterfaces
                 Bit1 = bb,
                 AI1 = ai0 == -1 ? _proj.ai[0] : ai0,
                 AI2 = ai1 == -1 ? _proj.ai[1] : ai1,
-                Damange = (short)(damage == -1 ? _proj.damage : damage),
+                Damage = (short)(damage == -1 ? _proj.damage : damage),
                 OriginalDamage = (ushort)_proj.originalDamage,
                 Knockback = knockBack == -1 ? _proj.knockBack : knockBack,
                 PlayerSlot = plr.Index,

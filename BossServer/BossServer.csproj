@@ -12,12 +12,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="BossFramework\testscipts\testcmd.cs" />
+	  <Compile Remove="BossFramework\testscipts\testmodule.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 		<PackageReference Include="BssomSerializer" Version="1.1.3" />
-		<PackageReference Include="FreeSql.Extensions.BaseEntity" Version="3.2.666-preview20220823" />
-		<PackageReference Include="FreeSql.Extensions.JsonMap" Version="3.2.666-preview20220823" />
-		<PackageReference Include="FreeSql.Extensions.Linq" Version="3.2.666-preview20220823" />
-		<PackageReference Include="FreeSql.Provider.MySqlConnector" Version="3.2.666-preview20220823" />
+		<PackageReference Include="FreeSql.Extensions.BaseEntity" Version="3.2.666-preview20220829" />
+		<PackageReference Include="FreeSql.Extensions.JsonMap" Version="3.2.666-preview20220829" />
+		<PackageReference Include="FreeSql.Extensions.Linq" Version="3.2.666-preview20220829" />
+		<PackageReference Include="FreeSql.Provider.MySqlConnector" Version="3.2.666-preview20220829" />
 		<PackageReference Include="NetCoreServer" Version="6.5.0" />
 		<PackageReference Include="System.Data.SQLite.Core" Version="1.0.116" />
 		<PackageReference Include="SQLite" Version="3.13.0" />

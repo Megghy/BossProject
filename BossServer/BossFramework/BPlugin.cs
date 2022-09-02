@@ -1,6 +1,5 @@
 ﻿using BossFramework.BAttributes;
 using Bssom.Serializer;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -28,6 +27,7 @@ namespace BossFramework
         #region 初始化
         public override void Initialize()
         {
+            FakeProvider.FakeProviderPlugin.FastWorldLoad = BConfig.Instance.FastLoadWorld;
             BssomSerializer.Serialize(this);
             AutoInit();
         }

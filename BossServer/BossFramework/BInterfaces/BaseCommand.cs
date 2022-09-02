@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System;
 
 namespace BossFramework.BInterfaces
 {
@@ -47,6 +46,7 @@ namespace BossFramework.BInterfaces
                     attrs.ForEach(a =>
                     {
                         var sub = ((SubCommandAttribute)a);
+                        sub.Method = method;
                         sub.Permission ??= method.GetCustomAttribute<NeedPermissionAttribute>()?.Perms?.FirstOrDefault();
                         sub.Description ??= method.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>()?.Description;
                         list.Add(sub);

@@ -1,8 +1,4 @@
-﻿using System;
-using Terraria;
-using Terraria.Localization;
-using TShockAPI;
-using TShockAPI.Hooks;
+﻿using TShockAPI.Hooks;
 
 namespace BossFramework.BHooks.HookHandlers
 {

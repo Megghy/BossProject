@@ -1,10 +1,5 @@
 ﻿using BossFramework.BAttributes;
 using BossFramework.BModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerrariaApi.Server;
 using TShockAPI;
 
@@ -28,7 +23,7 @@ namespace BossFramework.BModules
 
         public static void OnGameUpdate(EventArgs args)
         {
-            if(BInfo.GameTick % 60 == 0)
+            if (BInfo.GameTick % 60 == 0)
             {
                 BInfo.OnlinePlayers.ForEach(p =>
                 {
@@ -37,7 +32,7 @@ namespace BossFramework.BModules
             }
         }
 
-        public static void OnPlayerLeave (LeaveEventArgs args)
+        public static void OnPlayerLeave(LeaveEventArgs args)
         {
             if (TShock.Players[args.Who]?.GetBPlayer() is { } plr)
             {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TerrariaApi.Server
+﻿namespace TerrariaApi.Server
 {
     public class LeaveEventArgs : EventArgs
     {

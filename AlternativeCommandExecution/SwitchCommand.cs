@@ -12,7 +12,7 @@ namespace AlternativeCommandExecution
 
         private static void SwitchCmd_OnPostInit()
         {
-            Scs = new SwitchCmdManager(TShock.DB);
+            Scs = new SwitchCmdManager();
             Scs.UpdateSwitchCommands();
 
             Commands.ChatCommands.Add(new Command("ace.sc.manage", SwitchCommand, "sc", "指令开关")
@@ -59,7 +59,6 @@ namespace AlternativeCommandExecution
                 if (sc == null)
                 {
                     return;
-
                 }
                 if (!sc.TryUse(player))
                 {
@@ -79,7 +78,7 @@ namespace AlternativeCommandExecution
                             {
                                 command = command.Replace("@player", player.Name);
                             }
-                            BossFramework.BUtils.HandleCommand(player, command, true);
+                            BossFramework.BUtils.HandleCommand(player, command, sc.IgnorePermission);
                             Task.Delay(wait).Wait();
                         }
                     });
@@ -189,6 +188,40 @@ namespace AlternativeCommandExecution
                     Scs.ClearNonexistents();
                     args.Player.SendSuccessMessage("已经清除无用指令开关。");
                     break;
+                case "IGNORE":
+                    if (empty)
+                    {
+                        args.Player.SendErrorMessage("语法无效！正确语法：/sc ignore <true/false>");
+                        return;
+                    }
+                    bool open;
+                    if (string.Equals("true", sec, StringComparison.OrdinalIgnoreCase))
+                    {
+                        open = true;
+                    }
+                    else if (string.Equals("false", sec, StringComparison.OrdinalIgnoreCase))
+                    {
+                        open = false;
+                    }
+                    else
+                    {
+                        args.Player.SendErrorMessage("语法无效！正确语法：/sc ignore <true/false>");
+                        return;
+                    }
+                    info.WaitingSelection = true;
+                    info.Ss += (i, j) =>
+                    {
+                        if (!Scs.SetIgnoreStatus(i, j, open))
+                        {
+                            args.Player.SendErrorMessage("开关非指令开关。");
+                        }
+                        else
+                        {
+                            args.Player.SendSuccessMessage("设置忽略权限模式完毕！");
+                        }
+                    };
+                    args.Player.SendInfoMessage("触发一个开关/压力板以设置忽略权限为{0}.", open ? "开启" : "关闭");
+                    break;
                 case "HELP":
                     int pageNumber;
                     if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out pageNumber))
@@ -200,6 +233,7 @@ namespace AlternativeCommandExecution
                         "add <指令> - 设定某开关的指令状态",
                         "del - 删除某开关的指令状态",
                         "wait <ms> - 设定某开关的指令之间的间隔",
+                        "ignore <true/false> - 是否跳过权限执行",
                         "allcd <冷却时间秒> - 设置开关全局冷却时间",
                         "info - 查看某开关的指令状态",
                         "clear - 清除无效开关指令状态",

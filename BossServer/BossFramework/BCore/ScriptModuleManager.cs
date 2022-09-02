@@ -1,6 +1,5 @@
 ﻿using BossFramework.BAttributes;
 using BossFramework.BInterfaces;
-using System;
 using System.IO;
 
 namespace BossFramework.BCore

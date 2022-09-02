@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BossFramework.BAttributes
+﻿namespace BossFramework.BAttributes
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class SimpleTimerAttribute : Attribute

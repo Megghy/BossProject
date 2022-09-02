@@ -20,7 +20,7 @@ namespace PlotMarker
                 { PacketTypes.LiquidSet, HandleLiquidSet },
                 { PacketTypes.PlaceChest, HandlePlaceChest },
                 { PacketTypes.PlaceTileEntity, HandlePlaceTileEntity },
-                { PacketTypes.TileSendSquare, HandleSendTileSquare }
+                //{ PacketTypes.TileSendSquare, HandleSendTileSquare }
             };
         public static bool HandleGetData(PacketTypes type, TSPlayer player, MemoryStream data)
         {

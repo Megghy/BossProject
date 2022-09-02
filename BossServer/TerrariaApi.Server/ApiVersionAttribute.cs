@@ -1,5 +1,3 @@
-using System;
-
 namespace TerrariaApi.Server
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]

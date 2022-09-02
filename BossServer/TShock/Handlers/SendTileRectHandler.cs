@@ -1,5 +1,4 @@
 ﻿using BossFramework;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -268,21 +267,28 @@ namespace TShockAPI.Handlers
         /// <param name="args">SendTileRectEventArgs containing event information</param>
         internal void ProcessFlowerBoots(int realX, int realY, NetTile newTile, GetDataHandlers.SendTileRectEventArgs args)
         {
-            // We need to get the tile below the tile rect to determine what grass types are allowed
-            if (!WorldGen.InWorld(realX, realY + 1))
+            try
             {
-                // If the tile below the tile rect isn't valid, we return here and don't update the server tile state
-                return;
-            }
+                // We need to get the tile below the tile rect to determine what grass types are allowed
+                if (!WorldGen.InWorld(realX, realY + 1))
+                {
+                    // If the tile below the tile rect isn't valid, we return here and don't update the server tile state
+                    return;
+                }
 
-            ITile tile = Main.tile[realX, realY + 1];
-            if (!GrassToPlantMap.TryGetValue(tile.type, out List<ushort> plantTiles) && !plantTiles.Contains(newTile.Type))
+                ITile tile = Main.tile[realX, realY + 1] ?? new Tile();
+                if (!GrassToPlantMap.TryGetValue(tile.type, out List<ushort> plantTiles) && !plantTiles.Contains(newTile.Type))
+                {
+                    // If the tile below the tile rect isn't a valid plant tile (eg grass) then we don't update the server tile state
+                    return;
+                }
+
+                UpdateServerTileState(Main.tile[realX, realY], newTile, TileDataType.Tile);
+            }
+            catch(Exception ex)
             {
-                // If the tile below the tile rect isn't a valid plant tile (eg grass) then we don't update the server tile state
-                return;
+                TShock.Log.Error(ex.ToString());
             }
-
-            UpdateServerTileState(Main.tile[realX, realY], newTile, TileDataType.Tile);
         }
 
         /// <summary>

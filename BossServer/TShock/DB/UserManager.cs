@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using BCrypt.Net;
 using MySqlConnector;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;

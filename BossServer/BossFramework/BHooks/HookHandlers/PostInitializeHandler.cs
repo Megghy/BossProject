@@ -1,5 +1,6 @@
 ﻿using BossFramework.BAttributes;
-using System;
+using BossFramework.BModels;
+using CSScriptLib;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -35,6 +36,10 @@ namespace BossFramework.BHooks.HookHandlers
                     BLog.Error($"加载 [{kv.Key.DeclaringType!.Name}.{kv.Key.Name}] 时发生错误{Environment.NewLine}{ex}");
                 }
             });
+
+            CSScript.Evaluator.ReferenceDomainAssemblies();
+            CSScript.Evaluator.ReferenceAssemblyOf<BEventArgs.BaseEventArgs>();
+            CSScript.Evaluator.ReferenceAssemblyByNamespace("BossFramework.BModels");
         }
     }
 }

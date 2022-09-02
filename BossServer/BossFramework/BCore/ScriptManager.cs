@@ -1,6 +1,5 @@
 ﻿using BossFramework.BAttributes;
 using CSScriptLib;
-using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -20,13 +19,13 @@ namespace BossFramework.BCore
         /// <param name="filePath">文件路径</param>
         /// <returns></returns>
         /// <exception cref="FileNotFoundException"></exception>
-        public static T LoadSingleScript<T>(string filePath) where T : class
+        public static T LoadSingleScript<T>(string filePath, params object[] args) where T : class
         {
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"脚本文件 {filePath} 不存在");
             try
             {
-                return CSScript.Evaluator.LoadCode<T>(File.ReadAllText(filePath));
+                return CSScript.Evaluator.LoadCode<T>(File.ReadAllText(filePath), args);
             }
             catch (Exception ex)
             {
@@ -41,7 +40,7 @@ namespace BossFramework.BCore
         /// <param name="path">路径</param>
         /// <returns>脚本</returns>
         /// <exception cref="DirectoryNotFoundException"></exception>
-        public static T[] LoadScripts<T>(string path) where T : class
+        public static T[] LoadScripts<T>(string path, params object[] args) where T : class
         {
             if (!Directory.Exists(path))
                 throw new DirectoryNotFoundException($"路径 {path} 不存在");
@@ -50,7 +49,7 @@ namespace BossFramework.BCore
             {
                 try
                 {
-                    if (LoadSingleScript<T>(f) is { } script)
+                    if (LoadSingleScript<T>(f, args) is { } script)
                         scripts.Add(script);
                 }
                 catch (Exception ex)

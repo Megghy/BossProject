@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BossFramework.BAttributes
+﻿namespace BossFramework.BAttributes
 {
     /// <summary>
     /// 表示此子命令需要权限才能使用

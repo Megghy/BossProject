@@ -1,11 +1,6 @@
 ﻿using FreeSql;
 using FreeSql.DataAnnotations;
-using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BossFramework.BModules
 {
@@ -44,7 +39,7 @@ namespace BossFramework.BModules
         }
         public static T? GetData<T>(string key)
         {
-            if(GetDataString(key) is { } result)
+            if (GetDataString(key) is { } result)
                 return result.DeserializeJson<T>();
             return default;
         }

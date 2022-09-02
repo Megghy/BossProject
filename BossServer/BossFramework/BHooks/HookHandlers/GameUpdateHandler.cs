@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BossFramework.BHooks.HookHandlers
+﻿namespace BossFramework.BHooks.HookHandlers
 {
     public static class GameUpdateHandler
     {

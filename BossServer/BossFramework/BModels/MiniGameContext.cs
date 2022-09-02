@@ -1,6 +1,4 @@
 ﻿using BossFramework.BInterfaces;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 
@@ -13,31 +11,28 @@ namespace BossFramework.BModels
     {
         /// <summary>
         /// <para>小游戏上下文构造函数</para>
-        /// <para>如非必要尽量从 <see cref="BCore.MiniGameManager.CreateGame(IMiniGame, BPlayer, bool)" /> 创建实例</para>
+        /// <para>如非必要尽量从 <see cref="BCore.MiniGameManager.CreateGame(BaseMiniGame, BPlayer, bool)" /> 创建实例</para>
         /// </summary>
         /// <param name="game"></param>
-        public MiniGameContext(IMiniGame game)
+        public MiniGameContext(BaseMiniGame game, Guid contextId = default)
         {
+            GId = contextId == default ? Guid.NewGuid() : contextId;
             _game = game;
             _updateTimer.Elapsed += UpdateTimerCallBack;
         }
         /// <summary>
         /// 小游戏唯一标识符
         /// </summary>
-        public Guid GID { get; } = Guid.NewGuid();
+        public Guid GId { get; init; }
         /// <summary>
         /// 游戏实例
         /// </summary>
-        private IMiniGame _game;
+        private BaseMiniGame _game;
         private Timer _updateTimer { get; set; } = new()
         {
             Interval = 1000 / BCore.MiniGameManager.UPDATE_PRE_SECEND,
             AutoReset = true
         };
-        /// <summary>
-        /// 游玩的玩家
-        /// </summary>
-        public List<BPlayer> Players { get; } = new();
         /// <summary>
         /// 表示是否已调用过 <see cref="Init" />
         /// </summary>
@@ -49,13 +44,13 @@ namespace BossFramework.BModels
         /// <summary>
         /// 游戏提供的游戏名称, 此处返回第一个
         /// </summary>
-        public string Name => _game?.Names.First() ?? "Unknown";
+        public string Name => _game?.Names.First() ?? "unknown";
         public MiniGameState GameState => _game?.State ?? MiniGameState.End;
 
         #region 方法
         private void UpdateTimerCallBack(object sender, ElapsedEventArgs e)
         {
-            if (_game?.State == MiniGameState.End)
+            if (_game?.State == MiniGameState.Disposed)
                 Dispose();
             _game?.Update(GameTime);
             GameTime++;
@@ -87,7 +82,7 @@ namespace BossFramework.BModels
         {
             if (_game?.Join(plr) == true)
             {
-                Players.Add(plr);
+                _game.Players.Add(plr);
                 plr.PlayingGame = this;
                 return true;
             }
@@ -96,9 +91,9 @@ namespace BossFramework.BModels
         }
         public void Leave(BPlayer plr)
         {
-            if (Players.Contains(plr))
+            if (_game.Players.Contains(plr))
             {
-                Players.Remove(plr);
+                _game.Players.Remove(plr);
                 _game?.Leave(plr);
                 if (plr.PlayingGame == this)
                     plr.PlayingGame = null;
@@ -106,20 +101,21 @@ namespace BossFramework.BModels
         }
         public override string ToString()
         {
-            return $"{Name}:{GID}<{Players?.Count}>";
+            return $"{Name}:{GId}<{_game?.Players?.Count}>";
         }
 
         public void Dispose()
         {
-            Players.ForEach(p =>
+            _game?.Players.ForEach(p =>
             {
-                if (p.PlayingGame == this)
+                if (p.PlayingGame?.GId == this.GId)
                     p.PlayingGame = null;
             });
-            _updateTimer.Dispose();
+            _game?.Players.Clear();
             _game?.Stop();
             _game = null;
-            Players.Clear();
+            _updateTimer.Dispose();
+            BCore.MiniGameManager.RunningGames.Remove(this);
             BLog.DEBUG($"小游戏实例 [{this}] 已销毁");
         }
         #endregion

@@ -1,7 +1,6 @@
 ﻿using BossFramework.BAttributes;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,7 +62,7 @@ namespace BossFramework.BNet.PacketHandlers
                     projectile.position = proj.Position.Get();
                     projectile.velocity = proj.Velocity.Get();
                     projectile.type = proj.ProjType;
-                    projectile.damage = proj.Damange;
+                    projectile.damage = proj.Damage;
                     projectile.bannerIdToRespondTo = proj.BannerId;
                     projectile.originalDamage = proj.OriginalDamage;
                     projectile.knockBack = proj.Knockback;

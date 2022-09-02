@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BossFramework.BInterfaces
+﻿namespace BossFramework.BInterfaces
 {
     public interface IScriptModule : IDisposable
     {

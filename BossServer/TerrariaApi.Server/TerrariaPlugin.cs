@@ -1,4 +1,3 @@
-using System;
 using Terraria;
 
 namespace TerrariaApi.Server

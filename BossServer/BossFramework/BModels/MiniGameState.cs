@@ -20,6 +20,11 @@
         /// <summary>
         /// 已结束
         /// </summary>
-        End
+        End,
+
+        /// <summary>
+        /// 已卸载
+        /// </summary>
+        Disposed
     }
 }

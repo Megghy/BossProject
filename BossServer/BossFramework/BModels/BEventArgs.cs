@@ -22,6 +22,8 @@ namespace BossFramework.BModels
             }
             public bool Handled { get; set; } = false;
             public BPlayer Player { get; private set; }
+            public TSPlayer TsPlayer => Player?.TsPlayer;
+            public Player TrPlayer => Player?.TrPlayer;
         }
         public class PacketEventArgs : IEventArgs
         {
@@ -40,7 +42,7 @@ namespace BossFramework.BModels
             public PacketTypes PacketType { get; private set; }
             public BPlayer Player { get; private set; }
             private BinaryReader Reader { get; set; }
-            private Packet _packet;
+            internal Packet _packet;
             /// <summary>
             /// 未确定是否要读取前只使用 <see cref="PacketType"/> 查看类型
             /// </summary>

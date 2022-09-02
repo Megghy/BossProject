@@ -1,12 +1,10 @@
 ﻿using BossFramework;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using System;
+using System.Linq;
 using Terraria;
 using TrProtocol.Packets;
 using ProtocalBitByte = TrProtocol.Models.BitsByte;
-using TShockAPI.DB;
-using System.Linq;
 
 public class testtag : BaseRegionTagProcessor
 {
@@ -112,7 +110,7 @@ public class playertag : BaseRegionTagProcessor
 
     public override void OnGetPacket(BRegion region, BEventArgs.PacketEventArgs args)
     {
-        if(args.PacketType == PacketTypes.PlayerAddBuff)
+        if (args.PacketType == PacketTypes.PlayerAddBuff)
         {
             var bannedBuffs = region.Tags.Where(t => t.StartsWith("player.banbuff.")).Select(t => int.TryParse(t.Replace("player.banbuff.", ""), out var buffId) ? buffId : -1);
             if (bannedBuffs.Contains(((AddPlayerBuff)args.Packet).BuffType))
@@ -126,7 +124,7 @@ public class playertag : BaseRegionTagProcessor
                 }
             }
         }
-        if(args.PacketType == PacketTypes.PlayerBuff)
+        if (args.PacketType == PacketTypes.PlayerBuff)
         {
             Console.WriteLine(String.Join(", ", ((PlayerBuffs)args.Packet).BuffTypes.Select(b => b.ToString())));
             var result = CheckBuff(region, ((PlayerBuffs)args.Packet).BuffTypes.Select(b => (int)b).ToArray());

@@ -2,7 +2,6 @@
 using BossFramework.DB;
 using FreeSql.DataAnnotations;
 using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -87,9 +86,14 @@ namespace BossFramework.BModels
         #region 小游戏部分
         public long Point { get; set; }
         /// <summary>
+        /// 是否将要删除下一个点击的小游戏
+        /// </summary>
+        [Column(IsIgnore = true)]
+        public bool WantDelGame { get; internal set; } = false;
+        /// <summary>
         /// 正在玩的游戏, 通过 JoinGame 加入
         /// </summary>
-        public MiniGameContext PlayingGame { get; internal set; }
+        public MiniGameContext PlayingGame { get; set; }
         #endregion
 
         #endregion
@@ -97,7 +101,7 @@ namespace BossFramework.BModels
         #region 常用方法
         public override string ToString() => $"{Name}";
         internal bool CheckSendPacket(Packet p)
-            => BNet.PacketHandler.HandleSendData(new PacketEventArgs(this, p));
+            => BNet.PacketHandler.HandleSendData(false, new PacketEventArgs(this, p));
         /// <summary>
         /// 向玩家发送数据包
         /// </summary>

@@ -1,5 +1,4 @@
 ﻿using BossFramework.BAttributes;
-using System;
 using System.Reflection;
 using TShockAPI;
 using TShockAPI.Hooks;

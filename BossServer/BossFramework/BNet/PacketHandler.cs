@@ -1,8 +1,6 @@
 ﻿using BossFramework.BAttributes;
 using BossFramework.BCore;
 using BossFramework.BInterfaces;
-using BossFramework.BModels;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -39,7 +37,7 @@ namespace BossFramework.BNet
             {
                 using var stream = new MemoryStream(args.Buffer);
                 using var reader = new BinaryReader(stream);
-                args.Handled = HandleSendData(new PacketEventArgs(TShock.Players[args.Socket.Id]?.GetBPlayer() ?? new(TShock.Players[args.Socket.Id]),
+                args.Handled = HandleSendData(args.Handled, new PacketEventArgs(TShock.Players[args.Socket.Id]?.GetBPlayer() ?? new(TShock.Players[args.Socket.Id]),
                     (PacketTypes)args.Buffer[2], reader
                     )
                 {
@@ -51,7 +49,7 @@ namespace BossFramework.BNet
                 BLog.Error($"数据包发送处理失败{Environment.NewLine}{ex}");
             }
         }
-        internal static bool HandleSendData(PacketEventArgs args)
+        internal static bool HandleSendData(bool gameHandled, PacketEventArgs args)
         {
             if (Handlers.TryGetValue(args.PacketType, out var handler))
                 args.Handled = handler.SendPacket(args.Player, args.Packet);
@@ -59,7 +57,7 @@ namespace BossFramework.BNet
                 list.ForEach(h => h.Invoke(args));
             BRegionSystem.AllBRegion.Where(r => r.IsPlayerInThis(args.Player)).ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnSendPacket(r, args)));
 
-            return args.Handled;
+            return gameHandled || args.Handled;
         }
         internal static void OnGetData(GetDataEventArgs args)
         {
@@ -85,7 +83,7 @@ namespace BossFramework.BNet
                     list.ForEach(h => h.Invoke(packetArgs));
                 BRegionSystem.AllBRegion.Where(r => r.IsPlayerInThis(packetArgs.Player)).ForEach(r => BRegionSystem.RegionTagProcessers.ForEach(t => t.OnGetPacket(r, packetArgs)));
 
-                args.Handled = packetArgs.Handled;
+                args.Handled = packetArgs.Handled || args.Handled;
             }
             catch (Exception ex)
             {

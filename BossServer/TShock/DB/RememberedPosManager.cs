@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using Microsoft.Xna.Framework;
 using MySqlConnector;
-using System;
 using System.Data;
 using Terraria;
 

@@ -1,5 +1,4 @@
 ﻿using ClientApi.Networking;
-using System;
 using System.IO;
 using System.IO.Streams;
 

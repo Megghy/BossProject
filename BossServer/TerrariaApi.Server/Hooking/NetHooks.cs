@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using OTAPI;
-using System;
 using Terraria;
 using Terraria.Localization;
 using Terraria.Net;

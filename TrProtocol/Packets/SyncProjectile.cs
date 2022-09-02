@@ -17,7 +17,7 @@ public class SyncProjectile : Packet, IProjSlot, IPlayerSlot
     [Condition(nameof(Bit1), 3)]
     public ushort BannerId { get; set; }
     [Condition(nameof(Bit1), 4)]
-    public short Damange { get; set; }
+    public short Damage { get; set; }
     [Condition(nameof(Bit1), 5)]
     public float Knockback { get; set; }
     [Condition(nameof(Bit1), 6)]

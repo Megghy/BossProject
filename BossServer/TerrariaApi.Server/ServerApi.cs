@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -270,6 +269,13 @@ namespace TerrariaApi.Server
 
             Dictionary<TerrariaPlugin, Stopwatch> pluginInitWatches = new Dictionary<TerrariaPlugin, Stopwatch>();
 
+            /*var current = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.BaseType == typeof(TerrariaPlugin));
+            foreach (var type in current)
+            {
+                var temp = new PluginContainer((TerrariaPlugin)Activator.CreateInstance(type, game));
+                plugins.Add(temp); //默认加载
+                pluginInitWatches.Add(temp.Plugin, new());
+            }*/
             var ts = new PluginContainer((TerrariaPlugin)Activator.CreateInstance(typeof(TShockAPI.TShock), game));
             plugins.Add(ts); //默认加载ts
             pluginInitWatches.Add(ts.Plugin, new());
@@ -279,6 +285,18 @@ namespace TerrariaApi.Server
             };
             plugins.Add(boss); //默认加载boss
             pluginInitWatches.Add(boss.Plugin, new());
+            var tui = new PluginContainer((TerrariaPlugin)Activator.CreateInstance(typeof(TUIPlugin.TUIPlugin), game))
+            {
+                PluginAssembly = Assembly.GetExecutingAssembly()
+            };
+            plugins.Add(tui); //默认加载tui
+            pluginInitWatches.Add(tui.Plugin, new());
+            var fake = new PluginContainer((TerrariaPlugin)Activator.CreateInstance(typeof(FakeProvider.FakeProviderPlugin), game))
+            {
+                PluginAssembly = Assembly.GetExecutingAssembly()
+            };
+            plugins.Add(fake); //默认加载fakeprovider
+            pluginInitWatches.Add(fake.Plugin, new());
 
             foreach (FileInfo fileInfo in fileInfos)
             {

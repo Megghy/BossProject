@@ -50,7 +50,7 @@ namespace BossFramework.BCore.Cmds
             if (args.Any())
             {
                 if (BRegionSystem.FindBRegionByName(args[0]) is { } region)
-                    args.SendInfoMsg(string.Join(", ", region.Tags));
+                    args.SendInfoMsg("Tags: " + string.Join(", ", region.Tags));
                 else
                     args.SendErrorMsg($"未找到名为 {args[0]} 的区域");
             }

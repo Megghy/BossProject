@@ -1,10 +1,8 @@
 ﻿using BossFramework.BAttributes;
 using BossFramework.BModels;
-using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
-using TrProtocol;
 using TrProtocol.Packets;
 
 namespace BossFramework.BCore

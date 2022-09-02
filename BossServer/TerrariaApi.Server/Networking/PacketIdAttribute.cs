@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ClientApi.Networking
+﻿namespace ClientApi.Networking
 {
     public class PacketIdAttribute : Attribute
     {

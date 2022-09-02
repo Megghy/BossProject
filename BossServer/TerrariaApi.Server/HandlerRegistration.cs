@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TerrariaApi.Server
+﻿namespace TerrariaApi.Server
 {
     internal struct HandlerRegistration<ArgsType> where ArgsType : EventArgs
     {

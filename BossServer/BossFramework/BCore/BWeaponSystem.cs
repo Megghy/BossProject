@@ -1,7 +1,6 @@
 ﻿using BossFramework.BAttributes;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,8 +36,8 @@ namespace BossFramework.BCore
             }
             else
             {
-                BNet.PacketHandlers.SyncProjectileHandler.Get += args => OnProjCreate(new (args.Packet, args.Player));
-                BNet.PacketHandlers.DestroyProjectileHandler.Get += args => OnProjDestroy(new (args.Packet, args.Player));
+                BNet.PacketHandlers.SyncProjectileHandler.Get += args => OnProjCreate(new(args.Packet, args.Player));
+                BNet.PacketHandlers.DestroyProjectileHandler.Get += args => OnProjDestroy(new(args.Packet, args.Player));
             }
 
             BNet.PacketHandlers.PlayerDamageHandler.Get += OnPlayerHurt;

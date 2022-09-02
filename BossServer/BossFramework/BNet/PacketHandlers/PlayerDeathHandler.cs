@@ -1,7 +1,6 @@
 ﻿using BossFramework.BInterfaces;
 using BossFramework.BModels;
 using Microsoft.Xna.Framework;
-using System;
 using Terraria;
 using Terraria.Localization;
 using TrProtocol.Packets;

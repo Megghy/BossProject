@@ -1,5 +1,4 @@
 ﻿using BossFramework.BInterfaces;
-using System;
 using TrProtocol.Packets;
 
 namespace BossFramework.BModels

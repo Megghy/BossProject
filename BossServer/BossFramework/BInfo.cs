@@ -1,5 +1,4 @@
 ﻿using BossFramework.BModels;
-using System;
 using System.IO;
 using System.Linq;
 using TShockAPI;

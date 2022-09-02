@@ -1,5 +1,4 @@
 ﻿using BossFramework.BCore;
-using System;
 using System.Linq;
 using TrProtocol.Packets;
 
