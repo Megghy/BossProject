@@ -1,7 +1,8 @@
-﻿using BossFramework.BAttributes;
-using CSScriptLib;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using BossFramework.BAttributes;
+using CSScriptLib;
+using TShockAPI;
 
 namespace BossFramework.BCore
 {

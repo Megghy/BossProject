@@ -1,6 +1,6 @@
-﻿using FreeSql;
+﻿using System.Collections.Generic;
+using FreeSql;
 using FreeSql.DataAnnotations;
-using System.Collections.Generic;
 
 namespace BossFramework.BModules
 {

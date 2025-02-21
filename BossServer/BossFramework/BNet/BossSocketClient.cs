@@ -1,8 +1,8 @@
-﻿using NetCoreServer;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
+using NetCoreServer;
 using Terraria;
 using Terraria.Net.Sockets;
 

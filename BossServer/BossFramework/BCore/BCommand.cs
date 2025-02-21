@@ -1,11 +1,11 @@
-﻿using BossFramework.BAttributes;
-using BossFramework.BInterfaces;
-using BossFramework.BModels;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using BossFramework.BAttributes;
+using BossFramework.BInterfaces;
+using BossFramework.BModels;
 using TerrariaApi.Server;
 using TShockAPI;
 
@@ -30,7 +30,7 @@ namespace BossFramework.BCore
             try
             {
                 var loaded = new List<Assembly>();
-                ServerApi.Plugins.Select(p => p.PluginAssembly)
+                ServerApi.Plugins.Select(p => p.Plugin.GetType().Assembly)
                 .Where(a => a != null)
                 .ForEach(a =>
                 {
@@ -93,7 +93,7 @@ namespace BossFramework.BCore
         private static void OnUseAnyCmd(TShockAPI.Hooks.PlayerCommandEventArgs args)
         {
             CommandPlaceholder.Placeholders.Where(p => p.Match(args.CommandText))
-                .TForEach(p =>
+                .ForEach(p =>
                 {
                     args.CommandText = p.Replace(new(args.Player.GetBPlayer()), args.CommandText);
                     if (args.Parameters.Any())

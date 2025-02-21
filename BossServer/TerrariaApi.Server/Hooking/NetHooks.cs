@@ -6,9 +6,9 @@ using Terraria.Net;
 
 namespace TerrariaApi.Server.Hooking
 {
-    public class NetHooks
+    internal class NetHooks
     {
-        public static HookManager _hookManager;
+        private static HookManager _hookManager;
 
         public static readonly object syncRoot = new object();
 
@@ -24,11 +24,22 @@ namespace TerrariaApi.Server.Hooking
             On.Terraria.Netplay.OnConnectionAccepted += OnConnectionAccepted;
             On.Terraria.Chat.ChatHelper.BroadcastChatMessage += OnBroadcastChatMessage;
             On.Terraria.Net.NetManager.SendData += OnSendNetData;
+            On.Terraria.Netplay.UpdateConnectedClients += OnUpdateConnectedClients;
+
 
             Hooks.NetMessage.SendData += OnSendData;
             Hooks.NetMessage.SendBytes += OnSendBytes;
             Hooks.MessageBuffer.GetData += OnReceiveData;
             Hooks.MessageBuffer.NameCollision += OnNameCollision;
+        }
+
+        static void OnUpdateConnectedClients(On.Terraria.Netplay.orig_UpdateConnectedClients orig)
+        {
+            orig();
+            if (ServerApi.ForceUpdate)
+            {
+                Terraria.Netplay.HasClients = true;
+            }
         }
 
         static void OnBroadcastChatMessage(On.Terraria.Chat.ChatHelper.orig_BroadcastChatMessage orig, NetworkText text, Color color, int excludedPlayer)
@@ -49,6 +60,10 @@ namespace TerrariaApi.Server.Hooking
 
         static void OnSendData(object sender, Hooks.NetMessage.SendDataEventArgs e)
         {
+            if (e.Result == HookResult.Cancel)
+            {
+                return;
+            }
             if (e.Event == HookEvent.Before)
             {
                 var msgType = e.MsgType;
@@ -109,6 +124,10 @@ namespace TerrariaApi.Server.Hooking
 
         static void OnReceiveData(object sender, Hooks.MessageBuffer.GetDataEventArgs e)
         {
+            if (e.Result == HookResult.Cancel)
+            {
+                return;
+            }
             if (!Enum.IsDefined(typeof(PacketTypes), (int)e.PacketId))
             {
                 e.Result = HookResult.Cancel;
@@ -140,6 +159,10 @@ namespace TerrariaApi.Server.Hooking
 
         static void OnSendBytes(object sender, Hooks.NetMessage.SendBytesEventArgs e)
         {
+            if (e.Result == HookResult.Cancel)
+            {
+                return;
+            }
             if (_hookManager.InvokeNetSendBytes(Netplay.Clients[e.RemoteClient], e.Data, e.Offset, e.Size))
             {
                 e.Result = HookResult.Cancel;
@@ -148,6 +171,10 @@ namespace TerrariaApi.Server.Hooking
 
         static void OnNameCollision(object sender, Hooks.MessageBuffer.NameCollisionEventArgs e)
         {
+            if (e.Result == HookResult.Cancel)
+            {
+                return;
+            }
             if (_hookManager.InvokeNetNameCollision(e.Player.whoAmI, e.Player.name))
             {
                 e.Result = HookResult.Cancel;

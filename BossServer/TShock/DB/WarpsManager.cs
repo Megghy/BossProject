@@ -16,12 +16,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using Microsoft.Xna.Framework;
-using MySqlConnector;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using MySqlConnector;
 using Terraria;
 
 namespace TShockAPI.DB

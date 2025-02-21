@@ -16,9 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Localization;
@@ -29,7 +29,7 @@ namespace TShockAPI
 {
     public class TSServerPlayer : TSPlayer
     {
-        public static string AccountName = "ServerConsole";
+        public static string AccountName = GetParticularString("The account name of server console.", "ServerConsole");
 
         public TSServerPlayer()
             : base("Server")
@@ -74,7 +74,7 @@ namespace TShockAPI
 
             foreach (var snippet in snippets)
             {
-                if (snippet.Color != default)
+                if (snippet.Color != null)
                 {
                     Console.ForegroundColor = PickNearbyConsoleColor(snippet.Color);
                 }
@@ -164,7 +164,7 @@ namespace TShockAPI
                 int spawnTileY;
                 TShock.Utils.GetRandomClearTileWithInRange(startTileX, startTileY, tileXRange, tileYRange, out spawnTileX,
                                                              out spawnTileY);
-                NPC.NewNPC(new EntitySource_SpawnNPC(), spawnTileX * 16, spawnTileY * 16, type);
+                NPC.NewNPC(new EntitySource_DebugCommand(), spawnTileX * 16, spawnTileY * 16, type);
             }
         }
 
@@ -188,7 +188,7 @@ namespace TShockAPI
             // Send all players updated tile squares
             foreach (Vector2 coords in tiles.Keys)
             {
-                All.SendTileSquare((int)coords.X, (int)coords.Y, 3);
+                All.SendTileSquareCentered((int)coords.X, (int)coords.Y, 3);
             }
         }
 

@@ -1,14 +1,19 @@
 ﻿<Project>
     <PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
         <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\BossServer\BossServer.csproj"/>
+        <ProjectReference Include="..\BossServer\BossFramework.csproj"/>
+        
+		<PackageReference Include="TShock" Version="5.2.2" />
     </ItemGroup>
-
+    
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <Exec Command="xcopy /Y $(TargetPath) $(SolutionDir)Output\ServerPlugins\&#xD;&#xA;xcopy /Y $(TargetDir)$(TargetName).pdb $(SolutionDir)Output\ServerPlugins\" />
     </Target>

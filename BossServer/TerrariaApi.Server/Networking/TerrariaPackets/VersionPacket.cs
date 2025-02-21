@@ -1,6 +1,6 @@
-﻿using ClientApi.Networking;
-using System.IO;
+﻿using System.IO;
 using System.IO.Streams;
+using ClientApi.Networking;
 
 namespace TerrariaApi.Server.Networking.TerrariaPackets
 {

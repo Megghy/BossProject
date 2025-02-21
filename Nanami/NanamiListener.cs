@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 using Terraria;
 using TrProtocol.Packets;
 using TShockAPI;
@@ -49,12 +48,12 @@ namespace Nanami
             var killer = args.Packet.Reason._sourcePlayerIndex;
 
             // 处理杀死事件
-            if(killer >= 0 && killer < 256)
+            if (killer >= 0 && killer < 256)
             {
                 var killerData = PlayerPvpData.GetPlayerData(killer);
-                if(killerData.Kill() is { } killMessage)
+                if (killerData.Kill() is { } killMessage)
                 {
-                    args.Player.CurrentRegion?.GetPlayers().TForEach(p => p.SendMsg(killMessage, new Color(190, 110, 110)));
+                    args.Player.CurrentRegion?.GetPlayers().ForEach(p => p.SendMsg(killMessage, new Color(190, 110, 110)));
                     //TSPlayer.All.SendMessage(killMessage, color: Color.White);
                 }
             }

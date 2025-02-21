@@ -16,13 +16,20 @@ namespace TerrariaApi.Server
         }
         public string LogWriterName
         {
-            get { return this.WrappedLogWriter.Name; }
+            get { return this.WrappedLogWriter?.Name; }
         }
 
-        internal LogWriterManager()
+        /// <param name="enabled">
+        /// If set to false, no default log writer will be set at first, but a new one can be added with
+        /// <see cref="Attach(ILogWriter)"/> later.
+        /// </param>
+        internal LogWriterManager(bool enabled)
         {
-            this.DefaultLogWriter = new ServerLogWriter();
-            this.WrappedLogWriter = this.DefaultLogWriter;
+            if (enabled)
+            {
+                this.DefaultLogWriter = new ServerLogWriter();
+                this.WrappedLogWriter = this.DefaultLogWriter;
+            }
         }
 
         public void Attach(ILogWriter newLogWriter)
@@ -56,7 +63,7 @@ namespace TerrariaApi.Server
 
             if (detachException != null)
                 this.ServerWriteLine(
-                    string.Format("Log writer \"{0}\" had thrown an unexpected exception:\n{1}", prevLogWriter.Name, detachException),
+                    string.Format("Log writer \"{0}\" has thrown an unexpected exception:\n{1}", prevLogWriter?.Name, detachException),
                     TraceLevel.Error);
         }
 
@@ -71,7 +78,7 @@ namespace TerrariaApi.Server
             }
             catch (Exception ex)
             {
-                DefaultLogWriter.ServerWriteLine(
+                DefaultLogWriter?.ServerWriteLine(
                     string.Format("Log writer \"{0}\" has thrown an unexpected exception:\n{1}", this.LogWriterName, ex), TraceLevel.Error);
             }
 
@@ -80,9 +87,12 @@ namespace TerrariaApi.Server
 
         internal void ServerWriteLine(string message, TraceLevel kind)
         {
+            if (this.WrappedLogWriter == null)
+                return;
+
             try
             {
-                this.WrappedLogWriter?.ServerWriteLine(message, kind);
+                this.WrappedLogWriter.ServerWriteLine(message, kind);
             }
             catch (Exception ex)
             {
@@ -94,9 +104,12 @@ namespace TerrariaApi.Server
 
         public void PluginWriteLine(TerrariaPlugin plugin, string message, TraceLevel kind)
         {
+            if (this.WrappedLogWriter == null)
+                return;
+
             try
             {
-                this.WrappedLogWriter?.PluginWriteLine(plugin, message, kind);
+                this.WrappedLogWriter.PluginWriteLine(plugin, message, kind);
             }
             catch (Exception ex)
             {

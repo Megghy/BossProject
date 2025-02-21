@@ -134,5 +134,14 @@ public enum PacketTypes
     SyncCavernMonsterType = 136,
     RequestNPCBuffRemoval = 137,
     ClientSyncedInventory = 138,
-    SetCountsAsHostForGameplay = 139
+    SetCountsAsHostForGameplay = 139,
+    SetMiscEventValues = 140,
+    RequestLucyPopup = 141,
+    SyncProjectileTrackers = 142,
+    CrystalInvasionRequestedToSkipWaitTime = 143,
+    RequestQuestEffect = 144,
+    SyncItemsWithShimmer = 145,
+    ShimmerActions = 146,
+    SyncLoadout = 147,
+    SyncItemCannotBeTakenByEnemies = 148
 }

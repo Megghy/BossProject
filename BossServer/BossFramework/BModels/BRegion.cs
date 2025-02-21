@@ -1,8 +1,8 @@
-﻿using BossFramework.BCore;
+﻿using System.Collections.Generic;
+using System.Linq;
+using BossFramework.BCore;
 using BossFramework.DB;
 using FreeSql.DataAnnotations;
-using System.Collections.Generic;
-using System.Linq;
 using TShockAPI.DB;
 
 namespace BossFramework.BModels

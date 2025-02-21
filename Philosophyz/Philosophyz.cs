@@ -1,6 +1,6 @@
-﻿using BossFramework;
+﻿using System.Reflection;
+using BossFramework;
 using Philosophyz.Hooks;
-using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;

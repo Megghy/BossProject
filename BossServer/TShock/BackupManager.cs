@@ -48,7 +48,7 @@ namespace TShockAPI
                 DoBackup(null);
                 DeleteOld(null);
             });
-            t.Name = "Backup Thread";
+            t.Name = GetString("Backup Thread");
             t.Start();
 
             // ThreadPool.QueueUserWorkItem(DoBackup);
@@ -70,23 +70,23 @@ namespace TShockAPI
 
                 if (TShock.Config.Settings.ShowBackupAutosaveMessages)
                 {
-                    TSPlayer.All.SendInfoMessage("地图保存中，系统可能发生延迟");
+                    TSPlayer.All.SendInfoMessage(GetString("Server map saving..."));
                 }
-                Console.WriteLine("地图备份中...");
+                Console.WriteLine(GetString("Backing up world..."));
 
                 SaveManager.Instance.SaveWorld();
-                Console.WriteLine("地图备份完成");
+                Console.WriteLine(GetString("World backed up."));
                 Console.ForegroundColor = ConsoleColor.Gray;
-                TShock.Log.Info(string.Format("地图备份到 ({0}).", Main.worldPathName));
+                TShock.Log.Info(GetString("World backed up ({0}).", Main.worldPathName));
 
                 Main.ActiveWorldFileData._path = worldname;
             }
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("地图备份失败!");
+                Console.WriteLine(GetString("Backup failed!"));
                 Console.ForegroundColor = ConsoleColor.Gray;
-                TShock.Log.Error("地图备份失败!");
+                TShock.Log.Error(GetString("Backup failed!"));
                 TShock.Log.Error(ex.ToString());
             }
         }

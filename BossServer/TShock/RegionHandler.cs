@@ -13,10 +13,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
-using System.Timers;
+using Microsoft.Xna.Framework;
 using TShockAPI.DB;
 using TShockAPI.Hooks;
 
@@ -29,7 +28,6 @@ namespace TShockAPI
     internal sealed class RegionHandler : IDisposable
     {
         private readonly RegionManager _regionManager;
-        private Timer updater;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegionHandler"/> class with the specified <see cref="RegionManager"/> instance.
@@ -40,43 +38,8 @@ namespace TShockAPI
             _regionManager = regionManager;
 
             GetDataHandlers.GemLockToggle += OnGemLockToggle;
-            updater = new()
-            {
-                AutoReset = true,
-                Interval = 300
-            };
-            updater.Elapsed += Updater_Elapsed;
-            updater.Start();
+            GetDataHandlers.PlayerUpdate += OnPlayerUpdate;
             GetDataHandlers.TileEdit += OnTileEdit;
-        }
-
-        private void Updater_Elapsed(object? sender, ElapsedEventArgs e)
-        {
-            TShock.Players.Where(p => p is { Active: true, RealPlayer: true })
-                .TForEach(player =>
-                {
-                    // Store the player's last known region and update the current based on known regions at their coordinates.
-                    var oldRegion = player.CurrentRegion;
-                    player.CurrentRegion = _regionManager.GetTopRegion(_regionManager.InAreaRegion(player.TileX, player.TileY));
-
-                    // Do not fire any hooks if the player has not left and/or entered a region.
-                    if (player.CurrentRegion == oldRegion)
-                    {
-                        return;
-                    }
-
-                    // Ensure that the player has left a region before invoking the RegionLeft event
-                    if (oldRegion != null)
-                    {
-                        RegionHooks.OnRegionLeft(player, oldRegion);
-                    }
-
-                    // Ensure that the player has entered a valid region before invoking the RegionEntered event 
-                    if (player.CurrentRegion != null)
-                    {
-                        RegionHooks.OnRegionEntered(player, player.CurrentRegion);
-                    }
-                });
         }
 
         /// <summary>
@@ -84,8 +47,8 @@ namespace TShockAPI
         /// </summary>
         public void Dispose()
         {
-            updater.Dispose();
             GetDataHandlers.GemLockToggle -= OnGemLockToggle;
+            GetDataHandlers.PlayerUpdate -= OnPlayerUpdate;
             GetDataHandlers.TileEdit -= OnTileEdit;
         }
 
@@ -97,6 +60,33 @@ namespace TShockAPI
                 {
                     e.Handled = true;
                 }
+            }
+        }
+
+        private void OnPlayerUpdate(object sender, GetDataHandlers.PlayerUpdateEventArgs e)
+        {
+            var player = e.Player;
+
+            // Store the player's last known region and update the current based on known regions at their coordinates.
+            var oldRegion = player.CurrentRegion;
+            player.CurrentRegion = _regionManager.GetTopRegion(_regionManager.InAreaRegion(player.TileX, player.TileY));
+
+            // Do not fire any hooks if the player has not left and/or entered a region.
+            if (player.CurrentRegion == oldRegion)
+            {
+                return;
+            }
+
+            // Ensure that the player has left a region before invoking the RegionLeft event
+            if (oldRegion != null)
+            {
+                RegionHooks.OnRegionLeft(player, oldRegion);
+            }
+
+            // Ensure that the player has entered a valid region before invoking the RegionEntered event 
+            if (player.CurrentRegion != null)
+            {
+                RegionHooks.OnRegionEntered(player, player.CurrentRegion);
             }
         }
 
@@ -160,12 +150,12 @@ namespace TShockAPI
                 if (output.Count == 0)
                 {
                     player.SendInfoMessage(includeUnprotected
-                        ? "There are no regions at this point."
-                        : "There are no regions at this point, or they are not protected.");
+                        ? GetString("There are no regions at this point.")
+                        : GetString("There are no regions at this point, or they are not protected."));
                 }
                 else
                 {
-                    player.SendInfoMessage(includeUnprotected ? "Regions at this point: " : "Protected regions at this point: ");
+                    player.SendInfoMessage(includeUnprotected ? GetString("Regions at this point: ") : GetString("Protected regions at this point: "));
 
                     foreach (string line in PaginationTools.BuildLinesFromTerms(output))
                     {
@@ -180,7 +170,7 @@ namespace TShockAPI
                 }
 
                 // Revert all tile changes and handle the event
-                player.SendTileSquare(e.X, e.Y, 4);
+                player.SendTileSquareCentered(e.X, e.Y, 4);
                 e.Handled = true;
             }
 
@@ -193,13 +183,13 @@ namespace TShockAPI
                 // Set temp point coordinates to current tile coordinates
                 player.TempPoints[player.AwaitingTempPoint - 1].X = e.X;
                 player.TempPoints[player.AwaitingTempPoint - 1].Y = e.Y;
-                player.SendInfoMessage($"Set temp point {player.AwaitingTempPoint}.");
+                player.SendInfoMessage(GetString($"Set temp point {player.AwaitingTempPoint}."));
 
                 // Reset the awaiting temp point
                 player.AwaitingTempPoint = 0;
 
                 // Revert all tile changes and handle the event
-                player.SendTileSquare(e.X, e.Y, 4);
+                player.SendTileSquareCentered(e.X, e.Y, 4);
                 e.Handled = true;
             }
 

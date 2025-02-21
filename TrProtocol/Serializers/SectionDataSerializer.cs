@@ -9,25 +9,14 @@ public partial struct SectionData
     {
         protected override SectionData ReadOverride(BinaryReader reader)
         {
-            reader.BaseStream.Position = 1L;
-            var compressed = reader.ReadByte() != 0;
-            if (compressed)
-            {
-                using var ds = new DeflateStream(reader.BaseStream, CompressionMode.Decompress, true);
-                using var br = new BinaryReader(ds);
-                return deserialize(br);
-            }
-            else
-            {
-                reader.BaseStream.Position = 2L;
-                return deserialize(reader);
-            }
+            using var ds = new DeflateStream(reader.BaseStream, CompressionMode.Decompress, true);
+            using var br = new BinaryReader(ds);
+            return deserialize(br);
 
             SectionData deserialize(BinaryReader br)
             {
                 var data = new SectionData
                 {
-                    IsCompressed = compressed,
                     StartX = br.ReadInt32(),
                     StartY = br.ReadInt32(),
                     Width = br.ReadInt16(),
@@ -148,21 +137,9 @@ public partial struct SectionData
         }
         protected override void WriteOverride(BinaryWriter writer, SectionData data)
         {
-            writer.Write(data.IsCompressed);
-
-            if (data.IsCompressed)
-            {
-                using var compressed = new MemoryStream();
-                // simplified using cannot be used here
-                using (var ds = new DeflateStream(compressed, CompressionMode.Compress, true))
-                using (var bw = new BinaryWriter(ds))
-                    serialize(bw);
-                writer.Write(compressed.ToArray());
-            }
-            else
-            {
-                serialize(writer);
-            }
+            using (var ds = new DeflateStream(writer.BaseStream, CompressionMode.Compress, true))
+            using (var bw = new BinaryWriter(ds))
+                serialize(bw);
 
             void serialize(BinaryWriter bw)
             {

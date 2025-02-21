@@ -1,5 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using System.IO.Compression;
+﻿using System.IO.Compression;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Tile_Entities;
@@ -70,7 +70,7 @@ namespace WorldEdit
         public static List<int> GetTileID(string tile)
         {
             int ID;
-            if (int.TryParse(tile, out ID) && ID >= 0 && ID < Main.maxTileSets)
+            if (int.TryParse(tile, out ID) && ID >= 0 && ID < TileID.Count)
                 return new List<int> { ID };
 
             var list = new List<int>();
@@ -85,15 +85,14 @@ namespace WorldEdit
         }
         public static List<int> GetWallID(string wall)
         {
-            int ID;
-            if (int.TryParse(wall, out ID) && ID >= 0 && ID < Main.maxWallTypes)
-                return new List<int> { ID };
+            if (int.TryParse(wall, out int ID) && ID >= 0 && ID < WallID.Count)
+                return [ID];
 
             var list = new List<int>();
             foreach (var kvp in WorldEdit.Walls)
             {
                 if (kvp.Key == wall)
-                    return new List<int> { kvp.Value };
+                    return [kvp.Value];
                 if (kvp.Key.StartsWith(wall))
                     list.Add(kvp.Value);
             }
@@ -317,7 +316,7 @@ namespace WorldEdit
         {
             var tile = new Tile
             {
-                sTileHeader = reader.ReadInt16(),
+                sTileHeader = reader.ReadUInt16(),
                 bTileHeader = reader.ReadByte(),
                 bTileHeader2 = reader.ReadByte()
             };
@@ -341,7 +340,7 @@ namespace WorldEdit
         {
             var tile = new Tile
             {
-                sTileHeader = reader.ReadInt16(),
+                sTileHeader = reader.ReadUInt16(),
                 bTileHeader = reader.ReadByte(),
                 bTileHeader2 = reader.ReadByte()
             };

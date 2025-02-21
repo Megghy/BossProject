@@ -1,13 +1,14 @@
-﻿using BossFramework.BCore;
-using BossFramework.BModels;
-using BossFramework.BNet;
-using Microsoft.Xna.Framework;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
+using BossFramework.BCore;
+using BossFramework.BModels;
+using BossFramework.BNet;
+using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using Terraria;
 using Terraria.GameContent.Events;
 using Terraria.GameContent.Tile_Entities;
@@ -23,36 +24,17 @@ namespace BossFramework
     public static class BUtils
     {
         public static readonly Random Rand = new();
-        public static void ForEach<T>(this IEnumerable<T> source, Action<T, int> action)
+        public static void ForEachWithIndex<T>(this IEnumerable<T> source, Action<T, int> action)
         {
-            if (source == null)
+            int index = 0;
+            foreach (var item in source)
             {
-                throw new ArgumentNullException(nameof(source));
-            }
-            if (action == null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-            if (!source.Any())
-                return;
-            int count = 0;
-            foreach (T obj in source)
-            {
-                action(obj, count);
-                count++;
+                action(item, index++);
             }
         }
-        public static void ForEach<T>(this IEnumerable<T> source, Action<T> action) => source.ForEach((obj, _) => action(obj));
-        public static void ForEach(this int count, Action<int> action)
+        public static void For(this int count, Action<int> action)
         {
-            if (count < 1)
-            {
-                throw new ArgumentOutOfRangeException(nameof(count));
-            }
-            if (action == null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
+            if (count <= 0) return;
             for (int i = 0; i < count; i++)
             {
                 action(i);
@@ -270,7 +252,7 @@ namespace BossFramework
             worldInfo.EventInfo2 = bb5;
             ProtocolBitsByte bb6 = 0;
             bb6[0] = Main.expertMode;
-            bb6[1] = Main.fastForwardTime;
+            bb6[1] = Main.IsFastForwardingTime();//Main.fastForwardTime;
             bb6[2] = Main.slimeRain;
             bb6[3] = NPC.downedSlimeKing;
             bb6[4] = NPC.downedQueenBee;
@@ -393,7 +375,7 @@ namespace BossFramework
         public static byte[] GetPacketsByteData(this IEnumerable<Packet> packets)
         {
             List<byte> packetData = new();
-            packets.TForEach(packet => packetData.AddRange(packet.SerializePacket()));
+            packets.ForEach(packet => packetData.AddRange(packet.SerializePacket()));
             return packetData.ToArray();
         }
         public static void SendMsg(this TSPlayer plr, object msg, Color color = default)
@@ -418,16 +400,27 @@ namespace BossFramework
                 player.SendErrorMessage("键入的指令无效；使用 {0}help 查看有效指令。", Commands.Specifier);
             return false;
         }
+        public static bool IsWhiteSpace(char c)
+        {
+            if (c != ' ' && c != '\t')
+            {
+                return c == '\n';
+            }
+
+            return true;
+        }
+        public static MethodInfo ParseParameters = typeof(Commands).GetMethod("ParseParameters", BindingFlags.NonPublic | BindingFlags.Static);
+
         private static bool Internal_ParseCmd(string text, out string cmdText, out string cmdName, out List<string> args, out bool silent)
         {
-            cmdText = text.Remove(0, 1);
+            cmdText = text[1..];
             var cmdPrefix = text[0].ToString();
             silent = cmdPrefix == Commands.SilentSpecifier;
 
             var index = -1;
             for (var i = 0; i < cmdText.Length; i++)
             {
-                if (Commands.IsWhiteSpace(cmdText[i]))
+                if (IsWhiteSpace(cmdText[i]))
                 {
                     index = i;
                     break;
@@ -442,17 +435,17 @@ namespace BossFramework
             cmdName = index < 0 ? cmdText.ToLower() : cmdText.Substring(0, index).ToLower();
 
             args = index < 0 ?
-                new List<string>() :
-                Commands.ParseParameters(cmdText[index..]);
+                [] :
+                ParseParameters.Invoke(null, [cmdText[index..]]) as List<string>;
             return true;
         }
         public static bool HandleCommandDirect(TSPlayer player, string cmdText, string cmdName, List<string> args, bool silent, bool ignorePerm)
         {
             CommandPlaceholder.Placeholders.Where(p => p.Match(cmdText))
-                .TForEach(p =>
+                .ForEach(p =>
                 {
                     cmdText = p.Replace(new(player.GetBPlayer()), cmdText);
-                    if (args.Any())
+                    if (args.Count != 0)
                         for (int i = 0; i < args.Count; i++)
                         {
                             if (p.Match(args[i]))
@@ -466,7 +459,7 @@ namespace BossFramework
                 try
                 {
                     if (ignorePerm)
-                        player.IgnorePerm = true;
+                        player.SetData("BossFramework.IgnorePerm", true);
 
                     if (cmds.Count == 0)
                     {
@@ -493,7 +486,7 @@ namespace BossFramework
                 }
                 finally
                 {
-                    player.IgnorePerm = false;
+                    player.RemoveData("BossFramework.IgnorePerm");
                 }
                 return true;
             }

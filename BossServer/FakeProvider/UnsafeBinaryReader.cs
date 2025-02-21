@@ -1,7 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace FakeProvider
 {
@@ -12,7 +13,7 @@ namespace FakeProvider
     /// <remarks> 
     /// This reader assumes its on a Little Endian environment. It currently has no bound checks! 
     /// </remarks>
-    public sealed unsafe class UnsafeBinaryReader : IDisposable
+    public sealed unsafe class UnsafeBinaryReader : BinaryReader, IDisposable
     {
         //TODO assert pointer positions/bound checks? Or maybe just yolo lolll
         //TODO: after its proven safe/reliable do a global terraria patcher that switches to use this
@@ -24,7 +25,7 @@ namespace FakeProvider
 
         private bool disposedValue;
 
-        public UnsafeBinaryReader(byte[] data)
+        public UnsafeBinaryReader(byte[] data) : base(new MemoryStream(data))
         {
             Data = data;
             handle = GCHandle.Alloc(Data, GCHandleType.Pinned);

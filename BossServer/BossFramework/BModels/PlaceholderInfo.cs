@@ -1,6 +1,6 @@
-﻿using BossFramework.DB;
+﻿using System.Text.RegularExpressions;
+using BossFramework.DB;
 using CSScriptLib;
-using System.Text.RegularExpressions;
 using TShockAPI;
 
 namespace BossFramework.BModels
@@ -28,7 +28,7 @@ namespace BossFramework.BModels
             {
                 var match = _nonRegex.Match(text);
                 var newText = text;
-                match.Groups.Keys.TForEach(k => newText = newText.Replace(match.Groups[k].Value, $"{{{Name}}}"));
+                match.Groups.Keys.ForEach(k => newText = newText.Replace(match.Groups[k].Value, $"{{{Name}}}"));
                 return newText;
             }
             var result = ResultDelegate?.Invoke(new object[] { args });
@@ -38,7 +38,7 @@ namespace BossFramework.BModels
             {
                 var match = _regex.Match(text);
                 var newText = text;
-                match.Groups.Keys.TForEach(k => newText = newText.Replace(match.Groups[k].Value, result));
+                match.Groups.Keys.ForEach(k => newText = newText.Replace(match.Groups[k].Value, result));
                 return newText;
             }
         }

@@ -1,10 +1,7 @@
 ﻿#region Using
-using BossFramework;
 using System.Collections.Generic;
 using System.IO;
 using Terraria;
-using TrProtocol.Models;
-using TrProtocol.Packets;
 using BitsByte = TrProtocol.Models.BitsByte;
 #endregion
 namespace FakeProvider

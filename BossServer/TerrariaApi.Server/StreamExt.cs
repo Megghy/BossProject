@@ -1,6 +1,6 @@
 //#if !BOOTSTRAPPED
-using Microsoft.Xna.Framework;
 using System.Text;
+using Microsoft.Xna.Framework;
 namespace System.IO.Streams
 {
     public static class StreamExt

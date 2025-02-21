@@ -1,5 +1,5 @@
 ﻿using Extensions;
-using Terraria;
+using Terraria.ID;
 using TShockAPI;
 using TShockAPI.DB;
 
@@ -55,7 +55,7 @@ namespace RegionTrigger
                 var projids = value.Trim().ToLower().Split(',');
                 foreach (var projid in projids.Where(e => !string.IsNullOrWhiteSpace(e)))
                 {
-                    if (short.TryParse(projid, out short proj) && proj > 0 && proj < Main.maxProjectileTypes)
+                    if (short.TryParse(projid, out short proj) && proj > 0 && proj < ProjectileID.Count)
                         _projbans.Add(proj);
                 }
             }
@@ -73,7 +73,7 @@ namespace RegionTrigger
                 var tileids = value.Trim().ToLower().Split(',');
                 foreach (var tileid in tileids.Where(e => !string.IsNullOrWhiteSpace(e)))
                 {
-                    if (short.TryParse(tileid, out short tile) && tile > -1 && tile < Main.maxTileSets)
+                    if (short.TryParse(tileid, out short tile) && tile > -1 && tile < TileID.Count)
                         _tilebans.Add(tile);
                 }
             }
@@ -86,7 +86,7 @@ namespace RegionTrigger
             set
             {
                 _permissions.Clear();
-                value?.Split(',').TForEach(AddPermission);
+                value?.Split(',').ForEach(AddPermission);
             }
         }
 

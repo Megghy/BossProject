@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
 using Terraria;
-using TerrariaApi.Reporting;
 
 namespace TerrariaApi.Server
 {
@@ -16,19 +18,29 @@ namespace TerrariaApi.Server
     {
         public const string PluginsPath = "ServerPlugins";
 
-        public static readonly Version ApiVersion = new(2, 1, 0, 0);
-        private static Main game;
-        private static readonly Dictionary<string, Assembly> loadedAssemblies = new();
-        private static readonly List<PluginContainer> plugins = new();
+        /// <summary>
+        /// Returns the first value from <see cref="AdditionalPluginsPaths"/> if it exists, otherwise null.
+        /// </summary>
+        [Obsolete("Use AdditionalPluginsPaths instead", error: false)]
+        public static string? AdditionalPluginsPath => AdditionalPluginsPaths.FirstOrDefault();
 
-        internal static readonly CrashReporter reporter = new();
+        /// <summary> A list of all plugin paths specified by the -additionalplugins flag. </summary>
+        public static ImmutableList<string> AdditionalPluginsPaths { get; private set; } = ImmutableList.Create<string>();
+        public static readonly Version ApiVersion = new Version(2, 1, 0, 0);
+        private static Main game;
+        private static readonly Dictionary<string, Assembly> loadedAssemblies = new Dictionary<string, Assembly>();
+        private static readonly List<PluginContainer> plugins = new List<PluginContainer>();
 
         public static bool IgnoreVersion
         {
             get;
             set;
         }
-        public static string ServerPluginsDirectoryPath => Path.Combine(Environment.CurrentDirectory, PluginsPath);
+        public static string ServerPluginsDirectoryPath
+        {
+            get;
+            internal set;
+        }
         public static ReadOnlyCollection<PluginContainer> Plugins
         {
             get { return new ReadOnlyCollection<PluginContainer>(plugins); }
@@ -59,8 +71,10 @@ namespace TerrariaApi.Server
 
         static ServerApi()
         {
+            AppContext.SetSwitch("Switch.System.Diagnostics.StackTrace.ShowILOffsets", true);
+            Dictionary<string, string> args = Utils.ParseArguements(Environment.GetCommandLineArgs());
             Hooks = new HookManager();
-            LogWriter = new LogWriterManager();
+            LogWriter = new LogWriterManager(enabled: !args.ContainsKey("-nolog"));
             Profiler = new ProfilerManager();
 
             UseAsyncSocketsInMono = false;
@@ -84,6 +98,7 @@ namespace TerrariaApi.Server
 
             ServerApi.game = game;
             HandleCommandLine(commandLineArgs);
+            ServerPluginsDirectoryPath = Path.Combine(AppContext.BaseDirectory, PluginsPath);
 
             if (!Directory.Exists(ServerPluginsDirectoryPath))
             {
@@ -100,6 +115,10 @@ namespace TerrariaApi.Server
                     Directory.CreateDirectory(ServerPluginsDirectoryPath);
                 }
             }
+
+            // Add assembly resolver instructing it to use the server plugins directory as a search path.
+            // TODO: Either adding the server plugins directory to PATH or as a privatePath node in the assembly config should do too.
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
             LoadPlugins();
         }
@@ -119,6 +138,8 @@ namespace TerrariaApi.Server
 
             foreach (KeyValuePair<string, string> arg in args)
             {
+                // Note that the flag -nolog also exists in the constructor, but it can't be here because
+                // the log writer initializes before this code is run
                 switch (arg.Key.ToLower())
                 {
                     case "-ignoreversion":
@@ -148,6 +169,7 @@ namespace TerrariaApi.Server
                             break;
                         }
                     case "-players":
+                    case "-maxplayers":
                         {
                             int playerCount;
                             if (!Int32.TryParse(arg.Value, out playerCount))
@@ -161,16 +183,13 @@ namespace TerrariaApi.Server
 
                             break;
                         }
-                    case "-maxplayers":
-                        goto case "-players";
                     case "-pass":
+                    case "-password":
                         {
                             Netplay.ServerPassword = arg.Value;
 
                             break;
                         }
-                    case "-password":
-                        goto case "-pass";
                     case "-worldname":
                         {
                             game.SetWorldName(arg.Value);
@@ -247,10 +266,37 @@ namespace TerrariaApi.Server
 
                             break;
                         }
-                    case "-crashdir":
-                        CrashReporter.crashReportPath = arg.Value;
+                    case "-additionalplugins":
+                        AdditionalPluginsPaths = arg.Value.Split(',').ToImmutableList();
                         break;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Tests to see if a plugin is using an incompatible architecture
+        /// </summary>
+        /// <param name="file">File info of the plugin</param>
+        /// <param name="data">File contents</param>
+        static void TryCheckArchitecture(FileInfo file, byte[] data)
+        {
+            using var ms = new MemoryStream(data);
+            using var pe = new PEReader(ms);
+            if (pe.HasMetadata)
+            {
+                var currentArch = RuntimeInformation.ProcessArchitecture;
+                var laa = (pe.PEHeaders.CoffHeader.Characteristics & Characteristics.LargeAddressAware) != 0;
+                Architecture? asmArch = pe.PEHeaders.CoffHeader.Machine switch
+                {
+                    Machine.IA64 => Architecture.X64,
+                    Machine.Arm64 => Architecture.Arm64,
+                    Machine.Amd64 => Architecture.X64,
+                    Machine.I386 => laa ? Architecture.X64 : Architecture.X86,
+                    Machine.Arm => Architecture.Arm,
+                    _ => null,
+                };
+                if (asmArch is not null && currentArch != asmArch)
+                    LogWriter.ServerWriteLine($"{file.Name} was built for {asmArch} but expected it to be compatible with {currentArch}.", TraceLevel.Error);
             }
         }
 
@@ -266,6 +312,12 @@ namespace TerrariaApi.Server
 
             List<FileInfo> fileInfos = new DirectoryInfo(ServerPluginsDirectoryPath).GetFiles("*.dll").ToList();
             fileInfos.AddRange(new DirectoryInfo(ServerPluginsDirectoryPath).GetFiles("*.dll-plugin"));
+            foreach (string additionalPath in AdditionalPluginsPaths)
+            {
+                var di = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, additionalPath));
+                fileInfos.AddRange(di.GetFiles("*.dll"));
+                fileInfos.AddRange(di.GetFiles("*.dll-plugin"));
+            }
 
             Dictionary<TerrariaPlugin, Stopwatch> pluginInitWatches = new Dictionary<TerrariaPlugin, Stopwatch>();
 
@@ -311,19 +363,39 @@ namespace TerrariaApi.Server
 
                 try
                 {
+                    Assembly assembly;
                     // The plugin assembly might have been resolved by another plugin assembly already, so no use to
                     // load it again, but we do still have to verify it and create plugin instances.
-                    if (!loadedAssemblies.TryGetValue(fileNameWithoutExtension, out Assembly assembly))
+                    if (!loadedAssemblies.TryGetValue(fileNameWithoutExtension, out assembly))
                     {
+                        byte[] pe = null;
                         try
                         {
-                            assembly = Assembly.LoadFrom(fileInfo.FullName);
+                            var pdb = Path.ChangeExtension(fileInfo.FullName, ".pdb");
+                            var symbols = File.Exists(pdb) ? File.ReadAllBytes(pdb) : null;
+                            assembly = Assembly.Load(pe = File.ReadAllBytes(fileInfo.FullName), symbols);
                         }
                         catch (BadImageFormatException)
                         {
                             continue;
                         }
+                        catch (FileLoadException)
+                        {
+                            if (pe is not null)
+                                TryCheckArchitecture(fileInfo, pe);
+                            throw; // don't consume the exception, only care about testing arch here
+                        }
                         loadedAssemblies.Add(fileNameWithoutExtension, assembly);
+                    }
+
+                    if (!InvalidateAssembly(assembly, fileInfo.Name))
+                        continue;
+
+                    if (detector.MaliciousAssembly(assembly))
+                    {
+                        LogWriter.ServerWriteLine(string.Format("Assembly {0} {1} has been identified to the TShock Team as a dangerous plugin and needs to be removed.", assembly.GetName().Name, assembly.GetName().Version), TraceLevel.Error);
+                        LogWriter.ServerWriteLine(string.Format("Continuing to use {0} may damage your server, your data, or your computer. For your safety, this plugin has been disabled.", assembly.GetName().Name), TraceLevel.Error);
+                        continue;
                     }
 
                     foreach (Type type in assembly.GetExportedTypes())
@@ -367,6 +439,7 @@ namespace TerrariaApi.Server
                         }
                         plugins.Add(new PluginContainer(pluginInstance)
                         {
+                            // add
                             PluginAssembly = assembly
                         });
                     }
@@ -461,24 +534,32 @@ namespace TerrariaApi.Server
             }
         }
 
-        internal static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        public static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
+            ServerPluginsDirectoryPath ??= Path.Combine(AppContext.BaseDirectory, PluginsPath);
+
             string fileName = args.Name.Split(',')[0];
-            if (loadedAssemblies?.TryGetValue(fileName, out var target) == true)
-                return target;
+            string path = Path.Combine(ServerPluginsDirectoryPath, fileName + ".dll");
+            string libPath = Path.Combine(Path.Combine(AppContext.BaseDirectory, "Lib"), fileName + ".dll");
             try
             {
-
-                string path = Path.Combine(ServerPluginsDirectoryPath, fileName + ".dll");
-                if (!File.Exists(path))
-                    path = Path.Combine(Environment.CurrentDirectory, "Lib", fileName + ".dll");
-                if (!File.Exists(path))
+                if (File.Exists(path))
                 {
-                    return null;
+                    Assembly assembly;
+                    if (!loadedAssemblies.TryGetValue(fileName, out assembly))
+                    {
+                        var pdbPath = Path.ChangeExtension(fileName, ".pdb");
+                        assembly = Assembly.Load(File.ReadAllBytes(path), File.Exists(pdbPath) ? File.ReadAllBytes(pdbPath) : null);
+                        // We just do this to return a proper error message incase this is a resolved plugin assembly
+                        // referencing an old TerrariaServer version.
+                        if (!InvalidateAssembly(assembly, fileName))
+                            throw new InvalidOperationException(
+                                "The assembly is referencing a version of TerrariaServer prior 1.14.");
+
+                        loadedAssemblies.Add(fileName, assembly);
+                    }
+                    return assembly;
                 }
-                var assembly = Assembly.LoadFrom(path);
-                loadedAssemblies?.Add(fileName, assembly);
-                return assembly;
             }
             catch (Exception ex)
             {
@@ -487,6 +568,26 @@ namespace TerrariaApi.Server
                     TraceLevel.Error);
             }
             return null;
+        }
+
+        // Many types have changed with 1.14 and thus we won't even be able to check the ApiVersionAttribute of
+        // plugin classes of assemblies targeting a TerrariaServer prior 1.14 as they can not be loaded at all.
+        // We work around this by checking the referenced assemblies, if we notice a reference to the old
+        // TerrariaServer assembly, we expect the plugin assembly to be outdated.
+        private static bool InvalidateAssembly(Assembly assembly, string fileName)
+        {
+            AssemblyName[] referencedAssemblies = assembly.GetReferencedAssemblies();
+            AssemblyName terrariaServerReference = referencedAssemblies.FirstOrDefault(an => an.Name == "TerrariaServer");
+            if (terrariaServerReference != null && terrariaServerReference.Version == new Version(0, 0, 0, 0))
+            {
+                LogWriter.ServerWriteLine(
+                    string.Format("Plugin assembly \"{0}\" was compiled for a Server API version prior 1.14 and was ignored.",
+                    fileName), TraceLevel.Warning);
+
+                return false;
+            }
+
+            return true;
         }
     }
 }

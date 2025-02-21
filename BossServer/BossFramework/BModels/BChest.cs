@@ -1,6 +1,6 @@
-﻿using BossFramework.DB;
+﻿using System.Linq;
+using BossFramework.DB;
 using FreeSql.DataAnnotations;
-using System.Linq;
 using TrProtocol.Models;
 
 namespace BossFramework.BModels
@@ -12,7 +12,7 @@ namespace BossFramework.BModels
             if (Items?.Length < 40)
             {
                 Items = new ItemData[40];
-                40.ForEach(i =>
+                40.For(i =>
                 {
                     Items[i] = new();
                 });

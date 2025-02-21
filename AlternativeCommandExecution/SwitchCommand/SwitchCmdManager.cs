@@ -1,10 +1,7 @@
-﻿using MySqlConnector;
-using System.Data;
+﻿using System.Data;
 using Terraria;
 using Terraria.ID;
 using TShockAPI;
-using TShockAPI.DB;
-using BossFramework;
 
 namespace AlternativeCommandExecution.SwitchCommand
 {

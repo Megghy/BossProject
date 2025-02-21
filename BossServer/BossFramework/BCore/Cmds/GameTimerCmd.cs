@@ -1,7 +1,9 @@
-﻿using BossFramework.BInterfaces;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using BossFramework.BInterfaces;
 using BossFramework.BModels;
 using FreeSql.DataAnnotations;
-using System.Linq;
 using Terraria;
 using TShockAPI;
 
@@ -21,7 +23,7 @@ namespace BossFramework.BCore.Cmds
                 => EndDate - StartDate;
         }
         public const string GAMETIMER_PREFIX = "boss.player.gametimer";
-        public override string[] Names { get; } = new[] { "gametimer", "gt" };
+        public override string[] Names { get; } = ["gametimer", "gt"];
 
         public async static void Start(SubCommandArgs args)
         {
@@ -90,11 +92,12 @@ namespace BossFramework.BCore.Cmds
                 args.SendErrorMsg($"语法错误. /gt start 名称");
             }
         }
+        private static FieldInfo _playerData = typeof(TSPlayer).GetField("data", BindingFlags.NonPublic | BindingFlags.Instance);
         public static string GetStatus(BEventArgs.BaseEventArgs args)
         {
             if (args.Handled)
                 return string.Empty;
-            var timers = args.Player.TsPlayer.data.Where(k => k.Key.StartsWith(GAMETIMER_PREFIX));
+            var timers = (_playerData.GetValue(args.Player.TsPlayer) as Dictionary<string, object>).Where(k => k.Key.StartsWith(GAMETIMER_PREFIX));
             var text = "";
             timers.ForEach(t =>
             {

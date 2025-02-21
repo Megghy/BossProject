@@ -1,0 +1,14 @@
+﻿@page "/"
+
+<PageTitle>Boss服务器 | 首页</PageTitle>
+
+<Flex>
+    <Card Title="服务器状态" Style="width: 100%;">
+         @ServerManager.IsRunning
+         <Button OnClick="() => ServerManager.StartServer()">启动服务</Button>
+    </Card>
+</Flex>
+
+@code{
+
+}

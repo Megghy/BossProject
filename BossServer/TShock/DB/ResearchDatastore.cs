@@ -1,6 +1,6 @@
-﻿using MySqlConnector;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
+using MySqlConnector;
 using Terraria;
 
 namespace TShockAPI.DB
@@ -45,8 +45,8 @@ namespace TShockAPI.DB
             }
             catch (DllNotFoundException)
             {
-                Console.WriteLine("Possible problem with your database - is Sqlite3.dll present?");
-                throw new Exception("Could not find a database library (probably Sqlite3.dll)");
+                TShock.Log.ConsoleWarn(GetString("Possible problem with your database - is Sqlite3.dll present?"));
+                throw new Exception(GetString("Could not find a database library (probably Sqlite3.dll)"));
             }
         }
 

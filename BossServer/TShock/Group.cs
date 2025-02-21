@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
 
 namespace TShockAPI
 {
@@ -51,17 +52,17 @@ namespace TShockAPI
         /// <summary>
         /// The group that this group inherits permissions from.
         /// </summary>
-        public Group Parent { get; set; }
+        public virtual Group Parent { get; set; }
 
         /// <summary>
         /// The chat prefix for this group.
         /// </summary>
-        public string Prefix { get; set; }
+        public virtual string Prefix { get; set; }
 
         /// <summary>
         /// The chat suffix for this group.
         /// </summary>
-        public string Suffix { get; set; }
+        public virtual string Suffix { get; set; }
 
         /// <summary>
         /// The name of the parent, not particularly sure why this is here.
@@ -113,7 +114,7 @@ namespace TShockAPI
                 permissions.Clear();
                 negatedpermissions.Clear();
                 if (null != value)
-                    value.Split(',').TForEach(p => AddPermission(p.Trim()));
+                    value.Split(',').ForEach(p => AddPermission(p.Trim()));
             }
         }
 
@@ -162,6 +163,20 @@ namespace TShockAPI
         /// The group's chat color blue byte.
         /// </summary>
         public byte B = 255;
+
+        /// <summary>
+        /// Simplifies work with the <see cref="R"/>, <see cref="G"/>, <see cref="B"/> properties.
+        /// </summary>
+        public virtual Color Color
+        {
+            get => new Color(R, G, B);
+            set
+            {
+                R = value.R;
+                G = value.G;
+                B = value.B;
+            }
+        }
 
         /// <summary>
         /// The default group attributed to unregistered users.
@@ -241,7 +256,7 @@ namespace TShockAPI
         /// Adds a permission to the list of negated permissions.
         /// </summary>
         /// <param name="permission">The permission to negate.</param>
-        public void NegatePermission(string permission)
+        public virtual void NegatePermission(string permission)
         {
             // Avoid duplicates
             if (!negatedpermissions.Contains(permission))
@@ -255,7 +270,7 @@ namespace TShockAPI
         /// Adds a permission to the list of permissions.
         /// </summary>
         /// <param name="permission">The permission to add.</param>
-        public void AddPermission(string permission)
+        public virtual void AddPermission(string permission)
         {
             if (permission.StartsWith("!"))
             {
@@ -275,7 +290,7 @@ namespace TShockAPI
         /// will parse "!permission" and add it to the negated permissions.
         /// </summary>
         /// <param name="permission">The new list of permissions to associate with the group.</param>
-        public void SetPermission(List<string> permission)
+        public virtual void SetPermission(List<string> permission)
         {
             permissions.Clear();
             negatedpermissions.Clear();
@@ -287,7 +302,7 @@ namespace TShockAPI
         /// where "!permission" will remove a negated permission.
         /// </summary>
         /// <param name="permission"></param>
-        public void RemovePermission(string permission)
+        public virtual void RemovePermission(string permission)
         {
             if (permission.StartsWith("!"))
             {
@@ -301,7 +316,7 @@ namespace TShockAPI
         /// Assigns all fields of this instance to another.
         /// </summary>
         /// <param name="otherGroup">The other instance.</param>
-        public void AssignTo(Group otherGroup)
+        public virtual void AssignTo(Group otherGroup)
         {
             otherGroup.Name = Name;
             otherGroup.Parent = Parent;
@@ -324,7 +339,6 @@ namespace TShockAPI
     /// </summary>
     public class SuperAdminGroup : Group
     {
-        public static readonly SuperAdminGroup Default = new SuperAdminGroup();
         /// <summary>
         /// The superadmin class has every permission, represented by '*'.
         /// </summary>

@@ -1,6 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using System.IO.Streams;
+﻿using System.IO.Streams;
+using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ID;
 using TerrariaApi.Server;
 using TShockAPI;
 using TShockAPI.Hooks;
@@ -24,7 +25,7 @@ namespace RegionTrigger
 
         public override void Initialize()
         {
-            ServerApi.Hooks.GameInitialize.Register(this, OnInitialize, -10);
+            ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
             ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInit, -10);
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreetPlayer);
             ServerApi.Hooks.GameUpdate.Register(this, OnUpdate);
@@ -221,7 +222,7 @@ namespace RegionTrigger
 
             if (region.HasEvent(Event.Godmode))
             {
-                player.SetGodMode(false);
+                player.GodMode = false;
                 player.SendInfoMessage("区域内的无敌模式失效。");
             }
 
@@ -269,7 +270,7 @@ namespace RegionTrigger
 
             if (rt.HasEvent(Event.Godmode))
             {
-                player.SetGodMode(true);
+                player.GodMode = true;
                 player.SendInfoMessage("你在区域内会受到服务器的庇护！");
             }
 
@@ -437,7 +438,7 @@ namespace RegionTrigger
                                 args.Player.SendErrorMessage("无效事件名: {0}", invalids);
                             break;
                         case "pb":
-                            if (short.TryParse(propValue, out var id) && id > 0 && id < Main.maxProjectileTypes)
+                            if (short.TryParse(propValue, out var id) && id > 0 && id < ProjectileID.Count)
                             {
                                 if (!isDel)
                                 {
@@ -478,7 +479,7 @@ namespace RegionTrigger
                             }
                             break;
                         case "tb":
-                            if (short.TryParse(propValue, out var tileid) && tileid >= 0 && tileid < Main.maxTileSets)
+                            if (short.TryParse(propValue, out var tileid) && tileid >= 0 && tileid < TileID.Count)
                             {
                                 if (!isDel)
                                 {

@@ -1,11 +1,12 @@
-﻿using BossFramework.BAttributes;
-using Bssom.Serializer;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BossFramework.BAttributes;
+using Bssom.Serializer;
 using Terraria;
 using TerrariaApi.Server;
 using TrProtocol;
+using TShockAPI;
 
 namespace BossFramework
 {
@@ -35,7 +36,8 @@ namespace BossFramework
         {
             var auto = new Dictionary<MethodInfo, AutoInitAttribute>();
             var loaded = new List<Assembly>();
-            ServerApi.Plugins.Select(p => p.PluginAssembly)
+            var ass = ServerApi.Plugins.Select(p => p.Plugin.GetType().Assembly).ToList();
+            ServerApi.Plugins.Select(p => p.Plugin.GetType().Assembly)
                 .Where(a => a != null)
                 .ForEach(a =>
                 {
@@ -73,7 +75,7 @@ namespace BossFramework
         }
         #endregion
         [SimpleTimer(Time = 1)]
-        private static void OnSecondUpdate()
+        internal static void OnSecondUpdate()
         {
             var packets = new List<Packet>();
         }

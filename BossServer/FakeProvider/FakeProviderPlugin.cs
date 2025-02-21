@@ -1,11 +1,5 @@
 ﻿#region Using
-using BossFramework;
-using BossFramework.BCore;
-using BossFramework.BModels;
-using Microsoft.Xna.Framework;
-using OTAPI;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,6 +7,10 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using BossFramework;
+using BossFramework.BCore;
+using BossFramework.BModels;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -67,7 +65,7 @@ namespace FakeProvider
 
         public FakeProviderPlugin(Main game) : base(game)
         {
-            Order = -1002;
+            //Order = -1002;
             string[] args = Environment.GetCommandLineArgs();
             int argumentIndex;
             #region Offset
@@ -142,8 +140,10 @@ namespace FakeProvider
             for (int i = 0; i < Main.maxPlayers; i++)
                 AllPlayers[i] = i;
 
-            ServerApi.Hooks.WorldLoad.Register(this, OnPreLoadWorld);
-            ServerApi.Hooks.PostWorldLoad.Register(this, OnPostLoadWorld);
+            //ServerApi.Hooks.world.Register(this, OnPreLoadWorld);
+
+            HookEvents.Terraria.IO.WorldFile.LoadHeader += WorldFile_LoadHeader;
+            HookEvents.Terraria.IO.WorldFile.LoadWorld += OnPreLoadWorld;
             ServerApi.Hooks.WorldSave.Register(this, OnPreSaveWorld);
             ServerApi.Hooks.NetSendData.Register(this, OnSendData, Int32.MaxValue);
             ServerApi.Hooks.ServerLeave.Register(this, OnServerLeave);
@@ -157,6 +157,15 @@ namespace FakeProvider
             Commands.ChatCommands.AddRange(CommandList);
         }
 
+        private void WorldFile_LoadHeader(object? sender, HookEvents.Terraria.IO.WorldFile.LoadHeaderEventArgs e)
+        {
+            e.ContinueExecution = false;
+            e.OriginalMethod.Invoke(e.reader);
+
+            Console.WriteLine("[FakeProvider] Loading custom tile provider.");
+            CreateCustomTileProvider();
+        }
+
         #endregion
         #region Dispose
 
@@ -164,8 +173,10 @@ namespace FakeProvider
         {
             if (Disposing)
             {
-                ServerApi.Hooks.WorldLoad.Deregister(this, OnPreLoadWorld);
-                ServerApi.Hooks.PostWorldLoad.Deregister(this, OnPostLoadWorld);
+                //ServerApi.Hooks.WorldLoad.Deregister(this, OnPreLoadWorld);
+                //ServerApi.Hooks.PostWorldLoad.Deregister(this, OnPostLoadWorld);
+                HookEvents.Terraria.IO.WorldFile.LoadWorld -= OnPreLoadWorld;
+                WorldGen.Hooks.OnWorldLoad -= OnPostLoadWorld;
                 ServerApi.Hooks.WorldSave.Deregister(this, OnPreSaveWorld);
                 ServerApi.Hooks.NetSendData.Deregister(this, OnSendData);
                 ServerApi.Hooks.ServerLeave.Deregister(this, OnServerLeave);
@@ -216,7 +227,7 @@ namespace FakeProvider
                 args.Handled = true;
 
                 List<Packet> list = new();
-                40.ForEach(i =>
+                40.For(i =>
                 {
                     if (i < chest.item.Length)
                     {
@@ -267,21 +278,20 @@ namespace FakeProvider
         #endregion
         #region OnPreLoadWorld
 
-        private static void OnPreLoadWorld(HandledEventArgs args)
+        private static void OnPreLoadWorld(object? o, HookEvents.Terraria.IO.WorldFile.LoadWorldEventArgs args)
         {
-            args.Handled = true;
-            if (FastWorldLoad) 
-                LoadWorldFast();
-            else 
-                LoadWorldDirect(false);
-            TerrariaApi.Server.Hooking.WorldHooks._hookManager.InvokePostWorldLoad();
+            args.ContinueExecution = false;
+            args.OriginalMethod.Invoke(args.loadFromCloud);
+
+            OnPostLoadWorld();
         }
 
         #endregion
         #region OnPostLoadWorld
 
-        private static void OnPostLoadWorld(HandledEventArgs args)
+        private static void OnPostLoadWorld()
         {
+            Console.WriteLine("[FakeProvider] Post load world processing...");
             //FakeProviderAPI.Tile.OffsetX = OffsetX;
             //FakeProviderAPI.Tile.OffsetY = OffsetY;
 
@@ -414,7 +424,8 @@ namespace FakeProvider
         {
             foreach (RemoteClient client in clients)
                 try
-                {client.Socket.AsyncSend(data, 0, data.Length,
+                {
+                    client.Socket.AsyncSend(data, 0, data.Length,
                         new SocketSendCallback(client.ServerWriteCallBack), null);
                 }
                 catch (IOException) { }
@@ -1106,7 +1117,7 @@ Custom valid : {ValidateWorldData(array, num)}";
             {
                 writer.Write(NPC.killCount[j]);
             }
-            writer.Write(Main.fastForwardTime);
+            writer.Write(Main.IsFastForwardingTime());
             writer.Write(NPC.downedFishron);
             writer.Write(NPC.downedMartians);
             writer.Write(NPC.downedAncientCultist);
@@ -1503,7 +1514,7 @@ Custom valid : {ValidateWorldData(array, num)}";
         #endregion
         #region LoadWorldDirect
 
-        private static void LoadWorldDirect(bool loadFromCloud)
+        /*private static void LoadWorldDirect(bool loadFromCloud)
         {
             Main.lockMenuBGChange = true;
             WorldFile._isWorldOnCloud = loadFromCloud;
@@ -1656,6 +1667,7 @@ Custom valid : {ValidateWorldData(array, num)}";
             //if (WorldFile.OnWorldLoad != null)
             //WorldFile.OnWorldLoad();
         }
+        */
 
         #endregion
         #region LoadWorld_Version2
@@ -1766,13 +1778,15 @@ Custom valid : {ValidateWorldData(array, num)}";
         #region LoadWorldFast
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Index(int x, int y) => x * Main.tile.Height + y;
-
+        static bool _isLoadingWorld = false;
         private unsafe static void LoadWorldFast()
         {
+            if (_isLoadingWorld) return;
+            _isLoadingWorld = true;
             Console.WriteLine("[FakeProvider] Loading World using FastLoadWorld");
             try
             {
-                System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                System.Diagnostics.Stopwatch sw = new();
                 sw.Start();
                 WorldGen.loadFailed = false;
                 WorldGen.loadSuccess = true;
@@ -1889,7 +1903,7 @@ Custom valid : {ValidateWorldData(array, num)}";
                     {
                         positions[hPos] = reader.ReadInt32();
                     }
-                    short importanceNum = reader.ReadInt16();
+                    var importanceNum = reader.ReadUInt16();
                     importance = new bool[importanceNum];
                     byte headerByte = 0;
                     byte headerByte2 = 128;
@@ -1902,7 +1916,7 @@ Custom valid : {ValidateWorldData(array, num)}";
                         }
                         else
                         {
-                            headerByte2 = (byte)(headerByte2 << 1);
+                            headerByte2 <<= 1;
                         }
                         if ((headerByte & headerByte2) == headerByte2)
                         {
@@ -2210,6 +2224,22 @@ Custom valid : {ValidateWorldData(array, num)}";
                         {
                             Main.notTheBeesWorld = reader.ReadBoolean();
                         }
+                        if (versionNumber >= 249)
+                        {
+                            Main.remixWorld = reader.ReadBoolean();
+                        }
+                        if (versionNumber >= 266)
+                        {
+                            Main.noTrapsWorld = reader.ReadBoolean();
+                        }
+                        if (versionNumber >= 267)
+                        {
+                            Main.zenithWorld = reader.ReadBoolean();
+                        }
+                        else
+                        {
+                            Main.zenithWorld = Main.remixWorld && Main.drunkWorld;
+                        }
                     }
                     else
                     {
@@ -2390,7 +2420,7 @@ Custom valid : {ValidateWorldData(array, num)}";
                     {
                         goto LOADHEADER_END;
                     }
-                    Main.fastForwardTime = reader.ReadBoolean();
+                    Main.fastForwardTimeToDawn = reader.ReadBoolean();
                     Main.UpdateTimeRate();
                     if (versionNumber < 131)
                     {
@@ -2589,6 +2619,84 @@ Custom valid : {ValidateWorldData(array, num)}";
                     {
                         NPC.downedDeerclops = false;
                     }
+                    // Added at 2025.02.19
+                    if (versionNumber >= 250)
+                    {
+                        NPC.unlockedSlimeBlueSpawn = reader.ReadBoolean();
+                    }
+                    else
+                    {
+                        NPC.unlockedSlimeBlueSpawn = false;
+                    }
+                    if (versionNumber >= 251)
+                    {
+                        NPC.unlockedMerchantSpawn = reader.ReadBoolean();
+                        NPC.unlockedDemolitionistSpawn = reader.ReadBoolean();
+                        NPC.unlockedPartyGirlSpawn = reader.ReadBoolean();
+                        NPC.unlockedDyeTraderSpawn = reader.ReadBoolean();
+                        NPC.unlockedTruffleSpawn = reader.ReadBoolean();
+                        NPC.unlockedArmsDealerSpawn = reader.ReadBoolean();
+                        NPC.unlockedNurseSpawn = reader.ReadBoolean();
+                        NPC.unlockedPrincessSpawn = reader.ReadBoolean();
+                    }
+                    else
+                    {
+                        NPC.unlockedMerchantSpawn = false;
+                        NPC.unlockedDemolitionistSpawn = false;
+                        NPC.unlockedPartyGirlSpawn = false;
+                        NPC.unlockedDyeTraderSpawn = false;
+                        NPC.unlockedTruffleSpawn = false;
+                        NPC.unlockedArmsDealerSpawn = false;
+                        NPC.unlockedNurseSpawn = false;
+                        NPC.unlockedPrincessSpawn = false;
+                    }
+                    if (versionNumber >= 259)
+                    {
+                        NPC.combatBookVolumeTwoWasUsed = reader.ReadBoolean();
+                    }
+                    else
+                    {
+                        NPC.combatBookVolumeTwoWasUsed = false;
+                    }
+                    if (versionNumber >= 260)
+                    {
+                        NPC.peddlersSatchelWasUsed = reader.ReadBoolean();
+                    }
+                    else
+                    {
+                        NPC.peddlersSatchelWasUsed = false;
+                    }
+                    if (versionNumber >= 261)
+                    {
+                        NPC.unlockedSlimeGreenSpawn = reader.ReadBoolean();
+                        NPC.unlockedSlimeOldSpawn = reader.ReadBoolean();
+                        NPC.unlockedSlimePurpleSpawn = reader.ReadBoolean();
+                        NPC.unlockedSlimeRainbowSpawn = reader.ReadBoolean();
+                        NPC.unlockedSlimeRedSpawn = reader.ReadBoolean();
+                        NPC.unlockedSlimeYellowSpawn = reader.ReadBoolean();
+                        NPC.unlockedSlimeCopperSpawn = reader.ReadBoolean();
+                    }
+                    else
+                    {
+                        NPC.unlockedSlimeGreenSpawn = false;
+                        NPC.unlockedSlimeOldSpawn = false;
+                        NPC.unlockedSlimePurpleSpawn = false;
+                        NPC.unlockedSlimeRainbowSpawn = false;
+                        NPC.unlockedSlimeRedSpawn = false;
+                        NPC.unlockedSlimeYellowSpawn = false;
+                        NPC.unlockedSlimeCopperSpawn = false;
+                    }
+                    if (versionNumber >= 264)
+                    {
+                        Main.fastForwardTimeToDusk = reader.ReadBoolean();
+                        Main.moondialCooldown = reader.ReadByte();
+                    }
+                    else
+                    {
+                        Main.fastForwardTimeToDusk = false;
+                        Main.moondialCooldown = 0;
+                    }
+                    Main.UpdateTimeRate();
                     #endregion
                     debugPointerString = "After LoadHeader";
 
@@ -2614,169 +2722,178 @@ Custom valid : {ValidateWorldData(array, num)}";
                     #region LoadWorldTiles 
                     for (int tileX = 0; tileX < Main.maxTilesX; tileX++)
                     {
-                        for (int tileY = 0; tileY < Main.maxTilesY; tileY++)
+                        try
                         {
-                            //tiles[Index(tileX, tileY)] = new StructTile();
-                            int type = -1;
-                            byte b;
-                            byte b2 = (b = 0);
-                            //StructTile tiles[Index(tileX, tileY)] = tiles[Index(tileX, tileY)];
-                            byte b3 = reader.ReadByte();
-                            if ((b3 & 1) == 1)
+                            for (int tileY = 0; tileY < Main.maxTilesY; tileY++)
                             {
-                                b2 = reader.ReadByte();
-                                if ((b2 & 1) == 1)
+                                //tiles[Index(tileX, tileY)] = new StructTile();
+                                int type = -1;
+                                byte b;
+                                byte b2 = (b = 0);
+                                //StructTile tiles[Index(tileX, tileY)] = tiles[Index(tileX, tileY)];
+                                byte b3 = reader.ReadByte();
+                                if ((b3 & 1) == 1)
                                 {
-                                    b = reader.ReadByte();
-                                }
-                            }
-                            byte b4;
-                            if ((b3 & 2) == 2)
-                            {
-                                tiles[Index(tileX, tileY)].active(true);
-                                if ((b3 & 0x20) == 32)
-                                {
-                                    b4 = reader.ReadByte();
-                                    type = reader.ReadByte();
-                                    type = (type << 8) | b4;
-                                }
-                                else
-                                {
-                                    type = reader.ReadByte();
-                                }
-                                tiles[Index(tileX, tileY)].type = (ushort)type;
-                                if (importance[type])
-                                {
-                                    tiles[Index(tileX, tileY)].frameX = reader.ReadInt16();
-                                    tiles[Index(tileX, tileY)].frameY = reader.ReadInt16();
-                                    if (tiles[Index(tileX, tileY)].type == 144)
+                                    b2 = reader.ReadByte();
+                                    if ((b2 & 1) == 1)
                                     {
-                                        tiles[Index(tileX, tileY)].frameY = 0;
+                                        b = reader.ReadByte();
                                     }
                                 }
-                                else
+                                byte b4;
+                                if ((b3 & 2) == 2)
                                 {
-                                    tiles[Index(tileX, tileY)].frameX = -1;
-                                    tiles[Index(tileX, tileY)].frameY = -1;
-                                }
-                                if ((b & 8) == 8)
-                                {
-                                    tiles[Index(tileX, tileY)].color(reader.ReadByte());
-                                }
-                            }
-                            if ((b3 & 4) == 4)
-                            {
-                                tiles[Index(tileX, tileY)].wall = reader.ReadByte();
-                                if (tiles[Index(tileX, tileY)].wall >= 316)
-                                {
-                                    tiles[Index(tileX, tileY)].wall = 0;
-                                }
-                                if ((b & 0x10) == 16)
-                                {
-                                    tiles[Index(tileX, tileY)].wallColor(reader.ReadByte());
-                                }
-                            }
-                            b4 = (byte)((b3 & 0x18) >> 3);
-                            if (b4 != 0)
-                            {
-                                tiles[Index(tileX, tileY)].liquid = reader.ReadByte();
-                                if (b4 > 1)
-                                {
-                                    if (b4 == 2)
+                                    tiles[Index(tileX, tileY)].active(true);
+                                    if ((b3 & 0x20) == 32)
                                     {
-                                        tiles[Index(tileX, tileY)].lava(lava: true);
+                                        b4 = reader.ReadByte();
+                                        type = reader.ReadByte();
+                                        type = (type << 8) | b4;
                                     }
                                     else
                                     {
-                                        tiles[Index(tileX, tileY)].honey(honey: true);
+                                        type = reader.ReadByte();
                                     }
-                                }
-                            }
-                            if (b2 > 1)
-                            {
-                                if ((b2 & 2) == 2)
-                                {
-                                    tiles[Index(tileX, tileY)].wire(wire: true);
-                                }
-                                if ((b2 & 4) == 4)
-                                {
-                                    tiles[Index(tileX, tileY)].wire2(wire2: true);
-                                }
-                                if ((b2 & 8) == 8)
-                                {
-                                    tiles[Index(tileX, tileY)].wire3(wire3: true);
-                                }
-                                b4 = (byte)((b2 & 0x70) >> 4);
-                                if (b4 != 0 && (Main.tileSolid[tiles[Index(tileX, tileY)].type] || TileID.Sets.NonSolidSaveSlopes[tiles[Index(tileX, tileY)].type]))
-                                {
-                                    if (b4 == 1)
+                                    tiles[Index(tileX, tileY)].type = (ushort)type;
+                                    Console.WriteLine("Type: " + tiles[Index(tileX, tileY)].type);
+                                    if (importance[type])
                                     {
-                                        tiles[Index(tileX, tileY)].halfBrick(halfBrick: true);
+                                        tiles[Index(tileX, tileY)].frameX = reader.ReadInt16();
+                                        tiles[Index(tileX, tileY)].frameY = reader.ReadInt16();
+                                        if (tiles[Index(tileX, tileY)].type == 144)
+                                        {
+                                            tiles[Index(tileX, tileY)].frameY = 0;
+                                        }
                                     }
                                     else
                                     {
-                                        tiles[Index(tileX, tileY)].slope((byte)(b4 - 1));
+                                        tiles[Index(tileX, tileY)].frameX = -1;
+                                        tiles[Index(tileX, tileY)].frameY = -1;
+                                    }
+                                    if ((b & 8) == 8)
+                                    {
+                                        tiles[Index(tileX, tileY)].color(reader.ReadByte());
                                     }
                                 }
-                            }
-                            if (b > 0)
-                            {
-                                if ((b & 2) == 2)
+                                if ((b3 & 4) == 4)
                                 {
-                                    tiles[Index(tileX, tileY)].actuator(actuator: true);
-                                }
-                                if ((b & 4) == 4)
-                                {
-                                    tiles[Index(tileX, tileY)].inActive(inActive: true);
-                                }
-                                if ((b & 0x20) == 32)
-                                {
-                                    tiles[Index(tileX, tileY)].wire4(wire4: true);
-                                }
-                                if ((b & 0x40) == 64)
-                                {
-                                    b4 = reader.ReadByte();
-                                    tiles[Index(tileX, tileY)].wall = (ushort)((b4 << 8) | tiles[Index(tileX, tileY)].wall);
+                                    tiles[Index(tileX, tileY)].wall = reader.ReadByte();
                                     if (tiles[Index(tileX, tileY)].wall >= 316)
                                     {
                                         tiles[Index(tileX, tileY)].wall = 0;
                                     }
-                                }
-                            }
-                            int surfaceOffset = (byte)((b3 & 0xC0) >> 6) switch
-                            {
-                                0 => 0,
-                                1 => reader.ReadByte(),
-                                _ => reader.ReadInt16(),
-                            };
-                            if (type != -1)
-                            {
-                                if ((double)tileY <= Main.worldSurface)
-                                {
-                                    if ((double)(tileY + surfaceOffset) <= Main.worldSurface)
+                                    if ((b & 0x10) == 16)
                                     {
-                                        WorldGen.tileCounts[type] += (surfaceOffset + 1) * 5;
+                                        tiles[Index(tileX, tileY)].wallColor(reader.ReadByte());
+                                    }
+                                }
+                                b4 = (byte)((b3 & 0x18) >> 3);
+                                if (b4 != 0)
+                                {
+                                    tiles[Index(tileX, tileY)].liquid = reader.ReadByte();
+                                    if (b4 > 1)
+                                    {
+                                        if (b4 == 2)
+                                        {
+                                            tiles[Index(tileX, tileY)].lava(lava: true);
+                                        }
+                                        else
+                                        {
+                                            tiles[Index(tileX, tileY)].honey(honey: true);
+                                        }
+                                    }
+                                }
+                                if (b2 > 1)
+                                {
+                                    if ((b2 & 2) == 2)
+                                    {
+                                        tiles[Index(tileX, tileY)].wire(wire: true);
+                                    }
+                                    if ((b2 & 4) == 4)
+                                    {
+                                        tiles[Index(tileX, tileY)].wire2(wire2: true);
+                                    }
+                                    if ((b2 & 8) == 8)
+                                    {
+                                        tiles[Index(tileX, tileY)].wire3(wire3: true);
+                                    }
+                                    b4 = (byte)((b2 & 0x70) >> 4);
+                                    if (b4 != 0 && (Main.tileSolid[tiles[Index(tileX, tileY)].type] || TileID.Sets.NonSolidSaveSlopes[tiles[Index(tileX, tileY)].type]))
+                                    {
+                                        if (b4 == 1)
+                                        {
+                                            tiles[Index(tileX, tileY)].halfBrick(halfBrick: true);
+                                        }
+                                        else
+                                        {
+                                            tiles[Index(tileX, tileY)].slope((byte)(b4 - 1));
+                                        }
+                                    }
+                                }
+                                if (b > 0)
+                                {
+                                    if ((b & 2) == 2)
+                                    {
+                                        tiles[Index(tileX, tileY)].actuator(actuator: true);
+                                    }
+                                    if ((b & 4) == 4)
+                                    {
+                                        tiles[Index(tileX, tileY)].inActive(inActive: true);
+                                    }
+                                    if ((b & 0x20) == 32)
+                                    {
+                                        tiles[Index(tileX, tileY)].wire4(wire4: true);
+                                    }
+                                    if ((b & 0x40) == 64)
+                                    {
+                                        b4 = reader.ReadByte();
+                                        tiles[Index(tileX, tileY)].wall = (ushort)((b4 << 8) | tiles[Index(tileX, tileY)].wall);
+                                        if (tiles[Index(tileX, tileY)].wall >= 316)
+                                        {
+                                            tiles[Index(tileX, tileY)].wall = 0;
+                                        }
+                                    }
+                                }
+                                int surfaceOffset = (byte)((b3 & 0xC0) >> 6) switch
+                                {
+                                    0 => 0,
+                                    1 => reader.ReadByte(),
+                                    _ => reader.ReadInt16(),
+                                };
+                                if (type != -1)
+                                {
+                                    if (tileY <= Main.worldSurface)
+                                    {
+                                        if (tileY + surfaceOffset <= Main.worldSurface)
+                                        {
+                                            WorldGen.tileCounts[type] += (surfaceOffset + 1) * 5;
+                                        }
+                                        else
+                                        {
+                                            //Todo fix names
+                                            int surfaceSubtract = (int)(Main.worldSurface - tileY + 1.0);
+                                            int tileCountAdd = surfaceOffset + 1 - surfaceSubtract;
+                                            WorldGen.tileCounts[type] += surfaceSubtract * 5 + tileCountAdd;
+                                        }
                                     }
                                     else
                                     {
-                                        //Todo fix names
-                                        int surfaceSubtract = (int)(Main.worldSurface - (double)tileY + 1.0);
-                                        int tileCountAdd = surfaceOffset + 1 - surfaceSubtract;
-                                        WorldGen.tileCounts[type] += surfaceSubtract * 5 + tileCountAdd;
+                                        WorldGen.tileCounts[type] += surfaceOffset + 1;
                                     }
                                 }
-                                else
+                                StructTile tile = tiles[Index(tileX, tileY)];
+                                while (surfaceOffset > 0)
                                 {
-                                    WorldGen.tileCounts[type] += surfaceOffset + 1;
+                                    tileY++;
+                                    tiles[Index(tileX, tileY)] = tile;
+                                    surfaceOffset--;
                                 }
+                                Console.WriteLine($"x: {tileX}, y: {tileY}");
                             }
-                            StructTile tile = tiles[Index(tileX, tileY)];
-                            while (surfaceOffset > 0)
-                            {
-                                tileY++;
-                                tiles[Index(tileX, tileY)] = tile;
-                                surfaceOffset--;
-                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex);
                         }
                     }
                     WorldGen.AddUpAlignmentCounts(clearCounts: true);
@@ -3960,6 +4077,10 @@ Custom valid : {ValidateWorldData(array, num)}";
 					}*/
                     NPC.SetWorldSpecificMonstersByWorldID();
                     sw.Stop();
+
+                    EventInfo eventOnWorldLoad = typeof(WorldFile).GetEvent("OnWorldLoad", BindingFlags.Public | BindingFlags.Static);
+                    eventOnWorldLoad.GetRaiseMethod()?.Invoke(null, []);
+
                     Console.Write($"[FakeProvider] Loaded world in {sw.Elapsed}");
                 }
                 catch (Exception lastThrownLoadException)
@@ -3970,7 +4091,7 @@ Custom valid : {ValidateWorldData(array, num)}";
                     try
                     {
                         Console.WriteLine($"Error on FastLoadWorld: Falling back to vanilla LoadWorld");
-                        LoadWorldDirect(false);
+                        //LoadWorldDirect(false);
                         reader.Close();
                     }
                     catch
@@ -3982,8 +4103,9 @@ Custom valid : {ValidateWorldData(array, num)}";
             catch (Exception ex)
             {
                 Console.WriteLine($"{ex.Message}: {ex.StackTrace}");
-                Console.WriteLine($"Error on FastLoadWorld: Falling back to vanilla LoadWorld");
-                LoadWorldDirect(false);
+                Console.WriteLine($"Error on FastLoadWorld");
+                Console.ReadLine();
+                //LoadWorldDirect(false);
             }
 
         }

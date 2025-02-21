@@ -1,6 +1,6 @@
-﻿using BossFramework.BInterfaces;
-using System.Linq;
+﻿using System.Linq;
 using System.Timers;
+using BossFramework.BInterfaces;
 
 namespace BossFramework.BModels
 {

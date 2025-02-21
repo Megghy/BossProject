@@ -53,7 +53,7 @@ namespace BossFramework
             Console.WriteLine(log);
             Console.ResetColor();
             if (save)
-                TShock.Log.Write(log, TraceLevel.Info);
+                TShock.Log?.Write(log, TraceLevel.Info);
         }
     }
 }

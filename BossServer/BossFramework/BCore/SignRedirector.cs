@@ -1,12 +1,13 @@
-﻿using BossFramework.BAttributes;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using BossFramework.BAttributes;
 using BossFramework.BModels;
 using BossFramework.DB;
 using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TrProtocol;
 using TrProtocol.Packets;
+using TShockAPI;
 
 namespace BossFramework.BCore
 {
@@ -16,7 +17,7 @@ namespace BossFramework.BCore
         private static List<BSign> _overrideSign { get; set; } = new();
 
         [AutoPostInit]
-        private static void InitSign()
+        internal static void InitSign()
         {
             BLog.DEBUG("初始化标牌重定向");
 
@@ -44,7 +45,7 @@ namespace BossFramework.BCore
                 BLog.Success($"移除 {invalidCount} 个无效标牌");
         }
         [SimpleTimer(Time = 5)]
-        private static void UpdateClientSign()
+        internal static void UpdateClientSign()
         {
             Task.Run(() =>
             {
@@ -228,7 +229,7 @@ namespace BossFramework.BCore
         {
             var result = new List<BSign>();
             var rec = new Rectangle(startX, startY, width, height);
-            AllSign().ForEach((s, i) =>
+            AllSign().ForEachWithIndex((s, i) =>
             {
                 if (!result.Exists(r => r.Contains(s.X, s.Y)) && rec.Contains(s.X, s.Y))
                     result.Add(s);

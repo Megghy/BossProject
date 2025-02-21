@@ -16,10 +16,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using MySqlConnector;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using MySqlConnector;
 using TShockAPI.Hooks;
 
 namespace TShockAPI.DB
@@ -219,7 +219,7 @@ namespace TShockAPI.DB
                 }
                 if (traversed.Contains(cur))
                 {
-                    throw new InvalidOperationException("Infinite group parenting ({0})".SFormat(cur.Name));
+                    throw new InvalidOperationException(GetString($"Infinite group parenting ({cur.Name})"));
                 }
                 traversed.Add(cur);
                 cur = cur.Parent;

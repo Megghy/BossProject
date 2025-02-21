@@ -28,7 +28,8 @@ namespace TShockAPI
     /// </summary>
     public class TextLog : ILog, IDisposable
     {
-        private readonly StreamWriter _logWriter;
+        private readonly bool ClearFile;
+        private StreamWriter _logWriter;
 
         /// <summary>
         /// File name of the Text log
@@ -43,7 +44,7 @@ namespace TShockAPI
         public TextLog(string filename, bool clear)
         {
             FileName = filename;
-            _logWriter = new StreamWriter(filename, !clear);
+            ClearFile = clear;
         }
 
         public bool MayWriteType(TraceLevel type)
@@ -99,6 +100,28 @@ namespace TShockAPI
             Console.WriteLine(message);
             Console.ForegroundColor = ConsoleColor.Gray;
             Write(message, TraceLevel.Error);
+        }
+
+        /// <summary>
+        /// Writes an error to the log file.
+        /// </summary>
+        /// <param name="message">The message to be written.</param>
+        public void ConsoleWarn(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(message);
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Write(message, TraceLevel.Warning);
+        }
+
+        /// <summary>
+        /// Writes an error to the log file.
+        /// </summary>
+        /// <param name="format">The format of the message to be written.</param>
+        /// <param name="args">The format arguments.</param>
+        public void ConsoleWarn(string format, params object[] args)
+        {
+            ConsoleWarn(string.Format(format, args));
         }
 
         /// <summary>
@@ -224,6 +247,10 @@ namespace TShockAPI
         {
             if (!MayWriteType(level))
                 return;
+            if (_logWriter is null)
+            {
+                _logWriter = new StreamWriter(FileName, !ClearFile);
+            }
 
             var caller = "TShock";
 
@@ -255,7 +282,10 @@ namespace TShockAPI
 
         public void Dispose()
         {
-            _logWriter.Dispose();
+            if (_logWriter != null)
+            {
+                _logWriter.Dispose();
+            }
         }
     }
 }

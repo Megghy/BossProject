@@ -16,10 +16,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using MySqlConnector;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using MySqlConnector;
 
 namespace TShockAPI.DB
 {

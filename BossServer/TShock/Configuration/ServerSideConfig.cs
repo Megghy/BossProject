@@ -78,12 +78,28 @@ namespace TShockAPI.Configuration
     public class ServerSideConfig : ConfigFile<SscSettings>
     {
         /// <summary>
+        /// Upgrades the configuration file from the old format if required, then reads and returns the currently configured <see cref="SscSettings"/>
+        /// </summary>
+        /// <param name="json"></param>
+        /// <param name="incompleteSettings"></param>
+        /// <returns></returns>
+        public override SscSettings ConvertJson(string json, out bool incompleteSettings)
+        {
+            var settings = FileTools.LoadConfigAndCheckForChanges<SscSettings>(json, out incompleteSettings);
+
+            Settings = settings;
+            OnConfigRead?.Invoke(this);
+
+            return settings;
+        }
+
+        /// <summary>
         /// Dumps all configuration options to a text file in Markdown format
         /// </summary>
         public static void DumpDescriptions()
         {
             var sb = new StringBuilder();
-            var defaults = new ServerSideConfig();
+            var defaults = new SscSettings();
 
             foreach (var field in defaults.GetType().GetFields().OrderBy(f => f.Name))
             {
@@ -99,14 +115,14 @@ namespace TShockAPI.Configuration
 
                 var def = field.GetValue(defaults);
 
-                sb.AppendLine("{0}  ".SFormat(name));
-                sb.AppendLine("Type: {0}  ".SFormat(type));
-                sb.AppendLine("Description: {0}  ".SFormat(desc));
-                sb.AppendLine("Default: \"{0}\"  ".SFormat(def));
+                sb.AppendLine($"## {name}  ");
+                sb.AppendLine($"{desc}");
+                sb.AppendLine(GetString("* **Field type**: `{0}`", type));
+                sb.AppendLine(GetString("* **Default**: `{0}`", def));
                 sb.AppendLine();
             }
 
-            File.WriteAllText("ServerSideConfigDescriptions.txt", sb.ToString());
+            File.WriteAllText("docs/ssc-config.md", sb.ToString());
         }
     }
 }

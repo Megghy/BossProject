@@ -1,9 +1,10 @@
-﻿using BossFramework.BAttributes;
+﻿using BossFramework;
+using BossFramework.BAttributes;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using BossFramework.BModules;
-using BossFramework;
 using System.Collections.Generic;
+using System;
+using System.IO;
 using System.Linq;
 using TrProtocol;
 using TrProtocol.Packets;
@@ -11,12 +12,52 @@ using TShockAPI;
 
 public class ItemExchangeCmd : BaseCommand
 {
+    public struct ExchangeRecipe
+    {
+        public ExchangeRecipe() { }
+        public string Name { get; set; } = "";
+        public bool Notice { get; set; } = true;
+        /// <summary>
+        /// 需要的钱, 换算为铜币
+        /// </summary>
+        public int RequireCoin { get; set; } = -1;
+        /// <summary>
+        /// 需要的物品
+        /// </summary>
+        public NetItem[] RequireItem { get; set; } = Array.Empty<NetItem>();
+        /// <summary>
+        /// 给的物品
+        /// </summary>
+        public NetItem[] GiveItem { get; set; } = Array.Empty<NetItem>();
+        /// <summary>
+        /// 换了之后执行的命令
+        /// </summary>
+        public string[] ExcuteCommands { get; set; } = Array.Empty<string>();
+    }
+    public class ItemExchangeConfig_Internal : BaseConfig<ItemExchangeConfig_Internal>
+    {
+        protected override string FilePath => Path.Combine(BInfo.FilePath, "ItemExchange.json");
+        public ExchangeRecipe[] Recipes { get; set; } = {
+            new ExchangeRecipe
+            {
+                ExcuteCommands = new string[] { "/help" },
+                GiveItem = new NetItem[] { new(1500, 1, 0) },
+                Name = "test",
+                RequireCoin = 100,
+
+                RequireItem = new NetItem[]
+                {
+                    new NetItem(757, 1, 0)
+                }
+            }
+        };
+    }
     public override string[] Names { get; } = { "ie" };
     public static void Exchange(SubCommandArgs args)
     {
         if (args.Any())
         {
-            if (ItemExchangeConfig.Instance.Recipes.FirstOrDefault(r => r.Name.ToLower() == args[0].ToLower()) is { } recipe)
+            if (ItemExchangeConfig_Internal.Instance.Recipes.FirstOrDefault(r => r.Name.ToLower() == args[0].ToLower()) is { } recipe)
                 InternalExchange(args.Player, recipe);
             else
                 args.SendErrorMsg($"未找到名为 {args[0]} 的交换规则");
@@ -30,7 +71,7 @@ public class ItemExchangeCmd : BaseCommand
         if (args.Any())
         {
             if (BInfo.OnlinePlayers.FirstOrDefault(p => p.Name.IsSimilarWith(args[0])) is { } plr)
-                if (ItemExchangeConfig.Instance.Recipes.FirstOrDefault(r => r.Name.IsSimilarWith(args[1])) is { } recipe)
+                if (ItemExchangeConfig_Internal.Instance.Recipes.FirstOrDefault(r => r.Name.IsSimilarWith(args[1])) is { } recipe)
                     InternalExchange(plr, recipe);
                 else
                     args.SendErrorMsg($"未找到名为 {args[1]} 的交换规则");
@@ -42,7 +83,7 @@ public class ItemExchangeCmd : BaseCommand
     }
     public static void List(SubCommandArgs args)
     {
-        args.SendInfoMsg($"可用配方:\r\n{string.Join("\r\n", ItemExchangeConfig.Instance.Recipes.Select(r => $"{r.Name} [{MoneyInfo.GetFromCopper(r.RequireCoin)}] 所需物品: {string.Join(' ', r.RequireItem.Select(i => TShock.Utils.ItemTag(i)))}"))}");
+        args.SendInfoMsg($"可用配方:\r\n{string.Join("\r\n", ItemExchangeConfig_Internal.Instance.Recipes.Select(r => $"{r.Name} [{MoneyInfo.GetFromCopper(r.RequireCoin)}] 所需物品: {string.Join(' ', r.RequireItem.Select(i => TShock.Utils.ItemTag(i)))}"))}");
     }
     record MoneyInfo(long Platinum, long Gold, long Silver, long Copper)
     {
@@ -126,7 +167,7 @@ public class ItemExchangeCmd : BaseCommand
                                 Stack = (short)plr.TrPlayer.inventory[slot].stack
                             });
                         }
-                        else if (i.NetId is 71 or 72 or 73 or 74)
+                        else if (slot < 59 && i.NetId is 71 or 72 or 73 or 74 or 0)
                             packets.Add(new SyncEquipment()
                             {
                                 ItemSlot = (short)slot,
@@ -149,7 +190,8 @@ public class ItemExchangeCmd : BaseCommand
                 recipe.GiveItem?.ForEach(i => plr.TsPlayer.GiveItem(i.NetId, i.Stack, i.PrefixId));
                 recipe.ExcuteCommands?.ForEach(c => Commands.HandleCommand(plr.TsPlayer, c));
 
-                plr.SendSuccessMsg($"成功兑换配方 {recipe.Name}");
+                if (recipe.Notice)
+                    plr.SendSuccessMsg($"成功兑换配方 {recipe.Name}");
             }
             else
                 plr.SendErrorMsg($"金钱不足. 该配方所需 [{MoneyInfo.GetFromCopper(recipe.RequireCoin)}], 你的金钱为 [{money}]");

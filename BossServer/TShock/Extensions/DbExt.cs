@@ -44,7 +44,7 @@ namespace TShockAPI.DB
                 {
                     com.CommandText = query;
                     for (int i = 0; i < args.Length; i++)
-                        com.AddParameter("@" + i, args[i]);
+                        com.AddParameter("@" + i, args[i] ?? DBNull.Value);
                     return com.ExecuteNonQuery();
                 }
             }
@@ -64,18 +64,18 @@ namespace TShockAPI.DB
             try
             {
                 db.Open();
-                using (var com = db.CreateCommand())
+                var com = db.CreateCommand(); // this will be disposed via the QueryResult instance
                 {
                     com.CommandText = query;
                     for (int i = 0; i < args.Length; i++)
                         com.AddParameter("@" + i, args[i]);
 
-                    return new QueryResult(db, com.ExecuteReader());
+                    return new QueryResult(db, com.ExecuteReader(), com);
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("Fatal TShock initialization exception: failed to connect to MySQL database. See inner exception for details.", ex);
+                throw new Exception(GetString("Fatal TShock initialization exception: failed to connect to MySQL database. See inner exception for details."), ex);
             }
         }
 
@@ -116,13 +116,13 @@ namespace TShockAPI.DB
         {
             var db = olddb.CloneEx();
             db.Open();
-            using (var com = db.CreateCommand())
+            var com = db.CreateCommand(); // this will be disposed via the QueryResult instance
             {
                 com.CommandText = query;
                 foreach (var kv in values)
                     com.AddParameter("@" + kv.Key, kv.Value);
 
-                return new QueryResult(db, com.ExecuteReader());
+                return new QueryResult(db, com.ExecuteReader(), com);
             }
         }
 
@@ -250,7 +250,7 @@ namespace TShockAPI.DB
             if (typeof(T) != (t = reader.GetFieldType(column)))
             {
                 string columnName = reader.GetName(column);
-                throw new InvalidCastException($"Received type '{typeof(T).Name}', however column '{columnName}' expects type '{t.Name}'");
+                throw new InvalidCastException(GetString($"Received type '{typeof(T).Name}', however column '{columnName}' expects type '{t.Name}'"));
             }
 
             if (reader.IsDBNull(column))
@@ -273,11 +273,13 @@ namespace TShockAPI.DB
     {
         public IDbConnection Connection { get; protected set; }
         public IDataReader Reader { get; protected set; }
+        public IDbCommand Command { get; protected set; }
 
-        public QueryResult(IDbConnection conn, IDataReader reader)
+        public QueryResult(IDbConnection conn, IDataReader reader, IDbCommand command)
         {
             Connection = conn;
             Reader = reader;
+            Command = command;
         }
 
         ~QueryResult()
@@ -299,6 +301,11 @@ namespace TShockAPI.DB
                 {
                     Reader.Dispose();
                     Reader = null;
+                }
+                if (Command != null)
+                {
+                    Command.Dispose();
+                    Command = null;
                 }
                 if (Connection != null)
                 {

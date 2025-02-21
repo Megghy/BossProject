@@ -20,4 +20,5 @@ public class SyncPlayer : Packet, IPlayerSlot
     public Color ShoeColor { get; set; }
     public BitsByte Bit3 { get; set; }
     public BitsByte Bit4 { get; set; }
+    public BitsByte Bit5 { get; set; }
 }

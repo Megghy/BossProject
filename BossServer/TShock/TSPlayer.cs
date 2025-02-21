@@ -1,6 +1,6 @@
 ﻿/*
 TShock, a server mod for Terraria
-Copyright (C) 2011-2019 Pryaxis & TShock Contributors
+Copyright (C) 2011-2022 Pryaxis & TShock Contributors
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using Microsoft.Xna.Framework;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Timers;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
@@ -124,7 +124,7 @@ namespace TShockAPI
             }
             return found;
         }
-        public bool IgnorePerm { get; set; } = false;
+
         /// <summary>
         /// Used in preventing players from seeing the npc spawnrate permission error on join.
         /// </summary>
@@ -349,6 +349,9 @@ namespace TShockAPI
         /// <summary>Determines if the player is disabled for not clearing their trash. A re-login is the only way to reset this.</summary>
         public bool IsDisabledPendingTrashRemoval;
 
+        /// <summary>Determines if the player has finished the handshake (Sent all necessary packets for connection, such as Request World Data, Spawn Player, etc). A normal client would do all of this no problem.</summary>
+        public bool FinishedHandshake = false;
+
         /// <summary>Checks to see if active throttling is happening on events by Bouncer. Rejects repeated events by malicious clients in a short window.</summary>
         /// <returns>If the player is currently being throttled by Bouncer, or not.</returns>
         public bool IsBouncerThrottled()
@@ -385,6 +388,12 @@ namespace TShockAPI
             Item[] safe = TPlayer.bank2.item;
             Item[] forge = TPlayer.bank3.item;
             Item[] voidVault = TPlayer.bank4.item;
+            Item[] loadout1Armor = TPlayer.Loadouts[0].Armor;
+            Item[] loadout1Dye = TPlayer.Loadouts[0].Dye;
+            Item[] loadout2Armor = TPlayer.Loadouts[1].Armor;
+            Item[] loadout2Dye = TPlayer.Loadouts[1].Dye;
+            Item[] loadout3Armor = TPlayer.Loadouts[2].Armor;
+            Item[] loadout3Dye = TPlayer.Loadouts[2].Dye;
 
             Item trash = TPlayer.trashItem;
             for (int i = 0; i < NetItem.MaxInventory; i++)
@@ -404,7 +413,7 @@ namespace TShockAPI
                             check = true;
                             if (shouldWarnPlayer)
                             {
-                                SendErrorMessage("检测到堆栈作弊，请删除物品{0}({1}) ，然后重新加入", item.Name, inventory[i].stack);
+                                SendErrorMessage(GetString("Stack cheat detected. Remove item {0} ({1}) and then rejoin.", item.Name, inventory[i].stack));
                             }
                         }
                     }
@@ -424,7 +433,7 @@ namespace TShockAPI
                             check = true;
                             if (shouldWarnPlayer)
                             {
-                                SendErrorMessage("检测到堆栈作弊，请删除盔甲{0}({1}) ，然后重新加入", item.Name, armor[index].stack);
+                                SendErrorMessage(GetString("Stack cheat detected. Remove armor {0} ({1}) and then rejoin.", item.Name, armor[index].stack));
                             }
                         }
                     }
@@ -444,7 +453,7 @@ namespace TShockAPI
                             check = true;
                             if (shouldWarnPlayer)
                             {
-                                SendErrorMessage("检测到堆栈作弊，请删除染料{0}({1}) ，然后重新加入", item.Name, dye[index].stack);
+                                SendErrorMessage(GetString("Stack cheat detected. Remove dye {0} ({1}) and then rejoin.", item.Name, dye[index].stack));
                             }
                         }
                     }
@@ -464,7 +473,7 @@ namespace TShockAPI
                             check = true;
                             if (shouldWarnPlayer)
                             {
-                                SendErrorMessage("检测到堆栈作弊，请删除物品{0}({1}) ，然后重新加入", item.Name, miscEquips[index].stack);
+                                SendErrorMessage(GetString("Stack cheat detected. Remove item {0} ({1}) and then rejoin.", item.Name, miscEquips[index].stack));
                             }
                         }
                     }
@@ -484,7 +493,7 @@ namespace TShockAPI
                             check = true;
                             if (shouldWarnPlayer)
                             {
-                                SendErrorMessage("检测到堆栈作弊，请删除物品染料{0}({1}) ，然后重新加入", item.Name, miscDyes[index].stack);
+                                SendErrorMessage(GetString("Stack cheat detected. Remove item dye {0} ({1}) and then rejoin.", item.Name, miscDyes[index].stack));
                             }
                         }
                     }
@@ -505,7 +514,7 @@ namespace TShockAPI
                             check = true;
                             if (shouldWarnPlayer)
                             {
-                                SendErrorMessage("检测到堆栈作弊，请删除猪猪存钱罐{0}({1}) ，然后重新加入", item.Name, piggy[index].stack);
+                                SendErrorMessage(GetString("Stack cheat detected. Remove piggy-bank item {0} ({1}) and then rejoin.", item.Name, piggy[index].stack));
                             }
                         }
                     }
@@ -526,7 +535,7 @@ namespace TShockAPI
                             check = true;
                             if (shouldWarnPlayer)
                             {
-                                SendErrorMessage("Stack cheat detected. Remove safe item {0} ({1}) and then rejoin.", item.Name, safe[index].stack);
+                                SendErrorMessage(GetString("Stack cheat detected. Remove safe item {0} ({1}) and then rejoin.", item.Name, safe[index].stack));
                             }
                         }
                     }
@@ -546,7 +555,7 @@ namespace TShockAPI
                             check = true;
                             if (shouldWarnPlayer)
                             {
-                                SendErrorMessage("检测到堆栈作弊，请删除垃圾箱{0}({1}) ，然后重新加入", item.Name, trash.stack);
+                                SendErrorMessage(GetString("Stack cheat detected. Remove trash item {0} ({1}) and then rejoin.", item.Name, trash.stack));
                             }
                         }
                     }
@@ -567,7 +576,7 @@ namespace TShockAPI
                             check = true;
                             if (shouldWarnPlayer)
                             {
-                                SendErrorMessage("检测到堆栈作弊，请删除熔炉箱{0}({1}) ，然后重新加入", item.Name, forge[index].stack);
+                                SendErrorMessage(GetString("Stack cheat detected. Remove Defender's Forge item {0} ({1}) and then rejoin.", item.Name, forge[index].stack));
                             }
                         }
                     }
@@ -588,12 +597,131 @@ namespace TShockAPI
                             check = true;
                             if (shouldWarnPlayer)
                             {
-                                SendErrorMessage("检测到堆栈作弊，请删除虚空箱{0}({1}) ，然后重新加入", item.Name, voidVault[index].stack);
+                                SendErrorMessage(GetString("Stack cheat detected. Remove Void Vault item {0} ({1}) and then rejoin.", item.Name, voidVault[index].stack));
                             }
                         }
                     }
                 }
+                else if (i < NetItem.Loadout1Armor.Item2)
+                {
+                    var index = i - NetItem.Loadout1Armor.Item1;
+                    Item item = new Item();
+                    if (loadout1Armor[index] != null && loadout1Armor[index].netID != 0)
+                    {
+                        item.netDefaults(loadout1Armor[index].netID);
+                        item.Prefix(loadout1Armor[index].prefix);
+                        item.AffixName();
 
+                        if (loadout1Armor[index].stack > item.maxStack || loadout1Armor[index].stack < 0)
+                        {
+                            check = true;
+                            if (shouldWarnPlayer)
+                            {
+                                SendErrorMessage(GetString("Stack cheat detected. Remove Loadout 1 item {0} ({1}) and then rejoin.", item.Name, loadout1Armor[index].stack));
+                            }
+                        }
+                    }
+                }
+                else if (i < NetItem.Loadout1Dye.Item2)
+                {
+                    var index = i - NetItem.Loadout1Dye.Item1;
+                    Item item = new Item();
+                    if (loadout1Dye[index] != null && loadout1Dye[index].netID != 0)
+                    {
+                        item.netDefaults(loadout1Dye[index].netID);
+                        item.Prefix(loadout1Dye[index].prefix);
+                        item.AffixName();
+
+                        if (loadout1Dye[index].stack > item.maxStack || loadout1Dye[index].stack < 0)
+                        {
+                            check = true;
+                            if (shouldWarnPlayer)
+                            {
+                                SendErrorMessage(GetString("Stack cheat detected. Remove Loadout 1 item {0} ({1}) and then rejoin.", item.Name, loadout1Dye[index].stack));
+                            }
+                        }
+                    }
+                }
+                else if (i < NetItem.Loadout2Armor.Item2)
+                {
+                    var index = i - NetItem.Loadout2Armor.Item1;
+                    Item item = new Item();
+                    if (loadout2Armor[index] != null && loadout2Armor[index].netID != 0)
+                    {
+                        item.netDefaults(loadout2Armor[index].netID);
+                        item.Prefix(loadout2Armor[index].prefix);
+                        item.AffixName();
+
+                        if (loadout2Armor[index].stack > item.maxStack || loadout2Armor[index].stack < 0)
+                        {
+                            check = true;
+                            if (shouldWarnPlayer)
+                            {
+                                SendErrorMessage(GetString("Stack cheat detected. Remove Loadout 2 item {0} ({1}) and then rejoin.", item.Name, loadout2Armor[index].stack));
+                            }
+                        }
+                    }
+                }
+                else if (i < NetItem.Loadout2Dye.Item2)
+                {
+                    var index = i - NetItem.Loadout2Dye.Item1;
+                    Item item = new Item();
+                    if (loadout2Dye[index] != null && loadout2Dye[index].netID != 0)
+                    {
+                        item.netDefaults(loadout2Dye[index].netID);
+                        item.Prefix(loadout2Dye[index].prefix);
+                        item.AffixName();
+
+                        if (loadout2Dye[index].stack > item.maxStack || loadout2Dye[index].stack < 0)
+                        {
+                            check = true;
+                            if (shouldWarnPlayer)
+                            {
+                                SendErrorMessage(GetString("Stack cheat detected. Remove Loadout 2 item {0} ({1}) and then rejoin.", item.Name, loadout2Dye[index].stack));
+                            }
+                        }
+                    }
+                }
+                else if (i < NetItem.Loadout3Armor.Item2)
+                {
+                    var index = i - NetItem.Loadout3Armor.Item1;
+                    Item item = new Item();
+                    if (loadout3Armor[index] != null && loadout3Armor[index].netID != 0)
+                    {
+                        item.netDefaults(loadout3Armor[index].netID);
+                        item.Prefix(loadout3Armor[index].prefix);
+                        item.AffixName();
+
+                        if (loadout3Armor[index].stack > item.maxStack || loadout3Armor[index].stack < 0)
+                        {
+                            check = true;
+                            if (shouldWarnPlayer)
+                            {
+                                SendErrorMessage(GetString("Stack cheat detected. Remove Loadout 3 item {0} ({1}) and then rejoin.", item.Name, loadout3Armor[index].stack));
+                            }
+                        }
+                    }
+                }
+                else if (i < NetItem.Loadout3Dye.Item2)
+                {
+                    var index = i - NetItem.Loadout3Dye.Item1;
+                    Item item = new Item();
+                    if (loadout3Dye[index] != null && loadout3Dye[index].netID != 0)
+                    {
+                        item.netDefaults(loadout3Dye[index].netID);
+                        item.Prefix(loadout3Dye[index].prefix);
+                        item.AffixName();
+
+                        if (loadout3Dye[index].stack > item.maxStack || loadout3Dye[index].stack < 0)
+                        {
+                            check = true;
+                            if (shouldWarnPlayer)
+                            {
+                                SendErrorMessage(GetString("Stack cheat detected. Remove Loadout 3 item {0} ({1}) and then rejoin.", item.Name, loadout3Dye[index].stack));
+                            }
+                        }
+                    }
+                }
             }
 
             return check;
@@ -625,18 +753,14 @@ namespace TShockAPI
         /// <returns>True if the player is in range of a tile or if range checks are off. False if not.</returns>
         public bool IsInRange(int x, int y, int range = 32)
         {
-            return true;
-
-            //这玩意没啥用
-
-            /*int rgX = Math.Abs(TileX - x);
+            int rgX = Math.Abs(TileX - x);
             int rgY = Math.Abs(TileY - y);
             if (TShock.Config.Settings.RangeChecks && ((rgX > range) || (rgY > range)))
             {
-                TShock.Log.ConsoleDebug("范围检查失败 {0} ({1}, {2}) (rg: {3}/{5}, {4}/{5})", Name, x, y, rgX, rgY, range);
+                TShock.Log.ConsoleDebug(GetString("Rangecheck failed for {0} ({1}, {2}) (rg: {3}/{5}, {4}/{5})", Name, x, y, rgX, rgY, range));
                 return false;
             }
-            return true;*/
+            return true;
         }
 
         private enum BuildPermissionFailPoint
@@ -653,6 +777,12 @@ namespace TShockAPI
         /// <returns>True if the player can build at the given point from build, spawn, and region protection.</returns>
         public bool HasBuildPermission(int x, int y, bool shouldWarnPlayer = true)
         {
+            PermissionHookResult hookResult = PlayerHooks.OnPlayerHasBuildPermission(this, x, y);
+            if (hookResult != PermissionHookResult.Unhandled)
+            {
+                return hookResult == PermissionHookResult.Granted;
+            }
+
             BuildPermissionFailPoint failure = BuildPermissionFailPoint.GeneralBuild;
             // The goal is to short circuit on easy stuff as much as possible.
             // Don't compute permissions unless needed, and don't compute taxing stuff unless needed.
@@ -694,13 +824,13 @@ namespace TShockAPI
                 switch (failure)
                 {
                     case BuildPermissionFailPoint.GeneralBuild:
-                        SendErrorMessage("您无权进行建造");
+                        SendErrorMessage(GetString("You do not have permission to build on this server."));
                         break;
                     case BuildPermissionFailPoint.SpawnProtect:
-                        SendErrorMessage("您无权在生成点附近进行建造");
+                        SendErrorMessage(GetString("You do not have permission to build in the spawn point."));
                         break;
                     case BuildPermissionFailPoint.Regions:
-                        SendErrorMessage("您无权在此区域进行建造");
+                        SendErrorMessage(GetString("You do not have permission to build in this region."));
                         break;
                 }
             }
@@ -807,9 +937,15 @@ namespace TShockAPI
         public bool LoginHarassed = false;
 
         /// <summary>
-        /// Player cant die, unless onehit
+        /// Controls the journey godmode
         /// </summary>
-        public bool GodMode { get; private set; } = false;
+        public bool GodMode
+        {
+            get =>
+                CreativePowerManager.Instance.GetPower<CreativePowers.GodmodePower>().IsEnabledForPlayer(Index);
+            set =>
+                CreativePowerManager.Instance.GetPower<CreativePowers.GodmodePower>().SetEnabledState(Index, value);
+        }
 
         /// <summary>
         /// Players controls are inverted if using SSC
@@ -835,7 +971,7 @@ namespace TShockAPI
         /// <summary>
         /// Contains data stored by plugins
         /// </summary>
-        public ConcurrentDictionary<string, object> data = new ConcurrentDictionary<string, object>();
+        protected ConcurrentDictionary<string, object> data = new ConcurrentDictionary<string, object>();
 
         /// <summary>
         /// Whether the player is a real, human, player on the server.
@@ -853,7 +989,7 @@ namespace TShockAPI
             get
             {
                 return RealPlayer
-                       && (Netplay.Clients[Index] != null && Netplay.Clients[Index].IsActive && !Netplay.Clients[Index].PendingTermination);
+                       && (Client != null && Client.IsActive && !Client.PendingTermination);
             }
         }
 
@@ -870,8 +1006,8 @@ namespace TShockAPI
         /// </summary>
         public int State
         {
-            get { return Netplay.Clients[Index].State; }
-            set { Netplay.Clients[Index].State = value; }
+            get { return Client.State; }
+            set { Client.State = value; }
         }
 
         /// <summary>
@@ -879,7 +1015,7 @@ namespace TShockAPI
         /// </summary>
         public string UUID
         {
-            get { return RealPlayer ? Netplay.Clients[Index].ClientUUID : ""; }
+            get { return RealPlayer ? Client.ClientUUID : ""; }
         }
 
         /// <summary>
@@ -891,8 +1027,8 @@ namespace TShockAPI
             {
                 if (string.IsNullOrEmpty(CacheIP))
                     return
-                        CacheIP = RealPlayer ? (Netplay.Clients[Index].Socket.IsConnected()
-                                ? TShock.Utils.GetRealIP(Netplay.Clients[Index].Socket.GetRemoteAddress().ToString())
+                        CacheIP = RealPlayer ? (Client.Socket.IsConnected()
+                                ? TShock.Utils.GetRealIP(Client.Socket.GetRemoteAddress().ToString())
                                 : "")
                             : "127.0.0.1";
                 else
@@ -938,7 +1074,7 @@ namespace TShockAPI
             {
                 if (HasPermission(Permissions.bypassssc))
                 {
-                    TShock.Log.ConsoleInfo("跳过SSC备份" + Account.Name);
+                    TShock.Log.ConsoleInfo(GetString($"Skipping SSC save (due to tshock.ignore.ssc) for {Account.Name}"));
                     return true;
                 }
                 PlayerData.CopyCharacter(this);
@@ -976,6 +1112,11 @@ namespace TShockAPI
         }
 
         /// <summary>
+        /// Player RemoteClient.
+        /// </summary>
+        public RemoteClient Client => Netplay.Clients[Index];
+
+        /// <summary>
         /// Gets the Terraria Player object associated with the player.
         /// </summary>
         public Player TPlayer
@@ -1006,6 +1147,11 @@ namespace TShockAPI
         {
             get { return TPlayer.team; }
         }
+
+        /// <summary>
+        /// Gets PvP player mode.
+        /// </summary>
+        public bool Hostile => TPlayer.hostile;
 
         /// <summary>
         /// Gets the player's X coordinate.
@@ -1194,7 +1340,7 @@ namespace TShockAPI
         /// <param name="args"></param>
         public void TempGroupTimerElapsed(object sender, ElapsedEventArgs args)
         {
-            SendWarningMessage("您的临时组权限已过期");
+            SendWarningMessage(GetString("Your temporary group access has expired."));
 
             tempGroup = null;
             if (sender != null)
@@ -1229,7 +1375,7 @@ namespace TShockAPI
                 y = 992;
             }
 
-            SendTileSquare((int)(x / 16), (int)(y / 16), 15);
+            SendTileSquareCentered((int)(x / 16), (int)(y / 16), 15);
             TPlayer.Teleport(new Vector2(x, y), style);
             NetMessage.SendData((int)PacketTypes.Teleport, -1, -1, NetworkText.Empty, 0, TPlayer.whoAmI, x, y, style);
             return true;
@@ -1266,7 +1412,9 @@ namespace TShockAPI
         /// <param name="tiley">The Y coordinate.</param>
         /// <param name="context">The PlayerSpawnContext.</param>
         /// <param name="respawnTimer">The respawn timer, will be Player.respawnTimer if parameter is null.</param>
-        public void Spawn(int tilex, int tiley, PlayerSpawnContext context, int? respawnTimer = null)
+        /// <param name="numberOfDeathsPVE">The number of deaths PVE, will be TPlayer.numberOfDeathsPVE if parameter is null.</param>
+        /// <param name="numberOfDeathsPVP">The number of deaths PVP, will be TPlayer.numberOfDeathsPVP if parameter is null.</param>
+        public void Spawn(int tilex, int tiley, PlayerSpawnContext context, int? respawnTimer = null, short? numberOfDeathsPVE = null, short? numberOfDeathsPVP = null)
         {
             using (var ms = new MemoryStream())
             {
@@ -1276,6 +1424,8 @@ namespace TShockAPI
                     TileX = (short)tilex,
                     TileY = (short)tiley,
                     RespawnTimer = respawnTimer ?? TShock.Players[Index].RespawnTimer * 60,
+                    NumberOfDeathsPVE = numberOfDeathsPVE ?? (short)TPlayer.numberOfDeathsPVE,
+                    NumberOfDeathsPVP = numberOfDeathsPVP ?? (short)TPlayer.numberOfDeathsPVP,
                     PlayerSpawnContext = context,
                 };
                 msg.PackFull(ms);
@@ -1311,13 +1461,29 @@ namespace TShockAPI
         /// <param name="y">The y coordinate to send.</param>
         /// <param name="size">The size square set of tiles to send.</param>
         /// <returns>true if the tile square was sent successfully, else false</returns>
+        [Obsolete("This method may not send tiles the way you would expect it to. The (x,y) coordinates are the top left corner of the tile square, switch to " + nameof(SendTileSquareCentered) + " if you wish for the coordindates to be the center of the square.")]
         public virtual bool SendTileSquare(int x, int y, int size = 10)
         {
             return SendTileRect((short)x, (short)y, (byte)size, (byte)size);
         }
 
         /// <summary>
-        /// Sends a rectangle of tiles at a location with the given length and width. 
+        /// Sends a tile square at a center location with a given size.
+        /// Typically used to revert changes by Bouncer through sending the
+        /// "old" version of modified data back to a client.
+        /// Prevents desync issues.
+        /// </summary>
+        /// <param name="x">The x coordinates of the center of the square.</param>
+        /// <param name="y">The y coordinates of the center of the square.</param>
+        /// <param name="size">The size square set of tiles to send.</param>
+        /// <returns>true if the tile square was sent successfully, else false</returns>
+        public virtual bool SendTileSquareCentered(int x, int y, byte size = 10)
+        {
+            return SendTileRect((short)(x - (size / 2)), (short)(y - (size / 2)), size, size);
+        }
+
+        /// <summary>
+        /// Sends a rectangle of tiles at a location with the given length and width.
         /// </summary>
         /// <param name="x">The x coordinate the rectangle will begin at</param>
         /// <param name="y">The y coordinate the rectangle will begin at</param>
@@ -1337,6 +1503,41 @@ namespace TShockAPI
                 TShock.Log.Error(ex.ToString());
             }
             return false;
+        }
+
+        /// <summary>
+        /// Changes the values of the <see cref="RemoteClient.TileSections"/> array.
+        /// </summary>
+        /// <param name="rectangle">The area of the sections you want to set a value to.
+        /// The minimum size should be set to 200x150. If null, then the entire map is specified.</param>
+        /// <param name="isLoaded">Is the section loaded.</param>
+        // The server does not send the player the whole world, it sends it in sections. To do this, it sets up visible and invisible sections.
+        // If the player was not in any section(Client.TileSections[x, y] == false) then the server will send the missing section of the world.
+        // This method allows you to simulate what the player has or has not seen these sections.
+        // For example, we can put some number of earths blocks in some vast area, for example, for the whole world, but the player will not see the changes, because some section is already loaded for him. At this point this method can come into effect! With it we will be able to select some zone and make it both visible and invisible to the player.
+        // The server will assume that the zone is not loaded on the player, and will resend the data, but with earth blocks.
+        public void UpdateSection(Rectangle? rectangle = null, bool isLoaded = false)
+        {
+            if (rectangle.HasValue)
+            {
+                for (int i = Netplay.GetSectionX(rectangle.Value.X); i < Netplay.GetSectionX(rectangle.Value.X + rectangle.Value.Width) && i < Main.maxSectionsX; i++)
+                {
+                    for (int j = Netplay.GetSectionY(rectangle.Value.Y); j < Netplay.GetSectionY(rectangle.Value.Y + rectangle.Value.Height) && j < Main.maxSectionsY; j++)
+                    {
+                        Client.TileSections[i, j] = isLoaded;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < Main.maxSectionsX; i++)
+                {
+                    for (int j = 0; j < Main.maxSectionsY; j++)
+                    {
+                        Client.TileSections[i, j] = isLoaded;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -1365,12 +1566,128 @@ namespace TShockAPI
         /// <param name="prefix">The item prefix.</param>
         public virtual void GiveItem(int type, int stack, int prefix = 0)
         {
+            if (TShock.Config.Settings.GiveItemsDirectly)
+                GiveItemDirectly(type, stack, prefix);
+            else
+                GiveItemByDrop(type, stack, prefix);
+        }
+
+        /// <summary>
+        /// Gives an item to the player.
+        /// </summary>
+        /// <param name="item">Item with data to be given to the player.</param>
+        public virtual void GiveItem(NetItem item)
+        {
+            GiveItem(item.NetId, item.Stack, item.PrefixId);
+        }
+
+        private Item EmptySentinelItem = new Item();
+
+        private bool Depleted(Item item)
+            => item.type == 0 || item.stack == 0;
+
+        private void GiveItemDirectly(int type, int stack, int prefix)
+        {
+            if (ItemID.Sets.IsAPickup[type] || !Main.ServerSideCharacter || this.IsDisabledForSSC)
+            {
+                GiveItemByDrop(type, stack, prefix);
+                return;
+            }
+
             var item = new Item();
-            item.SetDefaults(type);
+            item.netDefaults(type);
             item.stack = stack;
             item.prefix = (byte)prefix;
-            int itemIndex = Item.NewItem(new EntitySource_DropAsItem(item), (int)X, (int)Y, TPlayer.width, TPlayer.height, type, stack, true, prefix, true);
-            SendData(PacketTypes.ItemDrop, "", itemIndex);
+
+            if (item.IsACoin)
+                for (int slot = -4; slot < 50; slot++)
+                    if (Depleted(item = GiveItemDirectly_FillIntoOccupiedSlot(item, slot < 0 ? slot + 54 : slot)))
+                        return;
+
+            if (item.FitsAmmoSlot())
+                if (Depleted(item = GiveItem_FillAmmo(item)))
+                    return;
+
+            for (int slot = 0; slot < 50; slot++)
+                if (Depleted(item = GiveItemDirectly_FillIntoOccupiedSlot(item, slot)))
+                    return;
+
+            if (!item.IsACoin && item.useStyle != 0)
+                for (int slot = 0; slot < 10; slot++)
+                    if (Depleted(item = GiveItemDirectly_FillEmptyInventorySlot(item, slot)))
+                        return;
+
+            int lastSlot = item.IsACoin ? 54 : 50;
+            for (int slot = lastSlot - 1; slot >= 0; slot--)
+                if (Depleted(item = GiveItemDirectly_FillEmptyInventorySlot(item, slot)))
+                    return;
+
+            // oh no, i can't give the rest of the items... guess i gotta spill it on the floor
+            GiveItemByDrop(item.type, item.stack, item.prefix);
+        }
+
+        private void SendItemSlotPacketFor(int slot)
+        {
+            int prefix = this.TPlayer.inventory[slot].prefix;
+            NetMessage.SendData(5, this.Index, -1, null, this.Index, slot, prefix, 0f, 0, 0, 0);
+        }
+
+        private Item GiveItem_FillAmmo(Item item)
+        {
+            var inv = this.TPlayer.inventory;
+
+            for (int i = 54; i < 58; i++)
+                if (Depleted(item = GiveItemDirectly_FillIntoOccupiedSlot(item, i)))
+                    return EmptySentinelItem;
+
+            if (!item.CanFillEmptyAmmoSlot())
+                return item;
+
+            for (int i = 54; i < 58; i++)
+                if (GiveItemDirectly_FillEmptyInventorySlot(item, i) == EmptySentinelItem)
+                    return EmptySentinelItem;
+
+            return item;
+        }
+
+        private Item GiveItemDirectly_FillIntoOccupiedSlot(Item item, int slot)
+        {
+            var inv = this.TPlayer.inventory;
+            if (inv[slot].type <= 0 || inv[slot].stack >= inv[slot].maxStack || !item.IsTheSameAs(inv[slot]))
+                return item;
+
+            if (item.stack + inv[slot].stack <= inv[slot].maxStack)
+            {
+                inv[slot].stack += item.stack;
+                SendItemSlotPacketFor(slot);
+                return EmptySentinelItem;
+            }
+
+            var newItem = item.DeepClone();
+            newItem.stack -= inv[slot].maxStack - inv[slot].stack;
+            inv[slot].stack = inv[slot].maxStack;
+            SendItemSlotPacketFor(slot);
+
+            return newItem;
+        }
+
+        private Item GiveItemDirectly_FillEmptyInventorySlot(Item item, int slot)
+        {
+            var inv = this.TPlayer.inventory;
+            if (inv[slot].type != 0)
+                return item;
+
+            inv[slot] = item;
+            SendItemSlotPacketFor(slot);
+            return EmptySentinelItem;
+        }
+
+        private void GiveItemByDrop(int type, int stack, int prefix)
+        {
+            int itemIndex = Item.NewItem(new EntitySource_DebugCommand(), (int)X, (int)Y, TPlayer.width, TPlayer.height, type, stack, true, prefix, true);
+            Main.item[itemIndex].playerIndexTheItemIsReservedFor = this.Index;
+            SendData(PacketTypes.ItemDrop, "", itemIndex, 1);
+            SendData(PacketTypes.ItemOwner, null, itemIndex);
         }
 
         /// <summary>
@@ -1521,6 +1838,7 @@ namespace TShockAPI
         public void SendFileTextAsMessage(string file)
         {
             string foo = "";
+            bool containsOldFormat = false;
             using (var tr = new StreamReader(file))
             {
                 Color lineColor;
@@ -1559,7 +1877,17 @@ namespace TShockAPI
         /// <param name="damage">The amount of damage the player will take.</param>
         public virtual void DamagePlayer(int damage)
         {
-            NetMessage.SendPlayerHurt(Index, PlayerDeathReason.LegacyDefault(), damage, (new Random()).Next(-1, 1), false, false, 0, -1, -1);
+            DamagePlayer(damage, PlayerDeathReason.LegacyDefault());
+        }
+
+        /// <summary>
+        /// Wounds the player with the given damage.
+        /// </summary>
+        /// <param name="damage">The amount of damage the player will take.</param>
+        /// <param name="reason">The reason for causing damage to player.</param>
+        public virtual void DamagePlayer(int damage, PlayerDeathReason reason)
+        {
+            NetMessage.SendPlayerHurt(Index, reason, damage, (new Random()).Next(-1, 1), false, false, 0, -1, -1);
         }
 
         /// <summary>
@@ -1567,7 +1895,16 @@ namespace TShockAPI
         /// </summary>
         public virtual void KillPlayer()
         {
-            NetMessage.SendPlayerDeath(Index, PlayerDeathReason.LegacyDefault(), 99999, (new Random()).Next(-1, 1), false, -1, -1);
+            KillPlayer(PlayerDeathReason.LegacyDefault());
+        }
+
+        /// <summary>
+        /// Kills the player.
+        /// </summary>
+        /// <param name="reason">Reason for killing a player.</param>
+        public virtual void KillPlayer(PlayerDeathReason reason)
+        {
+            NetMessage.SendPlayerDeath(Index, reason, 99999, (new Random()).Next(-1, 1), false, -1, -1);
         }
 
         /// <summary>
@@ -1576,6 +1913,8 @@ namespace TShockAPI
         /// <param name="team">The team color index.</param>
         public virtual void SetTeam(int team)
         {
+            if (team < 0 || team >= Main.teamColor.Length)
+                throw new ArgumentException("The player's team is not in the range of available.");
             Main.player[Index].team = team;
             NetMessage.SendData((int)PacketTypes.PlayerTeam, -1, -1, NetworkText.Empty, Index);
         }
@@ -1584,6 +1923,7 @@ namespace TShockAPI
         /// Sets the player's pvp.
         /// </summary>
         /// <param name="mode">The state of the pvp mode.</param>
+        /// <param name="withMsg">Whether a chat message about the change should be sent.</param>
         public virtual void SetPvP(bool mode, bool withMsg = false)
         {
             Main.player[Index].hostile = mode;
@@ -1628,11 +1968,11 @@ namespace TShockAPI
                     {
                         if (flags.HasFlag(DisableFlags.WriteToLog))
                         {
-                            TShock.Log.ConsoleInfo("用户{0}已被禁用，因{1}", Name, reason);
+                            TShock.Log.ConsoleInfo(GetString("Player {0} has been disabled for {1}.", Name, reason));
                         }
                         else
                         {
-                            Server.SendInfoMessage("用户{0}已被禁用，因{1}", Name, reason);
+                            Server.SendInfoMessage(GetString("Player {0} has been disabled for {1}.", Name, reason));
                         }
                     }
 
@@ -1664,15 +2004,14 @@ namespace TShockAPI
                 SilentKickInProgress = silent;
                 if (IsLoggedIn && saveSSI)
                     SaveServerCharacter();
-                Disconnect(string.Format("被驱逐: {0}", reason));
-                TShock.Log.ConsoleInfo(string.Format("驱逐 {0} 原因 : '{1}'", Name, reason));
-                string verb = force ? "force " : "";
+                Disconnect(GetString("Kicked: {0}", reason));
+                TShock.Log.ConsoleInfo(GetString("Kicked {0} for : '{1}'", Name, reason));
                 if (!silent)
                 {
                     if (string.IsNullOrWhiteSpace(adminUserName))
-                        TShock.Utils.Broadcast(string.Format("{0} 被 {1} 驱逐因 '{2}'", Name, verb, reason.ToLower()), Color.Green);
+                        TShock.Utils.Broadcast(GetString("{0} was kicked for '{1}'", Name, reason), Color.Green);
                     else
-                        TShock.Utils.Broadcast(string.Format("{0} {1} 驱逐 {2} 因 '{3}'", adminUserName, verb, Name, reason.ToLower()), Color.Green);
+                        TShock.Utils.Broadcast(GetString("{0} kicked {1} for '{2}'", adminUserName, Name, reason), Color.Green);
                 }
                 return true;
             }
@@ -1683,30 +2022,26 @@ namespace TShockAPI
         /// Bans and disconnects the player from the server.
         /// </summary>
         /// <param name="reason">The reason to be displayed to the server.</param>
-        /// <param name="force">If the ban should bypass immunity to ban checks.</param>
         /// <param name="adminUserName">The player who initiated the ban.</param>
-        public bool Ban(string reason, bool force = false, string adminUserName = null)
+        public bool Ban(string reason, string adminUserName = null)
         {
             if (!ConnectionAlive)
                 return true;
-            if (force)
-            {
-                TShock.Bans.InsertBan($"{Identifier.IP}{IP}", reason, adminUserName, DateTime.UtcNow, DateTime.MaxValue);
-                TShock.Bans.InsertBan($"{Identifier.UUID}{UUID}", reason, adminUserName, DateTime.UtcNow, DateTime.MaxValue);
-                if (Account != null)
-                {
-                    TShock.Bans.InsertBan($"{Identifier.Account}{Account.Name}", reason, adminUserName, DateTime.UtcNow, DateTime.MaxValue);
-                }
 
-                Disconnect(string.Format("封禁: {0}", reason));
-                string verb = force ? "强行 " : "";
-                if (string.IsNullOrWhiteSpace(adminUserName))
-                    TSPlayer.All.SendInfoMessage("{0} 被 {1}封禁，原因： '{2}'.", Name, verb, reason);
-                else
-                    TSPlayer.All.SendInfoMessage("{0} {1}banned {2} for '{3}'.", adminUserName, verb, Name, reason);
-                return true;
+            TShock.Bans.InsertBan($"{Identifier.IP}{IP}", reason, adminUserName, DateTime.UtcNow, DateTime.MaxValue);
+            TShock.Bans.InsertBan($"{Identifier.UUID}{UUID}", reason, adminUserName, DateTime.UtcNow, DateTime.MaxValue);
+            if (Account != null)
+            {
+                TShock.Bans.InsertBan($"{Identifier.Account}{Account.Name}", reason, adminUserName, DateTime.UtcNow, DateTime.MaxValue);
             }
-            return false;
+
+            Disconnect(GetString("Banned: {0}", reason));
+
+            if (string.IsNullOrWhiteSpace(adminUserName))
+                TSPlayer.All.SendInfoMessage(GetString("{0} was banned for '{1}'.", Name, reason));
+            else
+                TSPlayer.All.SendInfoMessage(GetString("{0} banned {1} for '{2}'.", adminUserName, Name, reason));
+            return true;
         }
 
         /// <summary>
@@ -1716,13 +2051,13 @@ namespace TShockAPI
         /// <param name="matches">An enumerable list with the matches</param>
         public void SendMultipleMatchError(IEnumerable<object> matches)
         {
-            SendErrorMessage("找到多个匹配项: ");
+            SendErrorMessage(GetString("More than one match found -- unable to decide which is correct: "));
 
             var lines = PaginationTools.BuildLinesFromTerms(matches.ToArray());
             lines.ForEach(SendInfoMessage);
 
-            SendErrorMessage("Use \"my query\" for items with spaces.");
-            SendErrorMessage("使用tsi:[number]或tsn:[username]来区分用户ID和用户名。");
+            SendErrorMessage(GetString("Use \"my query\" for items with spaces."));
+            SendErrorMessage(GetString("Use tsi:[number] or tsn:[username] to distinguish between user IDs and usernames."));
         }
 
         [Conditional("DEBUG")]
@@ -1813,7 +2148,7 @@ namespace TShockAPI
             if (!RealPlayer || !ConnectionAlive)
                 return;
 
-            Netplay.Clients[Index].Socket.AsyncSend(data, 0, data.Length, Netplay.Clients[Index].ServerWriteCallBack);
+            Client.Socket.AsyncSend(data, 0, data.Length, Client.ServerWriteCallBack);
         }
 
         /// <summary>
@@ -1845,8 +2180,7 @@ namespace TShockAPI
 
             if (hookResult != PermissionHookResult.Unhandled)
                 return hookResult == PermissionHookResult.Granted;
-            if (IgnorePerm)
-                return true;
+
             if (tempGroup != null)
                 return tempGroup.HasPermission(permission);
             else
@@ -1883,13 +2217,6 @@ namespace TShockAPI
         public bool HasPermission(TileBan bannedTile)
         {
             return TShock.TileBans.TileIsBanned(bannedTile.ID, this);
-        }
-        public void SetGodMode(bool enable)
-        {
-            GodMode = enable;
-            var godPower = CreativePowerManager.Instance.GetPower<CreativePowers.GodmodePower>();
-
-            godPower.SetEnabledState(Index, GodMode);
         }
     }
 

@@ -4,9 +4,9 @@ using Terraria;
 
 namespace TerrariaApi.Server.Hooking
 {
-    public static class NpcHooks
+    internal static class NpcHooks
     {
-        public static HookManager _hookManager;
+        private static HookManager _hookManager;
 
         /// <summary>
         /// Attaches any of the OTAPI Npc hooks to the existing <see cref="HookManager"/> implementation
@@ -72,6 +72,10 @@ namespace TerrariaApi.Server.Hooking
 
         static void OnSpawn(object sender, Hooks.NPC.SpawnEventArgs e)
         {
+            if (e.Result == HookResult.Cancel)
+            {
+                return;
+            }
             var index = e.Index;
             if (_hookManager.InvokeNpcSpawn(ref index))
             {
@@ -82,6 +86,10 @@ namespace TerrariaApi.Server.Hooking
 
         static void OnDropLoot(object sender, Hooks.NPC.DropLootEventArgs e)
         {
+            if (e.Result == HookResult.Cancel)
+            {
+                return;
+            }
             if (e.Event == HookEvent.Before)
             {
                 var Width = e.Width;
@@ -129,6 +137,10 @@ namespace TerrariaApi.Server.Hooking
 
         static void OnBossBagItem(object sender, Hooks.NPC.BossBagEventArgs e)
         {
+            if (e.Result == HookResult.Cancel)
+            {
+                return;
+            }
             var Width = e.Width;
             var Height = e.Height;
             var Type = e.Type;

@@ -1,9 +1,9 @@
-﻿using BossFramework.BAttributes;
+﻿using System.Linq;
+using BossFramework.BAttributes;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
 using BossFramework.DB;
 using CSScriptLib;
-using System.Linq;
 
 namespace BossFramework.BCore.Cmds
 {

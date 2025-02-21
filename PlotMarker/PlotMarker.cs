@@ -1,10 +1,10 @@
-﻿using BossFramework;
+﻿using System.Reflection;
+using BossFramework;
 using BossFramework.BCore;
 using BossFramework.BModels;
 using BossFramework.DB;
 using FakeProvider;
 using Microsoft.Xna.Framework;
-using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
@@ -30,7 +30,7 @@ namespace PlotMarker
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreet);
             ServerApi.Hooks.ServerLeave.Register(this, OnLeave);
             ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInitialize, 100);
-            ServerApi.Hooks.WorldSave.Register(this, (args) => { Task.Run(() => PlotManager.CurrentPlot?.Cells.Where(c => c.IsVisiable).TForEach(c => c.SaveCellData())); });
+            ServerApi.Hooks.WorldSave.Register(this, (args) => { Task.Run(() => PlotManager.CurrentPlot?.Cells.Where(c => c.IsVisiable).ForEach(c => c.SaveCellData())); });
 
             SignRedirector.SignUpdate += OnUpdateSign;
             //SignRedirector.SignCreate += SignRedirector_SignCreate;
@@ -271,7 +271,7 @@ namespace PlotMarker
                             }
                         }
                         plot.Generate(clear);
-                        plot.Cells.Where(c => c.IsVisiable).TForEach(c => c.RestoreCellTileData());
+                        plot.Cells.Where(c => c.IsVisiable).ForEach(c => c.RestoreCellTileData());
                     }
                     break;
                 case "信息":

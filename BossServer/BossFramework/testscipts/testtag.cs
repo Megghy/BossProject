@@ -1,9 +1,10 @@
-﻿using BossFramework;
+﻿using System.Linq;
+using BossFramework;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using System.Linq;
 using Terraria;
 using TrProtocol.Packets;
+using TShockAPI;
 using ProtocalBitByte = TrProtocol.Models.BitsByte;
 
 public class testtag : BaseRegionTagProcessor

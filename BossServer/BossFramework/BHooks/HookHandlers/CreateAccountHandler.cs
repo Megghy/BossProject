@@ -1,5 +1,5 @@
-﻿using BossFramework.BModels;
-using System.Linq;
+﻿using System.Linq;
+using BossFramework.BModels;
 using TShockAPI;
 using TShockAPI.Hooks;
 

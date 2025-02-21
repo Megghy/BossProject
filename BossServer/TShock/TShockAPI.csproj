@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <!-- 
+      Version information for an assembly consists of the following four values:
+
+          Major Version
+          Minor Version 
+          Build Number
+          Starting in version 4.2.5, we are no longer including the fourth decimal
+          location, which previously held the date and time.
+
+      Also, be sure to release on github with the exact assembly version tag as below
+      so that the update manager works correctly (via the Github releases api and mimic)
+    -->
+    <Version>5.2.2</Version>
+    <AssemblyTitle>TShock for Terraria</AssemblyTitle>
+    <Company>Pryaxis &amp; TShock Contributors</Company>
+    <Product>TShockAPI</Product>
+    <Copyright>Copyright © Pryaxis &amp; TShock Contributors 2011-2023</Copyright>
+    <!-- extras for nuget -->
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <Authors>Pryaxis &amp; TShock Contributors</Authors>
+    <Description>TShock is a toolbox for Terraria servers and communities.</Description>
+    <PackageId>TShock</PackageId> <!-- package name for nuget, instead of TShockAPI -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="GetText.NET" Version="8.0.5" />
+    <PackageReference Include="MySql.Data" Version="9.1.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TerrariaServerAPI\TerrariaServerAPI\TerrariaServerAPI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="HttpServer">
+      <HintPath>..\prebuilts\HttpServer.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\prebuilts\HttpServer.dll">
+      <Link>HttpServer.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <Pack>true</Pack>
+    </None>
+  </ItemGroup>
+
+</Project>

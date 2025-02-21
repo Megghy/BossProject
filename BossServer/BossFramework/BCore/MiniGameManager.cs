@@ -1,8 +1,8 @@
-﻿using BossFramework.BAttributes;
+﻿using System.Collections.Generic;
+using System.Linq;
+using BossFramework.BAttributes;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using System.Collections.Generic;
-using System.Linq;
 using TerrariaApi.Server;
 
 namespace BossFramework.BCore
@@ -42,7 +42,7 @@ namespace BossFramework.BCore
                     {
                         game.Dispose();
                     }
-                    catch(Exception ex) { BLog.Warn(ex); }
+                    catch (Exception ex) { BLog.Warn(ex); }
                     bplr.WantDelGame = false;
                     bplr.SendSuccessMsg($"已卸载指定游戏");
                     args.CanTouch = false;
@@ -54,7 +54,7 @@ namespace BossFramework.BCore
 
         private static void OnPlayerLeave(LeaveEventArgs args)
         {
-            if (TShockAPI.TShock.Players[args.Who]?.GetBPlayer() is { } plr && plr. PlayingGame != null)
+            if (TShockAPI.TShock.Players[args.Who]?.GetBPlayer() is { } plr && plr.PlayingGame != null)
             {
                 plr.PlayingGame.Leave(plr);
             }

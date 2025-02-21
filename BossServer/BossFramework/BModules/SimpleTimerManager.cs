@@ -1,10 +1,11 @@
-﻿using BossFramework.BAttributes;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
+using BossFramework.BAttributes;
 using TerrariaApi.Server;
+using TShockAPI;
 
 namespace BossFramework.BModules
 {
@@ -32,7 +33,7 @@ namespace BossFramework.BModules
                 time++;
             };
             var loaded = new List<Assembly>();
-            ServerApi.Plugins.Select(p => p.PluginAssembly)
+            ServerApi.Plugins.Select(p => p.Plugin.GetType().Assembly)
                 .Where(a => a != null)
                 .ForEach(a =>
                 {

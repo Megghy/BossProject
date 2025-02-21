@@ -1,5 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using ReLogic.OS;
 using Terraria.ID;
 
 namespace TerrariaApi.Server
@@ -76,12 +80,24 @@ namespace TerrariaApi.Server
             TileID.Sets.Hallow[TileID.Pearlstone] = true;
         }
 
+        /// <summary>
+        /// 1.4.4.2 introduced another static variable, which needs to be setup before any Main calls
+        /// </summary>
+        static void PrepareSavePath(string[] args)
+        {
+            Terraria.Program.LaunchParameters = Terraria.Utils.ParseArguements(args);
+            Terraria.Program.SavePath = (Terraria.Program.LaunchParameters.ContainsKey("-savedirectory")
+                ? Terraria.Program.LaunchParameters["-savedirectory"]
+                : Platform.Get<IPathService>().GetStoragePath("Terraria"));
+        }
+
         public static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += UnhandledException;
-            AppDomain.CurrentDomain.AssemblyResolve += ServerApi.CurrentDomain_AssemblyResolve;
+            System.Runtime.Loader.AssemblyLoadContext.Default.Resolving += Default_Resolving;
             try
             {
+                PrepareSavePath(args);
                 InitialiseInternals();
                 ServerApi.Hooks.AttachOTAPIHooks(args);
 
@@ -94,10 +110,28 @@ namespace TerrariaApi.Server
             }
             catch (Exception ex)
             {
-                ServerApi.LogWriter.ServerWriteLine("Server crashed due to an unhandled exception:\n" + ex, TraceLevel.Error);
+                Console.WriteLine("Server crashed due to an unhandled exception:\n" + ex, TraceLevel.Error);
             }
         }
+        static Dictionary<string, Assembly> _cache = new Dictionary<string, Assembly>();
+        static Assembly? Default_Resolving(System.Runtime.Loader.AssemblyLoadContext arg1, AssemblyName arg2)
+        {
+            if (arg2?.Name is null) return null;
+            if (_cache.TryGetValue(arg2.Name, out Assembly? asm) && asm is not null) return asm;
 
+            var loc = Path.Combine(AppContext.BaseDirectory, "Lib", arg2.Name + ".dll");
+            if (File.Exists(loc))
+                asm = arg1.LoadFromAssemblyPath(loc);
+
+            loc = Path.ChangeExtension(loc, ".exe");
+            if (File.Exists(loc))
+                asm = arg1.LoadFromAssemblyPath(loc);
+
+            if (asm is not null)
+                _cache[arg2.Name] = asm;
+
+            return asm;
+        }
         static void StartServer(string[] args)
         {
             if (args.Any(x => x == "-skipassemblyload"))
@@ -116,7 +150,7 @@ namespace TerrariaApi.Server
         /// <param name="e"></param>
         private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Console.WriteLine($"[Unhandled exception]\n{e}");
+            Console.WriteLine($"Unhandled exception\n{e}");
         }
     }
 }

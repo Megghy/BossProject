@@ -1,6 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using System.IO.Streams;
+﻿using System.IO.Streams;
+using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ID;
 using Terraria.ObjectData;
 using TShockAPI;
 using TShockAPI.Net;
@@ -214,7 +215,7 @@ namespace PlotMarker
             var type = args.Data.ReadInt16();
             var style = args.Data.ReadInt16();
 
-            if (type < 0 || type >= Main.maxTileSets)
+            if (type < 0 || type >= TileID.Count)
                 return true;
 
             if (x < 0 || x >= Main.maxTilesX)
@@ -231,7 +232,7 @@ namespace PlotMarker
                 {
                     if (PlotMarker.BlockModify(args.Player, x, y))
                     {
-                        args.Player.SendTileSquare(i, j, 4);
+                        args.Player.SendTileSquareCentered(i, j, 4);
                         return true;
                     }
                 }

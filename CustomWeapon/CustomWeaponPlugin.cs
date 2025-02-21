@@ -1,8 +1,8 @@
 // CustomWeaponPlugin.CustomWeaponPlugin
-using CustomWeaponAPI;
-using Microsoft.Xna.Framework;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using CustomWeaponAPI;
+using Microsoft.Xna.Framework;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;

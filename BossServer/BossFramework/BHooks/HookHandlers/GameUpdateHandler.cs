@@ -4,7 +4,7 @@
     {
         public static void OnGameUpdate(EventArgs args)
         {
-            BInfo.GameTick++;
+            //BInfo.GameTick++;
         }
     }
 }

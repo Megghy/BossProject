@@ -1,5 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
 
@@ -25,14 +25,14 @@ namespace FakeProvider
         public byte bTileHeader3;
         public ushort type;
         public ushort wall;
-        public short sTileHeader;
+        public ushort sTileHeader;
         public short frameX;
         public short frameY;
 
         ushort ITile.type { get => type; set => type = value; }
         ushort ITile.wall { get => wall; set => wall = value; }
         byte ITile.liquid { get => liquid; set => liquid = value; }
-        short ITile.sTileHeader { get => sTileHeader; set => sTileHeader = value; }
+        ushort ITile.sTileHeader { get => sTileHeader; set => sTileHeader = value; }
         byte ITile.bTileHeader { get => bTileHeader; set => bTileHeader = value; }
         byte ITile.bTileHeader2 { get => bTileHeader2; set => bTileHeader2 = value; }
         byte ITile.bTileHeader3 { get => bTileHeader3; set => bTileHeader3 = value; }
@@ -41,15 +41,15 @@ namespace FakeProvider
 
         public StructTile(StructTile copy)
         {
-            this.type = copy.type;
-            this.wall = copy.wall;
-            this.liquid = copy.liquid;
-            this.sTileHeader = copy.sTileHeader;
-            this.bTileHeader = copy.bTileHeader;
-            this.bTileHeader2 = copy.bTileHeader2;
-            this.bTileHeader3 = copy.bTileHeader3;
-            this.frameX = copy.frameX;
-            this.frameY = copy.frameY;
+            type = copy.type;
+            wall = copy.wall;
+            liquid = copy.liquid;
+            sTileHeader = copy.sTileHeader;
+            bTileHeader = copy.bTileHeader;
+            bTileHeader2 = copy.bTileHeader2;
+            bTileHeader3 = copy.bTileHeader3;
+            frameX = copy.frameX;
+            frameY = copy.frameY;
         }
 
         public object Clone()
@@ -59,55 +59,55 @@ namespace FakeProvider
 
         public void ClearEverything()
         {
-            this.type = 0;
-            this.wall = 0;
-            this.liquid = 0;
-            this.sTileHeader = 0;
-            this.bTileHeader = 0;
-            this.bTileHeader2 = 0;
-            this.bTileHeader3 = 0;
-            this.frameX = 0;
-            this.frameY = 0;
+            type = 0;
+            wall = 0;
+            liquid = 0;
+            sTileHeader = 0;
+            bTileHeader = 0;
+            bTileHeader2 = 0;
+            bTileHeader3 = 0;
+            frameX = 0;
+            frameY = 0;
         }
 
         public void ClearTile()
         {
-            this.slope(0);
-            this.halfBrick(false);
-            this.active(false);
-            this.inActive(false);
+            slope(0);
+            halfBrick(false);
+            active(false);
+            inActive(false);
         }
 
         public void CopyFrom(ITile from)
         {
-            this.type = from.type;
-            this.wall = from.wall;
-            this.liquid = from.liquid;
-            this.sTileHeader = from.sTileHeader;
-            this.bTileHeader = from.bTileHeader;
-            this.bTileHeader2 = from.bTileHeader2;
-            this.bTileHeader3 = from.bTileHeader3;
-            this.frameX = from.frameX;
-            this.frameY = from.frameY;
+            type = from.type;
+            wall = from.wall;
+            liquid = from.liquid;
+            sTileHeader = from.sTileHeader;
+            bTileHeader = from.bTileHeader;
+            bTileHeader2 = from.bTileHeader2;
+            bTileHeader3 = from.bTileHeader3;
+            frameX = from.frameX;
+            frameY = from.frameY;
         }
 
         public int collisionType
         {
             get
             {
-                if (!this.active())
+                if (!active())
                 {
                     return 0;
                 }
-                if (this.halfBrick())
+                if (halfBrick())
                 {
                     return 2;
                 }
-                if (this.slope() > 0)
+                if (slope() > 0)
                 {
-                    return (int)(2 + this.slope());
+                    return (int)(2 + slope());
                 }
-                if (Main.tileSolid[(int)this.type] && !Main.tileSolidTop[(int)this.type])
+                if (Main.tileSolid[(int)type] && !Main.tileSolidTop[(int)type])
                 {
                     return 1;
                 }
@@ -118,37 +118,37 @@ namespace FakeProvider
 
         public bool isTheSameAs(ITile compTile)
         {
-            if (this.sTileHeader != compTile?.sTileHeader)
+            if (sTileHeader != compTile?.sTileHeader)
             {
                 return false;
             }
-            if (this.active())
+            if (active())
             {
-                if (this.type != compTile.type)
+                if (type != compTile.type)
                 {
                     return false;
                 }
-                if (Main.tileFrameImportant[(int)this.type] && (this.frameX != compTile.frameX || this.frameY != compTile.frameY))
+                if (Main.tileFrameImportant[(int)type] && (frameX != compTile.frameX || frameY != compTile.frameY))
                 {
                     return false;
                 }
             }
-            if (this.wall != compTile.wall || this.liquid != compTile.liquid)
+            if (wall != compTile.wall || liquid != compTile.liquid)
             {
                 return false;
             }
             if (compTile.liquid == 0)
             {
-                if (this.wallColor() != compTile.wallColor())
+                if (wallColor() != compTile.wallColor())
                 {
                     return false;
                 }
-                if (this.wire4() != compTile.wire4())
+                if (wire4() != compTile.wire4())
                 {
                     return false;
                 }
             }
-            else if (this.bTileHeader != compTile.bTileHeader)
+            else if (bTileHeader != compTile.bTileHeader)
             {
                 return false;
             }
@@ -157,11 +157,11 @@ namespace FakeProvider
 
         public int blockType()
         {
-            if (this.halfBrick())
+            if (halfBrick())
             {
                 return 1;
             }
-            int num = (int)this.slope();
+            int num = (int)slope();
             if (num > 0)
             {
                 num++;
@@ -173,56 +173,56 @@ namespace FakeProvider
         {
             if (liquidType == 0)
             {
-                this.bTileHeader &= 159;
+                bTileHeader &= 159;
                 return;
             }
             if (liquidType == 1)
             {
-                this.lava(true);
+                lava(true);
                 return;
             }
             if (liquidType == 2)
             {
-                this.honey(true);
+                honey(true);
             }
         }
 
         public byte liquidType()
         {
-            return (byte)((this.bTileHeader & 96) >> 5);
+            return (byte)((bTileHeader & 96) >> 5);
         }
 
         public bool nactive()
         {
-            return (this.sTileHeader & 96) == 32;
+            return (sTileHeader & 96) == 32;
         }
 
         public void ResetToType(ushort type)
         {
-            this.liquid = 0;
-            this.sTileHeader = 32;
-            this.bTileHeader = 0;
-            this.bTileHeader2 = 0;
-            this.bTileHeader3 = 0;
-            this.frameX = 0;
-            this.frameY = 0;
-            this.type = type;
+            liquid = 0;
+            sTileHeader = 32;
+            bTileHeader = 0;
+            bTileHeader2 = 0;
+            bTileHeader3 = 0;
+            frameX = 0;
+            frameY = 0;
+            type = type;
         }
 
         public void ClearMetadata()
         {
-            this.liquid = 0;
-            this.sTileHeader = 0;
-            this.bTileHeader = 0;
-            this.bTileHeader2 = 0;
-            this.bTileHeader3 = 0;
-            this.frameX = 0;
-            this.frameY = 0;
+            liquid = 0;
+            sTileHeader = 0;
+            bTileHeader = 0;
+            bTileHeader2 = 0;
+            bTileHeader3 = 0;
+            frameX = 0;
+            frameY = 0;
         }
 
         public Color actColor(Color oldColor)
         {
-            if (!this.inActive())
+            if (!inActive())
             {
                 return oldColor;
             }
@@ -232,7 +232,7 @@ namespace FakeProvider
 
         public void actColor(ref Vector3 oldColor)
         {
-            if (!this.inActive())
+            if (!inActive())
             {
                 return;
             }
@@ -241,329 +241,463 @@ namespace FakeProvider
 
         public bool topSlope()
         {
-            byte b = this.slope();
+            byte b = slope();
             return b == 1 || b == 2;
         }
 
         public bool bottomSlope()
         {
-            byte b = this.slope();
+            byte b = slope();
             return b == 3 || b == 4;
         }
 
         public bool leftSlope()
         {
-            byte b = this.slope();
+            byte b = slope();
             return b == 2 || b == 4;
         }
 
         public bool rightSlope()
         {
-            byte b = this.slope();
+            byte b = slope();
             return b == 1 || b == 3;
         }
 
         public bool HasSameSlope(ITile tile)
         {
-            return (this.sTileHeader & 29696) == (tile.sTileHeader & 29696);
+            return (sTileHeader & 29696) == (tile.sTileHeader & 29696);
         }
 
         public byte wallColor()
         {
-            return (byte)(this.bTileHeader & 31);
+            return (byte)(bTileHeader & 31);
         }
 
         public void wallColor(byte wallColor)
         {
-            this.bTileHeader = (byte)((this.bTileHeader & 224) | wallColor);
+            bTileHeader = (byte)((bTileHeader & 224) | wallColor);
         }
 
         public bool lava()
         {
-            return (this.bTileHeader & 32) == 32;
+            return (bTileHeader & 32) == 32;
         }
 
         public void lava(bool lava)
         {
             if (lava)
             {
-                this.bTileHeader = (byte)((this.bTileHeader & 159) | 32);
+                bTileHeader = (byte)((bTileHeader & 159) | 32);
                 return;
             }
-            this.bTileHeader &= 223;
+            bTileHeader &= 223;
         }
 
         public bool honey()
         {
-            return (this.bTileHeader & 64) == 64;
+            return (bTileHeader & 64) == 64;
         }
 
         public void honey(bool honey)
         {
             if (honey)
             {
-                this.bTileHeader = (byte)((this.bTileHeader & 159) | 64);
+                bTileHeader = (byte)((bTileHeader & 159) | 64);
                 return;
             }
-            this.bTileHeader &= 191;
+            bTileHeader &= 191;
         }
 
         public bool wire4()
         {
-            return (this.bTileHeader & 128) == 128;
+            return (bTileHeader & 128) == 128;
         }
 
         public void wire4(bool wire4)
         {
             if (wire4)
             {
-                this.bTileHeader |= 128;
+                bTileHeader |= 128;
                 return;
             }
-            this.bTileHeader &= 127;
+            bTileHeader &= 127;
         }
 
         public int wallFrameX()
         {
-            return (int)((this.bTileHeader2 & 15) * 36);
+            return (int)((bTileHeader2 & 15) * 36);
         }
 
         public void wallFrameX(int wallFrameX)
         {
-            this.bTileHeader2 = (byte)((int)(this.bTileHeader2 & 240) | (wallFrameX / 36 & 15));
+            bTileHeader2 = (byte)((int)(bTileHeader2 & 240) | (wallFrameX / 36 & 15));
         }
 
         public byte frameNumber()
         {
-            return (byte)((this.bTileHeader2 & 48) >> 4);
+            return (byte)((bTileHeader2 & 48) >> 4);
         }
 
         public void frameNumber(byte frameNumber)
         {
-            this.bTileHeader2 = (byte)((int)(this.bTileHeader2 & 207) | (int)(frameNumber & 3) << 4);
+            bTileHeader2 = (byte)((int)(bTileHeader2 & 207) | (int)(frameNumber & 3) << 4);
         }
 
         public byte wallFrameNumber()
         {
-            return (byte)((this.bTileHeader2 & 192) >> 6);
+            return (byte)((bTileHeader2 & 192) >> 6);
         }
 
         public void wallFrameNumber(byte wallFrameNumber)
         {
-            this.bTileHeader2 = (byte)((int)(this.bTileHeader2 & 63) | (int)(wallFrameNumber & 3) << 6);
+            bTileHeader2 = (byte)((int)(bTileHeader2 & 63) | (int)(wallFrameNumber & 3) << 6);
         }
 
         public int wallFrameY()
         {
-            return (int)((this.bTileHeader3 & 7) * 36);
+            return (int)((bTileHeader3 & 7) * 36);
         }
 
         public void wallFrameY(int wallFrameY)
         {
-            this.bTileHeader3 = (byte)((int)(this.bTileHeader3 & 248) | (wallFrameY / 36 & 7));
+            bTileHeader3 = (byte)((int)(bTileHeader3 & 248) | (wallFrameY / 36 & 7));
         }
 
         public bool checkingLiquid()
         {
-            return (this.bTileHeader3 & 8) == 8;
+            return (bTileHeader3 & 8) == 8;
         }
 
         public void checkingLiquid(bool checkingLiquid)
         {
             if (checkingLiquid)
             {
-                this.bTileHeader3 |= 8;
+                bTileHeader3 |= 8;
                 return;
             }
-            this.bTileHeader3 &= 247;
+            bTileHeader3 &= 247;
         }
 
         public bool skipLiquid()
         {
-            return (this.bTileHeader3 & 16) == 16;
+            return (bTileHeader3 & 16) == 16;
         }
 
         public void skipLiquid(bool skipLiquid)
         {
             if (skipLiquid)
             {
-                this.bTileHeader3 |= 16;
+                bTileHeader3 |= 16;
                 return;
             }
-            this.bTileHeader3 &= 239;
+            bTileHeader3 &= 239;
         }
 
         public byte color()
         {
-            return (byte)(this.sTileHeader & 31);
+            return (byte)(sTileHeader & 31);
         }
 
         public void color(byte color)
         {
-            this.sTileHeader = (short)(((int)this.sTileHeader & 65504) | (int)color);
+            sTileHeader = (ushort)((sTileHeader & 65504) | (int)color);
         }
 
         public bool active()
         {
-            return (this.sTileHeader & 32) == 32;
+            return (sTileHeader & 32) == 32;
         }
 
         public void active(bool active)
         {
             if (active)
             {
-                this.sTileHeader |= 32;
+                sTileHeader |= 32;
                 return;
             }
-            this.sTileHeader = (short)((int)this.sTileHeader & 65503);
+            sTileHeader = (ushort)(sTileHeader & 65503);
         }
 
         public bool inActive()
         {
-            return (this.sTileHeader & 64) == 64;
+            return (sTileHeader & 64) == 64;
         }
 
         public void inActive(bool inActive)
         {
             if (inActive)
             {
-                this.sTileHeader |= 64;
+                sTileHeader |= 64;
                 return;
             }
-            this.sTileHeader = (short)((int)this.sTileHeader & 65471);
+            sTileHeader = (ushort)(sTileHeader & 65471);
         }
 
         public bool wire()
         {
-            return (this.sTileHeader & 128) == 128;
+            return (sTileHeader & 128) == 128;
         }
 
         public void wire(bool wire)
         {
             if (wire)
             {
-                this.sTileHeader |= 128;
+                sTileHeader |= 128;
                 return;
             }
-            this.sTileHeader = (short)((int)this.sTileHeader & 65407);
+            sTileHeader = (ushort)(sTileHeader & 65407);
         }
 
         public bool wire2()
         {
-            return (this.sTileHeader & 256) == 256;
+            return (sTileHeader & 256) == 256;
         }
 
         public void wire2(bool wire2)
         {
             if (wire2)
             {
-                this.sTileHeader |= 256;
+                sTileHeader |= 256;
                 return;
             }
-            this.sTileHeader = (short)((int)this.sTileHeader & 65279);
+            sTileHeader = (ushort)(sTileHeader & 65279);
         }
 
         public bool wire3()
         {
-            return (this.sTileHeader & 512) == 512;
+            return (sTileHeader & 512) == 512;
         }
 
         public void wire3(bool wire3)
         {
             if (wire3)
             {
-                this.sTileHeader |= 512;
+                sTileHeader |= 512;
                 return;
             }
-            this.sTileHeader = (short)((int)this.sTileHeader & 65023);
+            sTileHeader = (ushort)(sTileHeader & 65023);
         }
 
         public bool halfBrick()
         {
-            return (this.sTileHeader & 1024) == 1024;
+            return (sTileHeader & 1024) == 1024;
         }
 
         public void halfBrick(bool halfBrick)
         {
             if (halfBrick)
             {
-                this.sTileHeader |= 1024;
+                sTileHeader |= 1024;
                 return;
             }
-            this.sTileHeader = (short)((int)this.sTileHeader & 64511);
+            sTileHeader = (ushort)(sTileHeader & 64511);
         }
 
         public bool actuator()
         {
-            return (this.sTileHeader & 2048) == 2048;
+            return (sTileHeader & 2048) == 2048;
         }
 
         public void actuator(bool actuator)
         {
             if (actuator)
             {
-                this.sTileHeader |= 2048;
+                sTileHeader |= 2048;
                 return;
             }
-            this.sTileHeader = (short)((int)this.sTileHeader & 63487);
+            sTileHeader = (ushort)(sTileHeader & 63487);
         }
 
         public byte slope()
         {
-            return (byte)((this.sTileHeader & 28672) >> 12);
+            return (byte)((sTileHeader & 28672) >> 12);
         }
 
         public void slope(byte slope)
         {
-            this.sTileHeader = (short)(((int)this.sTileHeader & 36863) | (int)(slope & 7) << 12);
+            sTileHeader = (ushort)((sTileHeader & 36863) | (int)(slope & 7) << 12);
         }
 
         public void Clear(TileDataType types)
         {
             if ((types & TileDataType.Tile) != (TileDataType)0)
             {
-                this.type = 0;
-                this.active(false);
-                this.frameX = 0;
-                this.frameY = 0;
+                type = 0;
+                active(false);
+                frameX = 0;
+                frameY = 0;
             }
             if ((types & TileDataType.Wall) != (TileDataType)0)
             {
-                this.wall = 0;
-                this.wallFrameX(0);
-                this.wallFrameY(0);
+                wall = 0;
+                wallFrameX(0);
+                wallFrameY(0);
             }
             if ((types & TileDataType.TilePaint) != (TileDataType)0)
             {
-                this.color(0);
+                color(0);
             }
             if ((types & TileDataType.WallPaint) != (TileDataType)0)
             {
-                this.wallColor(0);
+                wallColor(0);
             }
             if ((types & TileDataType.Liquid) != (TileDataType)0)
             {
-                this.liquid = 0;
-                this.liquidType(0);
-                this.checkingLiquid(false);
+                liquid = 0;
+                liquidType(0);
+                checkingLiquid(false);
             }
             if ((types & TileDataType.Slope) != (TileDataType)0)
             {
-                this.slope(0);
-                this.halfBrick(false);
+                slope(0);
+                halfBrick(false);
             }
             if ((types & TileDataType.Wiring) != (TileDataType)0)
             {
-                this.wire(false);
-                this.wire2(false);
-                this.wire3(false);
-                this.wire4(false);
+                wire(false);
+                wire2(false);
+                wire3(false);
+                wire4(false);
             }
             if ((types & TileDataType.Actuator) != (TileDataType)0)
             {
-                this.actuator(false);
-                this.inActive(false);
+                actuator(false);
+                inActive(false);
             }
+        }
+
+        public bool shimmer()
+        {
+            return (bTileHeader & 0x60) == 96;
+        }
+
+        public void shimmer(bool shimmer)
+        {
+            if (shimmer)
+            {
+                bTileHeader = (byte)((bTileHeader & 0x9F) | 0x60);
+            }
+            else
+            {
+                bTileHeader &= 159;
+            }
+        }
+
+        public readonly bool invisibleBlock()
+        {
+            return (bTileHeader3 & 0x20) == 32;
+        }
+
+        public void invisibleBlock(bool invisibleBlock)
+        {
+            if (invisibleBlock)
+            {
+                bTileHeader3 |= 32;
+            }
+            else
+            {
+                bTileHeader3 = (byte)(bTileHeader3 & -33);
+            }
+        }
+
+        public readonly bool invisibleWall()
+        {
+            return (bTileHeader3 & 0x40) == 64;
+        }
+
+        public void invisibleWall(bool invisibleWall)
+        {
+            if (invisibleWall)
+            {
+                bTileHeader3 |= 64;
+            }
+            else
+            {
+                bTileHeader3 = (byte)(bTileHeader3 & -65);
+            }
+        }
+
+        public bool fullbrightBlock()
+        {
+            return (bTileHeader3 & 0x80) == 128;
+        }
+
+        public void fullbrightBlock(bool fullbrightBlock)
+        {
+            if (fullbrightBlock)
+            {
+                bTileHeader3 |= 128;
+            }
+            else
+            {
+                bTileHeader3 = (byte)(bTileHeader3 & -129);
+            }
+        }
+
+        public readonly bool fullbrightWall()
+        {
+            return (sTileHeader & 0x8000) == 32768;
+        }
+
+        public void fullbrightWall(bool fullbrightWall)
+        {
+            if (fullbrightWall)
+            {
+                sTileHeader |= 32768;
+            }
+            else
+            {
+                sTileHeader = (ushort)(sTileHeader & -32769);
+            }
+        }
+
+        public void CopyPaintAndCoating(ITile other)
+        {
+            color(other.color());
+            invisibleBlock(other.invisibleBlock());
+            fullbrightBlock(other.fullbrightBlock());
+        }
+
+        public TileColorCache BlockColorAndCoating()
+        {
+            TileColorCache result = default;
+            result.Color = color();
+            result.FullBright = fullbrightBlock();
+            result.Invisible = invisibleBlock();
+            return result;
+        }
+
+        public TileColorCache WallColorAndCoating()
+        {
+            TileColorCache result = default;
+            result.Color = wallColor();
+            result.FullBright = fullbrightWall();
+            result.Invisible = invisibleWall();
+            return result;
+        }
+
+        public readonly void UseBlockColors(TileColorCache cache)
+        {
+            cache.ApplyToBlock(this);
+        }
+
+        public readonly void UseWallColors(TileColorCache cache)
+        {
+            cache.ApplyToWall(this);
+        }
+
+        public void ClearBlockPaintAndCoating()
+        {
+            color(0);
+            fullbrightBlock(fullbrightBlock: false);
+            invisibleBlock(invisibleBlock: false);
+        }
+
+        public void ClearWallPaintAndCoating()
+        {
+            wallColor(0);
+            fullbrightWall(fullbrightWall: false);
+            invisibleWall(invisibleWall: false);
         }
     }
 }

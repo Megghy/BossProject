@@ -16,10 +16,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using Microsoft.Xna.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace TShockAPI
 {
@@ -77,7 +77,7 @@ namespace TShockAPI
                 set
                 {
                     if (value <= 0)
-                        throw new ArgumentException("The value has to be greater than zero.");
+                        throw new ArgumentException(GetString("The value has to be greater than zero."));
 
                     this.maxLinesPerPage = value;
                 }
@@ -91,7 +91,7 @@ namespace TShockAPI
                 set
                 {
                     if (value < 0)
-                        throw new ArgumentException("The value has to be greater than or equal to zero.");
+                        throw new ArgumentException(GetString("The value has to be greater than or equal to zero."));
 
                     this.pageLimit = value;
                 }
@@ -101,10 +101,10 @@ namespace TShockAPI
             public Settings()
             {
                 this.IncludeHeader = true;
-                this.headerFormat = "Page {0} of {1}";
+                this.headerFormat = GetString("Page {{0}} of {{1}}");
                 this.HeaderTextColor = Color.Green;
                 this.IncludeFooter = true;
-                this.footerFormat = "Type /<command> {0} for more.";
+                this.footerFormat = GetString("Type /<command> {{0}} for more.");
                 this.FooterTextColor = Color.Yellow;
                 this.NothingToDisplayString = null;
                 this.LineFormatter = null;
@@ -181,7 +181,7 @@ namespace TShockAPI
                     catch (Exception ex)
                     {
                         throw new InvalidOperationException(
-                          "The method referenced by LineFormatter has thrown an exception. See inner exception for details.", ex);
+                          GetString("The method referenced by LineFormatter has thrown an exception. See inner exception for details."), ex);
                     }
                 }
                 else
@@ -243,7 +243,7 @@ namespace TShockAPI
                     catch (Exception ex)
                     {
                         throw new ArgumentException(
-                          "The method represented by termFormatter has thrown an exception. See inner exception for details.", ex);
+                          GetString("The method represented by termFormatter has thrown an exception. See inner exception for details."), ex);
                     }
                 }
                 else
@@ -279,7 +279,7 @@ namespace TShockAPI
             if (!int.TryParse(pageNumberRaw, out pageNumber) || pageNumber < 1)
             {
                 if (errorMessageReceiver != null)
-                    errorMessageReceiver.SendErrorMessage("\"{0}\" is not a valid page number.", pageNumberRaw);
+                    errorMessageReceiver.SendErrorMessage(GetString("\"{0}\" is not a valid page number.", pageNumberRaw));
 
                 pageNumber = 1;
                 return false;

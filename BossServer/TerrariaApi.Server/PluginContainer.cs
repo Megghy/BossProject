@@ -19,8 +19,11 @@ namespace TerrariaApi.Server
             get;
             set;
         }
-
-        public Assembly PluginAssembly { get; set; }
+        public Assembly PluginAssembly
+        {
+            get;
+            init;
+        }
 
         public PluginContainer(TerrariaPlugin plugin) : this(plugin, true)
         {

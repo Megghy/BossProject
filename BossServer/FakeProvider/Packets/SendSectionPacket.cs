@@ -1,5 +1,4 @@
 ﻿#region Using
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -8,7 +7,6 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Tile_Entities;
 using Terraria.ID;
-using Terraria.Net.Sockets;
 #endregion
 namespace FakeProvider
 {

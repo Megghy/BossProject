@@ -1,6 +1,5 @@
 ﻿using FreeSql.DataAnnotations;
 using TShockAPI;
-using TShockAPI.DB;
 
 namespace AlternativeCommandExecution.SwitchCommand
 {

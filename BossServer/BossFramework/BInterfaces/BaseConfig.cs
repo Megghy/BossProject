@@ -1,6 +1,6 @@
-﻿using BossFramework.BAttributes;
+﻿using System.IO;
+using BossFramework.BAttributes;
 using Newtonsoft.Json;
-using System.IO;
 
 namespace BossFramework.BInterfaces
 {

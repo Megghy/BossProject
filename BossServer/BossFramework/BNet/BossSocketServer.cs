@@ -1,6 +1,6 @@
-﻿using NetCoreServer;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
+using NetCoreServer;
 using Terraria.Net.Sockets;
 
 namespace BossFramework.BNet

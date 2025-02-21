@@ -1,6 +1,6 @@
-﻿using BossFramework.DB;
+﻿using System.Data;
+using BossFramework.DB;
 using FakeProvider;
-using System.Data;
 using Terraria;
 using TrProtocol.Models;
 using TShockAPI;
@@ -24,7 +24,7 @@ namespace PlotMarker
             Plots.Clear();
 
             DBTools.GetAll<Plot>(p => p.WorldId == Main.worldID)
-                        .TForEach(plot =>
+                        .ForEach(plot =>
                         {
                             plot.Cells = LoadCells(plot);
                             Plots.Add(plot);

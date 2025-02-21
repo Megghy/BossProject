@@ -3,9 +3,9 @@ using Terraria;
 
 namespace TerrariaApi.Server.Hooking
 {
-    public static class WiringHooks
+    internal static class WiringHooks
     {
-        public static HookManager _hookManager;
+        private static HookManager _hookManager;
 
         /// <summary>
         /// Attaches any of the OTAPI Wiring hooks to the existing <see cref="HookManager"/> implementation
@@ -20,6 +20,10 @@ namespace TerrariaApi.Server.Hooking
 
         static void OnAnnouncementBox(object sender, Hooks.Wiring.AnnouncementBoxEventArgs e)
         {
+            if (e.Result == HookResult.Cancel)
+            {
+                return;
+            }
             if (_hookManager.InvokeWireTriggerAnnouncementBox(Wiring.CurrentUser, e.X, e.Y, e.SignId, Main.sign[e.SignId].text))
             {
                 e.Result = HookResult.Cancel;

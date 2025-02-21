@@ -1,9 +1,9 @@
-﻿using BossFramework.BModels;
-using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Timers;
+using BossFramework.BModels;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using TerrariaApi.Server;
@@ -40,12 +40,12 @@ namespace TUIPlugin
         public static DesignState[] playerDesignState = new DesignState[Main.maxPlayers];
         public static bool FakesEnabled = false;
         private static Timer RegionTimer = new Timer(1000) { AutoReset = true };
-        private static int[] PlaceStyles = new int[Main.maxItemTypes];
+        private static int[] PlaceStyles = new int[ItemID.Count];
 
-        public static Command[] CommandList = new Command[]
-        {
+        public static Command[] CommandList =
+        [
             new Command(TUI.ControlPermission, TUICommand, "tui")
-        };
+        ];
 
         #endregion Data
 
@@ -55,7 +55,7 @@ namespace TUIPlugin
             : base(game)
         {
             // ????????????????????????
-            Order = -1000;
+           // Order = -1000;
         }
 
         #endregion Constructor
@@ -72,9 +72,9 @@ namespace TUIPlugin
 
                 var old = Main.player[Main.myPlayer];
                 Main.player[Main.myPlayer] = new Player();
-                for (int i = 0; i < Main.maxItemTypes; i++)
+                for (int i = 0; i < ItemID.Count; i++)
                 {
-                    Item item = new Item();
+                    Item item = new();
                     item.netDefaults(i);
                     PlaceStyles[i] = item.placeStyle;
                 }
@@ -91,7 +91,7 @@ namespace TUIPlugin
                 PlayerHooks.PlayerLogout += OnPlayerLogout;
 
                 if (FakesEnabled)
-                    ServerApi.Hooks.PostWorldSave.Register(this, OnPostSaveWorld);
+                    ServerApi.Hooks.WorldSave.Register(this, OnPostSaveWorld);
                 TUI.Hooks.LoadRoot.Event += OnLoadRoot;
                 TUI.Hooks.CanTouch.Event += OnCanTouch;
                 TUI.Hooks.DrawObject.Event += OnDrawObject;
@@ -139,7 +139,7 @@ namespace TUIPlugin
 
                     PlayerHooks.PlayerLogout -= OnPlayerLogout;
                     if (FakesEnabled)
-                        ServerApi.Hooks.PostWorldSave.Deregister(this, OnPostSaveWorld);
+                        ServerApi.Hooks.WorldSave.Deregister(this, OnPostSaveWorld);
                     TUI.Hooks.LoadRoot.Event -= OnLoadRoot;
                     TUI.Hooks.CanTouch.Event -= OnCanTouch;
                     TUI.Hooks.DrawObject.Event -= OnDrawObject;
@@ -315,7 +315,7 @@ namespace TUIPlugin
                 else
                     return; // This means player is holding another item.Obtains by hacks.
 
-                
+
                 if (playerDesignState[player.Index] == DesignState.Waiting)
                     playerDesignState[player.Index] = DesignState.Begin;
                 else if (playerDesignState[player.Index] == DesignState.Begin)
@@ -347,7 +347,7 @@ namespace TUIPlugin
 
         #region OnPostSaveWorld
 
-        private static void OnPostSaveWorld(WorldPostSaveEventArgs args)
+        private static void OnPostSaveWorld(WorldSaveEventArgs args)
         {
             TUI.RequestDrawChanges();
         }

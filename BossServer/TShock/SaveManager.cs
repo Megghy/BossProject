@@ -15,9 +15,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Threading;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.IO;
 using TerrariaApi.Server;
@@ -54,11 +54,11 @@ namespace TShockAPI
                 // These can be caused by an unexpected error such as a bad or out of date plugin
                 try
                 {
-                    TShock.Utils.Broadcast("保存地图中...", Color.Yellow);
+                    TShock.Utils.Broadcast(GetString("Saving world..."), Color.Yellow);
                 }
                 catch (Exception ex)
                 {
-                    TShock.Log.Error("世界保存的通知发送失败");
+                    TShock.Log.Error("World saved notification failed");
                     TShock.Log.Error(ex.ToString());
                 }
             }
@@ -72,8 +72,6 @@ namespace TShockAPI
         /// <param name="direct">use the realsaveWorld method instead of saveWorld event (default: false)</param>
         public void SaveWorld(bool wait = true, bool resetTime = false, bool direct = false)
         {
-            if (ServerApi.Hooks.InvokeWorldSave(false))
-                return;
             EnqueueTask(new SaveTask(resetTime, direct));
             if (!wait)
                 return;
@@ -133,13 +131,13 @@ namespace TShockAPI
                                     WorldFile.SaveWorld(task.resetTime);
 
                                 if (TShock.Config.Settings.AnnounceSave)
-                                    TShock.Utils.Broadcast("地图已保存.", Color.Yellow);
+                                    TShock.Utils.Broadcast(GetString("World saved."), Color.Yellow);
 
-                                TShock.Log.Info(string.Format("地图保存在 ({0})", Main.worldPathName));
+                                TShock.Log.Info(GetString("World saved at ({0})", Main.worldPathName));
                             }
                             catch (Exception e)
                             {
-                                TShock.Log.Error("地图保存失败");
+                                TShock.Log.Error("World saved failed");
                                 TShock.Log.Error(e.ToString());
                             }
                         }
@@ -161,7 +159,7 @@ namespace TShockAPI
 
             public override string ToString()
             {
-                return string.Format("resetTime {0}, direct {1}", resetTime, direct);
+                return GetString("resetTime {0}, direct {1}", resetTime, direct);
             }
         }
     }

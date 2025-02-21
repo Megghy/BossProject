@@ -120,6 +120,49 @@ namespace TShockAPI.Hooks
     }
 
     /// <summary>
+    /// EventArgs used for the <see cref="PlayerHooks.PrePlayerCommand"/> event.
+    /// </summary>
+    public class PrePlayerCommandEventArgs : HandledEventArgs
+    {
+        /// <summary>
+        /// The command entered by the player.
+        /// </summary>
+        public Command Command { get; }
+        /// <summary>
+        /// Command arguments.
+        /// </summary>
+        public CommandArgs Arguments { get; set; }
+
+        public PrePlayerCommandEventArgs(Command command, CommandArgs args)
+        {
+            Command = command;
+            Arguments = args;
+        }
+    }
+
+    /// <summary>
+    /// EventArgs used for the <see cref="PlayerHooks.PostPlayerCommand"/> event.
+    /// </summary>
+    public class PostPlayerCommandEventArgs : HandledEventArgs
+    {
+        /// <summary>
+        /// The command entered by the player.
+        /// </summary>
+        public Command Command { get; }
+        /// <summary>
+        /// Command arguments.
+        /// </summary>
+        public CommandArgs Arguments { get; }
+
+        public PostPlayerCommandEventArgs(Command command, CommandArgs arguments, bool handled)
+        {
+            Command = command;
+            Arguments = arguments;
+            Handled = handled;
+        }
+    }
+
+    /// <summary>
     /// EventArgs used for the <see cref="PlayerHooks.PlayerChat"/> event.
     /// </summary>
     public class PlayerChatEventArgs : HandledEventArgs
@@ -273,6 +316,32 @@ namespace TShockAPI.Hooks
     }
 
     /// <summary>
+    /// EventArgs used for the <see cref="PlayerHooks.PlayerHasBuildPermission"/> event.
+    /// </summary>
+    public class PlayerHasBuildPermissionEventArgs
+    {
+        /// <summary>
+        /// The player who fired the event.
+        /// </summary>
+        public TSPlayer Player { get; set; }
+
+        /// <summary>
+        /// The X coordinate being checked.
+        /// </summary>
+        public int X { get; set; }
+
+        /// <summary>
+        /// The Y coordinate being checked.
+        /// </summary>
+        public int Y { get; set; }
+
+        /// <summary>
+        /// <see cref="PermissionHookResult"/> of the hook.
+        /// </summary>
+        public PermissionHookResult Result { get; set; }
+    }
+
+    /// <summary>
     /// A collection of events fired by players that can be hooked to.
     /// </summary>
     public static class PlayerHooks
@@ -316,6 +385,26 @@ namespace TShockAPI.Hooks
         /// Fired by players when using a command.
         /// </summary>
         public static event PlayerCommandD PlayerCommand;
+
+        /// <summary>
+        /// The delegate of the <see cref="PrePlayerCommand"/> event.
+        /// </summary>
+        /// <param name="e">The EventArgs for this event.</param>
+        public delegate void PrePlayerCommandD(PrePlayerCommandEventArgs e);
+        /// <summary>
+        /// Fired before a command is run.
+        /// </summary>
+        public static event PrePlayerCommandD PrePlayerCommand;
+
+        /// <summary>
+        /// The delegate of the <see cref="PostPlayerCommand"/> event.
+        /// </summary>
+        /// <param name="e">The EventArgs for this event.</param>
+        public delegate void PostPlayerCommandD(PostPlayerCommandEventArgs e);
+        /// <summary>
+        /// Fired after a command is run.
+        /// </summary>
+        public static event PostPlayerCommandD PostPlayerCommand;
 
         /// <summary>
         /// The delegate of the <see cref="PlayerChat"/> event.
@@ -368,6 +457,16 @@ namespace TShockAPI.Hooks
         /// </summary>
         public static event PlayerTilebanPermissionD PlayerTilebanPermission;
 
+        /// <summary>
+        /// The delegate of the <see cref="PlayerHasBuildPermission"/> event.
+        /// </summary>
+        /// <param name="e">The EventArgs for this event.</param>
+        public delegate void PlayerHasBuildPermissionD(PlayerHasBuildPermissionEventArgs e);
+        /// <summary>
+        /// Fired by players every time a build permission check occurs.
+        /// </summary>
+        public static event PlayerHasBuildPermissionD PlayerHasBuildPermission;
+
 
         /// <summary>
         /// Fires the <see cref="PlayerPostLogin"/> event.
@@ -394,7 +493,7 @@ namespace TShockAPI.Hooks
         /// <param name="commands">The list of commands.</param>
         /// <param name="cmdPrefix">The command specifier used.</param>
         /// <returns>True if the event has been handled.</returns>
-        public static bool OnPlayerCommand(TSPlayer player, string cmdName, ref string cmdText, List<string> args, ref IEnumerable<Command> commands, string cmdPrefix)
+        public static bool OnPlayerCommand(TSPlayer player, string cmdName, string cmdText, List<string> args, ref IEnumerable<Command> commands, string cmdPrefix)
         {
             if (PlayerCommand == null)
             {
@@ -410,8 +509,41 @@ namespace TShockAPI.Hooks
                 CommandPrefix = cmdPrefix,
             };
             PlayerCommand(playerCommandEventArgs);
-            cmdText = playerCommandEventArgs.CommandText;
             return playerCommandEventArgs.Handled;
+        }
+
+        /// <summary>
+        /// Fires the <see cref="PrePlayerCommand"/> event.
+        /// </summary>
+        /// <param name="cmd">Command to be executed</param>
+        /// <param name="arguments">Command arguments</param>
+        /// <returns>True if the event has been handled.</returns>
+        public static bool OnPrePlayerCommand(Command cmd, ref CommandArgs arguments)
+        {
+            if (PrePlayerCommand == null)
+                return false;
+
+            PrePlayerCommandEventArgs args = new PrePlayerCommandEventArgs(cmd, arguments);
+
+            PrePlayerCommand(args);
+
+            arguments = args.Arguments;
+            return args.Handled;
+        }
+
+        /// <summary>
+        /// Fires the <see cref="PostPlayerCommand"/> event.
+        /// </summary>
+        /// <param name="cmd">Executed command.</param>
+        /// <param name="arguments">Command arguments.</param>
+        /// <param name="handled">Is the command executed.</param>
+        public static void OnPostPlayerCommand(Command cmd, CommandArgs arguments, bool handled)
+        {
+            if (PostPlayerCommand == null)
+                return;
+
+            PostPlayerCommandEventArgs args = new PostPlayerCommandEventArgs(cmd, arguments, handled);
+            PostPlayerCommand(args);
         }
 
         /// <summary>
@@ -522,6 +654,22 @@ namespace TShockAPI.Hooks
 
             var args = new PlayerTilebanPermissionEventArgs(player, bannedTile);
             PlayerTilebanPermission(args);
+
+            return args.Result;
+        }
+
+        /// <summary>
+        /// Fires the <see cref="PlayerHasBuildPermission"/> event.
+        /// </summary>
+        /// <param name="player">The player firing the event.</param>
+        /// <returns>Event result if the event has been handled, otherwise <see cref="PermissionHookResult.Unhandled"/>.</returns>
+        public static PermissionHookResult OnPlayerHasBuildPermission(TSPlayer player, int x, int y)
+        {
+            if (PlayerHasBuildPermission == null)
+                return PermissionHookResult.Unhandled;
+
+            var args = new PlayerHasBuildPermissionEventArgs { Player = player, X = x, Y = y };
+            PlayerHasBuildPermission(args);
 
             return args.Result;
         }

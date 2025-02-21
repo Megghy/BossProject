@@ -1,6 +1,6 @@
-﻿using BossFramework.BAttributes;
+﻿using System.Linq.Expressions;
+using BossFramework.BAttributes;
 using FreeSql;
-using System.Linq.Expressions;
 
 namespace BossFramework.DB
 {

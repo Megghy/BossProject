@@ -1,10 +1,10 @@
-using Microsoft.Xna.Framework;
-using MySqlConnector;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Data.SQLite;
 using System.Reflection;
 using System.Text;
+using Microsoft.Xna.Framework;
+using MySql.Data.MySqlClient;
 using Terraria;
 using Terraria.ID;
 using Terraria.Utilities;
@@ -570,7 +570,7 @@ namespace WorldEdit
 
             Main.player[Main.myPlayer] = new Player();
             var item = new Item();
-            for (var i = 1; i < Main.maxItemTypes; i++)
+            for (var i = 1; i < ItemID.Count; i++)
             {
                 item.netDefaults(i);
 

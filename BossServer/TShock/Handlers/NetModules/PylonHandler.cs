@@ -33,10 +33,10 @@ namespace TShockAPI.Handlers.NetModules
         /// <param name="data"></param>
         public void Deserialize(MemoryStream data)
         {
-            PylonEventType = (SubPacketType)data.ReadByte();
+            PylonEventType = (SubPacketType)data.ReadInt8();
             TileX = data.ReadInt16();
             TileY = data.ReadInt16();
-            PylonType = (TeleportPylonType)data.ReadByte();
+            PylonType = (TeleportPylonType)data.ReadInt8();
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace TShockAPI.Handlers.NetModules
                 if (!player.HasPermission(Permissions.pylon))
                 {
                     rejectPacket = true;
-                    player.SendErrorMessage("You do not have permission to teleport using pylons.");
+                    player.SendErrorMessage(GetString("You do not have permission to teleport using pylons."));
                     return;
                 }
             }

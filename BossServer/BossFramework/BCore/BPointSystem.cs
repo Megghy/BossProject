@@ -1,6 +1,6 @@
-﻿using BossFramework.BModels;
+﻿using System.Linq;
+using BossFramework.BModels;
 using BossFramework.DB;
-using System.Linq;
 using TShockAPI;
 
 namespace BossFramework.BCore

@@ -1,8 +1,8 @@
-﻿using BossFramework;
+﻿using System.Collections.Generic;
+using BossFramework;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
 using FakeProvider;
-using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using TerrariaUI;
@@ -177,7 +177,7 @@ public class BackGammon : BaseMiniGame
             for (int tempY = 0; tempY < LENGTH; tempY++)
             {
                 //if ((tempX % 2 == 0 && tempY % 2 == 1) || (tempX % 2 == 1 && tempY % 2 == 0))
-                if((tempX + tempY) % 2 == 1)
+                if ((tempX + tempY) % 2 == 1)
                 {
                     boardNode[tempX, tempY] = new(0, 0, 2, 2, null, new()
                     {

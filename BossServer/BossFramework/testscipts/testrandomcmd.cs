@@ -1,9 +1,10 @@
-﻿using BossFramework.BInterfaces;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BossFramework;
+using BossFramework.BInterfaces;
+using Newtonsoft.Json;
 using Terraria;
 using TShockAPI;
 
@@ -149,14 +150,14 @@ public class RandomCmd : IScriptModule
 
     private static bool Internal_ParseCmd(string text, out string cmdText, out string cmdName, out List<string> args, out bool silent)
     {
-        cmdText = text.Remove(0, 1);
+        cmdText = text[1..];
         var cmdPrefix = text[0].ToString();
         silent = cmdPrefix == Commands.SilentSpecifier;
 
         var index = -1;
         for (var i = 0; i < cmdText.Length; i++)
         {
-            if (Commands.IsWhiteSpace(cmdText[i]))
+            if (BUtils.IsWhiteSpace(cmdText[i]))
             {
                 index = i;
                 break;
@@ -172,7 +173,7 @@ public class RandomCmd : IScriptModule
 
         args = index < 0 ?
             new List<string>() :
-            Commands.ParseParameters(cmdText.Substring(index));
+            BUtils.ParseParameters.Invoke(null, [cmdText.Substring(index)]) as List<string> ?? [];
         return true;
     }
 

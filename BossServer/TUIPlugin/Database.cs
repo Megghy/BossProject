@@ -1,8 +1,8 @@
-﻿using MySqlConnector;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
+using MySqlConnector;
 using TerrariaUI;
 using TShockAPI;
 using TShockAPI.DB;

@@ -84,7 +84,7 @@ namespace TShockAPI
                 if (DataModel.ItemIsBanned(EnglishLanguage.GetItemNameById(player.TPlayer.inventory[player.TPlayer.selectedItem].netID), player))
                 {
                     string itemName = player.TPlayer.inventory[player.TPlayer.selectedItem].Name;
-                    player.Disable($"持有被禁止的物品: {itemName}", disableFlags);
+                    player.Disable(GetString($"holding banned item: {itemName}"), disableFlags);
                     SendCorrectiveMessage(player, itemName);
                 }
 
@@ -146,13 +146,14 @@ namespace TShockAPI
         internal void OnPlayerUpdate(object sender, PlayerUpdateEventArgs args)
         {
             DisableFlags disableFlags = TShock.Config.Settings.DisableSecondUpdateLogs ? DisableFlags.WriteToConsole : DisableFlags.WriteToLogAndConsole;
+            bool useItem = args.Control.IsUsingItem;
             TSPlayer player = args.Player;
             string itemName = player.TPlayer.inventory[args.SelectedItem].Name;
 
             if (DataModel.ItemIsBanned(EnglishLanguage.GetItemNameById(player.TPlayer.inventory[args.SelectedItem].netID), args.Player))
             {
                 player.TPlayer.controlUseItem = false;
-                player.Disable($"持有被禁止的物品: {itemName}", disableFlags);
+                player.Disable(GetString($"holding banned item: {itemName}"), disableFlags);
 
                 SendCorrectiveMessage(player, itemName);
 
@@ -164,6 +165,7 @@ namespace TShockAPI
             }
 
             args.Handled = false;
+            return;
         }
 
         internal void OnChestItemChange(object sender, ChestItemEventArgs args)
@@ -180,6 +182,7 @@ namespace TShockAPI
             }
 
             args.Handled = false;
+            return;
         }
 
         internal void OnTileEdit(object sender, TileEditEventArgs args)
@@ -188,15 +191,15 @@ namespace TShockAPI
             {
                 if (args.Player.TPlayer.autoActuator && DataModel.ItemIsBanned("Actuator", args.Player))
                 {
-                    args.Player.SendTileSquare(args.X, args.Y, 1);
-                    args.Player.SendErrorMessage("您无权放置执行器");
+                    args.Player.SendTileSquareCentered(args.X, args.Y, 1);
+                    args.Player.SendErrorMessage(GetString("You do not have permission to place actuators."));
                     args.Handled = true;
                     return;
                 }
 
                 if (DataModel.ItemIsBanned(EnglishLanguage.GetItemNameById(args.Player.SelectedItem.netID), args.Player))
                 {
-                    args.Player.SendTileSquare(args.X, args.Y, 4);
+                    args.Player.SendTileSquareCentered(args.X, args.Y, 4);
                     args.Handled = true;
                     return;
                 }
@@ -221,7 +224,7 @@ namespace TShockAPI
 
         private void SendCorrectiveMessage(TSPlayer player, string itemName)
         {
-            player.SendErrorMessage("{0} 是被禁止的，请扔掉它!", itemName);
+            player.SendErrorMessage(GetString("{0} is banned! Remove it!", itemName));
         }
     }
 }

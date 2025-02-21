@@ -1,0 +1,84 @@
+[02/19/25 19:49:48] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/19/25 19:49:49] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll
+[02/19/25 19:49:49] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/19/25 19:49:49] [Server API] Verbose: 	Mono: False
+[02/19/25 19:49:49] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/19/25 19:49:49] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/20/25 20:43:30] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/20/25 20:43:30] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll
+[02/20/25 20:43:30] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/20/25 20:43:30] [Server API] Verbose: 	Mono: False
+[02/20/25 20:43:30] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/20/25 20:43:30] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/20/25 20:51:08] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/20/25 20:51:08] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll
+[02/20/25 20:51:08] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/20/25 20:51:08] [Server API] Verbose: 	Mono: False
+[02/20/25 20:51:08] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/20/25 20:51:09] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/20/25 20:53:10] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/20/25 20:53:10] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll
+[02/20/25 20:53:10] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/20/25 20:53:10] [Server API] Verbose: 	Mono: False
+[02/20/25 20:53:10] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/20/25 20:53:10] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/20/25 20:54:56] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/20/25 20:54:56] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll
+[02/20/25 20:54:56] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/20/25 20:54:56] [Server API] Verbose: 	Mono: False
+[02/20/25 20:54:57] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/20/25 20:54:57] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/21/25 00:43:07] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/21/25 00:43:07] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/21/25 00:43:07] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/21/25 00:43:07] [Server API] Verbose: 	Mono: False
+[02/21/25 00:43:07] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/21/25 00:43:08] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/21/25 00:43:08] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/21/25 00:43:10] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/21/25 00:43:11] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/21/25 00:46:35] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/21/25 00:46:35] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/21/25 00:46:35] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/21/25 00:46:35] [Server API] Verbose: 	Mono: False
+[02/21/25 00:46:35] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/21/25 00:46:35] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/21/25 00:46:35] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/21/25 00:46:37] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/21/25 00:46:38] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/21/25 00:48:15] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/21/25 00:48:15] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/21/25 00:48:15] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/21/25 00:48:15] [Server API] Verbose: 	Mono: False
+[02/21/25 00:48:15] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/21/25 00:48:16] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/21/25 00:48:16] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/21/25 00:48:18] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/21/25 00:48:19] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/21/25 00:50:19] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/21/25 00:50:19] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/21/25 00:50:19] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/21/25 00:50:19] [Server API] Verbose: 	Mono: False
+[02/21/25 00:50:19] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/21/25 00:50:19] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/21/25 00:50:19] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/21/25 00:50:21] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/21/25 00:50:22] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/21/25 00:52:51] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/21/25 00:52:51] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/21/25 00:52:51] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/21/25 00:52:51] [Server API] Verbose: 	Mono: False
+[02/21/25 00:52:52] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/21/25 00:52:52] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/21/25 00:52:52] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/21/25 00:52:53] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/21/25 00:52:55] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/21/25 00:54:56] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/21/25 00:54:56] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/21/25 00:54:56] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/21/25 00:54:56] [Server API] Verbose: 	Mono: False
+[02/21/25 00:54:56] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/21/25 00:54:56] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/21/25 00:54:56] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/21/25 00:54:58] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/21/25 00:54:59] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.

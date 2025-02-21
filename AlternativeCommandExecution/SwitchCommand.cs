@@ -1,5 +1,5 @@
-﻿using AlternativeCommandExecution.SwitchCommand;
-using System.IO.Streams;
+﻿using System.IO.Streams;
+using AlternativeCommandExecution.SwitchCommand;
 using Terraria;
 using Terraria.ID;
 using TShockAPI;

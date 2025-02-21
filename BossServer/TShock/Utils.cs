@@ -16,7 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,10 +23,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
-using Terraria.Localization;
-using Terraria.Utilities;
 using TShockAPI.Localization;
 
 namespace TShockAPI
@@ -132,7 +130,7 @@ namespace TShockAPI
         {
             TSPlayer.All.SendMessage(msg, red, green, blue);
             TSPlayer.Server.SendMessage(msg, red, green, blue);
-            TShock.Log.Info($"广播:{msg}");
+            TShock.Log.Info(GetString("Broadcast: {0}", msg));
         }
 
         /// <summary>>Broadcast - Broadcasts a message to all players on the server, as well as the server console, and the logs.</summary>
@@ -155,7 +153,7 @@ namespace TShockAPI
         {
             TSPlayer.All.SendMessageFromPlayer(msg, red, green, blue, ply);
             TSPlayer.Server.SendMessage(Main.player[ply].name + ": " + msg, red, green, blue);
-            TShock.Log.Info(string.Format("广播:{0}", Main.player[ply].name + ": " + msg));
+            TShock.Log.Info(GetString("Broadcast: {0}: {1}", Main.player[ply].name, msg));
         }
 
         /// <summary>
@@ -171,7 +169,7 @@ namespace TShockAPI
             foreach (TSPlayer player in TShock.Players)
             {
                 if (player != null && player != excludedPlayer && player.Active && player.HasPermission(Permissions.logs) &&
-                        player.DisplayLogs && TShock.Config.Settings.DisableSpewLogs == false)
+                        player.DisplayLogs && !TShock.Config.Settings.DisableSpewLogs)
                     player.SendMessage(log, color);
             }
         }
@@ -182,7 +180,7 @@ namespace TShockAPI
         /// <returns>The number of active players on the server.</returns>
         public int GetActivePlayerCount()
         {
-            return Main.player.Where(p => null != p && p.active).Count();
+            return TShock.Players.Count(p => null != p && p.Active && p.FinishedHandshake);
         }
 
         //Random should not be generated in a method
@@ -250,7 +248,7 @@ namespace TShockAPI
             int type = -1;
             if (Int32.TryParse(text, out type))
             {
-                if (type >= Main.maxItemTypes)
+                if (type >= Terraria.ID.ItemID.Count)
                     return new List<Item>();
                 return new List<Item> { GetItemById(type) };
             }
@@ -279,37 +277,47 @@ namespace TShockAPI
         /// <returns>List of Items</returns>
         public List<Item> GetItemByName(string name)
         {
-            var found = new List<Item>();
-            Item item = new Item();
-            string nameLower = name.ToLowerInvariant();
-            var checkEnglish = Language.ActiveCulture != GameCulture.FromCultureName(GameCulture.CultureName.English);
-
-            for (int i = 1; i < Main.maxItemTypes; i++)
+            var startswith = new List<int>();
+            var contains = new List<int>();
+            for (int i = 1; i < ItemID.Count; i++)
             {
-                item.netDefaults(i);
-                if (!String.IsNullOrWhiteSpace(item.Name))
+                var currentName = Lang.GetItemNameValue(i);
+                if (!string.IsNullOrEmpty(currentName))
                 {
-                    if (item.Name.ToLowerInvariant() == nameLower)
-                        return new List<Item> { item };
-                    if (item.Name.ToLowerInvariant().StartsWith(nameLower))
-                        found.Add(item.Clone());
+                    if (currentName.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                        return new List<Item> { GetItemById(i) };
+                    if (currentName.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        startswith.Add(i);
+                        continue;
+                    }
+                    if (currentName.Contains(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        contains.Add(i);
+                        continue;
+                    }
                 }
-
-                if (!checkEnglish)
+                currentName = EnglishLanguage.GetItemNameById(i);
+                if (!string.IsNullOrEmpty(currentName))
                 {
-                    continue;
-                }
-
-                string englishName = EnglishLanguage.GetItemNameById(i).ToLowerInvariant();
-                if (!String.IsNullOrEmpty(englishName))
-                {
-                    if (englishName == nameLower)
-                        return new List<Item> { item };
-                    if (englishName.StartsWith(nameLower))
-                        found.Add(item.Clone());
+                    if (currentName.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                        return new List<Item> { GetItemById(i) };
+                    if (currentName.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        startswith.Add(i);
+                        continue;
+                    }
+                    if (currentName.Contains(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        contains.Add(i);
+                        continue;
+                    }
                 }
             }
-            return found;
+
+            if (startswith.Count != 1)
+                startswith.AddRange(contains);
+            return startswith.Select(GetItemById).ToList();
         }
 
         /// <summary>
@@ -319,7 +327,7 @@ namespace TShockAPI
         /// <returns>The item represented by the tag.</returns>
         public Item GetItemFromTag(string tag)
         {
-            Regex regex = new Regex(@"\[i(tem)?(?:\/s(?<Stack>\d{1,3}))?(?:\/p(?<Prefix>\d{1,3}))?:(?<NetID>-?\d{1,4})\]");
+            Regex regex = new Regex(@"\[i(tem)?(?:\/s(?<Stack>\d{1,4}))?(?:\/p(?<Prefix>\d{1,3}))?:(?<NetID>-?\d{1,4})\]");
             Match match = regex.Match(tag);
             if (!match.Success)
                 return null;
@@ -342,7 +350,7 @@ namespace TShockAPI
             int type = -1;
             if (int.TryParse(idOrName, out type))
             {
-                if (type >= Main.maxNPCTypes)
+                if (type >= Terraria.ID.NPCID.Count)
                     return new List<NPC>();
                 return new List<NPC> { GetNPCById(type) };
             }
@@ -368,22 +376,47 @@ namespace TShockAPI
         /// <returns>List of matching NPCs</returns>
         public List<NPC> GetNPCByName(string name)
         {
-            var found = new List<NPC>();
-            NPC npc = new NPC();
-            string nameLower = name.ToLowerInvariant();
-            for (int i = -17; i < Main.maxNPCTypes; i++)
+            var startswith = new List<int>();
+            var contains = new List<int>();
+            for (int i = -17; i < NPCID.Count; i++)
             {
-                string englishName = EnglishLanguage.GetNpcNameById(i).ToLowerInvariant();
-
-                npc.SetDefaults(i);
-                if (npc.FullName.ToLowerInvariant() == nameLower || npc.TypeName.ToLowerInvariant() == nameLower
-                    || nameLower == englishName)
-                    return new List<NPC> { npc };
-                if (npc.FullName.ToLowerInvariant().StartsWith(nameLower) || npc.TypeName.ToLowerInvariant().StartsWith(nameLower)
-                    || englishName?.StartsWith(nameLower) == true)
-                    found.Add((NPC)npc.Clone());
+                var currentName = Lang.GetNPCNameValue(i);
+                if (!string.IsNullOrEmpty(currentName))
+                {
+                    if (currentName.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                        return new List<NPC> { GetNPCById(i) };
+                    if (currentName.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        startswith.Add(i);
+                        continue;
+                    }
+                    if (currentName.Contains(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        contains.Add(i);
+                        continue;
+                    }
+                }
+                currentName = EnglishLanguage.GetNpcNameById(i);
+                if (!string.IsNullOrEmpty(currentName))
+                {
+                    if (currentName.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                        return new List<NPC> { GetNPCById(i) };
+                    if (currentName.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        startswith.Add(i);
+                        continue;
+                    }
+                    if (currentName.Contains(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        contains.Add(i);
+                        continue;
+                    }
+                }
             }
-            return found;
+
+            if (startswith.Count != 1)
+                startswith.AddRange(contains);
+            return startswith.Select(GetNPCById).ToList();
         }
 
         /// <summary>
@@ -393,7 +426,7 @@ namespace TShockAPI
         /// <returns>name</returns>
         public string GetBuffName(int id)
         {
-            return (id > 0 && id < Main.maxBuffTypes) ? Lang.GetBuffName(id) : null;
+            return (id > 0 && id < Terraria.ID.BuffID.Count) ? Lang.GetBuffName(id) : null;
         }
 
         /// <summary>
@@ -403,7 +436,7 @@ namespace TShockAPI
         /// <returns>description</returns>
         public string GetBuffDescription(int id)
         {
-            return (id > 0 && id < Main.maxBuffTypes) ? Lang.GetBuffDescription(id) : null;
+            return (id > 0 && id < Terraria.ID.BuffID.Count) ? Lang.GetBuffDescription(id) : null;
         }
 
         /// <summary>
@@ -413,22 +446,47 @@ namespace TShockAPI
         /// <returns>Matching list of buff ids</returns>
         public List<int> GetBuffByName(string name)
         {
-            string nameLower = name.ToLower();
-            string buffname;
-            for (int i = 1; i < Main.maxBuffTypes; i++)
+            var startswith = new List<int>();
+            var contains = new List<int>();
+            for (int i = 1; i < BuffID.Count; i++)
             {
-                buffname = Lang.GetBuffName(i);
-                if (!String.IsNullOrWhiteSpace(buffname) && buffname.ToLower() == nameLower)
-                    return new List<int> { i };
+                var currentName = Lang.GetBuffName(i);
+                if (!string.IsNullOrWhiteSpace(currentName))
+                {
+                    if (currentName.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                        return new List<int> { i };
+                    if (currentName.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        startswith.Add(i);
+                        continue;
+                    }
+                    if (currentName.Contains(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        contains.Add(i);
+                        continue;
+                    }
+                }
+                currentName = EnglishLanguage.GetBuffNameById(i);
+                if (!string.IsNullOrWhiteSpace(currentName))
+                {
+                    if (currentName.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                        return new List<int> { i };
+                    if (currentName.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        startswith.Add(i);
+                        continue;
+                    }
+                    if (currentName.Contains(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        contains.Add(i);
+                        continue;
+                    }
+                }
             }
-            var found = new List<int>();
-            for (int i = 1; i < Main.maxBuffTypes; i++)
-            {
-                buffname = Lang.GetBuffName(i);
-                if (!String.IsNullOrWhiteSpace(buffname) && buffname.ToLower().StartsWith(nameLower))
-                    found.Add(i);
-            }
-            return found;
+
+            if (startswith.Count != 1)
+                startswith.AddRange(contains);
+            return startswith;
         }
 
         /// <summary>
@@ -448,21 +506,47 @@ namespace TShockAPI
         /// <returns>List of prefix IDs</returns>
         public List<int> GetPrefixByName(string name)
         {
-            Item item = new Item();
-            item.SetDefaults(0);
-            string lowerName = name.ToLowerInvariant();
-            var found = new List<int>();
+            var startswith = new List<int>();
+            var contains = new List<int>();
             for (int i = FirstItemPrefix; i <= LastItemPrefix; i++)
             {
-                item.prefix = (byte)i;
-                string prefixName = item.AffixName().Trim().ToLowerInvariant();
-                string englishName = EnglishLanguage.GetPrefixById(i).ToLowerInvariant();
-                if (prefixName == lowerName || englishName == lowerName)
-                    return new List<int>() { i };
-                else if (prefixName.StartsWith(lowerName) || englishName?.StartsWith(lowerName) == true) // Partial match
-                    found.Add(i);
+                var currentName = Lang.prefix[i].ToString();
+                if (!string.IsNullOrWhiteSpace(currentName))
+                {
+                    if (currentName.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                        return new List<int> { i };
+                    if (currentName.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        startswith.Add(i);
+                        continue;
+                    }
+                    if (currentName.Contains(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        contains.Add(i);
+                        continue;
+                    }
+                }
+                currentName = EnglishLanguage.GetPrefixById(i);
+                if (!string.IsNullOrWhiteSpace(currentName))
+                {
+                    if (currentName.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                        return new List<int> { i };
+                    if (currentName.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        startswith.Add(i);
+                        continue;
+                    }
+                    if (currentName.Contains(name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        contains.Add(i);
+                        continue;
+                    }
+                }
             }
-            return found;
+
+            if (startswith.Count != 1)
+                startswith.AddRange(contains);
+            return startswith;
         }
 
         /// <summary>
@@ -573,7 +657,7 @@ namespace TShockAPI
             var sb = new StringBuilder(3);
             for (int i = 0; i < str.Length; i++)
             {
-                if (Char.IsDigit(str[i]) || (str[i] == '-' || str[i] == '+' || str[i] == ' '))
+                if (char.IsDigit(str[i]) || str[i] == '-' || str[i] == '+' || str[i] == ' ')
                     sb.Append(str[i]);
                 else
                 {
@@ -598,6 +682,82 @@ namespace TShockAPI
                             break;
                         default:
                             return false;
+                    }
+                }
+            }
+            if (sb.Length != 0)
+                return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Attempts to parse a string as a positive timespan (_d_m_h_s).
+        /// </summary>
+        /// <param name="str">The time string.</param>
+        /// <param name="seconds">The seconds.</param>
+        /// <returns>Whether the string was parsed successfully.</returns>
+        public bool TryParseTime(string str, out ulong seconds)
+        {
+            seconds = 0;
+
+            if (string.IsNullOrWhiteSpace(str))
+            {
+                return false;
+            }
+
+            var sb = new StringBuilder(3);
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (char.IsDigit(str[i]) || str[i] == '-' || str[i] == '+' || str[i] == ' ')
+                    sb.Append(str[i]);
+                else
+                {
+                    int num;
+                    if (!int.TryParse(sb.ToString().Trim(' '), out num))
+                        return false;
+
+                    sb.Clear();
+
+                    if (num == 0)
+                    {
+                        continue;
+                    }
+
+                    int numSeconds;
+                    switch (str[i])
+                    {
+                        case 's':
+                            numSeconds = num;
+                            break;
+                        case 'm':
+                            numSeconds = num * 60;
+                            break;
+                        case 'h':
+                            numSeconds = num * 60 * 60;
+                            break;
+                        case 'd':
+                            numSeconds = num * 60 * 60 * 24;
+                            break;
+                        default:
+                            return false;
+                    }
+
+                    if (numSeconds > 0)
+                    {
+                        if (ulong.MaxValue - seconds < (uint)numSeconds)
+                        {
+                            return false;
+                        }
+
+                        seconds += (uint)numSeconds;
+                    }
+                    else if (seconds >= (uint)Math.Abs(numSeconds))
+                    {
+                        seconds -= (uint)Math.Abs(numSeconds);
+                    }
+                    else
+                    {
+                        return false;
                     }
                 }
             }
@@ -759,20 +919,20 @@ namespace TShockAPI
         {
             return String.Format("[c/{0}:{1}]", color.Hex3(), text);
         }
-        public string ItemTag(int id, int prefix, int stack)
-        {
-            string options = stack > 1 ? "/s" + stack : prefix != 0 ? "/p" + prefix : "";
-            return string.Format("[i{0}:{1}]", options, id);
-        }
-        public string ItemTag(NetItem item)
-            => ItemTag(item.NetId, item.PrefixId, item.Stack);
+
         /// <summary>
         /// Converts an item into its text representation using the item chat tag.
         /// </summary>
         /// <param name="item">The item to convert.</param>
         /// <returns>The <paramref name="item"/> NetID surrounded by the item tag with proper stack/prefix data.</returns>
         public string ItemTag(Item item)
-            => ItemTag(item.type, item.prefix, item.stack);
+        {
+            int netID = item.netID;
+            int stack = item.stack;
+            int prefix = item.prefix;
+            string options = stack > 1 ? "/s" + stack : prefix != 0 ? "/p" + prefix : "";
+            return String.Format("[i{0}:{1}]", options, netID);
+        }
 
         /// <summary>
         /// Gets a list of points selected by a mass-wiring tool.
@@ -868,18 +1028,13 @@ namespace TShockAPI
         {
             PrepareLangForDump();
             // Lang.setLang(true);
+
+            Directory.CreateDirectory("docs");
+
             Configuration.TShockConfig.DumpDescriptions();
             Permissions.DumpDescriptions();
             Configuration.ServerSideConfig.DumpDescriptions();
             RestManager.DumpDescriptions();
-            DumpBuffs("BuffList.txt");
-            DumpItems("Items-1_0.txt", 1, 235);
-            DumpItems("Items-1_1.txt", 235, 604);
-            DumpItems("Items-1_2.txt", 604, 2749);
-            DumpItems("Items-1_3.txt", 2749, Main.maxItemTypes);
-            DumpNPCs("NPCs.txt");
-            DumpProjectiles("Projectiles.txt");
-            DumpPrefixes("Prefixes.txt");
 
             if (exit)
             {
@@ -903,7 +1058,9 @@ namespace TShockAPI
             // Traverse to build group name list
             foreach (Group g in TShock.Groups.groups)
             {
+                output.Append("[[");
                 output.Append(g.Name);
+                output.Append("]]");
                 output.Append("|");
             }
 
@@ -918,9 +1075,9 @@ namespace TShockAPI
 
             foreach (var field in typeof(Permissions).GetFields().OrderBy(f => f.Name))
             {
-                output.Append("|");
+                output.Append("|[[");
                 output.Append((string)field.GetValue(null));
-                output.Append("|");
+                output.Append("]]|");
 
                 foreach (Group g in TShock.Groups.groups)
                 {
@@ -937,211 +1094,6 @@ namespace TShockAPI
             }
 
             File.WriteAllText(path, output.ToString());
-        }
-
-        public void DumpBuffs(string path)
-        {
-            StringBuilder buffer = new StringBuilder();
-            buffer.AppendLine("[block:parameters]").AppendLine("{").AppendLine("  \"data\": {");
-            buffer.AppendLine("    \"h-0\": \"ID\",");
-            buffer.AppendLine("    \"h-1\": \"Name\",");
-            buffer.AppendLine("    \"h-2\": \"Description\",");
-
-            List<object[]> elements = new List<object[]>();
-            for (int i = 0; i < Main.maxBuffTypes; i++)
-            {
-                if (!String.IsNullOrEmpty(Lang.GetBuffName(i)))
-                {
-                    object[] element = new object[] { i, Lang.GetBuffName(i), Lang.GetBuffDescription(i) };
-                    elements.Add(element);
-                }
-            }
-
-            var rows = elements.Count;
-            var columns = 0;
-            if (rows > 0)
-            {
-                columns = elements[0].Length;
-            }
-            OutputElementsForDump(buffer, elements, rows, columns);
-
-            buffer.AppendLine();
-            buffer.AppendLine("  },");
-            buffer.AppendLine(String.Format("  \"cols\": {0},", columns)).AppendLine(String.Format("  \"rows\": {0}", rows));
-            buffer.AppendLine("}").Append("[/block]");
-
-            File.WriteAllText(path, buffer.ToString());
-        }
-
-        public void DumpItems(string path, int start, int end)
-        {
-            Main.player[Main.myPlayer] = new Player();
-            StringBuilder buffer = new StringBuilder();
-            Regex newLine = new Regex(@"\n");
-            buffer.AppendLine("[block:parameters]").AppendLine("{").AppendLine("  \"data\": {");
-            buffer.AppendLine("    \"h-0\": \"ID\",");
-            buffer.AppendLine("    \"h-1\": \"Name\",");
-            buffer.AppendLine("    \"h-2\": \"Tooltip\",");
-
-            List<object[]> elements = new List<object[]>();
-            for (int i = start; i < end; i++)
-            {
-                Item item = new Item();
-                item.SetDefaults(i);
-
-                string tt = "";
-                for (int x = 0; x < item.ToolTip.Lines; x++)
-                {
-                    tt += item.ToolTip.GetLine(x) + "\n";
-                }
-                if (!String.IsNullOrEmpty(item.Name))
-                {
-                    object[] element = new object[] { i,
-                                                      newLine.Replace(item.Name, @" "),
-                                                      newLine.Replace(tt, @" "),
-                                                    };
-                    elements.Add(element);
-                }
-            }
-
-            var rows = elements.Count;
-            var columns = 0;
-            if (rows > 0)
-            {
-                columns = elements[0].Length;
-            }
-            OutputElementsForDump(buffer, elements, rows, columns);
-
-            buffer.AppendLine();
-            buffer.AppendLine("  },");
-            buffer.AppendLine(String.Format("  \"cols\": {0},", columns)).AppendLine(String.Format("  \"rows\": {0}", rows));
-            buffer.AppendLine("}").Append("[/block]");
-
-            File.WriteAllText(path, buffer.ToString());
-        }
-
-        public void DumpNPCs(string path)
-        {
-            StringBuilder buffer = new StringBuilder();
-            buffer.AppendLine("[block:parameters]").AppendLine("{").AppendLine("  \"data\": {");
-            buffer.AppendLine("    \"h-0\": \"ID\",");
-            buffer.AppendLine("    \"h-1\": \"Full Name\",");
-            buffer.AppendLine("    \"h-2\": \"Type Name\",");
-
-            List<object[]> elements = new List<object[]>();
-            for (int i = -65; i < Main.maxNPCTypes; i++)
-            {
-                NPC npc = new NPC();
-                npc.SetDefaults(i);
-                if (!String.IsNullOrEmpty(npc.FullName))
-                {
-                    object[] element = new object[] { i, npc.FullName, npc.TypeName };
-                    elements.Add(element);
-                }
-            }
-
-            var rows = elements.Count;
-            var columns = 0;
-            if (rows > 0)
-            {
-                columns = elements[0].Length;
-            }
-            OutputElementsForDump(buffer, elements, rows, columns);
-
-            buffer.AppendLine();
-            buffer.AppendLine("  },");
-            buffer.AppendLine(String.Format("  \"cols\": {0},", columns)).AppendLine(String.Format("  \"rows\": {0}", rows));
-            buffer.AppendLine("}").Append("[/block]");
-
-            File.WriteAllText(path, buffer.ToString());
-        }
-
-        public void DumpProjectiles(string path)
-        {
-            Main.rand = new UnifiedRandom();
-            StringBuilder buffer = new StringBuilder();
-            buffer.AppendLine("[block:parameters]").AppendLine("{").AppendLine("  \"data\": {");
-            buffer.AppendLine("    \"h-0\": \"ID\",");
-            buffer.AppendLine("    \"h-1\": \"Name\",");
-
-            List<object[]> elements = new List<object[]>();
-            for (int i = 0; i < Main.maxProjectileTypes; i++)
-            {
-                Projectile projectile = new Projectile();
-                projectile.SetDefaults(i);
-                if (!String.IsNullOrEmpty(projectile.Name))
-                {
-                    object[] element = new object[] { i, projectile.Name };
-                    elements.Add(element);
-                }
-            }
-
-            var rows = elements.Count;
-            var columns = 0;
-            if (rows > 0)
-            {
-                columns = elements[0].Length;
-            }
-            OutputElementsForDump(buffer, elements, rows, columns);
-
-            buffer.AppendLine();
-            buffer.AppendLine("  },");
-            buffer.AppendLine(String.Format("  \"cols\": {0},", columns)).AppendLine(String.Format("  \"rows\": {0}", rows));
-            buffer.AppendLine("}").Append("[/block]");
-
-            File.WriteAllText(path, buffer.ToString());
-        }
-
-        public void DumpPrefixes(string path)
-        {
-            StringBuilder buffer = new StringBuilder();
-            buffer.AppendLine("[block:parameters]").AppendLine("{").AppendLine("  \"data\": {");
-            buffer.AppendLine("    \"h-0\": \"ID\",");
-            buffer.AppendLine("    \"h-1\": \"Name\",");
-
-            List<object[]> elements = new List<object[]>();
-            for (int i = 0; i < PrefixID.Count; i++)
-            {
-                string prefix = Lang.prefix[i].ToString();
-
-                if (!String.IsNullOrEmpty(prefix))
-                {
-                    object[] element = new object[] { i, prefix };
-                    elements.Add(element);
-                }
-            }
-
-            var rows = elements.Count;
-            var columns = 0;
-            if (rows > 0)
-            {
-                columns = elements[0].Length;
-            }
-            OutputElementsForDump(buffer, elements, rows, columns);
-
-            buffer.AppendLine();
-            buffer.AppendLine("  },");
-            buffer.AppendLine(String.Format("  \"cols\": {0},", columns)).AppendLine(String.Format("  \"rows\": {0}", rows));
-            buffer.AppendLine("}").Append("[/block]");
-
-            File.WriteAllText(path, buffer.ToString());
-        }
-
-        private void OutputElementsForDump(StringBuilder buffer, List<object[]> elements, int rows, int columns)
-        {
-            if (rows > 0)
-            {
-                columns = elements[0].Length;
-                for (int i = 0; i < columns; i++)
-                {
-                    for (int j = 0; j < rows; j++)
-                    {
-                        buffer.Append(String.Format("    \"{0}-{1}\": \"{2}\"", j, i, elements[j][i]));
-                        if (j != rows - 1 || i != columns - 1)
-                            buffer.AppendLine(",");
-                    }
-                }
-            }
         }
 
         /// <summary>Starts an invasion on the server.</summary>
@@ -1194,11 +1146,15 @@ namespace TShockAPI
         /// <param name="empty">If the server is empty; determines if we should use Utils.GetActivePlayerCount() for player count or 0.</param>
         internal void SetConsoleTitle(bool empty)
         {
-            Console.Title = string.Format("{0}{1}/{2} on {3} @ {4}:{5} (TShock for Terraria v{6})",
+            if (ShouldSkipTitle)
+                return;
+            Console.Title = GetString("{0}{1}/{2} on {3} @ {4}:{5} (TShock for Terraria v{6})",
                     !string.IsNullOrWhiteSpace(TShock.Config.Settings.ServerName) ? TShock.Config.Settings.ServerName + " - " : "",
                     empty ? 0 : GetActivePlayerCount(),
                     TShock.Config.Settings.MaxSlots, Main.worldName, Netplay.ServerIP.ToString(), Netplay.ListenPort, TShock.VersionNum);
         }
+        // Some terminals doesn't supports XTerm escape sequences for setting the title
+        private static bool ShouldSkipTitle = !System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) && !(Environment.GetEnvironmentVariable("TERM")?.Contains("xterm") ?? false);
 
         /// <summary>Determines the distance between two vectors.</summary>
         /// <param name="value1">The first vector location.</param>
@@ -1227,7 +1183,7 @@ namespace TShockAPI
         internal void ComputeMaxStyles()
         {
             var item = new Item();
-            for (int i = 0; i < Main.maxItemTypes; i++)
+            for (int i = 0; i < Terraria.ID.ItemID.Count; i++)
             {
                 item.netDefaults(i);
                 if (item.placeStyle >= 0)

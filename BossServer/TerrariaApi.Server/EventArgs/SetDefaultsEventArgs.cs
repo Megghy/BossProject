@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Terraria.GameContent.Items;
 
 namespace TerrariaApi.Server
 {
@@ -14,5 +15,7 @@ namespace TerrariaApi.Server
             get;
             set;
         }
+
+        public ItemVariant ItemVariant { get; set; }
     }
 }

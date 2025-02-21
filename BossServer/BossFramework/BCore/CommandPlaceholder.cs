@@ -1,8 +1,8 @@
-﻿using BossFramework.BAttributes;
+﻿using System.Collections.Generic;
+using System.Linq;
+using BossFramework.BAttributes;
 using BossFramework.BModels;
 using BossFramework.DB;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BossFramework.BCore
 {

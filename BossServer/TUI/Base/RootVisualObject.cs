@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using TerrariaUI.Hooks;
 using TerrariaUI.Hooks.Args;
-using static ReLogic.Peripherals.RGB.Corsair.CorsairDeviceGroup;
 
 namespace TerrariaUI.Base
 {

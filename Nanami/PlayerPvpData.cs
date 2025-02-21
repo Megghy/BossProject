@@ -1,6 +1,6 @@
-﻿using Terraria;
+﻿using Microsoft.Xna.Framework;
+using Terraria;
 using TShockAPI;
-using Microsoft.Xna.Framework;
 using TShockAPI.DB;
 
 namespace Nanami

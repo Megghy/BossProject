@@ -1,6 +1,6 @@
 ﻿#region Using
-using Microsoft.Xna.Framework;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
 #endregion
@@ -105,7 +105,7 @@ namespace FakeProvider
 
         #region sTileHeader
 
-        public short sTileHeader
+        public ushort sTileHeader
         {
             get => Data[X, Y].sTileHeader;
             set => Data[X, Y].sTileHeader = value;
@@ -156,6 +156,8 @@ namespace FakeProvider
                 return -1;
             }
         }
+
+        ushort ITile.sTileHeader { get; set; }
 
         #endregion
 
@@ -423,7 +425,7 @@ namespace FakeProvider
         {
             if (Color > 31)
                 Color = 31;
-            sTileHeader = (short)((sTileHeader & 65504) | Color);
+            sTileHeader = (ushort)((sTileHeader & 65504) | Color);
         }
 
         #endregion
@@ -447,7 +449,7 @@ namespace FakeProvider
             if (Active)
                 sTileHeader |= 32;
             else
-                sTileHeader = (short)(sTileHeader & 65503);
+                sTileHeader = (ushort)(sTileHeader & 65503);
         }
 
         #endregion
@@ -459,7 +461,7 @@ namespace FakeProvider
             if (InActive)
                 sTileHeader |= 64;
             else
-                sTileHeader = (short)(sTileHeader & 65471);
+                sTileHeader = (ushort)(sTileHeader & 65471);
         }
 
         #endregion
@@ -473,7 +475,7 @@ namespace FakeProvider
             if (Wire)
                 sTileHeader |= 128;
             else
-                sTileHeader = (short)(sTileHeader & 65407);
+                sTileHeader = (ushort)(sTileHeader & 65407);
         }
 
         #endregion
@@ -485,7 +487,7 @@ namespace FakeProvider
             if (Wire2)
                 sTileHeader |= 256;
             else
-                sTileHeader = (short)(sTileHeader & 65279);
+                sTileHeader = (ushort)(sTileHeader & 65279);
         }
 
         #endregion
@@ -497,7 +499,7 @@ namespace FakeProvider
             if (Wire3)
                 sTileHeader |= 512;
             else
-                sTileHeader = (short)(sTileHeader & 65023);
+                sTileHeader = (ushort)(sTileHeader & 65023);
         }
 
         #endregion
@@ -522,7 +524,7 @@ namespace FakeProvider
             if (Actuator)
                 sTileHeader |= 2048;
             else
-                sTileHeader = (short)(sTileHeader & 63487);
+                sTileHeader = (ushort)(sTileHeader & 63487);
         }
 
         #endregion
@@ -535,7 +537,7 @@ namespace FakeProvider
             if (HalfBrick)
                 sTileHeader |= 1024;
             else
-                sTileHeader = (short)(sTileHeader & 64511);
+                sTileHeader = (ushort)(sTileHeader & 64511);
         }
 
         #endregion
@@ -543,7 +545,7 @@ namespace FakeProvider
 
         public byte slope() => (byte)((sTileHeader & 28672) >> 12);
         public void slope(byte Slope) =>
-            sTileHeader = (short)((sTileHeader & 36863) | ((Slope & 7) << 12));
+            sTileHeader = (ushort)((sTileHeader & 36863) | ((Slope & 7) << 12));
 
         #endregion
         #region topSlope
@@ -615,6 +617,91 @@ namespace FakeProvider
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+
+        public bool shimmer()
+        {
+            return Data[X, Y].shimmer();
+        }
+
+        public void shimmer(bool shimmer)
+        {
+            Data[X, Y].shimmer(shimmer);
+        }
+
+        public bool invisibleBlock()
+        {
+            return Data[X, Y].invisibleBlock();
+        }
+
+        public void invisibleBlock(bool invisibleBlock)
+        {
+            Data[X, Y].invisibleBlock(invisibleBlock);
+        }
+
+        public bool invisibleWall()
+        {
+            return Data[X, Y].invisibleWall();
+        }
+
+        public void invisibleWall(bool invisibleWall)
+        {
+            Data[X, Y].invisibleWall(invisibleWall);
+        }
+
+        public bool fullbrightBlock()
+        {
+            return Data[X, Y].fullbrightBlock();
+        }
+
+        public void fullbrightBlock(bool fullbrightBlock)
+        {
+            Data[X, Y].fullbrightBlock(fullbrightBlock);
+        }
+
+        public bool fullbrightWall()
+        {
+            return Data[X, Y].fullbrightWall();
+        }
+
+        public void fullbrightWall(bool fullbrightWall)
+        {
+            Data[X, Y].fullbrightWall(fullbrightWall);
+        }
+
+        public void CopyPaintAndCoating(ITile other)
+        {
+            Data[X, Y].CopyPaintAndCoating(other);
+        }
+
+        public TileColorCache BlockColorAndCoating()
+        {
+            return Data[X, Y].BlockColorAndCoating();
+        }
+
+        public TileColorCache WallColorAndCoating()
+        {
+            return Data[X, Y].WallColorAndCoating();
+        }
+
+        public void UseBlockColors(TileColorCache cache)
+        {
+            Data[X, Y].UseBlockColors(cache);
+        }
+
+        public void UseWallColors(TileColorCache cache)
+        {
+            Data[X, Y].UseWallColors(cache);
+        }
+
+        public void ClearBlockPaintAndCoating()
+        {
+            Data[X, Y].ClearBlockPaintAndCoating();
+        }
+
+        public void ClearWallPaintAndCoating()
+        {
+            Data[X, Y].ClearWallPaintAndCoating();
         }
 
         public static bool operator ==(TileReference left, TileReference right)

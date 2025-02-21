@@ -1,0 +1,81 @@
+﻿@inherits LayoutComponentBase
+@implements IDisposable
+@inject INotificationService _notification
+
+<ConfigProvider Theme="GlobalTheme.Dark">
+    <Flex Style="min-height: 100vh; ">
+        <Sider Breakpoint="BreakpointType.Md">
+            <div class="logo" />
+            <Menu Theme="MenuTheme.Dark" DefaultSelectedKeys=@(new[]{"1"}) Mode="MenuMode.Inline" Style="height:100vh;" Animation>
+                <MenuItem Key="1" RouterLink="/">
+                    <Icon Type="@IconType.Outline.PieChart" />
+                    <span>主页</span>
+                </MenuItem>
+                <MenuItem Key="2" RouterLink="/players" RouterMatch="NavLinkMatch.Prefix">
+                    <Icon Type="@IconType.Outline.Desktop" />
+                    <span>玩家管理</span>
+                </MenuItem>
+                @{
+                    RenderFragment sub1Title =
+                    @<span>
+                        <Icon Type="@IconType.Outline.User" />
+                        <span>User</span>
+                    </span>;
+                }
+                <SubMenu Key="sub1" TitleTemplate=sub1Title>
+                    <MenuItem Key="3">Tom</MenuItem>
+                    <MenuItem Key="4">Bill</MenuItem>
+                    <MenuItem Key="5">Alex</MenuItem>
+                </SubMenu>
+                @{
+                    RenderFragment sub2Title =
+                    @<span>
+                        <Icon Type="@IconType.Outline.Team" />
+                        <span>Team</span>
+                    </span>;
+                }
+                <SubMenu Key="sub2" TitleTemplate=sub2Title>
+                    <MenuItem Key="6">Team 1</MenuItem>
+                    <MenuItem Key="8">Team 2</MenuItem>
+                </SubMenu>
+                <MenuItem Key="9">
+                    <Icon Type="@IconType.Outline.File" />
+                </MenuItem>
+            </Menu>
+        </Sider>
+        <Layout Class="site-layout" Style="width: 100%;">
+            <ReuseTabs Style="margin: 16px;">
+                <Body>
+                    @Body
+                </Body>
+                <TabPaneTemplate>
+                    <Content Class="site-layout-background" Style="padding: 24px;min-height: 280px;">
+                        @context.Body
+                    </Content>
+                </TabPaneTemplate>
+            </ReuseTabs>
+        </Layout>
+    </Flex>
+</ConfigProvider>
+
+@code{
+    bool isDisposed = false;
+
+    protected override void OnInitialized()
+    {
+        Task.Run(() =>
+        {
+            while (!isDisposed)
+            {
+                while (Datas.NotificationQueue.TryTake(out var item))
+                {
+                    _notification.Open(item);
+                }
+            }
+        });
+    }
+    public void Dispose()
+    {
+        isDisposed = true;
+    }
+}

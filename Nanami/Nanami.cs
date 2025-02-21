@@ -1,7 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using System.Timers;
+using Microsoft.Xna.Framework;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
@@ -26,20 +26,22 @@ namespace Nanami
 
         internal static NanamiListener Listener;
 
-        public Nanami(Main game) : base(game) { }
+        public Nanami(Main game) : base(game)
+        {
+            Order = 10;
+        }
 
         public override void Initialize()
         {
-            ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
+            //ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
             ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInitialize);
+            ServerApi.Hooks.GamePostInitialize.Register(this, OnInitialize);
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreetPlayer);
             ServerApi.Hooks.ServerLeave.Register(this, OnLeave);
-            ServerApi.Hooks.PostWorldSave.Register(this, OnPostSaveWorld);
+            ServerApi.Hooks.WorldSave.Register(this, OnPostSaveWorld);
 
             GetDataHandlers.TogglePvp += OnPvpToggle;
             GeneralHooks.ReloadEvent += OnReload;
-
-            PvpDatas = new PvpDataManager(TShock.DB);
         }
 
         protected override void Dispose(bool disposing)
@@ -50,7 +52,7 @@ namespace Nanami
                 ServerApi.Hooks.GamePostInitialize.Deregister(this, OnPostInitialize);
                 ServerApi.Hooks.NetGreetPlayer.Deregister(this, OnGreetPlayer);
                 ServerApi.Hooks.ServerLeave.Deregister(this, OnLeave);
-                ServerApi.Hooks.PostWorldSave.Deregister(this, OnPostSaveWorld);
+                ServerApi.Hooks.WorldSave.Deregister(this, OnPostSaveWorld);
 
                 GetDataHandlers.TogglePvp -= OnPvpToggle;
                 GeneralHooks.ReloadEvent -= OnReload;
@@ -63,6 +65,8 @@ namespace Nanami
 
         private static void OnInitialize(EventArgs args)
         {
+            PvpDatas = new PvpDataManager(TShock.DB);
+
             Config = Configuration.Read(Configuration.FilePath);
             Config.Write(Configuration.FilePath);
 
@@ -149,7 +153,7 @@ namespace Nanami
             PvpDatas.Save(player.Account.ID, data);
         }
 
-        private static void OnPostSaveWorld(WorldPostSaveEventArgs args)
+        private static void OnPostSaveWorld(WorldSaveEventArgs args)
         {
             foreach (var plr in TShock.Players.Where(p => p?.Active == true && p.TPlayer?.hostile == true))
             {

@@ -16,10 +16,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using MySqlConnector;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MySqlConnector;
 using TShockAPI.Extensions;
 
 namespace TShockAPI.DB
@@ -170,7 +170,7 @@ namespace TShockAPI.DB
         /// <returns></returns>
         protected override string EscapeTableName(string table)
         {
-            return table.SFormat("'{0}'", table);
+            return $"\'{table}\'";
         }
     }
 
@@ -314,8 +314,7 @@ namespace TShockAPI.DB
             {
                 if (x.DefaultCurrentTimestamp && x.Type != MySqlDbType.DateTime)
                 {
-                    throw new SqlColumnException("Can't set to true SqlColumn.DefaultCurrentTimestamp " +
-                        "when the MySqlDbType is not DateTime");
+                    throw new SqlColumnException(GetString("Can't set to true SqlColumn.DefaultCurrentTimestamp when the MySqlDbType is not DateTime"));
                 }
             });
         }
@@ -341,7 +340,7 @@ namespace TShockAPI.DB
         public string UpdateValue(string table, List<SqlValue> values, List<SqlValue> wheres)
         {
             if (0 == values.Count)
-                throw new ArgumentException("No values supplied");
+                throw new ArgumentException(GetString("No values supplied"));
 
             return "UPDATE {0} SET {1} {2}".SFormat(EscapeTableName(table), string.Join(", ", values.Select(v => v.Name + " = " + v.Value)), BuildWhere(wheres));
         }

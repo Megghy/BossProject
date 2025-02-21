@@ -16,9 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using HttpServer;
-using HttpServer.Headers;
-using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -26,6 +23,9 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using HttpServer;
+using HttpServer.Headers;
+using Newtonsoft.Json;
 using TShockAPI;
 using HttpListener = HttpServer.HttpListener;
 
@@ -240,9 +240,9 @@ namespace Rests
             }
             catch (Exception ex)
             {
-                TShock.Log.Error("Fatal Startup Exception");
+                TShock.Log.Error(GetString("Fatal Startup Exception"));
                 TShock.Log.Error(ex.ToString());
-                TShock.Log.ConsoleError("Invalid REST configuration: \nYou may already have a REST service bound to port {0}. \nPlease adjust your configuration and restart the server. \nPress any key to exit.", Port);
+                TShock.Log.ConsoleError(GetString("Invalid REST configuration: \nYou may already have a REST service bound to port {0}. \nPlease adjust your configuration and restart the server. \nPress any key to exit.", Port));
                 Console.ReadLine();
                 Environment.Exit(1);
             }
@@ -349,7 +349,6 @@ namespace Rests
             {
                 str = string.Format("{0}({1});", jsonp, str);
             }
-            e.Response.Connection.Type = ConnectionType.Close;
             e.Response.ContentType = new ContentTypeHeader("application/json; charset=utf-8");
             e.Response.Add(serverHeader);
             var bytes = Encoding.UTF8.GetBytes(str);
@@ -421,14 +420,14 @@ namespace Rests
             {
                 return new RestObject("500")
                 {
-                    {"error", "Internal server error."},
+                    {"error", GetString("Internal server error.") },
                     {"errormsg", exception.Message},
                     {"stacktrace", exception.StackTrace},
                 };
             }
             return new RestObject("404")
             {
-                {"error", "Specified API endpoint doesn't exist. Refer to the documentation for a list of valid endpoints."}
+                {"error", GetString("Specified API endpoint doesn't exist. Refer to the documentation for a list of valid endpoints.") }
             };
         }
 
@@ -446,7 +445,8 @@ namespace Rests
             object result = cmd.Execute(verbs, parms, request, context);
             if (cmd.DoLog && TShock.Config.Settings.LogRest)
             {
-                TShock.Log.ConsoleInfo("Anonymous requested REST endpoint: " + BuildRequestUri(cmd, verbs, parms, false));
+                var endpoint = BuildRequestUri(cmd, verbs, parms, false);
+                TShock.Log.ConsoleInfo(GetString($"Anonymous requested REST endpoint: {endpoint}"));
             }
 
             return result;

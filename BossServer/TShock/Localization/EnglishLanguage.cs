@@ -19,7 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
+using Terraria.Initializers;
 using Terraria.Localization;
+using Terraria.UI.Chat;
 
 namespace TShockAPI.Localization
 {
@@ -34,6 +36,10 @@ namespace TShockAPI.Localization
 
         private static readonly Dictionary<int, string> Prefixs = new Dictionary<int, string>();
 
+        private static readonly Dictionary<int, string> Buffs = new Dictionary<int, string>();
+
+        private static readonly Dictionary<string, string> VanillaCommandsPrefixs = new Dictionary<string, string>();
+
         internal static void Initialize()
         {
             var culture = Language.ActiveCulture;
@@ -47,21 +53,36 @@ namespace TShockAPI.Localization
                     LanguageManager.Instance.SetLanguage(GameCulture.FromCultureName(GameCulture.CultureName.English));
                 }
 
-                for (var i = -48; i < Main.maxItemTypes; i++)
+                for (var i = -48; i < Terraria.ID.ItemID.Count; i++)
                 {
                     ItemNames.Add(i, Lang.GetItemNameValue(i));
                 }
 
-                for (var i = -17; i < Main.maxNPCTypes; i++)
+                for (var i = -17; i < Terraria.ID.NPCID.Count; i++)
                 {
                     NpcNames.Add(i, Lang.GetNPCNameValue(i));
+                }
+
+                for (var i = 0; i < Terraria.ID.BuffID.Count; i++)
+                {
+                    Buffs.Add(i, Lang.GetBuffName(i));
                 }
 
                 foreach (var field in typeof(Main).Assembly.GetType("Terraria.ID.PrefixID")
                             .GetFields().Where(f => !f.Name.Equals("Count", StringComparison.Ordinal)))
                 {
-                    Prefixs.Add((int)field.GetValue(null), field.Name);
+                    var i = (int)field.GetValue(null);
+                    Prefixs.Add(i, Lang.prefix[i].Value);
                 }
+
+                ChatInitializer.Load();
+                foreach (var command in ChatManager.Commands._localizedCommands)
+                {
+                    if (VanillaCommandsPrefixs.ContainsKey(command.Value._name))
+                        continue;
+                    VanillaCommandsPrefixs.Add(command.Value._name, command.Key.Value);
+                }
+                ChatManager.Commands._localizedCommands.Clear();
             }
             finally
             {
@@ -111,6 +132,33 @@ namespace TShockAPI.Localization
             if (Prefixs.TryGetValue(id, out prefix))
                 return prefix;
 
+            return null;
+        }
+
+        /// <summary>
+        /// Get buff name in English
+        /// </summary>
+        /// <param name="id">Buff Id</param>
+        /// <returns>Buff name in English</returns>
+        public static string GetBuffNameById(int id)
+        {
+            string buff;
+            if (Buffs.TryGetValue(id, out buff))
+                return buff;
+
+            return null;
+        }
+
+        /// <summary>
+        /// Get vanilla command prefix in English
+        /// </summary>
+        /// <param name="name">vanilla command name</param>
+        /// <returns>vanilla command prefix in English</returns>
+        public static string GetCommandPrefixByName(string name)
+        {
+            string commandText;
+            if (VanillaCommandsPrefixs.TryGetValue(name, out commandText))
+                return commandText;
             return null;
         }
     }

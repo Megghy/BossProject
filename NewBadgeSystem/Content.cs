@@ -1,6 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Globalization;
+using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
-using System.Globalization;
 using Terraria;
 using TShockAPI;
 

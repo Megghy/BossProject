@@ -1,6 +1,7 @@
-﻿using BossFramework.BCore;
-using System.Linq;
+﻿using System.Linq;
+using BossFramework.BCore;
 using TrProtocol.Packets;
+using TShockAPI;
 
 namespace BossFramework.BModels
 {

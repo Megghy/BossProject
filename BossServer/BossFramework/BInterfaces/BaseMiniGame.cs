@@ -1,5 +1,5 @@
-﻿using BossFramework.BModels;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using BossFramework.BModels;
 
 namespace BossFramework.BInterfaces
 {

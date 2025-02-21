@@ -1,10 +1,16 @@
-﻿using Microsoft.Xna.Framework;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using Microsoft.Xna.Framework;
+using Terraria.DataStructures;
 
 namespace TerrariaApi.Server
 {
     public class NpcLootDropEventArgs : HandledEventArgs
     {
+        public IEntitySource Source
+        {
+            get;
+            set;
+        }
         public Vector2 Position
         {
             get;

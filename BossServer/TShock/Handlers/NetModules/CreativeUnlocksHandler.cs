@@ -33,7 +33,7 @@ namespace TShockAPI.Handlers.NetModules
             // For whatever reason Terraria writes '0' to the stream at the beginning of this packet.
             // If this value is not 0 then its been crafted by a non-vanilla client.
             // We don't actually know why the 0 is written, so we're just going to call this UnknownField for now
-            UnknownField = (byte)data.ReadByte();
+            UnknownField = data.ReadInt8();
             if (UnknownField == 0)
             {
                 ItemId = data.ReadUInt16();
@@ -52,8 +52,7 @@ namespace TShockAPI.Handlers.NetModules
             if (!Main.GameModeInfo.IsJourneyMode)
             {
                 TShock.Log.ConsoleDebug(
-                    "NetModuleHandler received attempt to unlock sacrifice while not in journey mode from",
-                    player.Name
+                    GetString($"NetModuleHandler received attempt to unlock sacrifice while not in journey mode from {player.Name}")
                 );
 
                 rejectPacket = true;
@@ -63,9 +62,7 @@ namespace TShockAPI.Handlers.NetModules
             if (UnknownField != 0)
             {
                 TShock.Log.ConsoleDebug(
-                    "CreativeUnlocksHandler received non-vanilla unlock request. Random field value: {0} but should be 0 from {1}",
-                    UnknownField,
-                    player.Name
+                    GetString($"CreativeUnlocksHandler received non-vanilla unlock request. Random field value: {UnknownField} but should be 0 from {player.Name}")
                 );
 
                 rejectPacket = true;
@@ -74,7 +71,7 @@ namespace TShockAPI.Handlers.NetModules
 
             if (!player.HasPermission(Permissions.journey_contributeresearch))
             {
-                player.SendErrorMessage("You do not have permission to contribute research.");
+                player.SendErrorMessage(GetString("You do not have permission to contribute research."));
                 rejectPacket = true;
                 return;
             }

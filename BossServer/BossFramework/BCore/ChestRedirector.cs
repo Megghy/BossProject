@@ -1,12 +1,13 @@
-﻿using BossFramework.BAttributes;
+﻿using System.Collections.Generic;
+using System.Linq;
+using BossFramework.BAttributes;
 using BossFramework.BModels;
 using BossFramework.DB;
 using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using System.Linq;
 using TrProtocol;
 using TrProtocol.Models;
 using TrProtocol.Packets;
+using TShockAPI;
 
 namespace BossFramework.BCore
 {
@@ -20,13 +21,13 @@ namespace BossFramework.BCore
         {
             BLog.DEBUG("初始化箱子重定向");
 
-            Chests = DBTools.GetAll<BChest>().Where(r => r.WorldId == Terraria.Main.worldID).ToList();
+            Chests = [.. DBTools.GetAll<BChest>().Where(r => r.WorldId == Terraria.Main.worldID)];
 
             Terraria.Main.chest.Where(s => s != null).ForEach(chest =>
             {
                 if (!Chests.Exists(c => c.X == chest.x && c.Y == chest.y))
                 {
-                    CreateChest(chest.x, chest.y, chest.name, chest.item.Select(i => i.Get()).ToArray(), null); //不存在则新建
+                    CreateChest(chest.x, chest.y, chest.name, [.. chest.item.Select(i => i.Get())], null); //不存在则新建
                 }
             });
 
@@ -207,7 +208,7 @@ namespace BossFramework.BCore
         private static List<Packet> GetChestItemPakcets(this BChest chest, short chestSlot)
         {
             List<Packet> list = new();
-            40.ForEach(i =>
+            40.For(i =>
             {
                 chest.Items[i] ??= new();
                 var c = chest.Items[i];
@@ -245,7 +246,7 @@ namespace BossFramework.BCore
         {
             var newItems = new ItemData[40];
             if (items is { Length: > 0 })
-                40.ForEach(i =>
+                40.For(i =>
                 {
                     if (items.Length > i)
                         newItems[i] = items[i] ?? new();
@@ -278,7 +279,7 @@ namespace BossFramework.BCore
         {
             var result = new List<BChest>();
             var rec = new Rectangle(startX, startY, width, height);
-            AllChest().ForEach((c, i) =>
+            AllChest().ForEachWithIndex((c, i) =>
             {
                 if (!result.Exists(r => r.Contains(c.X, c.Y)) && rec.Contains(c.X, c.Y))
                     result.Add(c);

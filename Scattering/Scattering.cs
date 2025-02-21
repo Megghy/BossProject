@@ -1,5 +1,5 @@
-﻿using BossFramework.DB;
-using System.Reflection;
+﻿using System.Reflection;
+using BossFramework.DB;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;

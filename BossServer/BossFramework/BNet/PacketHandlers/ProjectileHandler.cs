@@ -1,9 +1,9 @@
-﻿using BossFramework.BAttributes;
-using BossFramework.BInterfaces;
-using BossFramework.BModels;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using BossFramework.BAttributes;
+using BossFramework.BInterfaces;
+using BossFramework.BModels;
 using Terraria;
 using TrProtocol.Packets;
 

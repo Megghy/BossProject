@@ -16,12 +16,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using MySqlConnector;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using MySqlConnector;
 using TShockAPI.DB;
 
 namespace TShockAPI
@@ -35,7 +35,7 @@ namespace TShockAPI
 
         public override string ToString()
         {
-            return string.Format("Message: {0}: {1}: {2}",
+            return GetString("Message: {0}: {1}: {2}",
                 caller, logLevel.ToString().ToUpper(), message);
         }
     }
@@ -142,6 +142,28 @@ namespace TShockAPI
         public void ConsoleError(string format, params object[] args)
         {
             ConsoleError(string.Format(format, args));
+        }
+
+        /// <summary>
+        /// Writes an error to the log file.
+        /// </summary>
+        /// <param name="message">The message to be written.</param>
+        public void ConsoleWarn(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(message);
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Write(message, TraceLevel.Warning);
+        }
+
+        /// <summary>
+        /// Writes an error to the log file.
+        /// </summary>
+        /// <param name="format">The format of the message to be written.</param>
+        /// <param name="args">The format arguments.</param>
+        public void ConsoleWarn(string format, params object[] args)
+        {
+            ConsoleWarn(string.Format(format, args));
         }
 
         /// <summary>
@@ -291,7 +313,7 @@ namespace TShockAPI
                         {
                             caller = "TShock",
                             logLevel = TraceLevel.Error,
-                            message = string.Format("SQL Log insert query failed: {0}", ex),
+                            message = GetString("SQL Log insert query failed: {0}", ex),
                             timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)
                         });
                     }
@@ -320,7 +342,7 @@ namespace TShockAPI
 
                 foreach (var logInfo in _failures)
                 {
-                    _backupLog.Write(string.Format("SQL log failed at: {0}. {1}", logInfo.timestamp, logInfo),
+                    _backupLog.Write(GetString("SQL log failed at: {0}. {1}", logInfo.timestamp, logInfo),
                         TraceLevel.Error);
                 }
                 _failures.Clear();

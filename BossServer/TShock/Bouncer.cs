@@ -15,11 +15,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-using BossFramework;
-using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -42,6 +41,27 @@ namespace TShockAPI
         internal Handlers.RequestTileEntityInteractionHandler RequestTileEntityInteractionHandler { get; private set; }
         internal Handlers.LandGolfBallInCupHandler LandGolfBallInCupHandler { get; private set; }
         internal Handlers.SyncTilePickingHandler SyncTilePickingHandler { get; private set; }
+
+        /// <summary>
+        /// A class that represents the limits for a particular buff when a client applies it with PlayerAddBuff.
+        /// </summary>
+        internal class BuffLimit
+        {
+            /// <summary>
+            /// How many ticks at the maximum a player can apply this to another player for.
+            /// </summary>
+            public int MaxTicks { get; set; }
+            /// <summary>
+            /// Can this buff be added without the receiver being hostile (PvP)
+            /// </summary>
+            public bool CanBeAddedWithoutHostile { get; set; }
+            /// <summary>
+            /// Can this buff only be applied to the sender?
+            /// </summary>
+            public bool CanOnlyBeAppliedToSender { get; set; }
+        }
+
+        internal static BuffLimit[] PlayerAddBuffWhitelist;
 
         /// <summary>
         /// Represents a place style corrector.
@@ -93,7 +113,7 @@ namespace TShockAPI
             GetDataHandlers.NewProjectile += OnNewProjectile;
             GetDataHandlers.NPCStrike += OnNPCStrike;
             GetDataHandlers.ProjectileKill += OnProjectileKill;
-            // GetDataHandlers.ChestItemChange += OnChestItemChange; 会和重定向冲突
+            GetDataHandlers.ChestItemChange += OnChestItemChange;
             GetDataHandlers.ChestOpen += OnChestOpen;
             GetDataHandlers.PlaceChest += OnPlaceChest;
             GetDataHandlers.PlayerZone += OnPlayerZone;
@@ -221,7 +241,7 @@ namespace TShockAPI
                         }
                         else
                         {
-                            throw new InvalidOperationException("Unrecognized player direction");
+                            throw new InvalidOperationException(GetString("Unrecognized player direction"));
                         }
                     }
                     else
@@ -230,13 +250,203 @@ namespace TShockAPI
                         return actualItemPlaceStyle;
                     }
                 });
+
+            #region PlayerAddBuff Whitelist
+
+            PlayerAddBuffWhitelist = new BuffLimit[Terraria.ID.BuffID.Count];
+            PlayerAddBuffWhitelist[BuffID.Poisoned] = new BuffLimit
+            {
+                MaxTicks = 60 * 60
+            };
+            PlayerAddBuffWhitelist[BuffID.OnFire] = new BuffLimit
+            {
+                MaxTicks = 60 * 20
+            };
+            PlayerAddBuffWhitelist[BuffID.Confused] = new BuffLimit
+            {
+                MaxTicks = 60 * 4
+            };
+            PlayerAddBuffWhitelist[BuffID.CursedInferno] = new BuffLimit
+            {
+                MaxTicks = 60 * 7
+            };
+            PlayerAddBuffWhitelist[BuffID.Wet] = new BuffLimit
+            {
+                MaxTicks = 60 * 30,
+                // The Water Gun can be shot at other players and inflict Wet while not in PvP
+                CanBeAddedWithoutHostile = true
+            };
+            PlayerAddBuffWhitelist[BuffID.Ichor] = new BuffLimit
+            {
+                MaxTicks = 60 * 20
+            };
+            PlayerAddBuffWhitelist[BuffID.Venom] = new BuffLimit
+            {
+                MaxTicks = 60 * 30
+            };
+            PlayerAddBuffWhitelist[BuffID.GelBalloonBuff] = new BuffLimit
+            {
+                MaxTicks = 60 * 30,
+                // The Sparkle Slime Balloon inflicts this while not in PvP
+                CanBeAddedWithoutHostile = true
+            };
+            PlayerAddBuffWhitelist[BuffID.Frostburn] = new BuffLimit
+            {
+                MaxTicks = 60 * 8
+            };
+            PlayerAddBuffWhitelist[BuffID.Campfire] = new BuffLimit
+            {
+                MaxTicks = 2,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true,
+            };
+            PlayerAddBuffWhitelist[BuffID.Sunflower] = new BuffLimit
+            {
+                MaxTicks = 2,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true,
+            };
+            PlayerAddBuffWhitelist[BuffID.WaterCandle] = new BuffLimit
+            {
+                MaxTicks = 2,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true,
+            };
+            PlayerAddBuffWhitelist[BuffID.BeetleEndurance1] = new BuffLimit
+            {
+                MaxTicks = 5,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true,
+            };
+            PlayerAddBuffWhitelist[BuffID.BeetleEndurance2] = new BuffLimit
+            {
+                MaxTicks = 5,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true,
+            };
+            PlayerAddBuffWhitelist[BuffID.BeetleEndurance3] = new BuffLimit
+            {
+                MaxTicks = 5,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true,
+            };
+            PlayerAddBuffWhitelist[BuffID.BeetleMight1] = new BuffLimit
+            {
+                MaxTicks = 5,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true,
+            };
+            PlayerAddBuffWhitelist[BuffID.BeetleMight2] = new BuffLimit
+            {
+                MaxTicks = 5,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true,
+            };
+            PlayerAddBuffWhitelist[BuffID.BeetleMight3] = new BuffLimit
+            {
+                MaxTicks = 5,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true,
+            };
+            PlayerAddBuffWhitelist[BuffID.SolarShield1] = new BuffLimit
+            {
+                MaxTicks = 5,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = false,
+            };
+            PlayerAddBuffWhitelist[BuffID.SolarShield2] = new BuffLimit
+            {
+                MaxTicks = 5,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = false,
+            };
+            PlayerAddBuffWhitelist[BuffID.SolarShield3] = new BuffLimit
+            {
+                MaxTicks = 5,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = false,
+            };
+            PlayerAddBuffWhitelist[BuffID.MonsterBanner] = new BuffLimit
+            {
+                MaxTicks = 2,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true
+            };
+            PlayerAddBuffWhitelist[BuffID.HeartLamp] = new BuffLimit
+            {
+                MaxTicks = 2,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true
+            };
+            PlayerAddBuffWhitelist[BuffID.PeaceCandle] = new BuffLimit
+            {
+                MaxTicks = 2,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true
+            };
+            PlayerAddBuffWhitelist[BuffID.StarInBottle] = new BuffLimit
+            {
+                MaxTicks = 2,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true
+            };
+            PlayerAddBuffWhitelist[BuffID.CatBast] = new BuffLimit
+            {
+                MaxTicks = 2,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true
+            };
+            PlayerAddBuffWhitelist[BuffID.OnFire3] = new BuffLimit
+            {
+                MaxTicks = 60 * 6,
+                CanBeAddedWithoutHostile = false,
+                CanOnlyBeAppliedToSender = false
+            };
+            PlayerAddBuffWhitelist[BuffID.HeartyMeal] = new BuffLimit
+            {
+                MaxTicks = 60 * 7,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true
+            };
+            PlayerAddBuffWhitelist[BuffID.Frostburn2] = new BuffLimit
+            {
+                MaxTicks = 60 * 7,
+                CanBeAddedWithoutHostile = false,
+                CanOnlyBeAppliedToSender = false
+            };
+            PlayerAddBuffWhitelist[BuffID.ShadowCandle] = new BuffLimit
+            {
+                MaxTicks = 2,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true
+            };
+            PlayerAddBuffWhitelist[BuffID.BrainOfConfusionBuff] = new BuffLimit
+            {
+                MaxTicks = 60 * 4,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true
+            };
+            PlayerAddBuffWhitelist[BuffID.WindPushed] = new BuffLimit
+            {
+                MaxTicks = 2,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true
+            };
+            PlayerAddBuffWhitelist[BuffID.ParryDamageBuff] = new BuffLimit
+            {
+                MaxTicks = 60 * 5,
+                CanBeAddedWithoutHostile = true,
+                CanOnlyBeAppliedToSender = true
+            };
+
+            #endregion Whitelist
         }
 
         internal void OnGetSection(object sender, GetDataHandlers.GetSectionEventArgs args)
         {
             if (args.Player.RequestedSection)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnGetSection rejected GetSection packet from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnGetSection rejected GetSection packet from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -244,8 +454,8 @@ namespace TShockAPI
 
             if (String.IsNullOrEmpty(args.Player.Name))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnGetSection rejected empty player name.");
-                args.Player.Kick("Your client sent a blank character name.", true, true);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnGetSection rejected empty player name."));
+                args.Player.Kick(GetString("Your client sent a blank character name."), true, true);
                 args.Handled = true;
                 return;
             }
@@ -270,45 +480,45 @@ namespace TShockAPI
 
             if (Single.IsInfinity(vel.X) || Single.IsInfinity(vel.Y))
             {
-                TShock.Log.ConsoleInfo("Bouncer / OnPlayerUpdate force kicked (attempted to set velocity to infinity) from {0}", args.Player.Name);
-                args.Player.Kick("Detected DOOM set to ON position.", true, true);
+                TShock.Log.ConsoleInfo(GetString("Bouncer / OnPlayerUpdate force kicked (attempted to set velocity to infinity) from {0}", args.Player.Name));
+                args.Player.Kick(GetString("Detected DOOM set to ON position."), true, true);
                 args.Handled = true;
                 return;
             }
 
             if (Single.IsNaN(vel.X) || Single.IsNaN(vel.Y))
             {
-                TShock.Log.ConsoleInfo("Bouncer / OnPlayerUpdate force kicked (attempted to set velocity to NaN) from {0}", args.Player.Name);
-                args.Player.Kick("Detected DOOM set to ON position.", true, true);
+                TShock.Log.ConsoleInfo(GetString("Bouncer / OnPlayerUpdate force kicked (attempted to set velocity to NaN) from {0}", args.Player.Name));
+                args.Player.Kick(GetString("Detected DOOM set to ON position."), true, true);
                 args.Handled = true;
                 return;
             }
 
             if (vel.X > 50000 || vel.Y > 50000 || vel.X < -50000 || vel.Y < -50000)
             {
-                TShock.Log.ConsoleInfo("Bouncer / OnPlayerUpdate force kicked (attempted to set velocity +/- 50000) from {0}", args.Player.Name);
-                args.Player.Kick("Detected DOOM set to ON position.", true, true);
+                TShock.Log.ConsoleInfo(GetString("Bouncer / OnPlayerUpdate force kicked (attempted to set velocity +/- 50000) from {0}", args.Player.Name));
+                args.Player.Kick(GetString("Detected DOOM set to ON position."), true, true);
                 args.Handled = true;
                 return;
             }
 
             if (pos.X < 0 || pos.Y < 0 || pos.X >= Main.maxTilesX * 16 - 16 || pos.Y >= Main.maxTilesY * 16 - 16)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerUpdate rejected from (position check) {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerUpdate rejected from (position check) {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (item < 0 || item >= args.Player.TPlayer.inventory.Length)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerUpdate rejected from (inventory length) {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerUpdate rejected from (inventory length) {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.LastNetPosition == Vector2.Zero)
             {
-                TShock.Log.ConsoleInfo("Bouncer / OnPlayerUpdate *would have rejected* from (last network position zero) {0}", args.Player.Name);
+                TShock.Log.ConsoleInfo(GetString("Bouncer / OnPlayerUpdate *would have rejected* from (last network position zero) {0}", args.Player.Name));
                 // args.Handled = true;
                 // return;
             }
@@ -326,23 +536,23 @@ namespace TShockAPI
                         // We need to tell them they were disabled and why, then revert the change.
                         if (args.Player.IsDisabledForStackDetection)
                         {
-                            args.Player.SendErrorMessage("物品叠堆超限额");
+                            args.Player.SendErrorMessage(GetString("Disabled. You went too far with hacked item stacks."));
                         }
                         else if (args.Player.IsDisabledForBannedWearable)
                         {
-                            args.Player.SendErrorMessage("使用违禁护甲");
+                            args.Player.SendErrorMessage(GetString("Disabled. You went too far with banned armor."));
                         }
                         else if (args.Player.IsDisabledForSSC)
                         {
-                            args.Player.SendErrorMessage("需要输入{0}login 登录后才能加载个人数据", TShock.Config.Settings.CommandSpecifier);
+                            args.Player.SendErrorMessage(GetString("Disabled. You need to {0}login to load your saved data.", TShock.Config.Settings.CommandSpecifier));
                         }
                         else if (TShock.Config.Settings.RequireLogin && !args.Player.IsLoggedIn)
                         {
-                            args.Player.SendErrorMessage("需要使用帐户，请输入{0}register 或{0}login加入游戏", TShock.Config.Settings.CommandSpecifier);
+                            args.Player.SendErrorMessage(GetString("Account needed! Please {0}register or {0}login to play!", TShock.Config.Settings.CommandSpecifier));
                         }
                         else if (args.Player.IsDisabledPendingTrashRemoval)
                         {
-                            args.Player.SendErrorMessage("需要重新加入游戏，以确保能清空垃圾桶！");
+                            args.Player.SendErrorMessage(GetString("You need to rejoin to ensure your trash can is cleared!"));
                         }
 
                         // ??
@@ -352,11 +562,11 @@ namespace TShockAPI
                         {
                             args.Player.Spawn(PlayerSpawnContext.RecallFromItem);
                         }
-                        TShock.Log.ConsoleDebug("Bouncer / OnPlayerUpdate rejected from (??) {0}", args.Player.Name);
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerUpdate rejected from (??) {0}", args.Player.Name));
                         args.Handled = true;
                         return;
                     }
-                    TShock.Log.ConsoleDebug("Bouncer / OnPlayerUpdate rejected from (below ??) {0}", args.Player.Name);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerUpdate rejected from (below ??) {0}", args.Player.Name));
                     args.Handled = true;
                     return;
                 }
@@ -364,7 +574,7 @@ namespace TShockAPI
                 // Corpses don't move
                 if (args.Player.Dead)
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnPlayerUpdate rejected from (corpses don't move) {0}", args.Player.Name);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerUpdate rejected from (corpses don't move) {0}", args.Player.Name));
                     args.Handled = true;
                     return;
                 }
@@ -394,32 +604,44 @@ namespace TShockAPI
             {
                 if (!TShock.Utils.TilePlacementValid(tileX, tileY))
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from (tile placement valid) {0} {1} {2}", args.Player.Name, action, editData);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from (tile placement valid) {0} {1} {2}", args.Player.Name, action, editData));
+                    args.Handled = true;
+                    return;
+                }
+
+                // I do not understand the ice tile check enough to be able to modify it, however I do know that it can be used to completely bypass region protection
+                // This check ensures that build permission is always checked no matter what
+                if (!args.Player.HasBuildPermission(tileX, tileY))
+                {
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from build from {0} {1} {2}", args.Player.Name, action, editData));
+
+                    GetRollbackRectSize(tileX, tileY, out byte width, out byte length, out int offsetY);
+                    args.Player.SendTileRect((short)(tileX - width), (short)(tileY + offsetY), (byte)(width * 2), (byte)(length + 1));
                     args.Handled = true;
                     return;
                 }
 
                 if (editData < 0 ||
-                    ((action == EditAction.PlaceTile || action == EditAction.ReplaceTile) && editData >= Main.maxTileSets) ||
-                    ((action == EditAction.PlaceWall || action == EditAction.ReplaceWall) && editData >= Main.maxWallTypes))
+                    ((action == EditAction.PlaceTile || action == EditAction.ReplaceTile) && editData >= Terraria.ID.TileID.Count) ||
+                    ((action == EditAction.PlaceWall || action == EditAction.ReplaceWall) && editData >= Terraria.ID.WallID.Count))
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from editData out of bounds {0} {1} {2}", args.Player.Name, action, editData);
-                    args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from editData out of bounds {0} {1} {2}", args.Player.Name, action, editData));
+                    args.Player.SendTileSquareCentered(tileX, tileY, 4);
                     args.Handled = true;
                     return;
                 }
 
                 if (action == EditAction.KillTile && Main.tile[tileX, tileY].type == TileID.MagicalIceBlock)
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnTileEdit super accepted from (ice block) {0} {1} {2}", args.Player.Name, action, editData);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit super accepted from (ice block) {0} {1} {2}", args.Player.Name, action, editData));
                     args.Handled = false;
                     return;
                 }
 
                 if (args.Player.Dead && TShock.Config.Settings.PreventDeadModification)
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from (pdm) {0} {1} {2}", args.Player.Name, action, editData);
-                    args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from (pdm) {0} {1} {2}", args.Player.Name, action, editData));
+                    args.Player.SendTileSquareCentered(tileX, tileY, 4);
                     args.Handled = true;
                     return;
                 }
@@ -432,9 +654,9 @@ namespace TShockAPI
                 {
                     if (TShock.TileBans.TileIsBanned(editData, args.Player))
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from (tb) {0} {1} {2}", args.Player.Name, action, editData);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
-                        //args.Player.SendErrorMessage("无权放置此物块");
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from (tb) {0} {1} {2}", args.Player.Name, action, editData));
+                        args.Player.SendTileSquareCentered(tileX, tileY, 1);
+                        args.Player.SendErrorMessage(GetString("You do not have permission to place this tile."));
                         args.Handled = true;
                         return;
                     }
@@ -454,9 +676,9 @@ namespace TShockAPI
                         // If none found then it can't be a false positive so deny the action
                         if (!PlaceStyleCorrectors.TryGetValue(actualTileToBeCreated, out PlaceStyleCorrector corrector))
                         {
-                            TShock.Log.ConsoleError("Bouncer / OnTileEdit rejected from (placestyle) {0} {1} {2} placeStyle: {3} expectedStyle: {4}",
-                                args.Player.Name, action, editData, requestedPlaceStyle, actualItemPlaceStyle);
-                            args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
+                            TShock.Log.ConsoleError(GetString("Bouncer / OnTileEdit rejected from (placestyle) {0} {1} {2} placeStyle: {3} expectedStyle: {4}",
+                                args.Player.Name, action, editData, requestedPlaceStyle, actualItemPlaceStyle));
+                            args.Player.SendTileSquareCentered(tileX, tileY, 1);
                             args.Handled = true;
                             return;
                         }
@@ -465,43 +687,48 @@ namespace TShockAPI
                         var correctedPlaceStyle = corrector(tplayer, requestedPlaceStyle, actualItemPlaceStyle);
                         if (requestedPlaceStyle != correctedPlaceStyle)
                         {
-                            TShock.Log.ConsoleError("Bouncer / OnTileEdit rejected from (placestyle) {0} {1} {2} placeStyle: {3} expectedStyle: {4}",
-                                args.Player.Name, action, editData, requestedPlaceStyle, correctedPlaceStyle);
-                            args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
+                            TShock.Log.ConsoleError(GetString("Bouncer / OnTileEdit rejected from (placestyle) {0} {1} {2} placeStyle: {3} expectedStyle: {4}",
+                                args.Player.Name, action, editData, requestedPlaceStyle, correctedPlaceStyle));
+                            args.Player.SendTileSquareCentered(tileX, tileY, 1);
                             args.Handled = true;
                             return;
                         }
                     }
                 }
 
-                if (action == EditAction.KillTile && !Main.tileCut[tile.type] && !breakableTiles.Contains(tile.type))
+                if (action == EditAction.KillTile && !Main.tileCut[tile.type] && !breakableTiles.Contains(tile.type) && args.Player.RecentFuse == 0)
                 {
-                    // TPlayer.mount.Type 8 => Drill Containment Unit.
-
                     // If the tile is an axe tile and they aren't selecting an axe, they're hacking.
-                    if (Main.tileAxe[tile.type] && ((args.Player.TPlayer.mount.Type != 8 && selectedItem.axe == 0) && !ItemID.Sets.Explosives[selectedItem.netID] && args.Player.RecentFuse == 0))
+                    if (Main.tileAxe[tile.type] && ((args.Player.TPlayer.mount.Type != MountID.Drill && selectedItem.axe == 0) && !ItemID.Sets.Explosives[selectedItem.netID]))
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from (axe) {0} {1} {2}", args.Player.Name, action, editData);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from (axe) {0} {1} {2}", args.Player.Name, action, editData));
+                        args.Player.SendTileSquareCentered(tileX, tileY, 4);
                         args.Handled = true;
                         return;
                     }
                     // If the tile is a hammer tile and they aren't selecting a hammer, they're hacking.
-                    else if (Main.tileHammer[tile.type] && ((args.Player.TPlayer.mount.Type != 8 && selectedItem.hammer == 0) && !ItemID.Sets.Explosives[selectedItem.netID] && args.Player.RecentFuse == 0))
+                    else if (Main.tileHammer[tile.type] && ((args.Player.TPlayer.mount.Type != MountID.Drill && selectedItem.hammer == 0) && !ItemID.Sets.Explosives[selectedItem.netID]))
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from (hammer) {0} {1} {2}", args.Player.Name, action, editData);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from (hammer) {0} {1} {2}", args.Player.Name, action, editData));
+                        args.Player.SendTileSquareCentered(tileX, tileY, 4);
                         args.Handled = true;
                         return;
                     }
                     // If the tile is a pickaxe tile and they aren't selecting a pickaxe, they're hacking.
                     // Item frames can be modified without pickaxe tile.
                     // also add an exception for snake coils, they can be removed when the player places a new one or after x amount of time
+                    // If the tile is part of the breakable when placing set, it might be getting broken by a placement.
                     else if (tile.type != TileID.ItemFrame && tile.type != TileID.MysticSnakeRope
-                        && !Main.tileAxe[tile.type] && !Main.tileHammer[tile.type] && tile.wall == 0 && args.Player.TPlayer.mount.Type != 8 && selectedItem.pick == 0 && selectedItem.type != ItemID.GravediggerShovel && !ItemID.Sets.Explosives[selectedItem.netID] && args.Player.RecentFuse == 0)
+                                                           && !ItemID.Sets.Explosives[selectedItem.netID]
+                                                           && !TileID.Sets.BreakableWhenPlacing[tile.type]
+                                                           && !Main.tileAxe[tile.type] && !Main.tileHammer[tile.type] && tile.wall == 0
+                                                           && selectedItem.pick == 0 && selectedItem.type != ItemID.GravediggerShovel
+                                                           && args.Player.TPlayer.mount.Type != MountID.Drill
+                                                           && args.Player.TPlayer.mount.Type != MountID.DiggingMoleMinecart)
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from (pick) {0} {1} {2}", args.Player.Name, action, editData);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from (pick) {0} {1} {2}", args.Player.Name, action,
+                            editData));
+                        args.Player.SendTileSquareCentered(tileX, tileY, 4);
                         args.Handled = true;
                         return;
                     }
@@ -511,8 +738,8 @@ namespace TShockAPI
                     // If they aren't selecting a hammer, they could be hacking.
                     if (selectedItem.hammer == 0 && !ItemID.Sets.Explosives[selectedItem.netID] && args.Player.RecentFuse == 0 && selectedItem.createWall == 0)
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from (hammer2) {0} {1} {2}", args.Player.Name, action, editData);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from (hammer2) {0} {1} {2}", args.Player.Name, action, editData));
+                        args.Player.SendTileSquareCentered(tileX, tileY, 1);
                         args.Handled = true;
                         return;
                     }
@@ -530,8 +757,8 @@ namespace TShockAPI
                         !args.Player.RecentlyCreatedProjectiles.Any(p => GetDataHandlers.projectileCreatesTile.ContainsKey(p.Type) && GetDataHandlers.projectileCreatesTile[p.Type] == editData &&
                         !p.Killed && Math.Abs((int)(Main.projectile[p.Index].position.X / 16f) - tileX) <= Math.Abs(Main.projectile[p.Index].velocity.X)))
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from (inconceivable rope coil) {0} {1} {2} selectedItem:{3} itemCreateTile:{4}", args.Player.Name, action, editData, selectedItem.netID, selectedItem.createTile);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from (inconceivable rope coil) {0} {1} {2} selectedItem:{3} itemCreateTile:{4}", args.Player.Name, action, editData, selectedItem.netID, selectedItem.createTile));
+                        args.Player.SendTileSquareCentered(tileX, tileY, 1);
                         args.Handled = true;
                         return;
                     }
@@ -541,8 +768,8 @@ namespace TShockAPI
                     if ((action == EditAction.PlaceTile && TShock.Config.Settings.PreventInvalidPlaceStyle) &&
                         requestedPlaceStyle > GetMaxPlaceStyle(editData))
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from (ms1) {0} {1} {2}", args.Player.Name, action, editData);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from (ms1) {0} {1} {2}", args.Player.Name, action, editData));
+                        args.Player.SendTileSquareCentered(tileX, tileY, 4);
                         args.Handled = true;
                         return;
                     }
@@ -550,18 +777,18 @@ namespace TShockAPI
                     /// Handle placement action if the player is using an Ice Rod but not placing the iceblock.
                     if (selectedItem.netID == ItemID.IceRod && editData != TileID.MagicalIceBlock)
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from using ice rod but not placing ice block {0} {1} {2}", args.Player.Name, action, editData);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from using ice rod but not placing ice block {0} {1} {2}", args.Player.Name, action, editData));
+                        args.Player.SendTileSquareCentered(tileX, tileY, 4);
                         args.Handled = true;
                     }
                     /// If they aren't selecting the item which creates the tile, they're hacking.
                     if ((action == EditAction.PlaceTile || action == EditAction.ReplaceTile) && editData != selectedItem.createTile)
                     {
                         /// These would get caught up in the below check because Terraria does not set their createTile field.
-                        if (selectedItem.netID != ItemID.IceRod && selectedItem.netID != ItemID.DirtBomb && selectedItem.netID != ItemID.StickyBomb)
+                        if (selectedItem.netID != ItemID.IceRod && selectedItem.netID != ItemID.DirtBomb && selectedItem.netID != ItemID.StickyBomb && (args.Player.TPlayer.mount.Type != MountID.DiggingMoleMinecart || editData != TileID.MinecartTrack))
                         {
-                            TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from tile placement not matching selected item createTile {0} {1} {2} selectedItemID:{3} createTile:{4}", args.Player.Name, action, editData, selectedItem.netID, selectedItem.createTile);
-                            args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                            TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from tile placement not matching selected item createTile {0} {1} {2} selectedItemID:{3} createTile:{4}", args.Player.Name, action, editData, selectedItem.netID, selectedItem.createTile));
+                            args.Player.SendTileSquareCentered(tileX, tileY, 4);
                             args.Handled = true;
                             return;
                         }
@@ -569,10 +796,21 @@ namespace TShockAPI
                     /// If they aren't selecting the item which creates the wall, they're hacking.
                     if ((action == EditAction.PlaceWall || action == EditAction.ReplaceWall) && editData != selectedItem.createWall)
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from wall placement not matching selected item createWall {0} {1} {2} selectedItemID:{3} createWall:{4}", args.Player.Name, action, editData, selectedItem.netID, selectedItem.createWall);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from wall placement not matching selected item createWall {0} {1} {2} selectedItemID:{3} createWall:{4}", args.Player.Name, action, editData, selectedItem.netID, selectedItem.createWall));
+                        args.Player.SendTileSquareCentered(tileX, tileY, 4);
                         args.Handled = true;
                         return;
+                    }
+                    if (action == EditAction.PlaceTile && (editData == TileID.Containers || editData == TileID.Containers2))
+                    {
+                        if (TShock.Utils.HasWorldReachedMaxChests())
+                        {
+                            TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from (chestcap) {0} {1} {2}", args.Player.Name, action, editData));
+                            args.Player.SendErrorMessage(GetString("The world's chest limit has been reached - unable to place more."));
+                            args.Player.SendTileSquareCentered(tileX, tileY, 3);
+                            args.Handled = true;
+                            return;
+                        }
                     }
                 }
                 else if (action == EditAction.PlaceWire || action == EditAction.PlaceWire2 || action == EditAction.PlaceWire3)
@@ -586,8 +824,8 @@ namespace TShockAPI
                         && selectedItem.type != ItemID.MulticolorWrench
                         && selectedItem.type != ItemID.WireKite)
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from place wire from {0} {1} {2}", args.Player.Name, action, editData);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from place wire from {0} {1} {2}", args.Player.Name, action, editData));
+                        args.Player.SendTileSquareCentered(tileX, tileY, 1);
                         args.Handled = true;
                         return;
                     }
@@ -600,8 +838,8 @@ namespace TShockAPI
                         && selectedItem.type != ItemID.WireKite
                         && selectedItem.type != ItemID.MulticolorWrench)
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from wire cutter from {0} {1} {2}", args.Player.Name, action, editData);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from wire cutter from {0} {1} {2}", args.Player.Name, action, editData));
+                        args.Player.SendTileSquareCentered(tileX, tileY, 1);
                         args.Handled = true;
                         return;
                     }
@@ -611,8 +849,8 @@ namespace TShockAPI
                     // If they aren't selecting the actuator and don't have the Presserator equipped, they're hacking.
                     if (selectedItem.type != ItemID.Actuator && !args.Player.TPlayer.autoActuator)
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from actuator/presserator from {0} {1} {2}", args.Player.Name, action, editData);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from actuator/presserator from {0} {1} {2}", args.Player.Name, action, editData));
+                        args.Player.SendTileSquareCentered(tileX, tileY, 1);
                         args.Handled = true;
                         return;
                     }
@@ -621,8 +859,8 @@ namespace TShockAPI
                 {
                     if (action == EditAction.KillWall || action == EditAction.ReplaceWall)
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from sts allow cut from {0} {1} {2}", args.Player.Name, action, editData);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from sts allow cut from {0} {1} {2}", args.Player.Name, action, editData));
+                        args.Player.SendTileSquareCentered(tileX, tileY, 1);
                         args.Handled = true;
                         return;
                     }
@@ -632,8 +870,8 @@ namespace TShockAPI
 
                 if (args.Player.IsBeingDisabled())
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from disable from {0} {1} {2}", args.Player.Name, action, editData);
-                    args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from disable from {0} {1} {2}", args.Player.Name, action, editData));
+                    args.Player.SendTileSquareCentered(tileX, tileY, 4);
                     args.Handled = true;
                     return;
                 }
@@ -641,7 +879,7 @@ namespace TShockAPI
                 if (!args.Player.HasModifiedIceSuccessfully(tileX, tileY, editData, action)
                     && !args.Player.HasBuildPermission(tileX, tileY))
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from ice/build from {0} {1} {2}", args.Player.Name, action, editData);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from ice/build from {0} {1} {2}", args.Player.Name, action, editData));
 
                     GetRollbackRectSize(tileX, tileY, out byte width, out byte length, out int offsetY);
                     args.Player.SendTileRect((short)(tileX - width), (short)(tileY + offsetY), (byte)(width * 2), (byte)(length + 1));
@@ -671,8 +909,8 @@ namespace TShockAPI
                         return;
                     }
 
-                    TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from explosives/fuses from {0} {1} {2}", args.Player.Name, action, editData);
-                    args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from explosives/fuses from {0} {1} {2}", args.Player.Name, action, editData));
+                    args.Player.SendTileSquareCentered(tileX, tileY, 4);
                     args.Handled = true;
                     return;
                 }
@@ -681,16 +919,16 @@ namespace TShockAPI
                 {
                     if (TShock.Config.Settings.KickOnTileKillThresholdBroken)
                     {
-                        args.Player.Kick(string.Format("破坏物块速率超过阈值 {0}.", TShock.Config.Settings.TileKillThreshold));
+                        args.Player.Kick(GetString("Tile kill threshold exceeded {0}.", TShock.Config.Settings.TileKillThreshold));
                     }
                     else
                     {
-                        args.Player.Disable("达到破坏物块速率阈值", DisableFlags.WriteToLogAndConsole);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                        args.Player.Disable(GetString("Reached TileKill threshold."), DisableFlags.WriteToLogAndConsole);
+                        args.Player.SendTileSquareCentered(tileX, tileY, 4);
                     }
 
-                    TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from tile kill threshold from {0}, (value: {1})", args.Player.Name, args.Player.TileKillThreshold);
-                    TShock.Log.ConsoleDebug("If this player wasn't hacking, please report the tile kill threshold they were disabled for to TShock so we can improve this!");
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from tile kill threshold from {0}, (value: {1})", args.Player.Name, args.Player.TileKillThreshold));
+                    TShock.Log.ConsoleDebug(GetString("If this player wasn't hacking, please report the tile kill threshold they were disabled for to TShock so we can improve this!"));
                     args.Handled = true;
                     return;
                 }
@@ -699,24 +937,24 @@ namespace TShockAPI
                 {
                     if (TShock.Config.Settings.KickOnTilePlaceThresholdBroken)
                     {
-                        args.Player.Kick(string.Format("物块放置速率超过阈值 {0}.", TShock.Config.Settings.TilePlaceThreshold));
+                        args.Player.Kick(GetString("Tile place threshold exceeded {0}.", TShock.Config.Settings.TilePlaceThreshold));
                     }
                     else
                     {
-                        args.Player.Disable("达到物块放置速率阈值", DisableFlags.WriteToLogAndConsole);
-                        args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                        args.Player.Disable(GetString("Reached TilePlace threshold."), DisableFlags.WriteToLogAndConsole);
+                        args.Player.SendTileSquareCentered(tileX, tileY, 4);
                     }
 
-                    TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from tile place threshold from {0}, (value: {1})", args.Player.Name, args.Player.TilePlaceThreshold);
-                    TShock.Log.ConsoleDebug("If this player wasn't hacking, please report the tile place threshold they were disabled for to TShock so we can improve this!");
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from tile place threshold from {0}, (value: {1})", args.Player.Name, args.Player.TilePlaceThreshold));
+                    TShock.Log.ConsoleDebug(GetString("If this player wasn't hacking, please report the tile place threshold they were disabled for to TShock so we can improve this!"));
                     args.Handled = true;
                     return;
                 }
 
                 if (args.Player.IsBouncerThrottled())
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from throttled from {0} {1} {2}", args.Player.Name, action, editData);
-                    args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from throttled from {0} {1} {2}", args.Player.Name, action, editData));
+                    args.Player.SendTileSquareCentered(tileX, tileY, 4);
                     args.Handled = true;
                     return;
                 }
@@ -748,9 +986,9 @@ namespace TShockAPI
             }
             catch
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnTileEdit rejected from weird confusing flow control from {0}", args.Player.Name);
-                TShock.Log.ConsoleDebug("If you're seeing this message and you know what that player did, please report it to TShock for further investigation.");
-                args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 4).SerializePacket());
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnTileEdit rejected from weird confusing flow control from {0}", args.Player.Name));
+                TShock.Log.ConsoleDebug(GetString("If you're seeing this message and you know what that player did, please report it to TShock for further investigation."));
+                args.Player.SendTileSquareCentered(tileX, tileY, 4);
                 args.Handled = true;
                 return;
             }
@@ -833,11 +1071,11 @@ namespace TShockAPI
             short type = args.Type;
 
             // player is attempting to crash clients
-            if (type < -48 || type >= Main.maxItemTypes)
+            if (type < -48 || type >= Terraria.ID.ItemID.Count)
             {
                 // Causes item duplications. Will be re added later if necessary
                 //args.Player.SendData(PacketTypes.ItemDrop, "", id);
-                TShock.Log.ConsoleDebug("Bouncer / OnItemDrop rejected from attempt crash from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnItemDrop rejected from attempt crash from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -847,7 +1085,7 @@ namespace TShockAPI
             // will break item pickups on the client.
             if (prefix > PrefixID.Count)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnItemDrop rejected from prefix check from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnItemDrop rejected from prefix check from {0}", args.Player.Name));
 
                 args.Player.SendData(PacketTypes.ItemDrop, "", id);
                 args.Handled = true;
@@ -862,7 +1100,7 @@ namespace TShockAPI
                 {
                     // Causes item duplications. Will be re added if necessary
                     //args.Player.SendData(PacketTypes.ItemDrop, "", id);
-                    TShock.Log.ConsoleDebug("Bouncer / OnItemDrop rejected from dupe range check from {0}", args.Player.Name);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnItemDrop rejected from dupe range check from {0}", args.Player.Name));
                     args.Handled = true;
                     return;
                 }
@@ -873,7 +1111,7 @@ namespace TShockAPI
 
             if (!args.Player.IsInRange((int)(pos.X / 16f), (int)(pos.Y / 16f)))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnItemDrop rejected from range check from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnItemDrop rejected from range check from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.ItemDrop, "", id);
                 args.Handled = true;
                 return;
@@ -883,7 +1121,7 @@ namespace TShockAPI
             // only if the client isn't picking up the item
             if (Main.item[id].active && Main.item[id].netID != type)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnItemDrop rejected from item drop/pickup check from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnItemDrop rejected from item drop/pickup check from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.ItemDrop, "", id);
                 args.Handled = true;
                 return;
@@ -893,7 +1131,7 @@ namespace TShockAPI
             item.netDefaults(type);
             if ((stacks > item.maxStack || stacks <= 0) || (TShock.ItemBans.DataModel.ItemIsBanned(EnglishLanguage.GetItemNameById(item.type), args.Player) && !args.Player.HasPermission(Permissions.allowdroppingbanneditems)))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnItemDrop rejected from drop item ban check / max stack check / min stack check from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnItemDrop rejected from drop item ban check / max stack check / min stack check from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.ItemDrop, "", id);
                 args.Handled = true;
                 return;
@@ -903,8 +1141,8 @@ namespace TShockAPI
             if ((Main.ServerSideCharacter) && (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - args.Player.LoginMS < TShock.ServerSideCharacterConfig.Settings.LogonDiscardThreshold))
             {
                 //Player is probably trying to sneak items onto the server in their hands!!!
-                TShock.Log.ConsoleInfo("用户{0}试图将{1}偷偷带入服务器！", args.Player.Name, item.Name);
-                TShock.Log.ConsoleDebug("Bouncer / OnItemDrop rejected from sneaky from {0}", args.Player.Name);
+                TShock.Log.ConsoleInfo(GetString("Player {0} tried to sneak {1} onto the server!", args.Player.Name, item.Name));
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnItemDrop rejected from sneaky from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.ItemDrop, "", id);
                 args.Handled = true;
                 return;
@@ -913,7 +1151,7 @@ namespace TShockAPI
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnItemDrop rejected from disabled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnItemDrop rejected from disabled from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.ItemDrop, "", id);
                 args.Handled = true;
                 return;
@@ -937,7 +1175,7 @@ namespace TShockAPI
 
             if (index > Main.maxProjectiles)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile rejected from above projectile limit from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNewProjectile rejected from above projectile limit from {0}", args.Player.Name));
                 args.Player.RemoveProjectile(ident, owner);
                 args.Handled = true;
                 return;
@@ -945,9 +1183,9 @@ namespace TShockAPI
 
             if (TShock.ProjectileBans.ProjectileIsBanned(type, args.Player))
             {
-                args.Player.Disable(String.Format("用户无权制造发射物 {0}.", type), DisableFlags.WriteToLogAndConsole);
-                TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile rejected from permission check from {0} {1}", args.Player.Name, type);
-                //args.Player.SendErrorMessage("无权制造该发射物");
+                args.Player.Disable(GetString("Player does not have permission to create projectile {0}.", type), DisableFlags.WriteToLogAndConsole);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNewProjectile rejected from permission check from {0} {1}", args.Player.Name, type));
+                args.Player.SendErrorMessage(GetString("You do not have permission to create that projectile."));
                 args.Player.RemoveProjectile(ident, owner);
                 args.Handled = true;
                 return;
@@ -955,8 +1193,8 @@ namespace TShockAPI
 
             if (damage > TShock.Config.Settings.MaxProjDamage && !args.Player.HasPermission(Permissions.ignoredamagecap))
             {
-                args.Player.Disable(String.Format("发射物伤害值超过 {0}.", TShock.Config.Settings.MaxProjDamage), DisableFlags.WriteToLogAndConsole);
-                TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile rejected from projectile damage limit from {0} {1}/{2}", args.Player.Name, damage, TShock.Config.Settings.MaxProjDamage);
+                args.Player.Disable(GetString("Projectile damage is higher than {0}.", TShock.Config.Settings.MaxProjDamage), DisableFlags.WriteToLogAndConsole);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNewProjectile rejected from projectile damage limit from {0} {1}/{2}", args.Player.Name, damage, TShock.Config.Settings.MaxProjDamage));
                 args.Player.RemoveProjectile(ident, owner);
                 args.Handled = true;
                 return;
@@ -964,7 +1202,7 @@ namespace TShockAPI
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile rejected from disabled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNewProjectile rejected from disabled from {0}", args.Player.Name));
                 args.Player.RemoveProjectile(ident, owner);
                 args.Handled = true;
                 return;
@@ -993,7 +1231,7 @@ namespace TShockAPI
                 !Handlers.LandGolfBallInCupHandler.GolfBallItemIDs.Contains(args.Player.TPlayer.HeldItem.type) &&
                 !args.Player.RecentlyCreatedProjectiles.Any(p => p.Type == ProjectileID.GolfClubHelper))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile please report to tshock about this! normally this is a reject from {0} {1} (golf)", args.Player.Name, type);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNewProjectile please report to tshock about this! normally this is a reject from {0} {1} (golf)", args.Player.Name, type));
             }
 
             // Main.projHostile contains projectiles that can harm players
@@ -1001,7 +1239,7 @@ namespace TShockAPI
             // possible for players to create. (Source: Ijwu, QuiCM)
             if (Main.projHostile[type])
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile rejected from hostile projectile from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNewProjectile rejected from hostile projectile from {0}", args.Player.Name));
                 args.Player.RemoveProjectile(ident, owner);
                 args.Handled = true;
                 return;
@@ -1012,7 +1250,7 @@ namespace TShockAPI
             // Death does not create a tombstone projectile by default
             if (type == ProjectileID.Tombstone)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile rejected from tombstones from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNewProjectile rejected from tombstones from {0}", args.Player.Name));
                 args.Player.RemoveProjectile(ident, owner);
                 args.Handled = true;
                 return;
@@ -1032,12 +1270,12 @@ namespace TShockAPI
                     || (type >= ProjectileID.MartianTurretBolt && type <= ProjectileID.RayGunnerLaser)
                     || type == ProjectileID.CultistBossLightningOrb)
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile rejected from weird check from {0} {1}", args.Player.Name, type);
-                    TShock.Log.Debug("Certain projectiles have been ignored for cheat detection.");
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnNewProjectile rejected from weird check from {0} {1}", args.Player.Name, type));
+                    TShock.Log.Debug(GetString("Certain projectiles have been ignored for cheat detection."));
                 }
                 else
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile please report to tshock about this! normally this is a reject from {0} {1}", args.Player.Name, type);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnNewProjectile please report to tshock about this! normally this is a reject from {0} {1}", args.Player.Name, type));
                     // args.Player.Disable(String.Format("Does not have projectile permission to update projectile. ({0})", type), DisableFlags.WriteToLogAndConsole);
                     // args.Player.RemoveProjectile(ident, owner);
                 }
@@ -1049,23 +1287,23 @@ namespace TShockAPI
             {
                 if (TShock.Config.Settings.KickOnProjectileThresholdBroken)
                 {
-                    args.Player.Kick(string.Format("发射物更新速率超过阈值 {0}.", TShock.Config.Settings.ProjectileThreshold));
+                    args.Player.Kick(GetString("Projectile create threshold exceeded {0}.", TShock.Config.Settings.ProjectileThreshold));
                 }
                 else
                 {
-                    args.Player.Disable("达到发射物更新速率阈值", DisableFlags.WriteToLogAndConsole);
+                    args.Player.Disable(GetString("Reached projectile create threshold."), DisableFlags.WriteToLogAndConsole);
                     args.Player.RemoveProjectile(ident, owner);
                 }
 
-                TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile rejected from projectile update threshold from {0} {1}/{2}", args.Player.Name, args.Player.ProjectileThreshold, TShock.Config.Settings.ProjectileThreshold);
-                TShock.Log.ConsoleDebug("If this player wasn't hacking, please report the projectile update threshold they were disabled for to TShock so we can improve this!");
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNewProjectile rejected from projectile create threshold from {0} {1}/{2}", args.Player.Name, args.Player.ProjectileThreshold, TShock.Config.Settings.ProjectileThreshold));
+                TShock.Log.ConsoleDebug(GetString("If this player wasn't hacking, please report the projectile create threshold they were disabled for to TShock so we can improve this!"));
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.IsBouncerThrottled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile rejected from bouncer throttle from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNewProjectile rejected from bouncer throttle from {0}", args.Player.Name));
                 args.Player.RemoveProjectile(ident, owner);
                 args.Handled = true;
                 return;
@@ -1078,7 +1316,7 @@ namespace TShockAPI
                     (Projectile_MaxValuesAI2[type] < ai[1] || Projectile_MinValuesAI2[type] > ai[1]))
             )
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile rejected from bouncer modified AI from {0}.", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNewProjectile rejected from bouncer modified AI from {0}.", args.Player.Name));
                 args.Player.RemoveProjectile(ident, owner);
                 args.Handled = true;
                 return;
@@ -1094,7 +1332,7 @@ namespace TShockAPI
 			*/
             if (TShock.Config.Settings.DisableModifiedZenith && type == ProjectileID.FinalFractal && (ai[0] < -100 || ai[0] > 101) && !Terraria.Graphics.FinalFractalHelper._fractalProfiles.ContainsKey((int)ai[1]))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNewProjectile rejected from bouncer modified Zenith projectile from {0}.", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNewProjectile rejected from bouncer modified Zenith projectile from {0}.", args.Player.Name));
                 args.Player.RemoveProjectile(ident, owner);
                 args.Handled = true;
                 return;
@@ -1104,7 +1342,7 @@ namespace TShockAPI
             {
                 if (type == ProjectileID.CrystalShard && TShock.Config.Settings.ProjIgnoreShrapnel) // Ignore crystal shards
                 {
-                    TShock.Log.Debug("Ignoring shrapnel per config..");
+                    TShock.Log.Debug(GetString("Ignoring shrapnel per config.."));
                 }
                 else if (!Main.projectile[index].active)
                 {
@@ -1116,6 +1354,7 @@ namespace TShockAPI
                 || type == ProjectileID.Dynamite
                 || type == ProjectileID.StickyBomb
                 || type == ProjectileID.StickyDynamite
+                || type == ProjectileID.BombFish
                 || type == ProjectileID.ScarabBomb
                 || type == ProjectileID.DirtBomb))
             {
@@ -1145,23 +1384,23 @@ namespace TShockAPI
             {
                 if (TShock.Config.Settings.KickOnDamageThresholdBroken)
                 {
-                    args.Player.Kick(string.Format("NPC伤害值超过 {0}.", TShock.Config.Settings.MaxDamage));
+                    args.Player.Kick(GetString("NPC damage exceeded {0}.", TShock.Config.Settings.MaxDamage));
                 }
                 else
                 {
-                    args.Player.Disable(String.Format("NPC伤害值超过 {0}.", TShock.Config.Settings.MaxDamage), DisableFlags.WriteToLogAndConsole);
+                    args.Player.Disable(GetString("NPC damage exceeded {0}.", TShock.Config.Settings.MaxDamage), DisableFlags.WriteToLogAndConsole);
                     args.Player.SendData(PacketTypes.NpcUpdate, "", id);
                 }
 
-                TShock.Log.ConsoleDebug("Bouncer / OnNPCStrike rejected from damage threshold from {0} {1}/{2}", args.Player.Name, damage, TShock.Config.Settings.MaxDamage);
-                TShock.Log.ConsoleDebug("If this player wasn't hacking, please report the damage threshold they were disabled for to TShock so we can improve this!");
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNPCStrike rejected from damage threshold from {0} {1}/{2}", args.Player.Name, damage, TShock.Config.Settings.MaxDamage));
+                TShock.Log.ConsoleDebug(GetString("If this player wasn't hacking, please report the damage threshold they were disabled for to TShock so we can improve this!"));
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNPCStrike rejected from disabled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNPCStrike rejected from disabled from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.NpcUpdate, "", id);
                 args.Handled = true;
                 return;
@@ -1170,7 +1409,7 @@ namespace TShockAPI
             if (TShock.Config.Settings.RangeChecks &&
                 !args.Player.IsInRange((int)(Main.npc[id].position.X / 16f), (int)(Main.npc[id].position.Y / 16f), 128))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNPCStrike rejected from range checks from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNPCStrike rejected from range checks from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.NpcUpdate, "", id);
                 args.Handled = true;
                 return;
@@ -1178,7 +1417,7 @@ namespace TShockAPI
 
             if (args.Player.IsBouncerThrottled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNPCStrike rejected from bouncer throttle from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNPCStrike rejected from bouncer throttle from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.NpcUpdate, "", id);
                 args.Handled = true;
                 return;
@@ -1192,14 +1431,14 @@ namespace TShockAPI
         {
             if (args.ProjectileIndex < 0)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnProjectileKill rejected from negative projectile index from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnProjectileKill rejected from negative projectile index from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnProjectileKill rejected from disabled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnProjectileKill rejected from disabled from {0}", args.Player.Name));
                 args.Player.RemoveProjectile(args.ProjectileIdentity, args.ProjectileOwner);
                 args.Handled = true;
                 return;
@@ -1207,7 +1446,7 @@ namespace TShockAPI
 
             if (args.Player.IsBouncerThrottled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnProjectileKill rejected from bouncer throttle from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnProjectileKill rejected from bouncer throttle from {0}", args.Player.Name));
                 args.Player.RemoveProjectile(args.ProjectileIdentity, args.ProjectileOwner);
                 args.Handled = true;
                 return;
@@ -1227,14 +1466,14 @@ namespace TShockAPI
 
             if (args.Player.TPlayer.chest != id)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnChestItemChange rejected from chest mismatch from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnChestItemChange rejected from chest mismatch from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnChestItemChange rejected from disable from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnChestItemChange rejected from disable from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.ChestItem, "", id, slot);
                 args.Handled = true;
                 return;
@@ -1242,14 +1481,14 @@ namespace TShockAPI
 
             if (!args.Player.HasBuildPermission(Main.chest[id].x, Main.chest[id].y) && TShock.Config.Settings.RegionProtectChests)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnChestItemChange rejected from region protection? from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnChestItemChange rejected from region protection? from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (!args.Player.IsInRange(Main.chest[id].x, Main.chest[id].y))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnChestItemChange rejected from range check from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnChestItemChange rejected from range check from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -1262,21 +1501,21 @@ namespace TShockAPI
         {
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnChestOpen rejected from disabled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnChestOpen rejected from disabled from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (!args.Player.IsInRange(args.X, args.Y))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnChestOpen rejected from range check from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnChestOpen rejected from range check from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (!args.Player.HasBuildPermission(args.X, args.Y) && TShock.Config.Settings.RegionProtectChests)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnChestOpen rejected from region check from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnChestOpen rejected from region check from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -1297,23 +1536,23 @@ namespace TShockAPI
 
             if (!TShock.Utils.TilePlacementValid(tileX, tileY) || (args.Player.Dead && TShock.Config.Settings.PreventDeadModification))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceChest rejected from invalid check from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceChest rejected from invalid check from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceChest rejected from disabled from {0}", args.Player.Name);
-                args.Player.SendTileSquare(tileX, tileY, 3);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceChest rejected from disabled from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(tileX, tileY, 3);
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.SelectedItem.placeStyle != style)
             {
-                TShock.Log.ConsoleError(string.Format("Bouncer / OnPlaceChest / rejected from invalid place style from {0}", args.Player.Name));
-                args.Player.SendTileSquare(tileX, tileY, 3);
+                TShock.Log.ConsoleError(GetString("Bouncer / OnPlaceChest / rejected from invalid place style from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(tileX, tileY, 3);
                 args.Handled = true;
                 return;
             }
@@ -1324,8 +1563,8 @@ namespace TShockAPI
                 && Main.tile[tileX, tileY].type != TileID.Containers2
                 && (!TShock.Utils.HasWorldReachedMaxChests() && Main.tile[tileX, tileY].type != TileID.Dirt)) //Chest
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceChest rejected from weird check from {0}", args.Player.Name);
-                args.Player.SendTileSquare(tileX, tileY, 3);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceChest rejected from weird check from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(tileX, tileY, 3);
                 args.Handled = true;
                 return;
             }
@@ -1335,9 +1574,9 @@ namespace TShockAPI
                 if ((TShock.Utils.TilePlacementValid(tileX, tileY + 1) && Main.tile[tileX, tileY + 1].type == TileID.Teleporter) ||
                     (TShock.Utils.TilePlacementValid(tileX + 1, tileY + 1) && Main.tile[tileX + 1, tileY + 1].type == TileID.Teleporter))
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnPlaceChest rejected from weird placement check from {0}", args.Player.Name);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceChest rejected from weird placement check from {0}", args.Player.Name));
                     //Prevent a dresser from being placed on a teleporter, as this can cause client and server crashes.
-                    args.Player.SendTileSquare(tileX, tileY, 3);
+                    args.Player.SendTileSquareCentered(tileX, tileY, 3);
                     args.Handled = true;
                     return;
                 }
@@ -1345,16 +1584,16 @@ namespace TShockAPI
 
             if (!args.Player.HasBuildPermission(tileX, tileY))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceChest rejected from invalid permission from {0}", args.Player.Name);
-                args.Player.SendTileSquare(tileX, tileY, 3);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceChest rejected from invalid permission from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(tileX, tileY, 3);
                 args.Handled = true;
                 return;
             }
 
             if (!args.Player.IsInRange(tileX, tileY))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceChest rejected from range check from {0}", args.Player.Name);
-                args.Player.SendTileSquare(tileX, tileY, 3);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceChest rejected from range check from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(tileX, tileY, 3);
                 args.Handled = true;
                 return;
             }
@@ -1390,7 +1629,7 @@ namespace TShockAPI
                     || (args.Zone2[4] && !hasStardustTower)
                     )
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnPlayerZone rejected from {0}", args.Player.Name);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerZone rejected from {0}", args.Player.Name));
                     args.Handled = true;
                     return;
                 }
@@ -1404,7 +1643,7 @@ namespace TShockAPI
         {
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerAnimation rejected from disabled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerAnimation rejected from disabled from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.PlayerAnimation, "", args.Player.Index);
                 args.Handled = true;
                 return;
@@ -1412,7 +1651,7 @@ namespace TShockAPI
 
             if (args.Player.IsBouncerThrottled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerAnimation rejected from throttle from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerAnimation rejected from throttle from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.PlayerAnimation, "", args.Player.Index);
                 args.Handled = true;
                 return;
@@ -1431,15 +1670,15 @@ namespace TShockAPI
 
             if (!TShock.Utils.TilePlacementValid(tileX, tileY) || (args.Player.Dead && TShock.Config.Settings.PreventDeadModification))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnLiquidSet rejected invalid check from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnLiquidSet rejected invalid check from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnLiquidSet rejected disabled from {0}", args.Player.Name);
-                args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnLiquidSet rejected disabled from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(tileX, tileY, 1);
                 args.Handled = true;
                 return;
             }
@@ -1448,16 +1687,16 @@ namespace TShockAPI
             {
                 if (TShock.Config.Settings.KickOnTileLiquidThresholdBroken)
                 {
-                    args.Player.Kick(string.Format("达到的平铺液体阈值 {0}.", TShock.Config.Settings.TileLiquidThreshold));
+                    args.Player.Kick(GetString("Reached TileLiquid threshold {0}.", TShock.Config.Settings.TileLiquidThreshold));
                 }
                 else
                 {
-                    args.Player.Disable("达到的平铺液体阈值", DisableFlags.WriteToLogAndConsole);
-                    args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
+                    args.Player.Disable(GetString("Reached TileLiquid threshold."), DisableFlags.WriteToLogAndConsole);
+                    args.Player.SendTileSquareCentered(tileX, tileY, 1);
                 }
 
-                TShock.Log.ConsoleDebug("Bouncer / OnLiquidSet rejected from liquid threshold from {0} {1}/{2}", args.Player.Name, args.Player.TileLiquidThreshold, TShock.Config.Settings.TileLiquidThreshold);
-                TShock.Log.ConsoleDebug("If this player wasn't hacking, please report the tile liquid threshold they were disabled for to TShock so we can improve this!");
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnLiquidSet rejected from liquid threshold from {0} {1}/{2}", args.Player.Name, args.Player.TileLiquidThreshold, TShock.Config.Settings.TileLiquidThreshold));
+                TShock.Log.ConsoleDebug(GetString("If this player wasn't hacking, please report the tile liquid threshold they were disabled for to TShock so we can improve this!"));
                 args.Handled = true;
                 return;
             }
@@ -1487,121 +1726,131 @@ namespace TShockAPI
 
             // Liquid anti-cheat
             // Arguably the banned buckets bit should be in the item bans system
-            if (amount != 0)
+            if (amount != 0 && !wasThereABombNearby)
             {
-                int bucket = -1;
                 int selectedItemType = args.Player.TPlayer.inventory[args.Player.TPlayer.selectedItem].type;
-                if (selectedItemType == ItemID.EmptyBucket)
+
+                void Reject(string reason)
                 {
-                    bucket = 0;
-                }
-                else if (selectedItemType == ItemID.WaterBucket)
-                {
-                    bucket = 1;
-                }
-                else if (selectedItemType == ItemID.LavaBucket)
-                {
-                    bucket = 2;
-                }
-                else if (selectedItemType == ItemID.HoneyBucket)
-                {
-                    bucket = 3;
-                }
-                else if (selectedItemType == ItemID.BottomlessBucket ||
-                    selectedItemType == ItemID.SuperAbsorbantSponge)
-                {
-                    bucket = 4;
-                }
-                else if (selectedItemType == ItemID.LavaAbsorbantSponge)
-                {
-                    bucket = 5;
-                }
-                else if (selectedItemType == ItemID.BottomlessLavaBucket)
-                {
-                    bucket = 6;
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnLiquidSet rejected liquid type {0} from {1} holding {2}", type, args.Player.Name, selectedItemType));
+                    args.Player.SendErrorMessage(GetString("You do not have permission to perform this action."));
+                    args.Player.Disable(reason, DisableFlags.WriteToLogAndConsole);
+                    args.Player.SendTileSquareCentered(tileX, tileY, 1);
+                    args.Handled = true;
                 }
 
-                if (!wasThereABombNearby && type == LiquidType.Lava && !(bucket == 2 || bucket == 0 || bucket == 5 || bucket == 6))
+                if (TShock.ItemBans.DataModel.ItemIsBanned(EnglishLanguage.GetItemNameById(selectedItemType), args.Player))
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnLiquidSet rejected bucket check 1 from {0}", args.Player.Name);
-                    args.Player.SendErrorMessage("您无权执行此操作");
-                    args.Player.Disable("没有拿着熔岩桶倾倒熔岩", DisableFlags.WriteToLogAndConsole);
-                    args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
-                    args.Handled = true;
+                    Reject(GetString("Using banned {0} to manipulate liquid", Lang.GetItemNameValue(selectedItemType)));
                     return;
                 }
 
-                if (!wasThereABombNearby && type == LiquidType.Lava && TShock.ItemBans.DataModel.ItemIsBanned("Lava Bucket", args.Player))
+                switch (type)
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnLiquidSet rejected lava bucket from {0}", args.Player.Name);
-                    args.Player.SendErrorMessage("您无权执行此操作");
-                    args.Player.Disable("未经许可使用熔岩桶", DisableFlags.WriteToLogAndConsole);
-                    args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
-                    args.Handled = true;
-                    return;
+                    case LiquidType.Water:
+                        if (TShock.ItemBans.DataModel.ItemIsBanned(EnglishLanguage.GetItemNameById(ItemID.WaterBucket), args.Player))
+                        {
+                            Reject(GetString("Using banned water bucket without permissions"));
+                            return;
+                        }
+                        break;
+                    case LiquidType.Lava:
+                        if (TShock.ItemBans.DataModel.ItemIsBanned(EnglishLanguage.GetItemNameById(ItemID.LavaBucket), args.Player))
+                        {
+                            Reject(GetString("Using banned lava bucket without permissions"));
+                            return;
+                        }
+                        break;
+                    case LiquidType.Honey:
+                        if (TShock.ItemBans.DataModel.ItemIsBanned(EnglishLanguage.GetItemNameById(ItemID.HoneyBucket), args.Player))
+                        {
+                            Reject(GetString("Using banned honey bucket without permissions"));
+                            return;
+                        }
+                        break;
+                    case LiquidType.Shimmer:
+                        if (TShock.ItemBans.DataModel.ItemIsBanned(EnglishLanguage.GetItemNameById(ItemID.BottomlessShimmerBucket), args.Player))
+                        {
+                            Reject(GetString("Using banned shimmering water bucket without permissions"));
+                            return;
+                        }
+                        break;
+                    default:
+                        Reject(GetString("Manipulating unknown liquid type"));
+                        return;
                 }
 
-                if (!wasThereABombNearby && type == LiquidType.Water && !(bucket == 1 || bucket == 0 || bucket == 4))
+                switch (selectedItemType)
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnLiquidSet rejected bucket check 2 from {0}", args.Player.Name);
-                    args.Player.SendErrorMessage("您无权执行此操作");
-                    args.Player.Disable("没有拿着水桶倾倒水", DisableFlags.WriteToLogAndConsole);
-                    args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
-                    args.Handled = true;
-                    return;
-                }
-
-                if (!wasThereABombNearby && type == LiquidType.Water && TShock.ItemBans.DataModel.ItemIsBanned("Water Bucket", args.Player))
-                {
-                    TShock.Log.ConsoleDebug("Bouncer / OnLiquidSet rejected bucket check 3 from {0}", args.Player.Name);
-                    args.Player.SendErrorMessage("您无权执行此操作");
-                    args.Player.Disable("未经许可使用水桶", DisableFlags.WriteToLogAndConsole);
-                    args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
-                    args.Handled = true;
-                    return;
-                }
-
-                if (!wasThereABombNearby && type == LiquidType.Honey && !(bucket == 3 || bucket == 0))
-                {
-                    TShock.Log.ConsoleDebug("Bouncer / OnLiquidSet rejected bucket check 4 from {0}", args.Player.Name);
-                    args.Player.SendErrorMessage("您无权执行此操作");
-                    args.Player.Disable("没有拿着蜂蜜桶倾倒蜂蜜蜜", DisableFlags.WriteToLogAndConsole);
-                    args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
-                    args.Handled = true;
-                    return;
-                }
-
-                if (!wasThereABombNearby && type == LiquidType.Honey && TShock.ItemBans.DataModel.ItemIsBanned("Honey Bucket", args.Player))
-                {
-                    TShock.Log.ConsoleDebug("Bouncer / OnLiquidSet rejected bucket check 5 from {0}", args.Player.Name);
-                    args.Player.SendErrorMessage("您无权执行此操作");
-                    args.Player.Disable("未经许可使用蜂蜜桶", DisableFlags.WriteToLogAndConsole);
-                    args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
-                    args.Handled = true;
-                    return;
+                    case ItemID.WaterBucket:
+                    case ItemID.BottomlessBucket:
+                        if (type != LiquidType.Water)
+                        {
+                            Reject(GetString("Using {0} on non-water", Lang.GetItemNameValue(selectedItemType)));
+                            return;
+                        }
+                        break;
+                    case ItemID.HoneyBucket:
+                    case ItemID.HoneyAbsorbantSponge:
+                    case ItemID.BottomlessHoneyBucket:
+                        if (type != LiquidType.Honey)
+                        {
+                            Reject(GetString("Using {0} on non-honey", Lang.GetItemNameValue(selectedItemType)));
+                            return;
+                        }
+                        break;
+                    case ItemID.LavaAbsorbantSponge:
+                    case ItemID.BottomlessLavaBucket:
+                    case ItemID.LavaBucket:
+                        if (type != LiquidType.Lava)
+                        {
+                            Reject(GetString("Using {0} on non-lava", Lang.GetItemNameValue(selectedItemType)));
+                            return;
+                        }
+                        break;
+                    case ItemID.BottomlessShimmerBucket:
+                        if (type != LiquidType.Shimmer)
+                        {
+                            Reject(GetString("Using {0} on non-shimmer", Lang.GetItemNameValue(selectedItemType)));
+                            return;
+                        }
+                        break;
+                    case ItemID.SuperAbsorbantSponge:
+                        if (type != LiquidType.Water && type != LiquidType.Shimmer)
+                        {
+                            Reject(GetString("Using {0} on non-water or shimmer", Lang.GetItemNameValue(selectedItemType)));
+                            return;
+                        }
+                        break;
+                    case ItemID.EmptyBucket:
+                    case ItemID.UltraAbsorbantSponge:
+                        break;
+                    default:
+                        Reject(GetString("Using {0} to manipulate unknown liquid {1}", Lang.GetItemNameValue(selectedItemType), type));
+                        return;
                 }
             }
 
             if (!args.Player.HasBuildPermission(tileX, tileY))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnLiquidSet rejected build permission from {0}", args.Player.Name);
-                args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnLiquidSet rejected build permission from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(tileX, tileY, 1);
                 args.Handled = true;
                 return;
             }
 
             if (!wasThereABombNearby && !args.Player.IsInRange(tileX, tileY, 16))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnLiquidSet rejected range checks from {0}", args.Player.Name);
-                args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnLiquidSet rejected range checks from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(tileX, tileY, 1);
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.IsBouncerThrottled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnLiquidSet rejected throttle from {0}", args.Player.Name);
-                args.Player.SendRawData(BUtils.GetSquareData(tileX, tileY, 1).SerializePacket());
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnLiquidSet rejected throttle from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(tileX, tileY, 1);
                 args.Handled = true;
                 return;
             }
@@ -1616,57 +1865,105 @@ namespace TShockAPI
             int type = args.Type;
             int time = args.Time;
 
-            if (TShock.Players[id] == null)
+            void Reject(bool shouldResync = true)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerBuff rejected null check");
                 args.Handled = true;
+
+                if (shouldResync)
+                    args.Player.SendData(PacketTypes.PlayerBuff, number: id);
+            }
+
+            if (id >= Main.maxPlayers)
+            {
+                TShock.Log.ConsoleDebug(GetString(
+                    "Bouncer / OnPlayerBuff rejected {0} ({1}) applying buff {2} to {3} for {4} ticks: target ID out of bounds",
+                    args.Player.Name, args.Player.Index, type, id, time));
+                Reject(false);
+                return;
+            }
+
+            if (TShock.Players[id] == null || !TShock.Players[id].Active)
+            {
+                TShock.Log.ConsoleDebug(GetString(
+                    "Bouncer / OnPlayerBuff rejected {0} ({1}) applying buff {2} to {3} for {4} ticks: target is null", args.Player.Name,
+                    args.Player.Index, type, id, time));
+                Reject(false);
+                return;
+            }
+
+            if (type >= Terraria.ID.BuffID.Count)
+            {
+                TShock.Log.ConsoleDebug(GetString(
+                    "Bouncer / OnPlayerBuff rejected {0} ({1}) applying buff {2} to {3} for {4} ticks: invalid buff type", args.Player.Name,
+                    args.Player.Index, type, id, time));
+                Reject(false);
                 return;
             }
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerBuff rejected disabled from {0}", args.Player.Name);
-                args.Player.SendData(PacketTypes.PlayerAddBuff, "", id);
-                args.Handled = true;
-                return;
-            }
-
-            if (id >= Main.maxPlayers)
-            {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerBuff rejected player cap from {0}", args.Player.Name);
-                args.Player.SendData(PacketTypes.PlayerAddBuff, "", id);
-                args.Handled = true;
-                return;
-            }
-
-            if (!TShock.Players[id].TPlayer.hostile || !Main.pvpBuff[type])
-            {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerBuff rejected hostile/pvp from {0}", args.Player.Name);
-                args.Player.SendData(PacketTypes.PlayerAddBuff, "", id);
-                args.Handled = true;
-                return;
-            }
-
-            if (!args.Player.IsInRange(TShock.Players[id].TileX, TShock.Players[id].TileY, 50))
-            {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerBuff rejected range check from {0}", args.Player.Name);
-                args.Player.SendData(PacketTypes.PlayerAddBuff, "", id);
-                args.Handled = true;
+                TShock.Log.ConsoleDebug(GetString(
+                    "Bouncer / OnPlayerBuff rejected {0} ({1}) applying buff {2} to {3} for {4} ticks: sender is being disabled",
+                    args.Player.Name, args.Player.Index, type, id, time));
+                Reject();
                 return;
             }
 
             if (args.Player.IsBouncerThrottled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerBuff rejected throttled from {0}", args.Player.Name);
-                args.Player.SendData(PacketTypes.PlayerAddBuff, "", id);
-                args.Handled = true;
+                TShock.Log.ConsoleDebug(GetString(
+                    "Bouncer / OnPlayerBuff rejected {0} ({1}) applying buff {2} to {3} for {4} ticks: sender is being throttled",
+                    args.Player.Name, args.Player.Index, type, id, time));
+                Reject();
+
                 return;
             }
 
-            if (WhitelistBuffMaxTime[type] > 0 && time <= WhitelistBuffMaxTime[type])
+            var targetPlayer = TShock.Players[id];
+            var buffLimit = PlayerAddBuffWhitelist[type];
+
+            if (!args.Player.IsInRange(targetPlayer.TileX, targetPlayer.TileY, 50))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerBuff rejected buff time whitelists from {0}", args.Player.Name);
-                args.Handled = false;
+                TShock.Log.ConsoleDebug(GetString(
+                    "Bouncer / OnPlayerBuff rejected {0} ({1}) applying buff {2} to {3} for {4} ticks: sender is not in range of target",
+                    args.Player.Name, args.Player.Index, type, id, time));
+                Reject();
+                return;
+            }
+
+            if (buffLimit == null)
+            {
+                TShock.Log.ConsoleDebug(GetString(
+                    "Bouncer / OnPlayerBuff rejected {0} ({1}) applying buff {2} to {3} for {4} ticks: buff is not whitelisted",
+                    args.Player.Name, args.Player.Index, type, id, time));
+                Reject();
+                return;
+            }
+
+            if (buffLimit.CanOnlyBeAppliedToSender && id != args.Player.Index)
+            {
+                TShock.Log.ConsoleDebug(GetString(
+                    "Bouncer / OnPlayerBuff rejected {0} ({1}) applying buff {2} to {3} for {4} ticks: buff cannot be applied to non-senders",
+                    args.Player.Name, args.Player.Index, type, id, time));
+                Reject();
+                return;
+            }
+
+            if (!buffLimit.CanBeAddedWithoutHostile && !targetPlayer.TPlayer.hostile)
+            {
+                TShock.Log.ConsoleDebug(GetString(
+                    "Bouncer / OnPlayerBuff rejected {0} ({1}) applying buff {2} to {3} for {4} ticks: buff cannot be applied without pvp",
+                    args.Player.Name, args.Player.Index, type, id, time));
+                Reject();
+                return;
+            }
+
+            if (time <= 0 || time > buffLimit.MaxTicks)
+            {
+                TShock.Log.ConsoleDebug(GetString(
+                    "Bouncer / OnPlayerBuff rejected {0} ({1}) applying buff {2} to {3} for {4} ticks: buff cannot be applied for that long",
+                    args.Player.Name, args.Player.Index, type, id, time));
+                Reject();
                 return;
             }
         }
@@ -1682,7 +1979,7 @@ namespace TShockAPI
 
             if (id >= Main.npc.Length)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNPCAddBuff rejected out of bounds NPC update from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNPCAddBuff rejected out of bounds NPC update from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -1691,46 +1988,63 @@ namespace TShockAPI
 
             if (npc == null)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNPCAddBuff rejected null npc from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNPCAddBuff rejected null npc from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnNPCAddBuff rejected disabled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnNPCAddBuff rejected disabled from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
-            bool detectedNPCBuffTimeCheat = false;
-
-            if (NPCAddBuffTimeMax.ContainsKey(type))
+            if (!args.Player.HasPermission(Permissions.ignorenpcbuffdetection))
             {
-                if (time > NPCAddBuffTimeMax[type])
+                bool detectedNPCBuffTimeCheat = false;
+
+                if (NPCAddBuffTimeMax.ContainsKey(type))
+                {
+                    if (time > NPCAddBuffTimeMax[type])
+                    {
+                        detectedNPCBuffTimeCheat = true;
+                    }
+
+                    if (npc.townNPC)
+                    {
+                        if (type != BuffID.Poisoned
+                            && type != BuffID.OnFire
+                            && type != BuffID.Confused
+                            && type != BuffID.CursedInferno
+                            && type != BuffID.Ichor
+                            && type != BuffID.Venom
+                            && type != BuffID.Midas
+                            && type != BuffID.Wet
+                            && type != BuffID.Lovestruck
+                            && type != BuffID.Stinky
+                            && type != BuffID.Slimed
+                            && type != BuffID.DryadsWard
+                            && type != BuffID.GelBalloonBuff
+                            && type != BuffID.OnFire3
+                            && type != BuffID.Frostburn2
+                            && type != BuffID.Shimmer)
+                        {
+                            detectedNPCBuffTimeCheat = true;
+                        }
+                    }
+                }
+                else
                 {
                     detectedNPCBuffTimeCheat = true;
                 }
 
-                if (npc.townNPC && npc.netID != NPCID.Guide && npc.netID != NPCID.Clothier)
+                if (detectedNPCBuffTimeCheat)
                 {
-                    if (type != BuffID.Lovestruck && type != BuffID.Stinky && type != BuffID.DryadsWard &&
-                        type != BuffID.Wet && type != BuffID.Slimed && type != BuffID.GelBalloonBuff && type != BuffID.Frostburn2)
-                    {
-                        detectedNPCBuffTimeCheat = true;
-                    }
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnNPCAddBuff rejected abnormal buff ({0}, last for {4}) added to {1} ({2}) from {3}.", type, npc.TypeName, npc.netID, args.Player.Name, time));
+                    args.Player.Kick(GetString($"Added buff to {npc.TypeName} NPC abnormally."), true);
+                    args.Handled = true;
                 }
-            }
-            else
-            {
-                detectedNPCBuffTimeCheat = true;
-            }
-
-            if (detectedNPCBuffTimeCheat)
-            {
-                TShock.Log.ConsoleDebug("Bouncer / OnNPCAddBuff rejected abnormal buff ({0}) added to {1} ({2}) from {3}.", type, npc.TypeName, npc.netID, args.Player.Name);
-                args.Player.Kick($"异常增加对NPC的增益", true);
-                args.Handled = true;
             }
         }
 
@@ -1747,7 +2061,7 @@ namespace TShockAPI
             {
                 args.Player.SendData(PacketTypes.UpdateNPCHome, "", id, Main.npc[id].homeTileX, Main.npc[id].homeTileY,
                                      Convert.ToByte(Main.npc[id].homeless));
-                TShock.Log.ConsoleDebug("Bouncer / OnUpdateNPCHome rejected npc home build permission from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnUpdateNPCHome rejected npc home build permission from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -1757,7 +2071,7 @@ namespace TShockAPI
             {
                 args.Player.SendData(PacketTypes.UpdateNPCHome, "", id, Main.npc[id].homeTileX, Main.npc[id].homeTileY,
                                      Convert.ToByte(Main.npc[id].homeless));
-                TShock.Log.ConsoleDebug("Bouncer / OnUpdateNPCHome rejected range checks from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnUpdateNPCHome rejected range checks from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -1771,9 +2085,9 @@ namespace TShockAPI
             short amount = args.Amount;
             byte plr = args.TargetPlayerIndex;
 
-            if (amount <= 0 || Main.player[plr] == null || !Main.player[plr].active)
+            if (amount <= 0 || TShock.Players[plr] == null || !TShock.Players[plr].Active)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnHealOtherPlayer rejected null checks");
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnHealOtherPlayer rejected null checks"));
                 args.Handled = true;
                 return;
             }
@@ -1783,8 +2097,8 @@ namespace TShockAPI
             // and the healing you can do with that is 20% of your damage.
             if (amount >= TShock.Config.Settings.MaxDamage * 0.2 && !args.Player.HasPermission(Permissions.ignoredamagecap))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnHealOtherPlayer 0.2 check from {0}", args.Player.Name);
-                args.Player.Disable("通过作弊来治愈其他玩家", DisableFlags.WriteToLogAndConsole);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnHealOtherPlayer 0.2 check from {0}", args.Player.Name));
+                args.Player.Disable(GetString("HealOtherPlayer cheat attempt!"), DisableFlags.WriteToLogAndConsole);
                 args.Handled = true;
                 return;
             }
@@ -1793,21 +2107,21 @@ namespace TShockAPI
             {
                 if (TShock.Config.Settings.KickOnHealOtherThresholdBroken)
                 {
-                    args.Player.Kick(string.Format("治愈速率超过阈值 {0}.", TShock.Config.Settings.HealOtherThreshold));
+                    args.Player.Kick(GetString("HealOtherPlayer threshold exceeded {0}.", TShock.Config.Settings.HealOtherThreshold));
                 }
                 else
                 {
-                    args.Player.Disable("达到治愈速率阈值", DisableFlags.WriteToLogAndConsole);
+                    args.Player.Disable(GetString("Reached HealOtherPlayer threshold."), DisableFlags.WriteToLogAndConsole);
                 }
-                TShock.Log.ConsoleDebug("Bouncer / OnHealOtherPlayer rejected heal other threshold from {0} {1}/{2}", args.Player.Name, args.Player.HealOtherThreshold, TShock.Config.Settings.HealOtherThreshold);
-                TShock.Log.ConsoleDebug("If this player wasn't hacking, please report the HealOtherPlayer threshold they were disabled for to TShock so we can improve this!");
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnHealOtherPlayer rejected heal other threshold from {0} {1}/{2}", args.Player.Name, args.Player.HealOtherThreshold, TShock.Config.Settings.HealOtherThreshold));
+                TShock.Log.ConsoleDebug(GetString("If this player wasn't hacking, please report the HealOtherPlayer threshold they were disabled for to TShock so we can improve this!"));
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.IsBeingDisabled() || args.Player.IsBouncerThrottled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnHealOtherPlayer rejected disabled/throttled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnHealOtherPlayer rejected disabled/throttled from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -1832,7 +2146,7 @@ namespace TShockAPI
             // if npc released outside allowed tile
             if (x >= Main.maxTilesX * 16 - 16 || x < 0 || y >= Main.maxTilesY * 16 - 16 || y < 0)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnReleaseNPC rejected out of bounds from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnReleaseNPC rejected out of bounds from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -1840,24 +2154,58 @@ namespace TShockAPI
             // if player disabled
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnReleaseNPC rejected npc release from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnReleaseNPC rejected npc release from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
-            // if released npc not from its item (from crafted packet)
-            // e.g. using bunny item to release golden bunny 
-            if (args.Player.TPlayer.lastVisualizedSelectedItem.makeNPC != type && args.Player.TPlayer.lastVisualizedSelectedItem.placeStyle != style)
+            void rejectForCritterNotReleasedFromItem()
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnReleaseNPC released different critter from {0}", args.Player.Name);
-                args.Player.Kick("Released critter was not from its item.", true);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnReleaseNPC released different critter from {0}", args.Player.Name));
+                args.Player.Kick(GetString("Released critter was not from its item."), true);
                 args.Handled = true;
-                return;
+            }
+
+            // if released npc not from its item (from crafted packet)
+            // e.g. using bunny item to release golden bunny
+            if (args.Player.TPlayer.lastVisualizedSelectedItem.makeNPC != type || args.Player.TPlayer.lastVisualizedSelectedItem.placeStyle != style)
+            {
+                // If the critter is an Explosive Bunny, check if we've recently created an Explosive Bunny projectile.
+                // If we have, check if the critter we are trying to create is within range of the projectile
+                // If we have at least one of those, then this wasn't a crafted packet, but simply a delayed critter release from an
+                // Explosive Bunny projectile.
+                if (type == NPCID.ExplosiveBunny)
+                {
+                    bool areAnyBunnyProjectilesInRange;
+
+                    lock (args.Player.RecentlyCreatedProjectiles)
+                    {
+                        areAnyBunnyProjectilesInRange = args.Player.RecentlyCreatedProjectiles.Any(projectile =>
+                        {
+                            if (projectile.Type != ProjectileID.ExplosiveBunny)
+                                return false;
+
+                            var projectileInstance = Main.projectile[projectile.Index];
+                            return projectileInstance.active && projectileInstance.WithinRange(new Vector2(args.X, args.Y), 32.0f);
+                        });
+                    }
+
+                    if (!areAnyBunnyProjectilesInRange)
+                    {
+                        rejectForCritterNotReleasedFromItem();
+                        return;
+                    }
+                }
+                else
+                {
+                    rejectForCritterNotReleasedFromItem();
+                    return;
+                }
             }
 
             if (args.Player.IsBouncerThrottled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnReleaseNPC rejected throttle from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnReleaseNPC rejected throttle from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -1875,35 +2223,28 @@ namespace TShockAPI
 
             if (!TShock.Utils.TilePlacementValid(x, y))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected valid placements from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected valid placements from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
-            if (type < 0 || type >= Main.maxTileSets)
+            if (type < 0 || type >= Terraria.ID.TileID.Count)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected out of bounds tile from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected out of bounds tile from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (x < 0 || x >= Main.maxTilesX)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected out of bounds tile x from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected out of bounds tile x from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (y < 0 || y >= Main.maxTilesY)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected out of bounds tile y from {0}", args.Player.Name);
-                args.Handled = true;
-                return;
-            }
-
-            if (args.Player.SelectedItem.placeStyle != style)
-            {
-                TShock.Log.ConsoleError(string.Format("Bouncer / OnPlaceObject rejected object placement with invalid style from {0}", args.Player.Name));
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected out of bounds tile y from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -1912,8 +2253,8 @@ namespace TShockAPI
             //These two items cause localised lag and rendering issues
             if (type == TileID.FakeContainers && (style == 52 || style == 53))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected fake containers from {0}", args.Player.Name);
-                args.Player.SendTileSquare(x, y, 4);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected fake containers from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(x, y, 4);
                 args.Handled = true;
                 return;
             }
@@ -1921,44 +2262,82 @@ namespace TShockAPI
             // TODO: REMOVE. This does NOT look like Bouncer code.
             if (TShock.TileBans.TileIsBanned(type, args.Player))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected banned tiles from {0}", args.Player.Name);
-                args.Player.SendTileSquare(x, y, 1);
-                //args.Player.SendErrorMessage("无权放置此物块");
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected banned tiles from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(x, y, 1);
+                args.Player.SendErrorMessage(GetString("You do not have permission to place this tile."));
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.Dead && TShock.Config.Settings.PreventDeadModification)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected dead people don't do things from {0}", args.Player.Name);
-                args.Player.SendTileSquare(x, y, 4);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected dead people don't do things from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(x, y, 4);
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected disabled from {0}", args.Player.Name);
-                args.Player.SendTileSquare(x, y, 4);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected disabled from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(x, y, 4);
                 args.Handled = true;
                 return;
             }
 
-            // This is necessary to check in order to prevent special tiles such as
-            // queen bee larva, paintings etc that use this packet from being placed
-            // without selecting the right item.
-            if (type != args.Player.TPlayer.inventory[args.Player.TPlayer.selectedItem].createTile)
+            if (args.Player.SelectedItem.type is ItemID.RubblemakerSmall or ItemID.RubblemakerMedium or ItemID.RubblemakerLarge)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected awkward tile creation/selection from {0}", args.Player.Name);
-                args.Player.SendTileSquare(x, y, 4);
-                args.Handled = true;
-                return;
+                if (type != TileID.LargePilesEcho && type != TileID.LargePiles2Echo && type != TileID.SmallPiles2x1Echo &&
+                    type != TileID.SmallPiles1x1Echo && type != TileID.PlantDetritus3x2Echo && type != TileID.PlantDetritus2x2Echo)
+                {
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected rubblemaker I can't believe it's not rubble! from {0}",
+                        args.Player.Name));
+                    args.Player.SendTileSquareCentered(x, y, 4);
+                    args.Handled = true;
+                    return;
+                }
+            }
+            else if (args.Player.SelectedItem.type == ItemID.AcornAxe)
+            {
+                if (type != TileID.Saplings)
+                {
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected Axe of Regrowth only places saplings {0}", args.Player.Name));
+                    args.Player.SendTileSquareCentered(x, y, 4);
+                    args.Handled = true;
+                    return;
+                }
+            }
+            else
+            {
+                // This is necessary to check in order to prevent special tiles such as
+                // queen bee larva, paintings etc that use this packet from being placed
+                // without selecting the right item.
+                if (type != args.Player.TPlayer.inventory[args.Player.TPlayer.selectedItem].createTile)
+                {
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected awkward tile creation/selection from {0}", args.Player.Name));
+                    args.Player.SendTileSquareCentered(x, y, 4);
+                    args.Handled = true;
+                    return;
+                }
+
+                if (args.Player.SelectedItem.placeStyle != style)
+                {
+                    var validTorch = args.Player.SelectedItem.createTile == TileID.Torches && args.Player.TPlayer.BiomeTorchPlaceStyle(args.Player.SelectedItem.placeStyle) == style;
+                    var validCampfire = args.Player.SelectedItem.createTile == TileID.Campfire && args.Player.TPlayer.BiomeCampfirePlaceStyle(args.Player.SelectedItem.placeStyle) == style;
+                    if (!args.Player.TPlayer.unlockedBiomeTorches || (!validTorch && !validCampfire))
+                    {
+                        TShock.Log.ConsoleError(GetString("Bouncer / OnPlaceObject rejected object placement with invalid style {1} (expected {2}) from {0}", args.Player.Name, style, args.Player.SelectedItem.placeStyle));
+                        args.Player.SendTileSquareCentered(x, y, 4);
+                        args.Handled = true;
+                        return;
+                    }
+                }
             }
 
             TileObjectData tileData = TileObjectData.GetTileData(type, style, 0);
             if (tileData == null)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected null tile data from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected null tile data from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -1973,8 +2352,8 @@ namespace TShockAPI
                     if (!args.Player.HasModifiedIceSuccessfully(i, j, type, EditAction.PlaceTile)
                         && !args.Player.HasBuildPermission(i, j))
                     {
-                        TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected mad loop from {0}", args.Player.Name);
-                        args.Player.SendTileSquare(i, j, 4);
+                        TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected mad loop from {0}", args.Player.Name));
+                        args.Player.SendTileSquareCentered(i, j, 4);
                         args.Handled = true;
                         return;
                     }
@@ -1989,17 +2368,17 @@ namespace TShockAPI
                     || type != TileID.MysticSnakeRope)
                     && !args.Player.IsInRange(x, y))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected range checks from {0}", args.Player.Name);
-                args.Player.SendTileSquare(x, y, 4);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected range checks from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(x, y, 4);
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.TilePlaceThreshold >= TShock.Config.Settings.TilePlaceThreshold)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceObject rejected tile place threshold from {0} {1}/{2}", args.Player.Name, args.Player.TilePlaceThreshold, TShock.Config.Settings.TilePlaceThreshold);
-                args.Player.Disable("达到方块的放置阈值", DisableFlags.WriteToLogAndConsole);
-                args.Player.SendTileSquare(x, y, 4);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceObject rejected tile place threshold from {0} {1}/{2}", args.Player.Name, args.Player.TilePlaceThreshold, TShock.Config.Settings.TilePlaceThreshold));
+                args.Player.Disable(GetString("Reached TilePlace threshold."), DisableFlags.WriteToLogAndConsole);
+                args.Player.SendTileSquareCentered(x, y, 4);
                 args.Handled = true;
                 return;
             }
@@ -2021,28 +2400,28 @@ namespace TShockAPI
         {
             if (!TShock.Utils.TilePlacementValid(args.X, args.Y))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceTileEntity rejected tile placement valid from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceTileEntity rejected tile placement valid from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceTileEntity rejected disabled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceTileEntity rejected disabled from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (!args.Player.HasBuildPermission(args.X, args.Y))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceTileEntity rejected permissions from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceTileEntity rejected permissions from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (!args.Player.IsInRange(args.X, args.Y))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceTileEntity rejected range checks from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceTileEntity rejected range checks from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -2055,14 +2434,14 @@ namespace TShockAPI
         {
             if (!TShock.Utils.TilePlacementValid(args.X, args.Y))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceItemFrame rejected tile placement valid from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceItemFrame rejected tile placement valid from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceItemFrame rejected disabled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceItemFrame rejected disabled from {0}", args.Player.Name));
                 NetMessage.SendData((int)PacketTypes.UpdateTileEntity, -1, -1, NetworkText.Empty, args.ItemFrame.ID, 0, 1);
                 args.Handled = true;
                 return;
@@ -2070,7 +2449,7 @@ namespace TShockAPI
 
             if (!args.Player.HasBuildPermission(args.X, args.Y))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceItemFrame rejected permissions from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceItemFrame rejected permissions from {0}", args.Player.Name));
                 NetMessage.SendData((int)PacketTypes.UpdateTileEntity, -1, -1, NetworkText.Empty, args.ItemFrame.ID, 0, 1);
                 args.Handled = true;
                 return;
@@ -2078,7 +2457,7 @@ namespace TShockAPI
 
             if (!args.Player.IsInRange(args.X, args.Y))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlaceItemFrame rejected range checks from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceItemFrame rejected range checks from {0}", args.Player.Name));
                 NetMessage.SendData((int)PacketTypes.UpdateTileEntity, -1, -1, NetworkText.Empty, args.ItemFrame.ID, 0, 1);
                 args.Handled = true;
                 return;
@@ -2091,9 +2470,9 @@ namespace TShockAPI
             //belongs to the player who sent the packet.
             if (args.Player.Index != args.TargetPlayerIndex)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerPortalTeleport rejected untargetable teleport from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerPortalTeleport rejected untargetable teleport from {0}", args.Player.Name));
                 //If the player who sent the packet is not the player being teleported, cancel this packet
-                args.Player.Disable("恶意的端口攻击", DisableFlags.WriteToLogAndConsole); //Todo: this message is not particularly clear - suggestions wanted
+                args.Player.Disable(GetString("Malicious portal attempt."), DisableFlags.WriteToLogAndConsole); //Todo: this message is not particularly clear - suggestions wanted
                 args.Handled = true;
                 return;
             }
@@ -2102,7 +2481,7 @@ namespace TShockAPI
             if (args.NewPosition.X > Main.maxTilesX || args.NewPosition.X < 0
                 || args.NewPosition.Y > Main.maxTilesY || args.NewPosition.Y < 0)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerPortalTeleport rejected teleport out of bounds from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerPortalTeleport rejected teleport out of bounds from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -2110,7 +2489,7 @@ namespace TShockAPI
             //May as well reject teleport attempts if the player is being throttled
             if (args.Player.IsBeingDisabled() || args.Player.IsBouncerThrottled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerPortalTeleport rejected disabled/throttled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerPortalTeleport rejected disabled/throttled from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -2123,21 +2502,21 @@ namespace TShockAPI
         {
             if (args.X < 0 || args.Y < 0 || args.X >= Main.maxTilesX || args.Y >= Main.maxTilesY)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnGemLockToggle rejected boundaries check from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnGemLockToggle rejected boundaries check from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (!TShock.Utils.TilePlacementValid(args.X, args.Y) || (args.Player.Dead && TShock.Config.Settings.PreventDeadModification))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnGemLockToggle invalid placement/deadmod from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnGemLockToggle invalid placement/deadmod from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnGemLockToggle rejected disabled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnGemLockToggle rejected disabled from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -2146,7 +2525,7 @@ namespace TShockAPI
             {
                 if (!args.Player.HasBuildPermission(args.X, args.Y))
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnGemLockToggle rejected permissions check from {0}", args.Player.Name);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnGemLockToggle rejected permissions check from {0}", args.Player.Name));
                     args.Handled = true;
                     return;
                 }
@@ -2181,21 +2560,21 @@ namespace TShockAPI
 
                 if (!TShock.Utils.TilePlacementValid(x, y) || (args.Player.Dead && TShock.Config.Settings.PreventDeadModification))
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnMassWireOperation rejected valid placement from {0}", args.Player.Name);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnMassWireOperation rejected valid placement from {0}", args.Player.Name));
                     args.Handled = true;
                     return;
                 }
 
                 if (args.Player.IsBeingDisabled())
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnMassWireOperation rejected disabled from {0}", args.Player.Name);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnMassWireOperation rejected disabled from {0}", args.Player.Name));
                     args.Handled = true;
                     return;
                 }
 
                 if (!args.Player.HasBuildPermission(x, y))
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnMassWireOperation rejected build perms from {0}", args.Player.Name);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnMassWireOperation rejected build perms from {0}", args.Player.Name));
                     args.Handled = true;
                     return;
                 }
@@ -2214,9 +2593,9 @@ namespace TShockAPI
             byte direction = args.Direction;
             PlayerDeathReason reason = args.PlayerDeathReason;
 
-            if (id >= Main.maxPlayers || TShock.Players[id] == null)
+            if (id >= Main.maxPlayers || TShock.Players[id] == null || !TShock.Players[id].Active)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerDamage rejected null check");
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerDamage rejected null check"));
                 args.Handled = true;
                 return;
             }
@@ -2225,15 +2604,15 @@ namespace TShockAPI
             {
                 if (TShock.Config.Settings.KickOnDamageThresholdBroken)
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnPlayerDamage rejected damage threshold from {0} {1}/{2}", args.Player.Name, damage, TShock.Config.Settings.MaxDamage);
-                    args.Player.Kick(string.Format("用户伤害值超过 {0}.", TShock.Config.Settings.MaxDamage));
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerDamage rejected damage threshold from {0} {1}/{2}", args.Player.Name, damage, TShock.Config.Settings.MaxDamage));
+                    args.Player.Kick(GetString("Player damage exceeded {0}.", TShock.Config.Settings.MaxDamage));
                     args.Handled = true;
                     return;
                 }
                 else
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnPlayerDamage rejected damage threshold2 from {0} {1}/{2}", args.Player.Name, damage, TShock.Config.Settings.MaxDamage);
-                    args.Player.Disable(String.Format("用户伤害值超过 {0}.", TShock.Config.Settings.MaxDamage), DisableFlags.WriteToLogAndConsole);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerDamage rejected damage threshold2 from {0} {1}/{2}", args.Player.Name, damage, TShock.Config.Settings.MaxDamage));
+                    args.Player.Disable(GetString("Player damage exceeded {0}.", TShock.Config.Settings.MaxDamage), DisableFlags.WriteToLogAndConsole);
                 }
                 args.Player.SendData(PacketTypes.PlayerHp, "", id);
                 args.Player.SendData(PacketTypes.PlayerUpdate, "", id);
@@ -2243,7 +2622,7 @@ namespace TShockAPI
 
             if (!TShock.Players[id].TPlayer.hostile && pvp && id != args.Player.Index)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerDamage rejected hostile from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerDamage rejected hostile from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.PlayerHp, "", id);
                 args.Player.SendData(PacketTypes.PlayerUpdate, "", id);
                 args.Handled = true;
@@ -2252,7 +2631,7 @@ namespace TShockAPI
 
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerDamage rejected disabled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerDamage rejected disabled from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.PlayerHp, "", id);
                 args.Player.SendData(PacketTypes.PlayerUpdate, "", id);
                 args.Handled = true;
@@ -2261,7 +2640,7 @@ namespace TShockAPI
 
             if (!args.Player.IsInRange(TShock.Players[id].TileX, TShock.Players[id].TileY, 100))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerDamage rejected range checks from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerDamage rejected range checks from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.PlayerHp, "", id);
                 args.Player.SendData(PacketTypes.PlayerUpdate, "", id);
                 args.Handled = true;
@@ -2270,7 +2649,7 @@ namespace TShockAPI
 
             if (args.Player.IsBouncerThrottled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerDamage rejected throttled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerDamage rejected throttled from {0}", args.Player.Name));
                 args.Player.SendData(PacketTypes.PlayerHp, "", id);
                 args.Player.SendData(PacketTypes.PlayerUpdate, "", id);
                 args.Handled = true;
@@ -2278,18 +2657,21 @@ namespace TShockAPI
             }
 
             /*
-			 * PlayerDeathReason does not initially contain any information, so all fields have values -1 or null. 
+			 * PlayerDeathReason does not initially contain any information, so all fields have values -1 or null.
 			 * We can use this to determine the real cause of death.
-			 * 
+			 *
 			 * If the player was not specified, that is, the player index is -1, then it is definitely a custom cause, as you can only deal damage with a projectile or another player.
 			 * This is how everything else works. If an NPC is specified, its value is not -1, which is a custom cause.
-			 * 
+			 *
+			 * An exception to this is damage dealt by the Inferno potion to other players -- it is only identified by the other index value of 16,
+			 * even lacking a source player index.
+			 *
 			 * Checking whether this damage came from the player is necessary, because the damage from the player can come even when it is hit by a NPC
 			*/
-            if (TShock.Config.Settings.DisableCustomDeathMessages && id != args.Player.Index &&
+            if (TShock.Config.Settings.DisableCustomDeathMessages && id != args.Player.Index && reason._sourceOtherIndex != 16 &&
                 (reason._sourcePlayerIndex == -1 || reason._sourceNPCIndex != -1 || reason._sourceOtherIndex != -1 || reason._sourceCustomReason != null))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnPlayerDamage rejected custom death message from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlayerDamage rejected custom death message from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -2304,18 +2686,18 @@ namespace TShockAPI
             short id = args.PlayerId;
             PlayerDeathReason playerDeathReason = args.PlayerDeathReason;
 
-            if (damage >= short.MaxValue) //Abnormal values have the potential to cause infinite loops in the server.
+            if (damage > 42000) //Abnormal values have the potential to cause infinite loops in the server.
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnKillMe rejected high damage from {0} {1}", args.Player.Name, damage);
-                args.Player.Kick("对多边形法线着色失败", true, true);
-                TShock.Log.ConsoleError("企图利用死亡：损害值 {0}", damage);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnKillMe rejected high damage from {0} {1}", args.Player.Name, damage));
+                args.Player.Kick(GetString("Failed to shade polygon normals."), true, true);
+                TShock.Log.ConsoleError(GetString("Death Exploit Attempt: Damage {0}", damage));
                 args.Handled = true;
                 return;
             }
 
             if (id >= Main.maxPlayers)
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnKillMe rejected index check from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnKillMe rejected index check from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
@@ -2325,14 +2707,14 @@ namespace TShockAPI
             {
                 if (playerDeathReason.GetDeathText(TShock.Players[id].Name).ToString().Length > 500)
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnKillMe rejected bad length death text from {0}", args.Player.Name);
-                    TShock.Players[id].Kick("死亡原因超出正常范围", true);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnKillMe rejected bad length death text from {0}", args.Player.Name));
+                    TShock.Players[id].Kick(GetString("Death reason outside of normal bounds."), true);
                     args.Handled = true;
                     return;
                 }
                 if (TShock.Config.Settings.DisableCustomDeathMessages && playerDeathReason._sourceCustomReason != null)
                 {
-                    TShock.Log.ConsoleDebug("Bouncer / OnKillMe rejected custom death message from {0}", args.Player.Name);
+                    TShock.Log.ConsoleDebug(GetString("Bouncer / OnKillMe rejected custom death message from {0}", args.Player.Name));
                     args.Handled = true;
                     return;
                 }
@@ -2351,31 +2733,31 @@ namespace TShockAPI
 
             if (!FishingRodItemIDs.Contains(args.Player.SelectedItem.type))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnFishOutNPC rejected for not using a fishing rod! - From {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnFishOutNPC rejected for not using a fishing rod! - From {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
             if (projectile.Type == 0 || projectile.Killed) /// The bobber projectile is never killed when the NPC spawns. Type can only be 0 if no recent projectile is found that is named Bobber.
 			{
-                TShock.Log.ConsoleDebug("Bouncer / OnFishOutNPC rejected for not finding active bobber projectile! - From {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnFishOutNPC rejected for not finding active bobber projectile! - From {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
             if (!FishableNpcIDs.Contains(args.NpcID))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnFishOutNPC rejected for the NPC not being on the fishable NPCs list! - From {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnFishOutNPC rejected for the NPC not being on the fishable NPCs list! - From {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
             if (args.NpcID == NPCID.DukeFishron && !args.Player.HasPermission(Permissions.summonboss))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnFishOutNPC rejected summon boss permissions from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnFishOutNPC rejected summon boss permissions from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
             if (!args.Player.IsInRange(args.TileX, args.TileY, 55))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnFishOutNPC rejected range checks from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnFishOutNPC rejected range checks from {0}", args.Player.Name));
                 args.Handled = true;
             }
         }
@@ -2389,44 +2771,44 @@ namespace TShockAPI
         {
             if (!TShock.Utils.TilePlacementValid(args.TileX, args.TileY))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnFoodPlatterTryPlacing rejected tile placement valid from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnFoodPlatterTryPlacing rejected tile placement valid from {0}", args.Player.Name));
                 args.Handled = true;
                 return;
             }
 
             if ((args.Player.SelectedItem.type != args.ItemID && args.Player.ItemInHand.type != args.ItemID))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnFoodPlatterTryPlacing rejected item not placed by hand from {0}", args.Player.Name);
-                args.Player.SendTileSquare(args.TileX, args.TileY, 1);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnFoodPlatterTryPlacing rejected item not placed by hand from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(args.TileX, args.TileY, 1);
                 args.Handled = true;
                 return;
             }
             if (args.Player.IsBeingDisabled())
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnFoodPlatterTryPlacing rejected disabled from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnFoodPlatterTryPlacing rejected disabled from {0}", args.Player.Name));
                 Item item = new Item();
                 item.netDefaults(args.ItemID);
                 args.Player.GiveItemCheck(args.ItemID, item.Name, args.Stack, args.Prefix);
-                args.Player.SendTileSquare(args.TileX, args.TileY, 1);
+                args.Player.SendTileSquareCentered(args.TileX, args.TileY, 1);
                 args.Handled = true;
                 return;
             }
 
             if (!args.Player.HasBuildPermission(args.TileX, args.TileY))
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnFoodPlatterTryPlacing rejected permissions from {0}", args.Player.Name);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnFoodPlatterTryPlacing rejected permissions from {0}", args.Player.Name));
                 Item item = new Item();
                 item.netDefaults(args.ItemID);
                 args.Player.GiveItemCheck(args.ItemID, item.Name, args.Stack, args.Prefix);
-                args.Player.SendTileSquare(args.TileX, args.TileY, 1);
+                args.Player.SendTileSquareCentered(args.TileX, args.TileY, 1);
                 args.Handled = true;
                 return;
             }
 
             if (!args.Player.IsInRange(args.TileX, args.TileY, range: 13)) // To my knowledge, max legit tile reach with accessories.
             {
-                TShock.Log.ConsoleDebug("Bouncer / OnFoodPlatterTryPlacing rejected range checks from {0}", args.Player.Name);
-                args.Player.SendTileSquare(args.TileX, args.TileY, 1);
+                TShock.Log.ConsoleDebug(GetString("Bouncer / OnFoodPlatterTryPlacing rejected range checks from {0}", args.Player.Name));
+                args.Player.SendTileSquareCentered(args.TileX, args.TileY, 1);
                 args.Handled = true;
                 return;
             }
@@ -2476,7 +2858,7 @@ namespace TShockAPI
             { BuffID.Poisoned, 3600 },              // BuffID: 20
 			{ BuffID.OnFire, 1200 },                // BuffID: 24
 			{ BuffID.Confused, short.MaxValue },    // BuffID: 31 Brain of Confusion Internal Item ID: 3223
-			{ BuffID.CursedInferno, 420 },          // BuffID: 39
+			{ BuffID.CursedInferno, 600 },          // BuffID: 39
 			{ BuffID.Frostburn, 900 },              // BuffID: 44
 			{ BuffID.Ichor, 1200 },                 // BuffID: 69
 			{ BuffID.Venom, 1800 },                 // BuffID: 70
@@ -2502,10 +2884,13 @@ namespace TShockAPI
 			{ BuffID.RainbowWhipNPCDebuff, 240  },  // BuffID: 316
 			{ BuffID.MaceWhipNPCDebuff, 240  },     // BuffID: 319
 			{ BuffID.GelBalloonBuff, 1800  },       // BuffID: 320
-			{ BuffID.OnFire3, 360 },                // BuffID: 323
-			{ BuffID.Frostburn2, 900 },             // BuffID: 324
+			{ BuffID.OnFire3, 1200 },               // BuffID: 323
+			{ BuffID.Frostburn2, 1200 },            // BuffID: 324
 			{ BuffID.BoneWhipNPCDebuff, 240 },      // BuffID: 326
-			{ BuffID.TentacleSpike, 540 }           // BuffID: 337
+			{ BuffID.TentacleSpike, 540 },          // BuffID: 337
+			{ BuffID.CoolWhipNPCDebuff, 240 },      // BuffID: 340
+			{ BuffID.BloodButcherer, 540 },         // BuffID: 344
+			{ BuffID.Shimmer, 100 },		        // BuffID: 353
 		};
 
         /// <summary>

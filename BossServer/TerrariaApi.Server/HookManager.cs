@@ -1,11 +1,12 @@
-﻿using Microsoft.Xna.Framework;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.GameContent.Items;
 using Terraria.Net;
 
 namespace TerrariaApi.Server
@@ -41,10 +42,12 @@ namespace TerrariaApi.Server
             if (args.Any(x => x == "-heaptile"))
             {
                 ServerApi.LogWriter.ServerWriteLine($"Using {nameof(HeapTile)} for tile implementation", TraceLevel.Info);
-                ModFramework.DefaultCollection<ITile>.OnCreateCollection += (int x, int y, string source) =>
-                {
-                    return new TileProvider();
-                };
+                Terraria.Main.tile = new TileProvider();
+            }
+            if (args.Any(x => x == "-constileation" || x == "-c"))
+            {
+                ServerApi.LogWriter.ServerWriteLine($"Using {nameof(ConstileationProvider)} for tile implementation", TraceLevel.Info);
+                Main.tile = new ConstileationProvider();
             }
 
             Hooking.GameHooks.AttachTo(this);
@@ -68,7 +71,7 @@ namespace TerrariaApi.Server
         }
 
         private bool currentGameMenuState;
-        public void InvokeGameUpdate()
+        internal void InvokeGameUpdate()
         {
             if (this.currentGameMenuState != Main.gameMenu)
             {
@@ -95,7 +98,7 @@ namespace TerrariaApi.Server
             get { return this.gamePostUpdate; }
         }
 
-        public void InvokeGamePostUpdate()
+        internal void InvokeGamePostUpdate()
         {
             this.GamePostUpdate.Invoke(EventArgs.Empty);
         }
@@ -110,7 +113,7 @@ namespace TerrariaApi.Server
             get { return this.gameHardmodeTileUpdate; }
         }
 
-        public bool InvokeGameHardmodeTileUpdate(int x, int y, int type)
+        internal bool InvokeGameHardmodeTileUpdate(int x, int y, int type)
         {
             HardmodeTileUpdateEventArgs args = new HardmodeTileUpdateEventArgs
             {
@@ -133,7 +136,7 @@ namespace TerrariaApi.Server
             get { return this.gameInitialize; }
         }
 
-        public void InvokeGameInitialize()
+        internal void InvokeGameInitialize()
         {
             this.GameInitialize.Invoke(EventArgs.Empty);
         }
@@ -148,7 +151,7 @@ namespace TerrariaApi.Server
             get { return this.gamePostInitialize; }
         }
 
-        public void InvokeGamePostInitialize()
+        internal void InvokeGamePostInitialize()
         {
             this.GamePostInitialize.Invoke(EventArgs.Empty);
         }
@@ -163,7 +166,7 @@ namespace TerrariaApi.Server
             get { return this.gameWorldConnect; }
         }
 
-        public void InvokeGameWorldConnect()
+        internal void InvokeGameWorldConnect()
         {
             this.GameWorldConnect.Invoke(EventArgs.Empty);
         }
@@ -178,7 +181,7 @@ namespace TerrariaApi.Server
             get { return this.gameWorldDisconnect; }
         }
 
-        public void InvokeGameWorldDisconnect()
+        internal void InvokeGameWorldDisconnect()
         {
             this.GameWorldDisconnect.Invoke(EventArgs.Empty);
         }
@@ -193,7 +196,7 @@ namespace TerrariaApi.Server
             get { return this.gameStatueSpawn; }
         }
 
-        public bool InvokeGameStatueSpawn(int within200, int within600, int worldWide, int x, int y, int type, bool npc)
+        internal bool InvokeGameStatueSpawn(int within200, int within600, int worldWide, int x, int y, int type, bool npc)
         {
             StatueSpawnEventArgs args = new StatueSpawnEventArgs
             {
@@ -222,12 +225,13 @@ namespace TerrariaApi.Server
             get { return this.itemSetDefaultsInt; }
         }
 
-        public bool InvokeItemSetDefaultsInt(ref int itemType, Item item)
+        internal bool InvokeItemSetDefaultsInt(ref int itemType, Item item, ItemVariant variant = null)
         {
             SetDefaultsEventArgs<Item, int> args = new SetDefaultsEventArgs<Item, int>
             {
                 Info = itemType,
-                Object = item
+                Object = item,
+                ItemVariant = variant
             };
 
             this.ItemSetDefaultsInt.Invoke(args);
@@ -246,7 +250,7 @@ namespace TerrariaApi.Server
             get { return this.itemSetDefaultsString; }
         }
 
-        public bool InvokeItemSetDefaultsString(ref string itemName, Item item)
+        internal bool InvokeItemSetDefaultsString(ref string itemName, Item item)
         {
             SetDefaultsEventArgs<Item, string> args = new SetDefaultsEventArgs<Item, string>
             {
@@ -270,7 +274,7 @@ namespace TerrariaApi.Server
             get { return this.itemNetDefaults; }
         }
 
-        public bool InvokeItemNetDefaults(ref int netType, Item item)
+        internal bool InvokeItemNetDefaults(ref int netType, Item item)
         {
             SetDefaultsEventArgs<Item, int> args = new SetDefaultsEventArgs<Item, int>
             {
@@ -294,7 +298,7 @@ namespace TerrariaApi.Server
             get { return this.itemForceIntoChest; }
         }
 
-        public bool InvokeItemForceIntoChest(Chest chest, Item item, Player player)
+        internal bool InvokeItemForceIntoChest(Chest chest, Item item, Player player)
         {
             ForceItemIntoChestEventArgs args = new ForceItemIntoChestEventArgs()
             {
@@ -320,7 +324,7 @@ namespace TerrariaApi.Server
             get { return this.netSendData; }
         }
 
-        public bool InvokeNetSendData(
+        internal bool InvokeNetSendData(
             ref int msgType, ref int remoteClient, ref int ignoreClient, ref Terraria.Localization.NetworkText text,
             ref int number, ref float number2, ref float number3, ref float number4, ref int number5,
             ref int number6, ref int number7)
@@ -367,7 +371,7 @@ namespace TerrariaApi.Server
             get { return this.netSendNetData; }
         }
 
-        public bool InvokeNetSendNetData(
+        internal bool InvokeNetSendNetData(
             ref NetManager netManager, ref Terraria.Net.Sockets.ISocket socket, ref NetPacket packet)
         {
             SendNetDataEventArgs args = new SendNetDataEventArgs
@@ -392,7 +396,7 @@ namespace TerrariaApi.Server
             get { return this.netGetData; }
         }
 
-        public bool InvokeNetGetData(ref byte msgId, MessageBuffer buffer, ref int index, ref int length)
+        internal bool InvokeNetGetData(ref byte msgId, MessageBuffer buffer, ref int index, ref int length)
         {
             if (Main.netMode == 2)
             {
@@ -422,18 +426,12 @@ namespace TerrariaApi.Server
                 switch ((PacketTypes)msgId)
                 {
                     case PacketTypes.ConnectRequest:
-                        using (var stream = new MemoryStream(buffer.readBuffer))
+                        if (this.InvokeServerConnect(buffer.whoAmI))
                         {
-                            stream.Position = index;
-                            using (var reader = new BinaryReader(stream))
-                            {
-                                if (this.InvokeServerConnect(reader.ReadString(), buffer.whoAmI))
-                                {
-                                    Netplay.Clients[buffer.whoAmI].PendingTermination = true;
-                                    return true;
-                                }
-                            }
+                            Netplay.Clients[buffer.whoAmI].PendingTermination = true;
+                            return true;
                         }
+
                         break;
                     case PacketTypes.ContinueConnecting2:
                         if (this.InvokeServerJoin(buffer.whoAmI))
@@ -452,7 +450,7 @@ namespace TerrariaApi.Server
                                 ushort moduleId = reader.ReadUInt16();
                                 //LoadNetModule is now used for sending chat text.
                                 //Read the module ID to determine if this is in fact the text module
-                                if (moduleId == NetManager.Instance.GetId<Terraria.GameContent.NetModules.NetTextModule>())
+                                if (moduleId == Terraria.Net.NetManager.Instance.GetId<Terraria.GameContent.NetModules.NetTextModule>())
                                 {
                                     //Then deserialize the message from the reader
                                     Terraria.Chat.ChatMessage msg = Terraria.Chat.ChatMessage.Deserialize(reader);
@@ -479,7 +477,7 @@ namespace TerrariaApi.Server
                             Guid guid = new Guid();
                             if (Guid.TryParse(Encoding.Default.GetString(uuid, 0, uuid.Length), out guid))
                             {
-                                SHA512 shaM = SHA512.Create();
+                                SHA512 shaM = new SHA512Managed();
                                 var result = shaM.ComputeHash(uuid);
                                 Netplay.Clients[buffer.whoAmI].ClientUUID = result.Aggregate("", (s, b) => s + b.ToString("X2"));
                                 return true;
@@ -516,7 +514,7 @@ namespace TerrariaApi.Server
             get { return this.netGreetPlayer; }
         }
 
-        public bool InvokeNetGreetPlayer(int who)
+        internal bool InvokeNetGreetPlayer(int who)
         {
             GreetPlayerEventArgs args = new GreetPlayerEventArgs
             {
@@ -538,7 +536,7 @@ namespace TerrariaApi.Server
             get { return this.netSendBytes; }
         }
 
-        public bool InvokeNetSendBytes(RemoteClient socket, byte[] buffer, int offset, int count)
+        internal bool InvokeNetSendBytes(RemoteClient socket, byte[] buffer, int offset, int count)
         {
             SendBytesEventArgs args = new SendBytesEventArgs
             {
@@ -562,7 +560,7 @@ namespace TerrariaApi.Server
             get { return this.netNameCollision; }
         }
 
-        public bool InvokeNetNameCollision(int who, string name)
+        internal bool InvokeNetNameCollision(int who, string name)
         {
             NameCollisionEventArgs args = new NameCollisionEventArgs
             {
@@ -584,7 +582,7 @@ namespace TerrariaApi.Server
 
         public HandlerCollection<NpcKilledEventArgs> NpcKilled => npcKilledInt;
 
-        public void InvokeNpcKilled(NPC npc)
+        internal void InvokeNpcKilled(NPC npc)
         {
             this.npcKilledInt.Invoke(new NpcKilledEventArgs() { npc = npc });
         }
@@ -599,7 +597,7 @@ namespace TerrariaApi.Server
             get { return this.npcSetDefaultsInt; }
         }
 
-        public bool InvokeNpcSetDefaultsInt(ref int npcType, NPC npc)
+        internal bool InvokeNpcSetDefaultsInt(ref int npcType, NPC npc)
         {
             SetDefaultsEventArgs<NPC, int> args = new SetDefaultsEventArgs<NPC, int>
             {
@@ -623,7 +621,7 @@ namespace TerrariaApi.Server
             get { return this.npcSetDefaultsString; }
         }
 
-        public bool InvokeNpcSetDefaultsString(ref string npcName, NPC npc)
+        internal bool InvokeNpcSetDefaultsString(ref string npcName, NPC npc)
         {
             SetDefaultsEventArgs<NPC, string> args = new SetDefaultsEventArgs<NPC, string>
             {
@@ -647,7 +645,7 @@ namespace TerrariaApi.Server
             get { return this.npcNetDefaults; }
         }
 
-        public bool InvokeNpcNetDefaults(ref int netType, NPC npc)
+        internal bool InvokeNpcNetDefaults(ref int netType, NPC npc)
         {
             SetDefaultsEventArgs<NPC, int> args = new SetDefaultsEventArgs<NPC, int>
             {
@@ -671,7 +669,7 @@ namespace TerrariaApi.Server
             get { return this.npcStrike; }
         }
 
-        public bool InvokeNpcStrike(
+        internal bool InvokeNpcStrike(
             NPC npc, ref int damage, ref float knockback, ref int hitDirection, ref bool crit, ref bool noEffect,
             ref bool fromNet, Player player)
         {
@@ -709,7 +707,7 @@ namespace TerrariaApi.Server
             get { return this.npcTransform; }
         }
 
-        public bool InvokeNpcTransformation(int npcId)
+        internal bool InvokeNpcTransformation(int npcId)
         {
             NpcTransformationEventArgs args = new NpcTransformationEventArgs
             {
@@ -730,7 +728,7 @@ namespace TerrariaApi.Server
             get { return this.npcSpawn; }
         }
 
-        public bool InvokeNpcSpawn(ref int npcId)
+        internal bool InvokeNpcSpawn(ref int npcId)
         {
             NpcSpawnEventArgs args = new NpcSpawnEventArgs
             {
@@ -752,7 +750,7 @@ namespace TerrariaApi.Server
             get { return this.npcLootDrop; }
         }
 
-        public bool InvokeNpcLootDrop(
+        internal bool InvokeNpcLootDrop(
             ref Vector2 position, ref int w, ref int h, ref int itemId, ref int stack, ref bool broadcast, ref int prefix,
             int npcId, int npcArrayIndex, ref bool nodelay, ref bool reverseLookup)
         {
@@ -794,7 +792,7 @@ namespace TerrariaApi.Server
             get { return this.npcTriggerPressurePlate; }
         }
 
-        public bool InvokeNpcTriggerPressurePlate(NPC npc, int tileX, int tileY)
+        internal bool InvokeNpcTriggerPressurePlate(NPC npc, int tileX, int tileY)
         {
             TriggerPressurePlateEventArgs<NPC> args = new TriggerPressurePlateEventArgs<NPC>
             {
@@ -818,7 +816,7 @@ namespace TerrariaApi.Server
             get { return this.dropBossBag; }
         }
 
-        public bool InvokeDropBossBag(ref Vector2 position, ref int w, ref int h, ref int itemId, ref int stack, ref bool broadcast, ref int prefix,
+        internal bool InvokeDropBossBag(ref Vector2 position, ref int w, ref int h, ref int itemId, ref int stack, ref bool broadcast, ref int prefix,
             int npcId, int npcArrayIndex, ref bool nodelay, ref bool reverseLookup)
         {
             DropBossBagEventArgs args = new DropBossBagEventArgs
@@ -860,7 +858,7 @@ namespace TerrariaApi.Server
             get { return this.npcAiUpdate; }
         }
 
-        public bool InvokeNpcAIUpdate(NPC npc)
+        internal bool InvokeNpcAIUpdate(NPC npc)
         {
             NpcAiUpdateEventArgs args = new NpcAiUpdateEventArgs
             {
@@ -884,7 +882,7 @@ namespace TerrariaApi.Server
             get { return this.playerUpdatePhysics; }
         }
 
-        public void InvokePlayerUpdatePhysics(Player player)
+        internal void InvokePlayerUpdatePhysics(Player player)
         {
             UpdatePhysicsEventArgs args = new UpdatePhysicsEventArgs
             {
@@ -903,7 +901,7 @@ namespace TerrariaApi.Server
             get { return this.playerTriggerPressurePlate; }
         }
 
-        public bool InvokePlayerTriggerPressurePlate(Player player, int tileX, int tileY)
+        internal bool InvokePlayerTriggerPressurePlate(Player player, int tileX, int tileY)
         {
             TriggerPressurePlateEventArgs<Player> args = new TriggerPressurePlateEventArgs<Player>
             {
@@ -929,7 +927,7 @@ namespace TerrariaApi.Server
             get { return this.projectileSetDefaults; }
         }
 
-        public bool InvokeProjectileSetDefaults(ref int type, Projectile projectile)
+        internal bool InvokeProjectileSetDefaults(ref int type, Projectile projectile)
         {
             SetDefaultsEventArgs<Projectile, int> args = new SetDefaultsEventArgs<Projectile, int>
             {
@@ -953,7 +951,7 @@ namespace TerrariaApi.Server
             get { return this.projectileTriggerPressurePlate; }
         }
 
-        public bool InvokeProjectileTriggerPressurePlate(Projectile projectile, int tileX, int tileY)
+        internal bool InvokeProjectileTriggerPressurePlate(Projectile projectile, int tileX, int tileY)
         {
             TriggerPressurePlateEventArgs<Projectile> args = new TriggerPressurePlateEventArgs<Projectile>
             {
@@ -977,7 +975,7 @@ namespace TerrariaApi.Server
             get { return this.projectileAiUpdate; }
         }
 
-        public bool InvokeProjectileAIUpdate(Projectile projectile)
+        internal bool InvokeProjectileAIUpdate(Projectile projectile)
         {
             ProjectileAiUpdateEventArgs args = new ProjectileAiUpdateEventArgs
             {
@@ -1001,7 +999,7 @@ namespace TerrariaApi.Server
             get { return this.serverCommand; }
         }
 
-        public bool InvokeServerCommand(string command)
+        internal bool InvokeServerCommand(string command)
         {
             CommandEventArgs args = new CommandEventArgs
             {
@@ -1022,20 +1020,19 @@ namespace TerrariaApi.Server
             get { return this.serverConnect; }
         }
 
-        public bool InvokeServerConnect(string connectText, int who)
+        internal bool InvokeServerConnect(int who)
         {
             if (Netplay.Clients[who].State != 0)
             {
                 return false;
             }
 
-            ConnectEventArgs args = new()
+            ConnectEventArgs args = new ConnectEventArgs
             {
-                Who = who,
-                ConnectMessage = connectText
+                Who = who
             };
 
-            ServerConnect.Invoke(args);
+            this.ServerConnect.Invoke(args);
             return args.Handled;
         }
         #endregion
@@ -1049,7 +1046,7 @@ namespace TerrariaApi.Server
             get { return this.serverJoin; }
         }
 
-        public bool InvokeServerJoin(int who)
+        internal bool InvokeServerJoin(int who)
         {
             JoinEventArgs args = new JoinEventArgs
             {
@@ -1070,7 +1067,7 @@ namespace TerrariaApi.Server
             get { return this.serverLeave; }
         }
 
-        public void InvokeServerLeave(int who)
+        internal void InvokeServerLeave(int who)
         {
             LeaveEventArgs args = new LeaveEventArgs
             {
@@ -1090,9 +1087,9 @@ namespace TerrariaApi.Server
             get { return this.serverChat; }
         }
 
-        public bool InvokeServerChat(MessageBuffer buffer, int who, string text, Terraria.Chat.ChatCommandId commandId)
+        internal bool InvokeServerChat(MessageBuffer buffer, int who, string text, Terraria.Chat.ChatCommandId commandId)
         {
-            ServerChatEventArgs args = new()
+            ServerChatEventArgs args = new ServerChatEventArgs
             {
                 Buffer = buffer,
                 Who = who,
@@ -1100,7 +1097,7 @@ namespace TerrariaApi.Server
                 CommandId = commandId
             };
 
-            ServerChat.Invoke(args);
+            this.ServerChat.Invoke(args);
             return args.Handled;
         }
         #endregion
@@ -1114,7 +1111,7 @@ namespace TerrariaApi.Server
             get { return serverBroadcast; }
         }
 
-        public bool InvokeServerBroadcast(ref Terraria.Localization.NetworkText message, ref float r, ref float g, ref float b)
+        internal bool InvokeServerBroadcast(ref Terraria.Localization.NetworkText message, ref float r, ref float g, ref float b)
         {
             ServerBroadcastEventArgs args = new ServerBroadcastEventArgs
             {
@@ -1142,7 +1139,7 @@ namespace TerrariaApi.Server
             get { return this.serverSocketReset; }
         }
 
-        public void InvokeServerSocketReset(RemoteClient socket)
+        internal void InvokeServerSocketReset(RemoteClient socket)
         {
             SocketResetEventArgs args = new SocketResetEventArgs
             {
@@ -1155,40 +1152,6 @@ namespace TerrariaApi.Server
         #endregion
 
         #region World Hooks
-        #region loadworld
-        private readonly HandlerCollection<HandledEventArgs> worldLoad =
-            new("WorldLoad");
-
-        public HandlerCollection<HandledEventArgs> WorldLoad
-        {
-            get { return this.worldLoad; }
-        }
-
-        public bool InvokeWorldLoad()
-        {
-            HandledEventArgs args = new();
-
-            this.worldLoad.Invoke(args);
-            return args.Handled;
-        }
-
-        private readonly HandlerCollection<HandledEventArgs> postWorldLoad =
-            new("PostWorldLoad");
-
-        public HandlerCollection<HandledEventArgs> PostWorldLoad
-        {
-            get { return this.postWorldLoad; }
-        }
-
-        public bool InvokePostWorldLoad()
-        {
-            HandledEventArgs args = new();
-
-            this.postWorldLoad.Invoke(args);
-            return args.Handled;
-        }
-        #endregion
-
         #region WorldSave
         private readonly HandlerCollection<WorldSaveEventArgs> worldSave =
             new HandlerCollection<WorldSaveEventArgs>("WorldSave");
@@ -1198,33 +1161,14 @@ namespace TerrariaApi.Server
             get { return this.worldSave; }
         }
 
-        public bool InvokeWorldSave(bool resetTime)
+        internal bool InvokeWorldSave(bool resetTime)
         {
-            WorldSaveEventArgs args = new()
+            WorldSaveEventArgs args = new WorldSaveEventArgs
             {
                 ResetTime = resetTime
             };
 
             this.WorldSave.Invoke(args);
-            return args.Handled;
-        }
-
-        private readonly HandlerCollection<WorldPostSaveEventArgs> postWorldSave =
-            new("PostWorldSave");
-
-        public HandlerCollection<WorldPostSaveEventArgs> PostWorldSave
-        {
-            get { return this.postWorldSave; }
-        }
-
-        public bool InvokePostWorldSave(bool resetTime)
-        {
-            WorldPostSaveEventArgs args = new()
-            {
-                ResetTime = resetTime
-            };
-
-            this.PostWorldSave.Invoke(args);
             return args.Handled;
         }
         #endregion
@@ -1238,7 +1182,7 @@ namespace TerrariaApi.Server
             get { return this.worldStartHardMode; }
         }
 
-        public bool InvokeWorldStartHardMode()
+        internal bool InvokeWorldStartHardMode()
         {
             HandledEventArgs args = new HandledEventArgs();
             this.WorldStartHardMode.Invoke(args);
@@ -1255,7 +1199,7 @@ namespace TerrariaApi.Server
             get { return this.worldMeteorDrop; }
         }
 
-        public bool InvokeWorldMeteorDrop(int x, int y)
+        internal bool InvokeWorldMeteorDrop(int x, int y)
         {
             MeteorDropEventArgs args = new MeteorDropEventArgs
             {
@@ -1277,7 +1221,7 @@ namespace TerrariaApi.Server
             get { return this.worldChristmasCheck; }
         }
 
-        public bool InvokeWorldChristmasCheck(ref bool xmasCheck)
+        internal bool InvokeWorldChristmasCheck(ref bool xmasCheck)
         {
             ChristmasCheckEventArgs args = new ChristmasCheckEventArgs
             {
@@ -1299,7 +1243,7 @@ namespace TerrariaApi.Server
             get { return this.worldHalloweenCheck; }
         }
 
-        public bool InvokeWorldHalloweenCheck(ref bool halloweenCheck)
+        internal bool InvokeWorldHalloweenCheck(ref bool halloweenCheck)
         {
             HalloweenCheckEventArgs args = new HalloweenCheckEventArgs
             {
@@ -1322,7 +1266,7 @@ namespace TerrariaApi.Server
             get { return this.worldGrassSpread; }
         }
 
-        public bool InvokeWorldGrassSpread(int tileX, int tileY, int dirt, int grass, bool repeat, byte color)
+        internal bool InvokeWorldGrassSpread(int tileX, int tileY, int dirt, int grass, bool repeat, TileColorCache color)
         {
             GrassSpreadEventArgs args = new GrassSpreadEventArgs
             {
@@ -1350,7 +1294,7 @@ namespace TerrariaApi.Server
             get { return this.wireTriggerAnnouncementBox; }
         }
 
-        public bool InvokeWireTriggerAnnouncementBox(int player, int tileX, int tileY, int signIndex, string text)
+        internal bool InvokeWireTriggerAnnouncementBox(int player, int tileX, int tileY, int signIndex, string text)
         {
             TriggerAnnouncementBoxEventArgs args = new TriggerAnnouncementBoxEventArgs
             {

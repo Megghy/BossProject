@@ -1,20 +1,16 @@
-﻿using BossFramework;
+﻿using System.Collections.Generic;
+using System.Linq;
+using BossFramework;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
 using FakeProvider;
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria.ID;
 using TerrariaUI;
 using TerrariaUI.Base;
 using TerrariaUI.Base.Style;
 using TerrariaUI.Widgets;
 using TUIPlugin;
-using static MonoMod.InlineRT.MonoModRule;
 
 public class drawboard : BaseMiniGame
 {
@@ -22,7 +18,7 @@ public class drawboard : BaseMiniGame
     {
     }
 
-    public override string[] Names { get; } = new[] {"db", "drawboard", "画板" };
+    public override string[] Names { get; } = new[] { "db", "drawboard", "画板" };
     public override string Author { get; }
     public override string Description { get; }
 

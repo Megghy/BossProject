@@ -16,11 +16,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using Microsoft.Xna.Framework;
-using MySqlConnector;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using MySqlConnector;
 using Terraria;
 
 namespace TShockAPI.DB
@@ -98,13 +98,13 @@ namespace TShockAPI.DB
                                 if (Int32.TryParse(splitids[i], out userid)) // if unparsable, it's not an int, so silently skip
                                     r.AllowedIDs.Add(userid);
                                 else
-                                    TShock.Log.Warn("One of your UserIDs is not a usable integer: " + splitids[i]);
+                                    TShock.Log.Warn(GetString($"One of your UserIDs is not a usable integer: {splitids[i]}"));
                             }
                         }
                         catch (Exception e)
                         {
-                            TShock.Log.Error("Your database contains invalid UserIDs (they should be ints).");
-                            TShock.Log.Error("A lot of things will fail because of this. You must manually delete and re-create the allowed field.");
+                            TShock.Log.Error(GetString("Your database contains invalid UserIDs (they should be integers)."));
+                            TShock.Log.Error(GetString("A lot of things will fail because of this. You must manually delete and re-create the allowed field."));
                             TShock.Log.Error(e.ToString());
                             TShock.Log.Error(e.StackTrace);
                         }
@@ -312,7 +312,7 @@ namespace TShockAPI.DB
         }
 
         /// <summary>
-        /// Checks if any regions exist at the given (x, y) coordinate 
+        /// Checks if any regions exist at the given (x, y) coordinate
         /// and returns an IEnumerable containing their IDs
         /// </summary>
         /// <param name="x">X coordinate</param>
@@ -784,7 +784,7 @@ namespace TShockAPI.DB
             {
                 if (!ply.HasBeenNaggedAboutLoggingIn)
                 {
-                    ply.SendMessage("You must be logged in to take advantage of protected regions.", Color.Red);
+                    ply.SendMessage(GetString("You must be logged in to take advantage of protected regions."), Color.Red);
                     ply.HasBeenNaggedAboutLoggingIn = true;
                 }
                 return false;

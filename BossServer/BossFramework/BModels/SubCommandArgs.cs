@@ -1,8 +1,8 @@
-﻿using BossFramework.BInterfaces;
-using Microsoft.Xna.Framework;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using BossFramework.BInterfaces;
+using Microsoft.Xna.Framework;
 using Terraria;
 using TShockAPI;
 

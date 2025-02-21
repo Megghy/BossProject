@@ -1,10 +1,10 @@
-﻿using BossFramework.BAttributes;
-using BossFramework.BInterfaces;
-using BossFramework.BModels;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using BossFramework.BAttributes;
+using BossFramework.BInterfaces;
+using BossFramework.BModels;
 using Terraria.ID;
 using TerrariaApi.Server;
 using TrProtocol;
@@ -18,7 +18,7 @@ namespace BossFramework.BCore
         public const short FillItem = 3853;
         public static string WeaponScriptPath => Path.Combine(ScriptManager.ScriptRootPath, "Weapons");
         [AutoInit]
-        private static void InitWeapon()
+        internal static void InitWeapon()
         {
             BLog.DEBUG("初始化自定义武器");
 
@@ -165,7 +165,7 @@ namespace BossFramework.BCore
             List<Packet> packetData = new();
             lock (plr.TrPlayer)
             {
-                plr.TrPlayer.inventory.ForEach((item, i) =>
+                plr.TrPlayer.inventory.ForEachWithIndex((item, i) =>
                 {
                     if (i < 50 && (item is null || item?.type == 0))
                     {
@@ -187,7 +187,7 @@ namespace BossFramework.BCore
         private static void RemoveFillItems(this BPlayer plr)
         {
             List<Packet> packetData = new();
-            plr.TsPlayer?.TPlayer.inventory.ForEach((item, i) =>
+            plr.TsPlayer?.TPlayer.inventory.ForEachWithIndex((item, i) =>
             {
                 if (item is { type: FillItem })
                 {
@@ -273,7 +273,7 @@ namespace BossFramework.BCore
         }
         public static void BackToNormalItem(this BPlayer plr)
         {
-            plr.TrPlayer.inventory.ForEach((item, i) =>
+            plr.TrPlayer.inventory.ForEachWithIndex((item, i) =>
             {
                 if (BWeapons.Any(w => w.Equals(item)))
                     plr.SendPacket(new SyncEquipment()

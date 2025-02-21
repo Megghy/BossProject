@@ -1,12 +1,12 @@
-﻿using OTAPI;
-using System.Linq;
+﻿using System.Linq;
+using OTAPI;
 using Terraria;
 
 namespace TerrariaApi.Server.Hooking
 {
-    public static class ServerHooks
+    internal static class ServerHooks
     {
-        public static HookManager _hookManager;
+        private static HookManager _hookManager;
 
         /// <summary>
         /// Attaches any of the OTAPI Server hooks to the existing <see cref="HookManager"/> implementation
@@ -34,6 +34,10 @@ namespace TerrariaApi.Server.Hooking
 
         static void OnProcess(object sender, Hooks.Main.CommandProcessEventArgs e)
         {
+            if (e.Result == HookResult.Cancel)
+            {
+                return;
+            }
             if (_hookManager.InvokeServerCommand(e.Command))
             {
                 e.Result = HookResult.Cancel;

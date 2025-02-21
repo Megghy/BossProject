@@ -1,6 +1,6 @@
-using MySqlConnector;
-using Newtonsoft.Json;
 using System.Data;
+using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using TShockAPI;
 using TShockAPI.DB;
 
@@ -25,7 +25,7 @@ namespace BadgeSystem
             new SqlColumn("CurrentSuffix", MySqlDbType.Text));
             IDbConnection database = _database;
             IQueryBuilder provider;
-            if (_database.GetSqlType() != SqlType.Sqlite)
+            if (_database?.GetSqlType() != SqlType.Sqlite)
             {
                 IQueryBuilder queryBuilder = new MysqlQueryCreator();
                 provider = queryBuilder;
