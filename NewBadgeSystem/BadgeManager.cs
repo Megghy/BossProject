@@ -6,13 +6,13 @@ using TShockAPI.DB;
 
 namespace BadgeSystem
 {
-    internal sealed class BadgeManager
+    public static class BadgeManager
     {
-        private readonly IDbConnection _database;
+        //private readonly IDbConnection _database;
 
-        public BadgeManager(IDbConnection conn)
+        public static void Init()
         {
-            _database = conn;
+            var _database = TShock.DB;
             SqlTable table = new SqlTable("NewBadge", new SqlColumn("Id", MySqlDbType.Int32)
             {
                 Primary = true
@@ -39,11 +39,11 @@ namespace BadgeSystem
             sqlTableCreator.EnsureTableStructure(table);
         }
 
-        public Tuple<IEnumerable<string>, IEnumerable<string>>[] Load(int userId)
+        public static Tuple<IEnumerable<string>, IEnumerable<string>>[] Load(int userId)
         {
             try
             {
-                using QueryResult queryResult = _database.QueryReader("SELECT * FROM NewBadge WHERE Id=@0", userId);
+                using QueryResult queryResult = TShock.DB.QueryReader("SELECT * FROM NewBadge WHERE Id=@0", userId);
                 if (queryResult?.Read() ?? false)
                 {
                     //TShock.Log.ConsoleInfo("1");
@@ -79,10 +79,10 @@ namespace BadgeSystem
                     new Tuple<IEnumerable<string>, IEnumerable<string>>(new string[0], new string[0])};
             return tuple2;
         }
-        public void Update(int userId, PlayerData data)
+        public static void Update(int userId, PlayerData data)
         {
             bool flag;
-            using (QueryResult queryResult = _database.QueryReader("SELECT * FROM NewBadge WHERE Id=@0", userId))
+            using (QueryResult queryResult = TShock.DB.QueryReader("SELECT * FROM NewBadge WHERE Id=@0", userId))
             {
                 flag = queryResult?.Read() ?? false;
             }
@@ -94,7 +94,7 @@ namespace BadgeSystem
                 string CurrentPrefix = JsonConvert.SerializeObject(data.CurrentPrefix.Select((Content x) => x.Identifier));
                 string TotalSuffix = JsonConvert.SerializeObject(data.TotalSuffix.Select((Content x) => x.Identifier));
                 string CurrentSuffix = JsonConvert.SerializeObject(data.CurrentSuffix.Select((Content x) => x.Identifier));
-                _database.Query(flag ?
+                TShock.DB.Query(flag ?
                     "UPDATE NewBadge SET TotalBrackets = @0, CurrentBrackets = @1,TotalPrefix = @2, CurrentPrefix = @3,TotalSuffix = @4, CurrentSuffix = @5 WHERE Id = @6;" :
                     "INSERT INTO NewBadge (TotalBrackets, CurrentBrackets, TotalPrefix, CurrentPrefix, TotalSuffix, CurrentSuffix,Id) VALUES (@0, @1, @2, @3, @4, @5, @6);", TotalBrackets, CurrentBrackets, TotalPrefix, CurrentPrefix, TotalSuffix, CurrentSuffix, userId);
             }

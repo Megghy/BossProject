@@ -34,6 +34,9 @@ namespace BossFramework
         }
         private void AutoInit()
         {
+            //var updateTimerField = TShock.UpdateManager.GetType().GetField("CheckXMinutes", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            //updateTimerField.SetValue(TShock.UpdateManager, 9999999); //不检查更新
+
             var auto = new Dictionary<MethodInfo, AutoInitAttribute>();
             var loaded = new List<Assembly>();
             var ass = ServerApi.Plugins.Select(p => p.Plugin.GetType().Assembly).ToList();

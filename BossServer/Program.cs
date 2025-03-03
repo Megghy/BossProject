@@ -119,7 +119,7 @@ namespace TerrariaApi.Server
             if (arg2?.Name is null) return null;
             if (_cache.TryGetValue(arg2.Name, out Assembly? asm) && asm is not null) return asm;
 
-            var loc = Path.Combine(AppContext.BaseDirectory, "Lib", arg2.Name + ".dll");
+            var loc = Path.Combine(AppContext.BaseDirectory, "bin", arg2.Name + ".dll");
             if (File.Exists(loc))
                 asm = arg1.LoadFromAssemblyPath(loc);
 

@@ -1,6 +1,6 @@
 ﻿using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using TrProtocol.Packets;
+using EnchCoreApi.TrProtocol.NetPackets;
 using TShockAPI;
 
 namespace BossFramework.BNet.PacketHandlers
@@ -11,7 +11,7 @@ namespace BossFramework.BNet.PacketHandlers
         {
             var args = new GetDataHandlers.SignEventArgs
             {
-                Player = plr.TsPlayer,
+                Player = plr.TSPlayer,
                 Data = null,
                 ID = packet.SignSlot,
                 X = packet.Position.X,

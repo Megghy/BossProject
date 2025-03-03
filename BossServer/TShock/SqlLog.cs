@@ -21,7 +21,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 using TShockAPI.DB;
 
 namespace TShockAPI

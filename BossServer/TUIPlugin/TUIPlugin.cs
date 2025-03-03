@@ -11,7 +11,7 @@ using TerrariaUI;
 using TerrariaUI.Base;
 using TerrariaUI.Hooks.Args;
 using TerrariaUI.Widgets;
-using TrProtocol.Packets;
+using EnchCoreApi.TrProtocol.NetPackets;
 using TShockAPI;
 using TShockAPI.Hooks;
 using Timer = System.Timers.Timer;
@@ -304,7 +304,7 @@ namespace TUIPlugin
         {
             try
             {
-                TSPlayer player = args.Player.TsPlayer;
+                TSPlayer player = args.Player.TSPlayer;
                 if (args.Handled || args.Packet.ProjType != 651 || player?.TPlayer == null)
                     return;
 

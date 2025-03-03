@@ -3,7 +3,7 @@ using TShockAPI;
 
 namespace BadgeSystem
 {
-    internal sealed class ContentConfig
+    public sealed class ContentConfig
     {
         public List<Content> Content = new List<Content>();
 

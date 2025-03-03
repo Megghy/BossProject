@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Terraria;
 using TrProtocol;
-using TrProtocol.Packets;
+using EnchCoreApi.TrProtocol.NetPackets;
 using TShockAPI;
 
 namespace BossFramework.BModels
@@ -22,8 +22,8 @@ namespace BossFramework.BModels
             }
             public bool Handled { get; set; } = false;
             public BPlayer Player { get; private set; }
-            public TSPlayer TsPlayer => Player?.TsPlayer;
-            public Player TrPlayer => Player?.TrPlayer;
+            public TSPlayer TsPlayer => Player?.TSPlayer;
+            public Player TrPlayer => Player?.TRPlayer;
         }
         public class PacketEventArgs : IEventArgs
         {

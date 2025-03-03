@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 using TerrariaUI;
 using TShockAPI;
 using TShockAPI.DB;

@@ -2,15 +2,15 @@
   "profiles": {
     "Boss_Megghy": {
       "commandName": "Executable",
-      "executablePath": "D:\\Code\\BossPlugin\\Output\\TShock.Server.exe",
+      "executablePath": "$(MSBuildStartupDirectory)\\Output\\BossServer.exe",
       "commandLineArgs": "-language zh-Hans -ip 127.0.0.1 -port 7777 -maxplayers 8 -world D:\\Code\\BossPlugin\\Output\\BOSS.wld",
-      "workingDirectory": "D:\\Code\\BossPlugin\\Output\\"
+      "workingDirectory": "$(MSBuildStartupDirectory)\\Output"
     },
     "Boss_Jeoi": {
       "commandName": "Executable",
-      "executablePath": "C:\\Users\\Jeoi\\source\\repos\\BossProject\\Output\\BossServer.exe",
+      "executablePath": "$(MSBuildStartupDirectory)\\Output\\BossServer.exe",
       "commandLineArgs": "-language zh-Hans -ip 127.0.0.1 -port 7777 -maxplayers 8 -world C:/Users/Jeoi/Documents/My Games/Terraria/Worlds/BOSS工作室.wld",
-      "workingDirectory": "C:\\Users\\Jeoi\\source\\repos\\BossProject\\Output"
+      "workingDirectory": "$(MSBuildStartupDirectory)\\Output"
     }
   }
 }

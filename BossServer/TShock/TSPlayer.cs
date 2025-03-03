@@ -2184,7 +2184,7 @@ namespace TShockAPI
             if (tempGroup != null)
                 return tempGroup.HasPermission(permission);
             else
-                return Group.HasPermission(permission);
+                return Group?.HasPermission(permission) ?? false;
         }
 
         /// <summary>

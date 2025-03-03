@@ -29,7 +29,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using MaxMind;
 using Microsoft.Xna.Framework;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using Rests;
 using Terraria;
@@ -1068,7 +1068,7 @@ namespace TShockAPI
                 Main.worldName = Config.Settings.ServerName;
             }
 
-            UpdateManager = new UpdateManager();
+            //UpdateManager = new UpdateManager(); 不许更新
         }
 
         /// <summary>LastCheck - Used to keep track of the last check for basically all time based checks.</summary>

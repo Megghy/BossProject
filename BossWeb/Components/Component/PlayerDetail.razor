@@ -1,0 +1,37 @@
+﻿<Descriptions Bordered Size="DescriptionsSize.Small">
+    <DescriptionsItem Title="用户名">
+        @Player.Account.Name
+    </DescriptionsItem>
+    <DescriptionsItem Title="创建时间">
+        @Player.Account.Registered
+    </DescriptionsItem>
+    <DescriptionsItem Title="UUID">
+        @Player.Account.UUID
+    </DescriptionsItem>
+    @if (Player.Player != null)
+    {
+
+    }
+</Descriptions>
+
+<Divider />
+
+<Collapse>
+    <Panel Header="头衔管理">
+    </Panel>
+    <Panel Header="快捷操作">
+
+    </Panel>
+</Collapse>
+
+@code {
+    [Parameter]
+    public Pages.Players.TempUserData Player { get; set; }
+    BadgeSystem.PlayerData Badges { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Badges = BadgeSystem.PlayerData.GetPlayerDataById(Player.Account.ID);
+    }
+}

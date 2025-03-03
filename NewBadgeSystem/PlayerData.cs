@@ -1,12 +1,13 @@
 using System.Text;
 using TShockAPI;
+using TShockAPI.DB;
 
 namespace BadgeSystem
 {
     public sealed class PlayerData
     {
         public const string Key = "badgesys";
-        private readonly TSPlayer _player;
+        private readonly UserAccount _account;
         private string _prefix;
         private readonly List<Content> _totalBrackets;
         private readonly List<Content> _currentBrackets;
@@ -47,23 +48,27 @@ namespace BadgeSystem
             PlayerData playerData = player.GetData<PlayerData>("badgesys");
             if (playerData == null)
             {
-
-                Tuple<IEnumerable<string>, IEnumerable<string>>[] tuples = BadgeSystem.Badges.Load(player.Account.ID);
-                //TShock.Log.ConsoleInfo(tuples.Count().ToString());
-                IEnumerable<Content> TotalBrackets = LoadContent(tuples[0].Item1);
-                IEnumerable<Content> CurrentBrackets = LoadContent(tuples[0].Item2);
-                IEnumerable<Content> TotalPrefix = LoadContent(tuples[1].Item1);
-                IEnumerable<Content> CurrentPrefix = LoadContent(tuples[1].Item2);
-                IEnumerable<Content> TotalSuffix = LoadContent(tuples[2].Item1);
-                IEnumerable<Content> CurrentSuffix = LoadContent(tuples[2].Item2);
-                playerData = new PlayerData(player, TotalBrackets, CurrentBrackets, TotalPrefix, CurrentPrefix, TotalSuffix, CurrentSuffix);
+                playerData = GetPlayerDataById(player.Account.ID);
                 player.SetData("badgesys", playerData);
             }
             return playerData;
         }
-        internal PlayerData(TSPlayer player, IEnumerable<Content> TotalBrackets, IEnumerable<Content> CurrentBrackets, IEnumerable<Content> TotalPrefix, IEnumerable<Content> CurrentPrefix, IEnumerable<Content> TotalSuffix, IEnumerable<Content> CurrentSuffix)
+        public static PlayerData GetPlayerDataById(int id)
         {
-            _player = player;
+            Tuple<IEnumerable<string>, IEnumerable<string>>[] tuples = BadgeManager.Load(id);
+            //TShock.Log.ConsoleInfo(tuples.Count().ToString());
+            IEnumerable<Content> TotalBrackets = LoadContent(tuples[0].Item1);
+            IEnumerable<Content> CurrentBrackets = LoadContent(tuples[0].Item2);
+            IEnumerable<Content> TotalPrefix = LoadContent(tuples[1].Item1);
+            IEnumerable<Content> CurrentPrefix = LoadContent(tuples[1].Item2);
+            IEnumerable<Content> TotalSuffix = LoadContent(tuples[2].Item1);
+            IEnumerable<Content> CurrentSuffix = LoadContent(tuples[2].Item2);
+            var playerData = new PlayerData(TShock.UserAccounts.GetUserAccountByID(id), TotalBrackets, CurrentBrackets, TotalPrefix, CurrentPrefix, TotalSuffix, CurrentSuffix);
+            return playerData;
+        }
+        internal PlayerData(UserAccount player, IEnumerable<Content> TotalBrackets, IEnumerable<Content> CurrentBrackets, IEnumerable<Content> TotalPrefix, IEnumerable<Content> CurrentPrefix, IEnumerable<Content> TotalSuffix, IEnumerable<Content> CurrentSuffix)
+        {
+            _account = player;
             _totalBrackets = new List<Content>(TotalBrackets);
             _currentBrackets = new List<Content>(CurrentBrackets);
             _totalPrefix = new List<Content>(TotalPrefix);
@@ -88,7 +93,7 @@ namespace BadgeSystem
                 _totalBrackets.RemoveAll((Content i) => i.Identifier == b.Identifier);
                 _totalBrackets.Add(b);
             }
-            BadgeSystem.Badges.Update(_player.Account.ID, this);
+            BadgeManager.Update(_account.ID, this);
             _prefix = null;
         }
         public void AddCurrentContent(Content b, String type)
@@ -114,7 +119,7 @@ namespace BadgeSystem
                 _totalBrackets.Add(b);
                 _currentBrackets.Add(b);
             }
-            BadgeSystem.Badges.Update(_player.Account.ID, this);
+            BadgeManager.Update(_account.ID, this);
             _prefix = null;
         }
         public void RemoveContent(Content a, String type)
@@ -139,7 +144,7 @@ namespace BadgeSystem
             }
             if (num != 0 || num2 != 0)
             {
-                BadgeSystem.Badges.Update(_player.Account.ID, this);
+                BadgeManager.Update(_account.ID, this);
                 _prefix = null;
             }
         }
@@ -149,7 +154,7 @@ namespace BadgeSystem
             {
                 if (_currentPrefix.RemoveAll((Content i) => i.Identifier == b.Identifier) != 0)
                 {
-                    BadgeSystem.Badges.Update(_player.Account.ID, this);
+                    BadgeManager.Update(_account.ID, this);
                     _prefix = null;
                 }
             }
@@ -157,7 +162,7 @@ namespace BadgeSystem
             {
                 if (_currentSuffix.RemoveAll((Content i) => i.Identifier == b.Identifier) != 0)
                 {
-                    BadgeSystem.Badges.Update(_player.Account.ID, this);
+                    BadgeManager.Update(_account.ID, this);
                     _prefix = null;
                 }
             }
@@ -165,7 +170,7 @@ namespace BadgeSystem
             {
                 if (_currentBrackets.RemoveAll((Content i) => i.Identifier == b.Identifier) != 0)
                 {
-                    BadgeSystem.Badges.Update(_player.Account.ID, this);
+                    BadgeManager.Update(_account.ID, this);
                     _prefix = null;
                 }
             }
@@ -176,19 +181,19 @@ namespace BadgeSystem
             if (type == "prefix")
             {
                 _currentPrefix.Clear();
-                BadgeSystem.Badges.Update(_player.Account.ID, this);
+                BadgeManager.Update(_account.ID, this);
                 _prefix = null;
             }
             else if (type == "suffix")
             {
                 _currentSuffix.Clear();
-                BadgeSystem.Badges.Update(_player.Account.ID, this);
+                BadgeManager.Update(_account.ID, this);
                 _prefix = null;
             }
             else if (type == "brackets")
             {
                 _currentBrackets.Clear();
-                BadgeSystem.Badges.Update(_player.Account.ID, this);
+                BadgeManager.Update(_account.ID, this);
                 _prefix = null;
             }
         }

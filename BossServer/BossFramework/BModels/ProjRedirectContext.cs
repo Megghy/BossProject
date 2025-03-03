@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using BossFramework.BCore;
-using TrProtocol.Packets;
+using EnchCoreApi.TrProtocol.NetPackets;
 using TShockAPI;
 
 namespace BossFramework.BModels
@@ -44,7 +44,7 @@ namespace BossFramework.BModels
                 Projs[slot] = proj;
                 var all = BindingRegion.GetAllPlayerInRegion();
                 (sendToSelf ? all : all.Where(p => p != from))
-                    .ForEach(p => p.TsPlayer?.SendRawData(proj.SerializePacket()));
+                    .ForEach(p => p.TSPlayer?.SendRawData(proj.SerializePacket()));
             }
             catch (Exception ex)
             {
@@ -66,9 +66,9 @@ namespace BossFramework.BModels
             var plrs = BindingRegion.GetAllPlayerInRegion();
             if (ignoreSelf)
                 plrs.Where(p => p.Index != killProj.PlayerSlot)
-                .ForEach(p => p.TsPlayer?.SendRawData(rawData));
+                .ForEach(p => p.TSPlayer?.SendRawData(rawData));
             else
-                plrs.ForEach(p => p.TsPlayer?.SendRawData(rawData));
+                plrs.ForEach(p => p.TSPlayer?.SendRawData(rawData));
         }
     }
 }

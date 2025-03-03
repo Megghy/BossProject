@@ -933,6 +933,14 @@ namespace TShockAPI
             string options = stack > 1 ? "/s" + stack : prefix != 0 ? "/p" + prefix : "";
             return String.Format("[i{0}:{1}]", options, netID);
         }
+        public string ItemTag(NetItem item)
+        {
+            int netID = item.NetId;
+            int stack = item.Stack;
+            int prefix = item.PrefixId;
+            string options = stack > 1 ? "/s" + stack : prefix != 0 ? "/p" + prefix : "";
+            return String.Format("[i{0}:{1}]", options, netID);
+        }
 
         /// <summary>
         /// Gets a list of points selected by a mass-wiring tool.

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 using Terraria;
 
 namespace TShockAPI.DB

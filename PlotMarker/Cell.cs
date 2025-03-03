@@ -8,7 +8,7 @@ using Terraria;
 using Terraria.GameContent.Tile_Entities;
 using TrProtocol;
 using TrProtocol.Models;
-using TrProtocol.Packets;
+using EnchCoreApi.TrProtocol.NetPackets;
 using TShockAPI;
 using IProtocolTileEntity = TrProtocol.Models.TileEntity;
 using TileEntity = Terraria.DataStructures.TileEntity;

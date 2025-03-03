@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Data;
 using Microsoft.Xna.Framework;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 using Terraria;
 
 namespace TShockAPI.DB

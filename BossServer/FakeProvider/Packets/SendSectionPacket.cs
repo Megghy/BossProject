@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Tile_Entities;
@@ -129,356 +128,357 @@ namespace FakeProvider
         #endregion
         #region CompressTileBlock_Inner
 
+
+        public static short[] _compressChestList = new short[8000];
+
+        public static short[] _compressSignList = new short[1000];
+
+        public static short[] _compressEntities = new short[1000];
         private static void CompressTileBlock_Inner(IEnumerable<TileProvider> providers,
             BinaryWriter writer, int xStart, int yStart, int width, int height)
         {
-            short[] array = new short[8000];
-            short[] array2 = new short[1000];
-            short[] array3 = new short[1000];
-            short num = 0;
-            short num2 = 0;
-            short num3 = 0;
-            short num4 = 0;
-            int num5 = 0;
-            int num6 = 0;
-            byte b = 0;
-            byte[] array4 = new byte[15];
-            ITile tile = null;
-            (var tiles, bool relative) = FakeProviderAPI.ApplyPersonal(providers, xStart, yStart, width, height);
-            int dj = relative ? -xStart : 0;
-            int di = relative ? -yStart : 0;
-            for (int i = yStart; i < yStart + height; i++)
+            // Counter indices
+            short chestCount = 0;
+            short signCount = 0;
+            short entityCount = 0;
+
+            // Tracking variables
+            int bufferPos = 0;
+            int headerPos = 0;
+            int repeatedTileCount = 0;
+            byte flags = 0;
+            byte[] buffer = new byte[16];
+            ITile previousTile = null;
+
+            // Process all tiles in the specified region
+            for (int y = yStart; y < yStart + height; y++)
             {
-                for (int j = xStart; j < xStart + width; j++)
+                for (int x = xStart; x < xStart + width; x++)
                 {
-                    ITile tile2 = tiles[j + dj, i + di];
-                    if (tile2.isTheSameAs(tile) && TileID.Sets.AllowsSaveCompressionBatching[(int)tile2.type])
+                    ITile currentTile = Terraria.Main.tile[x, y];
+
+                    // Check if this tile can be batched with the previous one
+                    if (currentTile.isTheSameAs(previousTile) && TileID.Sets.AllowsSaveCompressionBatching[currentTile.type])
                     {
-                        num4 += 1;
+                        repeatedTileCount++;
+                        continue;
                     }
-                    else
+
+                    // Write out any accumulated repeated tiles
+                    if (previousTile != null)
                     {
-                        if (tile != null)
+                        if (repeatedTileCount > 0)
                         {
-                            if (num4 > 0)
-                            {
-                                array4[num5] = (byte)(num4 & 255);
-                                num5++;
-                                if (num4 > 255)
-                                {
-                                    b |= 128;
-                                    array4[num5] = (byte)(((int)num4 & 65280) >> 8);
-                                    num5++;
-                                }
-                                else
-                                {
-                                    b |= 64;
-                                }
-                            }
-                            array4[num6] = b;
-                            writer.Write(array4, num6, num5 - num6);
-                            num4 = 0;
-                        }
-                        num5 = 3;
-                        byte b3;
-                        byte b2 = b = (b3 = 0);
-                        if (tile2.active())
-                        {
-                            b |= 2;
-                            array4[num5] = (byte)tile2.type;
-                            num5++;
-                            if (tile2.type > 255)
-                            {
-                                array4[num5] = (byte)(tile2.type >> 8);
-                                num5++;
-                                b |= 32;
-                            }
-                            if (TileID.Sets.BasicChest[(int)tile2.type] && tile2.frameX % 36 == 0 && tile2.frameY % 36 == 0)
-                            {
-                                short num7 = (short)Chest.FindChest(j, i);
-                                if (num7 != -1)
-                                {
-                                    array[(int)num] = num7;
-                                    num += 1;
-                                }
-                            }
-                            if (tile2.type == 88 && tile2.frameX % 54 == 0 && tile2.frameY % 36 == 0)
-                            {
-                                short num8 = (short)Chest.FindChest(j, i);
-                                if (num8 != -1)
-                                {
-                                    array[(int)num] = num8;
-                                    num += 1;
-                                }
-                            }
+                            // Write repeat count (using one or two bytes depending on size)
+                            buffer[bufferPos] = (byte)(repeatedTileCount & 0xFF);
+                            bufferPos++;
 
-                            if (tile2.frameX % 36 == 0 && tile2.frameY % 36 == 0)
+                            if (repeatedTileCount > 255)
                             {
-                                switch (tile2.type)
-                                {
-                                    case 85:
-                                    case 55:
-                                    case 425:
-                                    case 573:
-                                        {
-                                            short k = (short)Sign.ReadSign(j, i, true);
-                                            if (k != -1)
-                                            {
-                                                array2[num2++] = k;
-                                            }
-                                            break;
-                                        }
-                                }
-                            }
-
-
-                            if (tile2.type == 378 && tile2.frameX % 36 == 0 && tile2.frameY == 0)
-                            {
-                                int num17 = TETrainingDummy.Find(j, i);
-                                if (num17 != -1)
-                                {
-                                    short[] array9 = array3;
-                                    short num18 = num3;
-                                    num3 = (short)(num18 + 1);
-                                    array9[(int)num18] = (short)num17;
-                                }
-                            }
-                            if (tile2.type == 395 && tile2.frameX % 36 == 0 && tile2.frameY == 0)
-                            {
-                                int num19 = TEItemFrame.Find(j, i);
-                                if (num19 != -1)
-                                {
-                                    short[] array10 = array3;
-                                    short num20 = num3;
-                                    num3 = (short)(num20 + 1);
-                                    array10[(int)num20] = (short)num19;
-                                }
-                            }
-                            if (tile2.type == 520 && tile2.frameX % 18 == 0 && tile2.frameY == 0)
-                            {
-                                int num21 = TEFoodPlatter.Find(j, i);
-                                if (num21 != -1)
-                                {
-                                    short[] array11 = array3;
-                                    short num22 = num3;
-                                    num3 = (short)(num22 + 1);
-                                    array11[(int)num22] = (short)num21;
-                                }
-                            }
-                            if (tile2.type == 471 && tile2.frameX % 54 == 0 && tile2.frameY == 0)
-                            {
-                                int num23 = TEWeaponsRack.Find(j, i);
-                                if (num23 != -1)
-                                {
-                                    short[] array12 = array3;
-                                    short num24 = num3;
-                                    num3 = (short)(num24 + 1);
-                                    array12[(int)num24] = (short)num23;
-                                }
-                            }
-                            if (tile2.type == 470 && tile2.frameX % 36 == 0 && tile2.frameY == 0)
-                            {
-                                int num25 = TEDisplayDoll.Find(j, i);
-                                if (num25 != -1)
-                                {
-                                    short[] array13 = array3;
-                                    short num26 = num3;
-                                    num3 = (short)(num26 + 1);
-                                    array13[(int)num26] = (short)num25;
-                                }
-                            }
-                            if (tile2.type == 475 && tile2.frameX % 54 == 0 && tile2.frameY == 0)
-                            {
-                                int num27 = TEHatRack.Find(j, i);
-                                if (num27 != -1)
-                                {
-                                    short[] array14 = array3;
-                                    short num28 = num3;
-                                    num3 = (short)(num28 + 1);
-                                    array14[(int)num28] = (short)num27;
-                                }
-                            }
-                            if (tile2.type == 597 && tile2.frameX % 54 == 0 && tile2.frameY % 72 == 0)
-                            {
-                                int num29 = TETeleportationPylon.Find(j, i);
-                                if (num29 != -1)
-                                {
-                                    short[] array15 = array3;
-                                    short num30 = num3;
-                                    num3 = (short)(num30 + 1);
-                                    array15[(int)num30] = (short)num29;
-                                }
-                            }
-                            if (Main.tileFrameImportant[(int)tile2.type])
-                            {
-                                array4[num5] = (byte)(tile2.frameX & 255);
-                                num5++;
-                                array4[num5] = (byte)(((int)tile2.frameX & 65280) >> 8);
-                                num5++;
-                                array4[num5] = (byte)(tile2.frameY & 255);
-                                num5++;
-                                array4[num5] = (byte)(((int)tile2.frameY & 65280) >> 8);
-                                num5++;
-                            }
-                            if (tile2.color() != 0)
-                            {
-                                b3 |= 8;
-                                array4[num5] = tile2.color();
-                                num5++;
-                            }
-                        }
-                        if (tile2.wall != 0)
-                        {
-                            b |= 4;
-                            array4[num5] = (byte)tile2.wall;
-                            num5++;
-                            if (tile2.wallColor() != 0)
-                            {
-                                b3 |= 16;
-                                array4[num5] = tile2.wallColor();
-                                num5++;
-                            }
-                        }
-                        if (tile2.liquid != 0)
-                        {
-                            if (tile2.lava())
-                            {
-                                b |= 16;
-                            }
-                            else if (tile2.honey())
-                            {
-                                b |= 24;
+                                flags |= 0x80; // Two-byte repeat flag
+                                buffer[bufferPos] = (byte)((repeatedTileCount & 0xFF00) >> 8);
+                                bufferPos++;
                             }
                             else
                             {
-                                b |= 8;
+                                flags |= 0x40; // One-byte repeat flag
                             }
-                            array4[num5] = tile2.liquid;
-                            num5++;
                         }
-                        if (tile2.wire())
+
+                        // Write the header byte with flags
+                        buffer[headerPos] = flags;
+                        writer.Write(buffer, headerPos, bufferPos - headerPos);
+                        repeatedTileCount = 0;
+                    }
+
+                    // Reset for new tile
+                    bufferPos = 4;
+                    flags = 0;
+                    byte importantFlag = 0;
+                    byte headerFlag2 = 0;
+                    byte headerFlag3 = 0;
+
+                    // Process active tile properties
+                    if (currentTile.active())
+                    {
+                        flags |= 2; // Active tile flag
+
+                        // Write tile type
+                        buffer[bufferPos++] = (byte)currentTile.type;
+
+                        // Handle tile types that need extended format
+                        if (currentTile.type > 255)
                         {
-                            b2 |= 2;
+                            buffer[bufferPos++] = (byte)(currentTile.type >> 8);
+                            flags |= 0x20; // Extended tile type flag
                         }
-                        if (tile2.wire2())
+
+                        // Process special tiles
+                        ProcessSpecialTiles(currentTile, x, y, ref chestCount, ref signCount, ref entityCount);
+
+                        // Handle important frame data
+                        if (Terraria.Main.tileFrameImportant[currentTile.type])
                         {
-                            b2 |= 4;
+                            WriteFrameData(currentTile, buffer, ref bufferPos);
                         }
-                        if (tile2.wire3())
+
+                        // Handle tile color
+                        if (currentTile.color() != 0)
                         {
-                            b2 |= 8;
+                            headerFlag2 |= 8;
+                            buffer[bufferPos++] = currentTile.color();
                         }
-                        int num31;
-                        if (tile2.halfBrick())
+                    }
+
+                    // Process wall properties
+                    if (currentTile.wall != 0)
+                    {
+                        flags |= 4; // Wall flag
+                        buffer[bufferPos++] = (byte)currentTile.wall;
+
+                        // Handle wall color
+                        if (currentTile.wallColor() != 0)
                         {
-                            num31 = 16;
+                            headerFlag2 |= 0x10;
+                            buffer[bufferPos++] = currentTile.wallColor();
                         }
-                        else if (tile2.slope() != 0)
+
+                        // Extended wall ID
+                        if (currentTile.wall > 255)
                         {
-                            num31 = (int)(tile2.slope() + 1) << 4;
+                            buffer[bufferPos++] = (byte)(currentTile.wall >> 8);
+                            headerFlag2 |= 0x40;
+                        }
+                    }
+
+                    // Process liquid properties
+                    if (currentTile.liquid != 0)
+                    {
+                        if (!currentTile.shimmer())
+                        {
+                            flags |= (byte)(currentTile.lava() ? 0x10 :
+                                    (currentTile.honey() ? 0x18 : 0x08));
                         }
                         else
                         {
-                            num31 = 0;
+                            headerFlag2 |= 0x80;
+                            flags |= 0x08;
                         }
-                        b2 |= (byte)num31;
-                        if (tile2.actuator())
-                        {
-                            b3 |= 2;
-                        }
-                        if (tile2.inActive())
-                        {
-                            b3 |= 4;
-                        }
-                        if (tile2.wire4())
-                        {
-                            b3 |= 32;
-                        }
-                        if (tile2.wall > 255)
-                        {
-                            array4[num5] = (byte)(tile2.wall >> 8);
-                            num5++;
-                            b3 |= 64;
-                        }
-                        num6 = 2;
-                        if (b3 != 0)
-                        {
-                            b2 |= 1;
-                            array4[num6] = b3;
-                            num6--;
-                        }
-                        if (b2 != 0)
-                        {
-                            b |= 1;
-                            array4[num6] = b2;
-                            num6--;
-                        }
-                        tile = tile2;
+                        buffer[bufferPos++] = currentTile.liquid;
                     }
+
+                    // Process wire properties
+                    if (currentTile.wire()) importantFlag |= 2;
+                    if (currentTile.wire2()) importantFlag |= 4;
+                    if (currentTile.wire3()) importantFlag |= 8;
+                    if (currentTile.wire4()) headerFlag2 |= 0x20;
+
+                    // Process brick/slope properties
+                    byte shapeValue = GetShapeValue(currentTile);
+                    importantFlag |= shapeValue;
+
+                    // Process additional tile flags
+                    if (currentTile.actuator()) headerFlag2 |= 2;
+                    if (currentTile.inActive()) headerFlag2 |= 4;
+
+                    // Process invisibility and lighting flags
+                    if (currentTile.invisibleBlock()) headerFlag3 |= 2;
+                    if (currentTile.invisibleWall()) headerFlag3 |= 4;
+                    if (currentTile.fullbrightBlock()) headerFlag3 |= 8;
+                    if (currentTile.fullbrightWall()) headerFlag3 |= 0x10;
+
+                    // Set up header positions in reverse order (header3, header2, header1)
+                    headerPos = 3;
+
+                    // Only include headers that are needed
+                    if (headerFlag3 != 0)
+                    {
+                        headerFlag2 |= 1;
+                        buffer[headerPos--] = headerFlag3;
+                    }
+
+                    if (headerFlag2 != 0)
+                    {
+                        importantFlag |= 1;
+                        buffer[headerPos--] = headerFlag2;
+                    }
+
+                    if (importantFlag != 0)
+                    {
+                        flags |= 1;
+                        buffer[headerPos--] = importantFlag;
+                    }
+
+                    previousTile = currentTile;
                 }
             }
-            if (num4 > 0)
+
+            // Handle any remaining repeated tiles
+            if (repeatedTileCount > 0)
             {
-                array4[num5] = (byte)(num4 & 255);
-                num5++;
-                if (num4 > 255)
+                buffer[bufferPos++] = (byte)(repeatedTileCount & 0xFF);
+
+                if (repeatedTileCount > 255)
                 {
-                    b |= 128;
-                    array4[num5] = (byte)(((int)num4 & 65280) >> 8);
-                    num5++;
+                    flags |= 0x80;
+                    buffer[bufferPos++] = (byte)((repeatedTileCount & 0xFF00) >> 8);
                 }
                 else
                 {
-                    b |= 64;
+                    flags |= 0x40;
                 }
             }
-            array4[num6] = b;
-            writer.Write(array4, num6, num5 - num6);
-            writer.Write(num);
-            for (int k = 0; k < (int)num; k++)
+
+            // Write final buffer
+            buffer[headerPos] = flags;
+            writer.Write(buffer, headerPos, bufferPos - headerPos);
+
+            // Write special tile entities
+            WriteSpecialEntities(writer, chestCount, signCount, entityCount);
+        }
+
+        // Helper method to process special tiles (chests, signs, etc.)
+        private static void ProcessSpecialTiles(ITile tile, int x, int y, ref short chestCount, ref short signCount, ref short entityCount)
+        {
+            // Basic chest detection
+            if (TileID.Sets.BasicChest[tile.type] && tile.frameX % 36 == 0 && tile.frameY % 36 == 0)
             {
-                Chest chest = Main.chest[(int)array[k]];
-                writer.Write(array[k]);
+                short chestIndex = (short)Chest.FindChest(x, y);
+                if (chestIndex != -1)
+                {
+                    _compressChestList[chestCount++] = chestIndex;
+                }
+            }
+
+            // Special chest type (ID 88)
+            if (tile.type == 88 && tile.frameX % 54 == 0 && tile.frameY % 36 == 0)
+            {
+                short chestIndex = (short)Chest.FindChest(x, y);
+                if (chestIndex != -1)
+                {
+                    _compressChestList[chestCount++] = chestIndex;
+                }
+            }
+
+            // Sign types (85, 55, 425, 573)
+            int[] signTypes = { 85, 55, 425, 573 };
+            if (Array.IndexOf(signTypes, tile.type) >= 0 && tile.frameX % 36 == 0 && tile.frameY % 36 == 0)
+            {
+                short signIndex = (short)Sign.ReadSign(x, y);
+                if (signIndex != -1)
+                {
+                    _compressSignList[signCount++] = signIndex;
+                }
+            }
+
+            // Process special entity tiles
+            ProcessEntityTile(tile, x, y, ref entityCount);
+        }
+
+        // Helper method to process entity tiles
+        private static void ProcessEntityTile(ITile tile, int x, int y, ref short entityCount)
+        {
+            int entityIndex = -1;
+
+            // Training dummy
+            if (tile.type == 378 && tile.frameX % 36 == 0 && tile.frameY == 0)
+            {
+                entityIndex = TETrainingDummy.Find(x, y);
+            }
+            // Item frame
+            else if (tile.type == 395 && tile.frameX % 36 == 0 && tile.frameY == 0)
+            {
+                entityIndex = TEItemFrame.Find(x, y);
+            }
+            // Food platter
+            else if (tile.type == 520 && tile.frameX % 18 == 0 && tile.frameY == 0)
+            {
+                entityIndex = TEFoodPlatter.Find(x, y);
+            }
+            // Weapons rack
+            else if (tile.type == 471 && tile.frameX % 54 == 0 && tile.frameY == 0)
+            {
+                entityIndex = TEWeaponsRack.Find(x, y);
+            }
+            // Display doll
+            else if (tile.type == 470 && tile.frameX % 36 == 0 && tile.frameY == 0)
+            {
+                entityIndex = TEDisplayDoll.Find(x, y);
+            }
+            // Hat rack
+            else if (tile.type == 475 && tile.frameX % 54 == 0 && tile.frameY == 0)
+            {
+                entityIndex = TEHatRack.Find(x, y);
+            }
+            // Teleportation pylon
+            else if (tile.type == 597 && tile.frameX % 54 == 0 && tile.frameY % 72 == 0)
+            {
+                entityIndex = TETeleportationPylon.Find(x, y);
+            }
+
+            if (entityIndex != -1)
+            {
+                _compressEntities[entityCount++] = (short)entityIndex;
+            }
+        }
+
+        // Helper method to write frame data
+        private static void WriteFrameData(ITile tile, byte[] buffer, ref int position)
+        {
+            // Write frameX
+            buffer[position++] = (byte)(tile.frameX & 0xFF);
+            buffer[position++] = (byte)((tile.frameX & 0xFF00) >> 8);
+
+            // Write frameY
+            buffer[position++] = (byte)(tile.frameY & 0xFF);
+            buffer[position++] = (byte)((tile.frameY & 0xFF00) >> 8);
+        }
+
+        // Helper method to get shape value
+        private static byte GetShapeValue(ITile tile)
+        {
+            if (tile.halfBrick())
+            {
+                return 16;
+            }
+            else if (tile.slope() != 0)
+            {
+                return (byte)((tile.slope() + 1) << 4);
+            }
+
+            return 0;
+        }
+
+        // Helper method to write special entities (chests, signs, etc.)
+        private static void WriteSpecialEntities(BinaryWriter writer, short chestCount, short signCount, short entityCount)
+        {
+            // Write chests
+            writer.Write(chestCount);
+            for (int i = 0; i < chestCount; i++)
+            {
+                Chest chest = Terraria.Main.chest[_compressChestList[i]];
+                writer.Write(_compressChestList[i]);
                 writer.Write((short)chest.x);
                 writer.Write((short)chest.y);
                 writer.Write(chest.name);
             }
 
-            {   // TODO: Optimize, add a custom sign that does not exist in the world
-
-                var entities = providers.SelectMany(p => p.Entities);
-                var fakeSigns = entities.Where(p => p is FakeSign).Select(p => p as FakeSign).ToList();
-                int count = fakeSigns.Count();
-
-                FakeSign FindSign(int x, int y)
-                {
-                    foreach (FakeSign sign in fakeSigns)
-                        if (sign.x == x && sign.y == y)
-                            return sign;
-                    return null;
-                }
-
-                writer.Write(num2);
-                for (int l = 0; l < (int)num2; l++)
-                {
-                    Sign sign = Main.sign[(int)array2[l]];
-                    FakeSign fakeSign = FindSign(sign.x, sign.y);
-                    if (fakeSign != null)
-                    {
-                        sign = fakeSign;
-                    }
-
-                    writer.Write(array2[l]);
-                    writer.Write((short)sign.x);
-                    writer.Write((short)sign.y);
-                    writer.Write(sign.text);
-                }
+            // Write signs
+            writer.Write(signCount);
+            for (int i = 0; i < signCount; i++)
+            {
+                Sign sign = Terraria.Main.sign[_compressSignList[i]];
+                writer.Write(_compressSignList[i]);
+                writer.Write((short)sign.x);
+                writer.Write((short)sign.y);
+                writer.Write(sign.text);
             }
 
-            writer.Write(num3);
-            for (int m = 0; m < (int)num3; m++)
+            // Write tile entities
+            writer.Write(entityCount);
+            for (int i = 0; i < entityCount; i++)
             {
-                TileEntity.Write(writer, TileEntity.ByID[(int)array3[m]], false);
+                TileEntity.Write(writer, TileEntity.ByID[_compressEntities[i]]);
             }
         }
 

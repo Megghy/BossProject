@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using BossFramework.BAttributes;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
+using EnchCoreApi.TrProtocol.NetPackets;
 using Terraria;
-using TrProtocol.Packets;
 
 namespace BossFramework.BNet.PacketHandlers
 {
@@ -59,8 +59,8 @@ namespace BossFramework.BNet.PacketHandlers
                         Netplay.Clients[proj.PlayerSlot].SpamProjectile += 1f;
                     }
                     projectile.identity = proj.ProjSlot;
-                    projectile.position = proj.Position.Get();
-                    projectile.velocity = proj.Velocity.Get();
+                    projectile.position = proj.Position;
+                    projectile.velocity = proj.Velocity;
                     projectile.type = proj.ProjType;
                     projectile.damage = proj.Damage;
                     projectile.bannerIdToRespondTo = proj.BannerId;

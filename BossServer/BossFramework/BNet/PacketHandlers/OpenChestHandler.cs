@@ -1,6 +1,6 @@
 ﻿using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using TrProtocol.Packets;
+using EnchCoreApi.TrProtocol.NetPackets;
 using TShockAPI;
 
 namespace BossFramework.BNet.PacketHandlers
@@ -12,7 +12,7 @@ namespace BossFramework.BNet.PacketHandlers
         {
             var args = new GetDataHandlers.ChestOpenEventArgs()
             {
-                Player = plr.TsPlayer,
+                Player = plr.TSPlayer,
                 Data = null,
                 X = packet.Position.X,
                 Y = packet.Position.Y

@@ -1,14 +1,90 @@
 ﻿@page "/"
+@implements IDisposable
 
 <PageTitle>Boss服务器 | 首页</PageTitle>
 
 <Flex>
-    <Card Title="服务器状态" Style="width: 100%;">
-         @ServerManager.IsRunning
-         <Button OnClick="() => ServerManager.StartServer()">启动服务</Button>
+    <Card Style="width: 100%;">
+        <TitleTemplate>
+            <Flex Align="FlexAlign.Center" Gap="FlexGap.Small">
+                <span>服务器状态</span>
+                @if (ServerManager.Status == ServerManager.ServerStatus.Starting)
+                {
+                    <Alert Type="AlertType.Info"
+                           Message="启动中"
+                           ShowIcon="true" />
+                }
+                else if (ServerManager.Status == ServerManager.ServerStatus.Running)
+                {
+                    <Alert Type="AlertType.Success"
+                           Message="运行中"
+                           ShowIcon="true" />
+                }
+                else
+                {
+                    <Alert Type="AlertType.Default"
+                           Message="未运行"
+                           ShowIcon="true"
+                           Style="max-width: 100px;" />
+                }
+            </Flex>
+        </TitleTemplate>
+        <ChildContent>
+            <Space Direction="SpaceDirection.Vertical" Size="SpaceSize.Small">
+                <SpaceItem>
+                    @if (ServerManager.Status == ServerManager.ServerStatus.Stopped || ServerManager.Status == ServerManager.ServerStatus.Starting)
+                    {
+                        <Spin Spinning="ServerManager.Status == ServerManager.ServerStatus.Starting" />
+                        <Button Type="ButtonType.Primary" OnClick="() => ServerManager.StartServer()" Disabled="ServerManager.Status == ServerManager.ServerStatus.Starting">启动服务器</Button>
+                    }
+                    else
+                    {
+                        <Button Danger OnClick="() => ServerManager.StopServer()" Disabled="ServerManager.Status == ServerManager.ServerStatus.Starting">关闭服务器</Button>
+                    }
+                </SpaceItem>
+                <SpaceItem>
+                    <Search Placeholder="input search text" EnterButton="@("保存")" @bind-Value="Config.Instance.StartupCommandLine" OnSearch="OnSaveStartArgs" Style="min-width: 700px;" />
+                </SpaceItem>
+                <Flex>
+                    <Switch @bind-Value="Config.Instance.AutoStart" OnChange="OnSaveStartArgs" Style="max-width: 20px;">自动启动</Switch>
+                    自动启动
+                </Flex>
+            </Space>
+        </ChildContent>
     </Card>
+    <ContentParser Content="@("字符串[i:2802]你好[c/FF4500:汪][c/EE4000:汪][c/FFA500:队][c/FF7F00:长一号] ")" />
 </Flex>
 
 @code{
+    ServerManager.ServerStatus CurrentStatus = ServerManager.ServerStatus.Stopped;
+    bool isDisposed = false;
+    public void Start(string value)
+    {
+        Task.Run(() =>
+        {
+            while (!isDisposed)
+            {
+                CurrentStatus = ServerManager.Status;
+                StateHasChanged();
+                Thread.Sleep(1000);
+            }
+        });
+    }
 
+    public void OnSaveStartArgs()
+    {
+        Config.Instance.Save();
+        Utils.NotificateSuccess("已保存");
+    }
+
+    public void Dispose()
+    {
+        isDisposed = true;
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        CurrentStatus = ServerManager.Status;
+    }
 }

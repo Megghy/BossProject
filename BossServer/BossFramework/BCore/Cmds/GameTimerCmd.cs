@@ -97,7 +97,7 @@ namespace BossFramework.BCore.Cmds
         {
             if (args.Handled)
                 return string.Empty;
-            var timers = (_playerData.GetValue(args.Player.TsPlayer) as Dictionary<string, object>).Where(k => k.Key.StartsWith(GAMETIMER_PREFIX));
+            var timers = (_playerData.GetValue(args.Player.TSPlayer) as Dictionary<string, object>).Where(k => k.Key.StartsWith(GAMETIMER_PREFIX));
             var text = "";
             timers.ForEach(t =>
             {

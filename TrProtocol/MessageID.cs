@@ -147,5 +147,12 @@ public enum MessageID : byte
     ClientSyncedInventory = 138,
     SetCountsAsHostForGameplay = 139,
     SetMiscEventValues = 140,
-    Count = 141
+    Count = 141,
+    SyncProjectileTrackers = 142,
+    CrystalInvasionRequestedToSkipWaitTime = 143,
+    RequestQuestEffect = 144,
+    SyncItemsWithShimmer = 145,
+    ShimmerActions = 146,
+    SyncLoadout = 147,
+    SyncItemCannotBeTakenByEnemies = 148
 }

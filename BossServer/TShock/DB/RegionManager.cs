@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 using Terraria;
 
 namespace TShockAPI.DB

@@ -123,12 +123,12 @@ namespace Philosophyz
 
             var remoteClient = args.remoteClient;
             if (remoteClient == -1)
-                BInfo.OnlinePlayers.ForEach(p => p.SendPacket(BUtils.GetCurrentWorldData(PlayerInfo.GetPlayerInfo(p.TsPlayer).FakeSscStatus ?? DefaultFakeSscStatus)));
+                BInfo.OnlinePlayers.ForEach(p => p.SendPacket(BUtils.GetCurrentWorldData(PlayerInfo.GetPlayerInfo(p.TSPlayer).FakeSscStatus ?? DefaultFakeSscStatus)));
             else
             {
                 var plr = TShock.Players[args.remoteClient]?.GetBPlayer();
                 if (plr is not null)
-                    plr.SendPacket(BUtils.GetCurrentWorldData(PlayerInfo.GetPlayerInfo(plr.TsPlayer).FakeSscStatus ?? DefaultFakeSscStatus));
+                    plr.SendPacket(BUtils.GetCurrentWorldData(PlayerInfo.GetPlayerInfo(plr.TSPlayer).FakeSscStatus ?? DefaultFakeSscStatus));
             }
         }
 

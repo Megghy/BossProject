@@ -1,6 +1,6 @@
 ﻿using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using TrProtocol.Packets;
+using EnchCoreApi.TrProtocol.NetPackets;
 
 namespace BossFramework.BNet.PacketHandlers
 {
@@ -17,8 +17,8 @@ namespace BossFramework.BNet.PacketHandlers
 
         public override bool OnSendPacket(BPlayer plr, SyncEquipment packet)
         {
-            if (plr.IsChangingWeapon)
-                return true;
+            /*if (plr.IsChangingWeapon) // 防止正在修改武器时玩家操作背包, 之后再完善
+                return true;*/
             return base.OnSendPacket(plr, packet);
         }
     }

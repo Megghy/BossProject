@@ -58,12 +58,12 @@ public class BackGammon : BaseMiniGame
             if (kind == Kind.White)
             {
                 White.SendCombatMessage("现在是你的回合");
-                NetMessage.PlayNetSound(new NetMessage.NetSoundInfo(White.TrPlayer.position, 112, -1, 0.62f), White.Index);
+                NetMessage.PlayNetSound(new NetMessage.NetSoundInfo(White.TRPlayer.position, 112, -1, 0.62f), White.Index);
             }
             else
             {
                 Black.SendCombatMessage("现在是你的回合");
-                NetMessage.PlayNetSound(new NetMessage.NetSoundInfo(White.TrPlayer.position, 112, -1, 0.62f), White.Index);
+                NetMessage.PlayNetSound(new NetMessage.NetSoundInfo(White.TRPlayer.position, 112, -1, 0.62f), White.Index);
             }
             NowKindLabel.UpdateTileColor(kind == Kind.Black ? PaintID.BlackPaint : PaintID.WhitePaint);
         }
@@ -530,7 +530,7 @@ public class BackGammon : BaseMiniGame
         }
         if (plr is not null)
         {
-            int num = Projectile.NewProjectile(Projectile.GetNoneSource(), plr.TrPlayer.position.X, plr.TrPlayer.position.Y - 64f, 0f, -8f, 167, 0, 0f, 255, 0f, 0f);
+            int num = Projectile.NewProjectile(Projectile.GetNoneSource(), plr.TRPlayer.position.X, plr.TRPlayer.position.Y - 64f, 0f, -8f, 167, 0, 0f, 255, 0f, 0f);
             Main.projectile[num].Kill();
         }
         TileType = new int[LENGTH, LENGTH];

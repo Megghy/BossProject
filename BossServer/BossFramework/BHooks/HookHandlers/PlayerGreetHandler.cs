@@ -1,7 +1,7 @@
 ﻿using BossFramework.BModels;
+using EnchCoreApi.TrProtocol.NetPackets;
 using Microsoft.Xna.Framework;
 using TerrariaApi.Server;
-using TrProtocol.Packets;
 using TShockAPI;
 
 namespace BossFramework.BHooks.HookHandlers

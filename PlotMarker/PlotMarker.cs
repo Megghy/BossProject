@@ -123,7 +123,7 @@ namespace PlotMarker
 
         private static void OnUpdateSign(BEventArgs.SignUpdateEventArgs args)
         {
-            var plr = args.Player.TsPlayer;
+            var plr = args.Player.TSPlayer;
             if (plr.GetCurrentCell() is { } cell)
             {
                 if (!cell.CanEdit(plr) && !plr.HasPermission("pm.admin.updatesign"))

@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 
 namespace TShockAPI.DB
 {

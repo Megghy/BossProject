@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using BossFramework.BCore;
 using BossFramework.BInterfaces;
 using BossFramework.DB;
 using FreeSql.DataAnnotations;
 using Microsoft.Xna.Framework;
 using Terraria;
-using TrProtocol;
-using TrProtocol.Packets;
 using TShockAPI;
 using static BossFramework.BModels.BEventArgs;
 
@@ -46,22 +45,35 @@ namespace BossFramework.BModels
         public long LastPingTime { get; internal set; } = -1;
         [Column(IsIgnore = true)]
         public bool WaitingPing { get; internal set; } = false;
-
+        [Obsolete("Use TSPlayer")]
         public TSPlayer TsPlayer { get; internal set; }
-        public Player TrPlayer => TsPlayer?.TPlayer;
-        public string Name => TsPlayer?.Name ?? "unknown";
-        public byte Index => (byte)(TsPlayer?.Index ?? -1);
-        public bool IsRealPlayer => TsPlayer?.RealPlayer ?? false;
-        public float X => TsPlayer.X;
-        public float Y => TsPlayer.Y;
-        public int TileX => TsPlayer.TileX;
-        public int TileY => TsPlayer.TileY;
+        /// <summary>
+        /// tshock的玩家对象
+        /// </summary>
+        public TSPlayer TSPlayer => TsPlayer;
+        [Obsolete("Use TPlayer")]
+        public Player TrPlayer => TSPlayer?.TPlayer;
+        /// <summary>
+        /// tr自身的玩家对象
+        /// </summary>
+        public Player TRPlayer => TrPlayer;
+        /// <summary>
+        /// tr自身的玩家对象
+        /// </summary>
+        public Player TPlayer => TrPlayer;
+        public string Name => TSPlayer?.Name ?? "unknown";
+        public byte Index => (byte)(TSPlayer?.Index ?? -1);
+        public bool IsRealPlayer => TSPlayer?.RealPlayer ?? false;
+        public float X => TSPlayer.X;
+        public float Y => TSPlayer.Y;
+        public int TileX => TSPlayer.TileX;
+        public int TileY => TSPlayer.TileY;
 
         public readonly Dictionary<Func<BaseEventArgs, string>, int> PlayerStatusCallback = new();
 
         public BaseBWeapon[] Weapons { get; internal set; }
         public BRegion CurrentRegion
-            => BCore.BRegionSystem.FindBRegionForRegion(TsPlayer?.CurrentRegion) ?? BRegion.Default;
+            => BCore.BRegionSystem.FindBRegionForRegion(TSPlayer?.CurrentRegion) ?? BRegion.Default;
         public ProjRedirectContext ProjContext => CurrentRegion?.ProjContext;
         /// <summary>
         /// 是否处于使用自定义武器的状态, 修改需使用 <see cref="BCore.BWeaponSystem.ChangeCustomWeaponMode(BPlayer, bool?)"/>
@@ -109,7 +121,7 @@ namespace BossFramework.BModels
         public void SendPacket(Packet p)
         {
             if (!CheckSendPacket(p))
-                TsPlayer?.SendRawData(p.SerializePacket());
+                TSPlayer?.SendRawData(p.SerializePacket());
         }
         public void SendPackets<T>(IEnumerable<T> p) where T : Packet
         {
@@ -119,46 +131,46 @@ namespace BossFramework.BModels
                 if (!CheckSendPacket(packet))
                     packets.Add(packet);
             });
-            TsPlayer?.SendRawData(packets.GetPacketsByteData());
+            TSPlayer?.SendRawData(packets.GetPacketsByteData());
         }
-        public void SendRawData(byte[] data) => TsPlayer?.SendRawData(data);
+        public void SendRawData(byte[] data) => TSPlayer?.SendRawData(data);
         public void SendCombatMessage(string msg, Color color = default, bool randomPosition = true)
         {
             color = color == default ? Color.White : color;
             Random random = new();
-            TsPlayer!.SendData(PacketTypes.CreateCombatTextExtended, msg, (int)color.PackedValue, TsPlayer.X + (randomPosition ? random.Next(-75, 75) : 0), TsPlayer.Y + (randomPosition ? random.Next(-50, 50) : 0));
+            TSPlayer!.SendData(PacketTypes.CreateCombatTextExtended, msg, (int)color.PackedValue, TSPlayer.X + (randomPosition ? random.Next(-75, 75) : 0), TSPlayer.Y + (randomPosition ? random.Next(-50, 50) : 0));
         }
         public void SendCombatMessage(string msg, Point p, Color color = default)
         {
             color = color == default ? Color.White : color;
-            TsPlayer!.SendData(PacketTypes.CreateCombatTextExtended, msg, (int)color.PackedValue, p.X, p.Y);
+            TSPlayer!.SendData(PacketTypes.CreateCombatTextExtended, msg, (int)color.PackedValue, p.X, p.Y);
         }
         public void SendSuccessMsg(object text)
         {
-            TsPlayer?.SendMsg(text, new Color(120, 194, 96));
+            TSPlayer?.SendMsg(text, new Color(120, 194, 96));
         }
 
         public void SendInfoMsg(object text)
         {
-            TsPlayer?.SendMsg(text, new Color(216, 212, 82));
+            TSPlayer?.SendMsg(text, new Color(216, 212, 82));
         }
         public void SendErrorMsg(object text)
         {
-            TsPlayer?.SendMsg(text, new Color(195, 83, 83));
+            TSPlayer?.SendMsg(text, new Color(195, 83, 83));
         }
         public void SendMsg(object text, Color color = default)
         {
-            TsPlayer?.SendMsg(text, color);
+            TSPlayer?.SendMsg(text, color);
         }
         public void SendMultipleMatchError(IEnumerable<object> matches)
         {
-            TsPlayer?.SendErrorMessage("More than one match found -- unable to decide which is correct: ");
+            TSPlayer?.SendErrorMessage("More than one match found -- unable to decide which is correct: ");
 
             var lines = PaginationTools.BuildLinesFromTerms(matches.ToArray());
-            lines.ForEach(TsPlayer!.SendInfoMessage);
+            lines.ForEach(TSPlayer!.SendInfoMessage);
 
-            TsPlayer?.SendErrorMessage("Use \"my query\" for items with spaces.");
-            TsPlayer?.SendErrorMessage("Use tsi:[number] or tsn:[username] to distinguish between user IDs and usernames.");
+            TSPlayer?.SendErrorMessage("Use \"my query\" for items with spaces.");
+            TSPlayer?.SendErrorMessage("Use tsi:[number] or tsn:[username] to distinguish between user IDs and usernames.");
         }
         public SyncEquipment RemoveItemPacket(int slot, bool clearServerSideItem = true)
             => new()
@@ -172,7 +184,7 @@ namespace BossFramework.BModels
         public void RemoveItem(int slot, bool clearServerSideItem = true)
         {
             if (clearServerSideItem)
-                TrPlayer.inventory[slot]?.SetDefaults();
+                TRPlayer.inventory[slot]?.SetDefaults();
             SendPacket(RemoveItemPacket(slot));
         }
 
@@ -182,13 +194,13 @@ namespace BossFramework.BModels
             => BCore.BPointSystem.ChangePoint(Index, -num, from);
 
         public void SetData(string key, object data)
-            => TsPlayer?.SetData(key, data);
+            => TSPlayer?.SetData(key, data);
         public bool ContainsData(string key)
-            => TsPlayer?.ContainsData(key) ?? false;
+            => TSPlayer?.ContainsData(key) ?? false;
         public T GetData<T>(string key)
-            => TsPlayer.GetData<T>(key) ?? default;
+            => TSPlayer.GetData<T>(key) ?? default;
         public void RemoveData(string key)
-            => TsPlayer?.RemoveData(key);
+            => TSPlayer?.RemoveData(key);
 
         #region 玩家状态
         /// <summary>
@@ -199,14 +211,14 @@ namespace BossFramework.BModels
         {
             if (IsRealPlayer)
                 return false;
-            if (TsPlayer.TPlayer.statMana + value < 0)
+            if (TSPlayer.TPlayer.statMana + value < 0)
                 return false;
-            TsPlayer.TPlayer.statMana += value;
+            TSPlayer.TPlayer.statMana += value;
             SendPacket(new PlayerMana()
             {
                 PlayerSlot = Index,
-                StatMana = (short)TsPlayer.TPlayer.statMana,
-                StatManaMax = (short)TsPlayer.TPlayer.statLifeMax2
+                StatMana = (short)TSPlayer.TPlayer.statMana,
+                StatManaMax = (short)TSPlayer.TPlayer.statLifeMax2
             });
             BUtils.SendPacketToAll(new ManaEffect()
             {
@@ -218,5 +230,13 @@ namespace BossFramework.BModels
 
         #endregion
         #endregion
+    }
+    // 一些工具方法, 本来应该放在对应的静态类中用拓展方法实现的, 不过各种脚本引用不方便, 就直接放这个里头了
+    public partial class BPlayer
+    {
+        public bool IsInRegion(string region)
+        {
+            return BRegionSystem.FindBRegionByName(region) is { } bregion && CurrentRegion == bregion;
+        }
     }
 }

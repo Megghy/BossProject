@@ -3,7 +3,7 @@ using BossFramework.BModels;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Localization;
-using TrProtocol.Packets;
+using EnchCoreApi.TrProtocol.NetPackets;
 using TShockAPI;
 
 namespace BossFramework.BNet.PacketHandlers
@@ -13,7 +13,7 @@ namespace BossFramework.BNet.PacketHandlers
         public override bool OnGetPacket(BPlayer plr, PlayerDeathV2 packet)
         {
             var death = TShock.Players[packet.PlayerSlot]?.GetBPlayer();
-            if (death is null || death.TrPlayer.dead)
+            if (death is null || death.TRPlayer.dead)
                 return true;
             var targetName = packet.Reason._sourcePlayerIndex is < 255 and >= 0
                 ? TShock.Players[packet.Reason._sourcePlayerIndex]?.GetBPlayer()?.Name.Color("E5C5C5")
@@ -48,16 +48,16 @@ namespace BossFramework.BNet.PacketHandlers
             death.CurrentRegion?.GetPlayers().ForEach(p => p.SendMsg(text, new Color(190, 110, 110)));
             packet.SendPacketToAll();
 
-            death.TrPlayer.dead = true;
-            death.TsPlayer.Dead = true;
-            death.TsPlayer.RespawnTimer = TShock.Config.Settings.RespawnSeconds;
+            death.TRPlayer.dead = true;
+            death.TSPlayer.Dead = true;
+            death.TSPlayer.RespawnTimer = TShock.Config.Settings.RespawnSeconds;
 
             foreach (NPC npc in Main.npc)
             {
                 if (npc.active && (npc.boss || npc.type == 13 || npc.type == 14 || npc.type == 15) &&
-                    Math.Abs(death.TrPlayer.Center.X - npc.Center.X) + Math.Abs(death.TrPlayer.Center.Y - npc.Center.Y) < 4000f)
+                    Math.Abs(death.TRPlayer.Center.X - npc.Center.X) + Math.Abs(death.TRPlayer.Center.Y - npc.Center.Y) < 4000f)
                 {
-                    death.TsPlayer.RespawnTimer = TShock.Config.Settings.RespawnBossSeconds;
+                    death.TSPlayer.RespawnTimer = TShock.Config.Settings.RespawnBossSeconds;
                     break;
                 }
             }

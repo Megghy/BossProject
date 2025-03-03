@@ -50,7 +50,7 @@ public class ConstileationProvider : ModFramework.ICollection<ITile>
 /// </summary>
 /// <remarks>When updating this, refer to <see cref="ITile"/> properties, and adjust the Size accordingly. Size is likely not required, but it make it clear how many bytes we expect to consume</remarks>
 [StructLayout(LayoutKind.Sequential, Size = TileReference.TileSize, Pack = 1)]
-internal struct TileData
+public struct TileData
 {
     public ushort type;
     public ushort wall;
@@ -66,7 +66,7 @@ internal struct TileData
 /// <summary>
 /// This class is intended to be issued back and forth between Terraria, while referring to a preallocated memory mapping of the tile data which avoids duplicating data and storing offsets.
 /// </summary>
-internal unsafe sealed class TileReference : Tile
+public unsafe sealed class TileReference : Tile
 {
     /// <summary>
     /// Size of the tile data in bytes
@@ -132,7 +132,7 @@ internal unsafe sealed class TileReference : Tile
         // this is called in ctor. we dont want to run the default code here.
     }
 
-    internal readonly TileData* _tile;
+    public readonly TileData* _tile;
 
     /// <summary>
     /// Creates a new reference to the packed memory data

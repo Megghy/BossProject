@@ -59,9 +59,9 @@ namespace Scattering
         }
         private void OnPlayerSpawn(BossFramework.BModels.BEventArgs.PacketEventArgs args)
         {
-            if (HomeManager._spawns.FirstOrDefault(s => s.Id == args.Player.TsPlayer.Account?.ID) is { } spawn)
+            if (HomeManager._spawns.FirstOrDefault(s => s.Id == args.Player.TSPlayer.Account?.ID) is { } spawn)
             {
-                args.Player.TsPlayer.Spawn(spawn.X, spawn.Y, PlayerSpawnContext.ReviveFromDeath);
+                args.Player.TSPlayer.Spawn(spawn.X, spawn.Y, PlayerSpawnContext.ReviveFromDeath);
             }
         }
         private void SetSpawn(CommandArgs args)

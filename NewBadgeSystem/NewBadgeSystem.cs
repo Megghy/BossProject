@@ -8,9 +8,20 @@ namespace BadgeSystem
     [ApiVersion(2, 1)]
     public sealed class BadgeSystem : TerrariaPlugin
     {
-        internal static BadgeManager Badges;
-
-        internal static ContentConfig ContentConfig;
+        private static ContentConfig contentConfig;
+        public static ContentConfig ContentConfig
+        {
+            get
+            {
+                contentConfig ??= ContentConfig.Read();
+                return contentConfig;
+            }
+            set
+            {
+                contentConfig = value;
+                contentConfig.Write();
+            }
+        }
 
         public override string Name => GetType().Namespace;
 
@@ -27,7 +38,7 @@ namespace BadgeSystem
         {
             PlayerHooks.PlayerChat += OnChat;
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreet);
-            ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
+            ServerApi.Hooks.GamePostInitialize.Register(this, OnInitialize);
         }
 
         protected override void Dispose(bool disposing)
@@ -36,15 +47,15 @@ namespace BadgeSystem
             {
                 PlayerHooks.PlayerChat -= OnChat;
                 ServerApi.Hooks.NetGreetPlayer.Deregister(this, OnGreet);
-                ServerApi.Hooks.GameInitialize.Deregister(this, OnInitialize);
+                ServerApi.Hooks.GamePostInitialize.Deregister(this, OnInitialize);
             }
             base.Dispose(disposing);
         }
 
         private static void OnInitialize(EventArgs args)
         {
-            Badges = new BadgeManager(TShock.DB);
-            ReloadConfig();
+            //Badges = new BadgeManager(TShock.DB);
+            //ReloadConfig();
             GeneralHooks.ReloadEvent += delegate
             {
                 ReloadConfig();
@@ -331,28 +342,37 @@ namespace BadgeSystem
                         return;
                     }
                 }
-                Content b = new Content(content, id, text, type);
-                TSPlayer[] players = TShock.Players;
-                foreach (TSPlayer tSPlayer in players)
-                {
-                    if (tSPlayer != null)
-                    {
-                        PlayerData playerData = PlayerData.GetPlayerData(tSPlayer);
-                        if (playerData.TotalPrefix.Any((Content i) => i.Identifier == b.Identifier))
-                        {
-                            playerData.AddContent(b, type);
-                        }
-                    }
-                }
-                ContentConfig.Content.RemoveAll((Content i) => i.Identifier == b.Identifier);
-                ContentConfig.Content.Add(b);
-                ContentConfig.Write();
+                AddBadge(id, content, text, type);
                 args.Player.SendSuccessMessage("完成创建: " + result);
             }
             else
             {
                 args.Player.SendErrorMessage("语法错误！用法： new" + type + " <内容> <识别号> " + type == "brackets" ? "<颜色>" : "" + "" + " 示例：bd new" + type + " Bomb bomb ff6a6a");
             }
+        }
+        public static Content AddBadge(string identifier, string content, string color, string type)
+        {
+            if (color.Length != 3 && color.Length != 6)
+            {
+                throw new ArgumentOutOfRangeException(nameof(color));
+            }
+            Content b = new Content(content, identifier, color, type);
+            TSPlayer[] players = TShock.Players;
+            foreach (TSPlayer tSPlayer in players)
+            {
+                if (tSPlayer != null)
+                {
+                    PlayerData playerData = PlayerData.GetPlayerData(tSPlayer);
+                    if (playerData.TotalPrefix.Any((Content i) => i.Identifier == b.Identifier))
+                    {
+                        playerData.AddContent(b, type);
+                    }
+                }
+            }
+            ContentConfig.Content.RemoveAll((Content i) => i.Identifier == b.Identifier);
+            ContentConfig.Content.Add(b);
+            ContentConfig.Write();
+            return b;
         }
         private static void Del(CommandArgs args, string type)
         {    //      1      2
@@ -370,23 +390,27 @@ namespace BadgeSystem
                     args.Player.SendErrorMessage("无对应前缀或识别号错误");
                     return;
                 }
-                TSPlayer[] players = TShock.Players;
-                //TSPlayer[] array = players;
-                foreach (TSPlayer tSPlayer in players)
-                {
-                    if (tSPlayer != null)
-                    {
-                        PlayerData.GetPlayerData(tSPlayer).RemoveContent(b, type);
-                    }
-                }
-                ContentConfig.Content.Remove(b);
-                ContentConfig.Write();
+                DeleteBadge(b);
                 args.Player.SendSuccessMessage("完成删除: " + result);
             }
             else
             {
                 args.Player.SendErrorMessage("语法错误！用法：/del" + type + " <识别号>");
             }
+        }
+        public static void DeleteBadge(Content c)
+        {
+            TSPlayer[] players = TShock.Players;
+            //TSPlayer[] array = players;
+            foreach (TSPlayer tSPlayer in players)
+            {
+                if (tSPlayer != null)
+                {
+                    PlayerData.GetPlayerData(tSPlayer).RemoveContent(c, c.Type);
+                }
+            }
+            ContentConfig.Content.Remove(c);
+            ContentConfig.Write();
         }
         private static void Remove(CommandArgs args, string type)
         {    //     1      2          3

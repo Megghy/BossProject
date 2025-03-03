@@ -1,5 +1,37 @@
 ﻿<Project>
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="xcopy /Y $(TargetDir)*.dll $(SolutionDir)Output\bin\&#xD;&#xA;xcopy /Y $(TargetDir)BossFramework.dll $(SolutionDir)Output\ServerPlugins\&#xD;&#xA;xcopy /Y $(TargetDir)BossFramework.pdb $(SolutionDir)Output\ServerPlugins\" />
+    <!-- 统一输出路径配置 -->
+    <PropertyGroup>
+        <!-- 根据配置自动生成输出路径后缀 -->
+        <ConfigurationSuffix Condition="'$(Configuration)' == 'Release'">-Release</ConfigurationSuffix>
+        <!-- 主输出根路径 -->
+        <OutputRoot>$(SolutionDir)Output$(ConfigurationSuffix)</OutputRoot>
+        <!-- 二进制文件子目录 -->
+        <OutputBin>$(OutputRoot)\bin</OutputBin>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <LibFiles Include="$(TargetDir)*.dll"/>
+        <LibFiles Include="$(TargetDir)*.pdb"/>
+        
+        <ServerFiles Include="$(TargetDir)*.json"/>
+        <ServerFiles Include="$(TargetDir)BossServer.dll"/>
+        <ServerFiles Include="$(TargetDir)BossServer.exe"/>
+        <ServerFiles Include="$(TargetDir)BossServer.pdb"/>
+    </ItemGroup>
+    
+    <Target Name="PostBuild" 
+            AfterTargets="PostBuildEvent" >
+        <!-- 创建多级目录 -->
+        <MakeDir Directories="$(OutputBin);$(OutputRoot)" />
+        
+        <!-- 复制所有 DLL 到 bin 目录 -->
+        <Copy SourceFiles="@(LibFiles)"
+              DestinationFolder="$(OutputBin)"
+              SkipUnchangedFiles="true" />
+
+        <!-- 复制配置文件及主程序文件到根目录 -->
+        <Copy SourceFiles="@(ServerFiles)"
+              DestinationFolder="$(OutputRoot)"
+              SkipUnchangedFiles="true" />
     </Target>
 </Project>

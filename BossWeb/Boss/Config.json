@@ -1,0 +1,11 @@
+{
+  "FastLoadWorld": true,
+  "DebugInfo": true,
+  "SignRefreshRadius": 200,
+  "ChangWeaponDelay": 10,
+  "DisableSpawnBroadcast": true,
+  "EnableNewSocketService": false,
+  "EnableProjRedirect": false,
+  "EnableProjQueue": true,
+  "EnableChatAboveHead": false
+}

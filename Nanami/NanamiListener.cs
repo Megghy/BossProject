@@ -1,6 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using EnchCoreApi.TrProtocol.NetPackets;
+using Microsoft.Xna.Framework;
 using Terraria;
-using TrProtocol.Packets;
 using TShockAPI;
 
 namespace Nanami
@@ -22,7 +22,7 @@ namespace Nanami
         private static void OnPlayerDamage(BossFramework.BModels.BEventArgs.PacketHookArgs<PlayerHurtV2> args)
         {
             // 记录 伤害量
-            var data = PlayerPvpData.GetPlayerData(args.Player.TsPlayer);
+            var data = PlayerPvpData.GetPlayerData(args.Player.TSPlayer);
 
             var calculatedDmg = (int)Main.CalculateDamagePlayersTakeInPVP(args.Packet.Damage, Main.player[args.Packet.OtherPlayerSlot].statDefense);
 
@@ -34,13 +34,13 @@ namespace Nanami
 
         private static void OnKillMe(BossFramework.BModels.BEventArgs.PacketHookArgs<PlayerDeathV2> args)
         {
-            if (!args.Player.TrPlayer.hostile)
+            if (!args.Player.TRPlayer.hostile)
             {
                 return;
             }
 
-            args.Player.TsPlayer.RespawnTimer = Nanami.Config.RespawnPvPSeconds;
-            var data = PlayerPvpData.GetPlayerData(args.Player.TsPlayer);
+            args.Player.TSPlayer.RespawnTimer = Nanami.Config.RespawnPvPSeconds;
+            var data = PlayerPvpData.GetPlayerData(args.Player.TSPlayer);
 
             // 处理死亡事件
             data.Die(args.Packet.Damage);

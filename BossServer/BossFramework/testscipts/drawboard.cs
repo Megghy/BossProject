@@ -291,7 +291,7 @@ public class drawboard : BaseMiniGame
         if (!Players.Contains(data))
         {
             data.SendInfoMsg("你尚未加入游戏");
-            data.TsPlayer.Teleport(FakePanel.X * 16, FakePanel.Y * 16);
+            data.TSPlayer.Teleport(FakePanel.X * 16, FakePanel.Y * 16);
         }
         else
         {
@@ -307,7 +307,7 @@ public class drawboard : BaseMiniGame
         if (!Players.Contains(data))
         {
             data.SendInfoMsg("你尚未加入游戏");
-            data.TsPlayer.Teleport(FakePanel.X * 16, FakePanel.Y * 16);
+            data.TSPlayer.Teleport(FakePanel.X * 16, FakePanel.Y * 16);
         }
         else
         {
@@ -377,7 +377,7 @@ public class drawboard : BaseMiniGame
                     if (state == TouchState.Begin)
                     {
                         data.SendInfoMsg("你尚未加入游戏");
-                        data.TsPlayer.Teleport(FakePanel.X * 16, FakePanel.Y * 16);
+                        data.TSPlayer.Teleport(FakePanel.X * 16, FakePanel.Y * 16);
                     }
                 }
                 else

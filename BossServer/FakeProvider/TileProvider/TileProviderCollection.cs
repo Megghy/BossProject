@@ -83,17 +83,11 @@ namespace FakeProvider
         {
             get
             {
-                lock (Locker)
-                {
-                    return _GlobalProvidersBuffer[ProviderIndexes[X, Y]].GetTileInWorld(X, Y);
-                }
+                return _GlobalProvidersBuffer[ProviderIndexes[X, Y]][X, Y];
             }
             set
             {
-                lock (Locker)
-                {
-                    _GlobalProvidersBuffer[ProviderIndexes[X, Y]].SetTileInWorld(X, Y, value);
-                }
+                _GlobalProvidersBuffer[ProviderIndexes[X, Y]][X, Y] = value;
             }
         }
 

@@ -52,5 +52,6 @@ namespace BossWeb
         }
 
         public string StartupCommandLine { get; set; } = "-language zh-Hans -ip 0.0.0.0 -port 7777 -maxplayers 255 -world D:\\Code\\BossPlugin\\Output\\BOSS.wld";
+        public bool AutoStart { get; set; } = false;
     }
 }

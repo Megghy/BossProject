@@ -17,7 +17,7 @@ namespace BossFramework.BNet
     {
         public static readonly PacketSerializer Serializer = new(false);
 
-        public static readonly Dictionary<PacketTypes, IPacketHandler> Handlers = new();
+        public static readonly Dictionary<PacketTypes, IPacketHandler> Handlers = [];
         [AutoInit("初始化数据包处理")]
         public static void InitPacketHandlers()
         {
@@ -28,7 +28,7 @@ namespace BossFramework.BNet
                             if (t.BaseType?.Name == "PacketHandlerBase`1")
                                 Handlers.Add(
                                     (PacketTypes)((Packet)Activator.CreateInstance(t.BaseType.GetGenericArguments().First())!).Type,
-                                    (IPacketHandler)Activator.CreateInstance(t, Array.Empty<object>())!);
+                                    (IPacketHandler)Activator.CreateInstance(t, [])!);
                         });
         }
         internal static void OnSendData(SendBytesEventArgs args)

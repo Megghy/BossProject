@@ -1,8 +1,10 @@
-﻿using BossFramework.BModels;
-using TrProtocol.Models;
-using TrProtocol.Packets;
+﻿extern alias TrProtocol;
+
+using BossFramework.BModels;
+using Microsoft.Xna.Framework;
+using Terraria;
+using TrProtocol::EnchCoreApi.TrProtocol.NetPackets;
 using TShockAPI;
-using Vector2 = TrProtocol.Models.Vector2;
 
 namespace BossFramework.BInterfaces
 {
@@ -33,24 +35,21 @@ namespace BossFramework.BInterfaces
                     b2[5] = NotAmmo.HasValue;
                     var item = new Terraria.Item();
                     item.SetDefaults(ItemID);
-                    _tweakePacket = new ItemTweaker()
-                    {
-                        Bit1 = b1,
-                        Bit2 = b2,
-                        PackedColor = Color?.PackedValue ?? item.color.PackedValue,
-                        Damage = (ushort)(Damage ?? item.damage),
-                        Knockback = (ushort)(KnockBack ?? item.knockBack),
-                        UseAnimation = (ushort)(AnimationTime ?? item.useAnimation),
-                        UseTime = (ushort)(UseTime ?? item.useTime),
-                        Shoot = (short)(ShootProj ?? item.shoot),
-                        ShootSpeed = ShootSpeed ?? item.shootSpeed,
-                        Width = (short)(Width ?? item.width),
-                        Height = (short)(Height ?? item.height),
-                        Scale = Size ?? item.scale,
-                        Ammo = (short)(Ammo ?? item.ammo),
-                        UseAmmo = (short)(UseAmmo ?? item.useAmmo),
-                        NotAmmo = NotAmmo ?? item.notAmmo,
-                    };
+                    var bb1 = new TrProtocol.Terraria.BitsByte() { value = b1.value };
+                    var bb2 = new TrProtocol.Terraria.BitsByte() { value = b2.value };
+                    _tweakePacket = new ItemTweaker(-1, bb1, bb2, Color?.PackedValue ?? item.color.PackedValue,
+                        (ushort)(Damage ?? item.damage),
+                        (float)(KnockBack ?? item.knockBack),
+                        (ushort)(AnimationTime ?? item.useAnimation),
+                        (ushort)(UseTime ?? item.useTime),
+                        (short)(ShootProj ?? item.shoot),
+                        ShootSpeed ?? item.shootSpeed,
+                        (short)(Width ?? item.width),
+                        (short)(Height ?? item.height),
+                        (float)(Size ?? item.scale),
+                        (short)(Ammo ?? item.ammo),
+                        (short)(UseAmmo ?? item.useAmmo),
+                        NotAmmo ?? item.notAmmo);
                 }
                 return (ItemTweaker)_tweakePacket;
             }
@@ -168,11 +167,11 @@ namespace BossFramework.BInterfaces
             if (obj is null)
                 return false;
             else if (obj is SyncEquipment syncItem)
-                return syncItem.ItemType == ItemID && syncItem.Prefix == Prefix && syncItem.Stack == Stack;
+                return syncItem.ItemType == ItemID && syncItem.Prefix == Prefix;
             else if (obj is Terraria.Item item)
-                return item.type == ItemID && item.prefix == Prefix && item.stack == Stack;
+                return item.type == ItemID && item.prefix == Prefix;
             else if (obj is NetItem netItem)
-                return netItem.NetId == ItemID && netItem.PrefixId == Prefix && netItem.Stack == Stack;
+                return netItem.NetId == ItemID && netItem.PrefixId == Prefix;
             else
                 return false;
         }

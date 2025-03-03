@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Tile_Entities;
+using TerrariaApi.Server;
 #endregion
 namespace FakeProvider
 {
@@ -13,7 +15,7 @@ namespace FakeProvider
         #region Data
 
         public TileProviderCollection ProviderCollection { get; internal set; }
-        internal StructTile[,] Data;
+        internal TileData[,] Data;
         public string Name { get; private set; }
         public int X { get; private set; }
         public int Y { get; private set; }
@@ -29,6 +31,8 @@ namespace FakeProvider
         public ReadOnlyCollection<IFake> Entities => new ReadOnlyCollection<IFake>(_Entities.ToList());
         private object Locker = new object();
 
+        public int GetIndex(int x, int y) => x * (Height - 1) + y;
+
         #endregion
 
         #region Constructor
@@ -40,26 +44,12 @@ namespace FakeProvider
 
         internal void Initialize(string Name, int X, int Y, int Width, int Height, int Layer, HashSet<int> Observers = null)
         {
-            this.Name = Name;
-            this.Data = new StructTile[Width, Height];
-            this.X = X;
-            this.Y = Y;
-            this.Width = Width;
-            this.Height = Height;
-            this.Layer = Layer;
-            this.Observers = Observers;
+            Init(Name, X, Y, Width, Height, Layer, Observers);
         }
 
         internal void Initialize(string Name, int X, int Y, int Width, int Height, int Layer, ModFramework.ICollection<ITile> CopyFrom, HashSet<int> Observers = null)
         {
-            this.Name = Name;
-            this.Data = new StructTile[Width, Height];
-            this.X = X;
-            this.Y = Y;
-            this.Width = Width;
-            this.Height = Height;
-            this.Layer = Layer;
-            this.Observers = Observers;
+            Init(Name, X, Y, Width, Height, Layer, Observers);
 
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
@@ -72,14 +62,7 @@ namespace FakeProvider
 
         internal void Initialize(string Name, int X, int Y, int Width, int Height, int Layer, ITile[,] CopyFrom, HashSet<int> Observers = null)
         {
-            this.Name = Name;
-            this.Data = new StructTile[Width, Height];
-            this.X = X;
-            this.Y = Y;
-            this.Width = Width;
-            this.Height = Height;
-            this.Layer = Layer;
-            this.Observers = Observers;
+            Init(Name, X, Y, Width, Height, Layer, Observers);
 
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
@@ -89,34 +72,57 @@ namespace FakeProvider
                         this[i, j].CopyFrom(t);
                 }
         }
+        internal void Init(string Name, int X, int Y, int Width, int Height, int Layer, HashSet<int> Observers = null)
+        {
+            if (Width <= 0 || Height <= 0) throw new ArgumentException("Invalid width or height.");
+            this.Name = Name;
+            this.Data = new TileData[Width, Height];
+            this.X = X;
+            this.Y = Y;
+            this.Width = Width;
+            this.Height = Height;
+            this.Layer = Layer;
+            this.Observers = Observers;
+        }
 
         #endregion
 
         #region operator[,]
 
-        ITile ModFramework.ICollection<ITile>.this[int X, int Y]
+        unsafe ITile ModFramework.ICollection<ITile>.this[int x, int y]
         {
-            get => new TileReference(Data, X, Y);
-            set => new TileReference(Data, X, Y).CopyFrom(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                //data ??= new TileData[Width * Height];
+                return new TileReference(ref Data[x, y]);
+            }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set
+            {
+                if (value is TileReference tref) // if it's one of our own, copy memory instead of newing up a new reference.
+                    Data[x, y] = *tref._tile;
+                else new TileReference(ref Data[x, y]).CopyFrom(value);
+            }
         }
 
-        public ITile this[int X, int Y]
+        public unsafe ITile this[int x, int y]
         {
-            get => new TileReference(Data, X, Y);
-            set => new TileReference(Data, X, Y).CopyFrom(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                //data ??= new TileData[Width * Height];
+                if (x < 0 || y < 0 || x >= Width || y >= Height) return ProviderCollection.VoidTile;
+                return new TileReference(ref Data[x, y]);
+            }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set
+            {
+                if (value is TileReference tref) // if it's one of our own, copy memory instead of newing up a new reference.
+                    Data[x, y] = *tref._tile;
+                else new TileReference(ref Data[x, y]).CopyFrom(value);
+            }
         }
-
-        #endregion
-        #region GetTileInWorld
-
-        public ITile GetTileInWorld(int X, int Y) =>
-            new TileReference(Data, X - this.X, Y - this.Y);
-
-        #endregion
-        #region SetTileInWorld
-
-        public void SetTileInWorld(int X, int Y, ITile Tile) =>
-            new TileReference(Data, X - this.X, Y - this.Y).CopyFrom(Tile);
 
         #endregion
         #region GetTileSafe
@@ -154,7 +160,7 @@ namespace FakeProvider
                 if (Width <= 0 || Height <= 0)
                     throw new ArgumentException("Invalid new width or height.");
 
-                StructTile[,] newData = new StructTile[Width, Height];
+                TileData[,] newData = new TileData[Width, Height];
                 for (int i = 0; i < Width; i++)
                     for (int j = 0; j < Height; j++)
                         if ((i < this.Width) && (j < this.Height))

@@ -1,0 +1,197 @@
+﻿@page "/plugins/badgesystem"
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>
+    头衔 | 插件管理 | Boss服务器
+</PageTitle>
+
+<Alert Type="AlertType.Warning">
+    当前Antdesign版本暂不支持颜色选择器, 后续更新之后添加
+</Alert>
+<Divider /> 
+<Button Type="ButtonType.Primary" OnClick="() => showAddBadgeModal = true">
+    添加
+</Button>
+<Divider/>
+<Table DataSource="BadgeSystem.BadgeSystem.ContentConfig.Content" Size="TableSize.Small">
+    <ChildContent>
+        <Column TData="string" Title="标识符(名称)">
+            @if (!editCache[context.Identifier].edit)
+            {
+                @context.Identifier
+            }
+            else
+            {
+                <Input @bind-Value="editCache[context.Identifier].data.Identifier" />
+            }
+        </Column>
+        <PropertyColumn Property="b => b.Type" Title="类型" Filterable Filters="TypeFilters">
+            @if (!editCache[context.Identifier].edit)
+            {
+                <Tag>
+                    @BadgeTypeDict[context.Type]
+                </Tag>
+            }
+            else
+            {
+                <SimpleSelect DefaultValue="@("prefix")" OnSelectedItemChanged="e => editCache[context.Identifier].data.Type = e">
+                    <SelectOptions>
+                        <SimpleSelectOption Label="前缀" Value="@("prefix")" />
+                        <SimpleSelectOption Label="后缀" Value="@("suffix")" />
+                        <SimpleSelectOption Label="括号" Value="@("brackets")" />
+                    </SelectOptions>
+                </SimpleSelect>
+            }
+        </PropertyColumn>
+        <Column TData="string" Title="颜色">
+            @if (!editCache[context.Identifier].edit)
+            {
+                <div style="@($"background: #{context.ColorHex};width: 20px;height: 20px;border: 1px solid #5b5b5b;")">
+
+                </div>
+            }
+            else
+            {
+                <Input @bind-Value="editCache[context.Identifier].data.ColorHex" />
+            }
+        </Column>
+        <ActionColumn Title="Action">
+            @if (!editCache[context.Identifier].edit)
+            {
+                <Button OnClick="() => startEdit(context.Identifier)" Size="ButtonSize.Small">编辑</Button>
+            }
+            else
+            {
+                <Button OnClick="() => saveEdit(context.Identifier)" class="save" Size="ButtonSize.Small">保存</Button>
+                <Popconfirm Title="确定取消吗?"
+                OnConfirm="() => cancelEdit(context.Identifier)"
+                OkText="是嘟"
+                CancelText="算了">
+                    <Button Size="ButtonSize.Small">取消</Button>
+                </Popconfirm>
+            }
+            <Button OnClick="() => DeleteBadge(context)" Danger Size="ButtonSize.Small">删除</Button>
+        </ActionColumn>
+    </ChildContent>
+</Table>
+
+<Modal Title="添加"
+@bind-Visible="@showAddBadgeModal"
+OnOk="AddBadge">
+    @FormTemplate()
+</Modal>
+
+@code {
+    Dictionary<string, string> BadgeTypeDict = new()
+    {
+        {"prefix", "前缀"},
+        {"suffix", "后缀"},
+        {"brackets", "后缀"}
+    };
+    TableFilter<string>[] TypeFilters = new TableFilter<string>[] {
+        new() { Text = "前缀", Value = "prefix" },
+        new() { Text = "后缀", Value = "suffix" },
+        new() { Text = "括号", Value = "brackets" }
+    }; 
+    RenderFragment FormTemplate()
+    {
+        return
+        @<Form Model="@newBadge"
+                       LabelColSpan="8"
+                       WrapperColSpan="16"
+                       OnFinish="() => showAddBadgeModal = false"
+                        @ref="@_form">
+            <FormItem Label="标识符(名称)">
+                <Input @bind-Value="@context.Identifier" />
+            </FormItem>
+            <FormItem Label="内容">
+                <Input @bind-Value="@context.Content" />
+            </FormItem>
+            <FormItem Label="颜色">
+                <Input @bind-Value="context.Color" />
+            </FormItem>
+            <FormItem Label="类型">
+                <SimpleSelect DefaultValue="@("prefix")" OnSelectedItemChanged="e => context.Type = e">
+                    <SelectOptions>
+                        <SimpleSelectOption Label="前缀" Value="@("prefix")" />
+                        <SimpleSelectOption Label="后缀" Value="@("suffix")" />
+                        <SimpleSelectOption Label="括号" Value="@("brackets")" />
+                    </SelectOptions>
+                </SimpleSelect>
+            </FormItem>
+        </Form>
+    ;
+    }
+    Form<TempNewBadge> _form;
+
+    class TempNewBadge()
+    {
+        [Required]
+        public string Identifier { get; set; }
+        [Required]
+        public string Content { get; set; }
+        [Required]
+        public string Color { get; set; }
+        [Required]
+        public string Type { get; set; } = "prefix";
+    }
+
+
+    IDictionary<string, (bool edit, BadgeSystem.Content data)> editCache = new Dictionary<string, (bool edit, BadgeSystem.Content data)>();
+    TempNewBadge newBadge = new();
+    bool showAddBadgeModal = false;
+
+
+    void startEdit(string id)
+    {
+        var data = editCache[id];
+        editCache[id] = (true, data.data with { }); // add a copy in cache
+    }
+
+    void cancelEdit(string id)
+    {
+        var data = BadgeSystem.BadgeSystem.ContentConfig.Content.FirstOrDefault(item => item.Identifier == id);
+        editCache[id] = (false, data); // recovery
+    }
+
+    void saveEdit(string id)
+    {
+        var index = BadgeSystem.BadgeSystem.ContentConfig.Content.FindIndex(item => item.Identifier == id);
+        BadgeSystem.BadgeSystem.ContentConfig.Content[index] = editCache[id].data; // apply the copy to data source
+        editCache[id] = (false, BadgeSystem.BadgeSystem.ContentConfig.Content[index]); // don't affect rows in editing
+        BadgeSystem.BadgeSystem.ContentConfig.Write();
+        Utils.NotificateSuccess("保存成功");
+    }
+
+    void DeleteBadge(BadgeSystem.Content badge)
+    {
+        BadgeSystem.BadgeSystem.DeleteBadge(badge);
+        Utils.NotificateSuccess("已删除");
+    }
+    void AddBadge()
+    {
+        if (string.IsNullOrEmpty(newBadge.Content))
+        {
+            Utils.NotificateError("内容为空");
+            return;
+        }
+        if(BadgeSystem.BadgeSystem.ContentConfig.Content.Exists(c => c.Identifier == newBadge.Identifier))
+        {
+            Utils.NotificateError($"已存在id为 {newBadge.Identifier} 的头衔");
+            return;
+        }
+        var result = BadgeSystem.BadgeSystem.AddBadge(newBadge.Identifier, newBadge.Content, newBadge.Color, newBadge.Type);
+        editCache.TryAdd(result.Identifier, (false, result));
+        newBadge = new();
+        Utils.NotificateSuccess("已添加");
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        BadgeSystem.BadgeSystem.ContentConfig.Content.ForEach(c =>
+        {
+            editCache.TryAdd(c.Identifier, (false, c with { }));
+        });
+    }
+}

@@ -33,9 +33,8 @@ namespace Nanami
 
         public override void Initialize()
         {
-            //ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
+            ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
             ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInitialize);
-            ServerApi.Hooks.GamePostInitialize.Register(this, OnInitialize);
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreetPlayer);
             ServerApi.Hooks.ServerLeave.Register(this, OnLeave);
             ServerApi.Hooks.WorldSave.Register(this, OnPostSaveWorld);

@@ -82,3 +82,618 @@
 [02/21/25 00:54:56] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
 [02/21/25 00:54:58] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
 [02/21/25 00:54:59] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/22/25 01:32:17] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/22/25 01:32:17] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/22/25 01:32:17] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/22/25 01:32:17] [Server API] Verbose: 	Mono: False
+[02/22/25 01:32:17] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/22/25 01:32:20] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/22/25 01:32:20] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/22/25 01:32:20] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/22/25 01:32:22] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/22/25 17:25:44] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/22/25 17:25:44] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/22/25 17:25:44] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/22/25 17:25:44] [Server API] Verbose: 	Mono: False
+[02/22/25 17:25:44] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/22/25 17:25:47] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/22/25 17:25:47] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/22/25 17:25:47] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/22/25 17:25:49] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/22/25 18:46:41] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/22/25 18:46:41] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/22/25 18:46:41] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/22/25 18:46:41] [Server API] Verbose: 	Mono: False
+[02/22/25 18:46:41] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/22/25 18:46:44] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/22/25 18:46:44] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/22/25 18:46:44] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/22/25 18:46:46] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/22/25 19:47:52] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/22/25 19:47:52] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/22/25 19:47:52] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/22/25 19:47:52] [Server API] Verbose: 	Mono: False
+[02/22/25 19:47:52] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/22/25 19:47:55] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/22/25 19:47:55] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/22/25 19:47:55] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/22/25 19:47:56] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/22/25 20:09:06] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/22/25 20:09:06] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/22/25 20:09:06] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/22/25 20:09:06] [Server API] Verbose: 	Mono: False
+[02/22/25 20:09:06] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/22/25 20:09:09] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/22/25 20:09:09] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/22/25 20:09:09] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/22/25 20:09:11] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/22/25 20:18:45] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/22/25 20:18:45] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/22/25 20:18:45] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/22/25 20:18:45] [Server API] Verbose: 	Mono: False
+[02/22/25 20:18:45] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/22/25 20:18:48] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/22/25 20:18:48] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/22/25 20:18:48] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/22/25 20:18:50] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/22/25 20:21:16] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/22/25 20:21:16] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/22/25 20:21:16] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/22/25 20:21:16] [Server API] Verbose: 	Mono: False
+[02/22/25 20:21:16] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/22/25 20:21:19] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/22/25 20:21:19] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/22/25 20:21:19] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/22/25 20:21:22] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/22/25 22:23:15] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/22/25 22:23:15] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/22/25 22:23:15] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/22/25 22:23:15] [Server API] Verbose: 	Mono: False
+[02/22/25 22:23:15] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/22/25 22:23:18] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/22/25 22:23:18] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/22/25 22:23:18] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/22/25 22:23:20] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/23/25 19:37:15] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/23/25 19:37:15] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/23/25 19:37:15] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/23/25 19:37:15] [Server API] Verbose: 	Mono: False
+[02/23/25 19:37:15] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/23/25 19:37:23] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/23/25 19:37:23] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/23/25 19:37:23] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/23/25 19:38:42] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/23/25 19:38:42] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/23/25 19:38:42] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/23/25 19:38:42] [Server API] Verbose: 	Mono: False
+[02/23/25 19:38:42] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/23/25 19:38:45] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/23/25 19:38:45] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/23/25 19:38:45] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/23/25 19:38:48] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/23/25 20:01:52] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/23/25 20:01:52] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock
+[02/23/25 20:01:52] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/23/25 20:01:52] [Server API] Verbose: 	Mono: False
+[02/23/25 20:01:53] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/23/25 20:01:53] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:01:53] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/23/25 20:01:56] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:01:56] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:01:58] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/23/25 20:03:24] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/23/25 20:03:24] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/23/25 20:03:24] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/23/25 20:03:24] [Server API] Verbose: 	Mono: False
+[02/23/25 20:03:25] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/23/25 20:03:25] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:03:26] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/23/25 20:03:28] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:03:29] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:03:31] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/23/25 20:04:23] [Server API] Warning: Plugin "PlotMarker" has had an unhandled exception thrown by one of its GamePostInitialize handlers: 
+System.Exception: Timeout expired.  The timeout period elapsed prior to completion of the operation or the server is not responding
+ ---> MySql.Data.MySqlClient.MySqlException (0x80004005): Timeout expired.  The timeout period elapsed prior to completion of the operation or the server is not responding
+ ---> System.TimeoutException: Timeout in IO operation
+   at MySql.Data.MySqlClient.TimedStream.ReadAsync(Byte[] buffer, Int32 offset, Int32 count, Boolean execAsync) in MySql.Data.dll:token 0x600139b+0xc6
+   at MySql.Data.MySqlClient.MySqlStream.ReadFullyAsync(Stream stream, Byte[] buffer, Int32 offset, Int32 count, Boolean execAsync) in MySql.Data.dll:token 0x6001275+0xbb
+   at MySql.Data.MySqlClient.MySqlStream.LoadPacketAsync(Boolean execAsync) in MySql.Data.dll:token 0x6001276+0x174
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacketAsync(Boolean execAsync) in MySql.Data.dll:token 0x6001274+0x75
+   at MySql.Data.MySqlClient.NativeDriver.FetchDataRowAsync(Int32 statementId, Int32 columns, Boolean execAsync) in MySql.Data.dll:token 0x60012b4+0x84
+   at MySql.Data.MySqlClient.Driver.FetchDataRowAsync(Int32 statementId, Int32 columns, Boolean execAsync) in MySql.Data.dll:token 0x6000e2d+0x83
+   at MySql.Data.MySqlClient.ResultSet.GetNextRowAsync(Boolean execAsync) in MySql.Data.dll:token 0x6001311+0x83
+   at MySql.Data.MySqlClient.ResultSet.NextRowAsync(CommandBehavior behavior, Boolean execAsync) in MySql.Data.dll:token 0x6001312+0xea
+   at MySql.Data.MySqlClient.MySqlDataReader.ReadAsync(Boolean execAsync, CancellationToken cancellationToken) in MySql.Data.dll:token 0x6001163+0xc3
+   at MySql.Data.MySqlClient.Interceptors.ExceptionInterceptor.Throw(Exception exception) in MySql.Data.dll:token 0x60013f7+0x20
+   at MySql.Data.MySqlClient.MySqlConnection.Throw(Exception ex) in MySql.Data.dll:token 0x600107d+0xa
+   at MySql.Data.MySqlClient.MySqlConnection.HandleTimeoutOrThreadAbortAsync(Exception ex, Boolean execAsync, CancellationToken cancellationToken) in MySql.Data.dll:token 0x6001079+0x2f6
+   at MySql.Data.MySqlClient.MySqlDataReader.ReadAsync(Boolean execAsync, CancellationToken cancellationToken) in MySql.Data.dll:token 0x6001163+0x194
+   at MySql.Data.MySqlClient.MySqlDataReader.Read() in MySql.Data.dll:token 0x6001161+0x12
+   at FreeSql.Internal.CommonProvider.AdoProvider.ExecuteReaderMultiple(Int32 multipleResult, DbConnection connection, DbTransaction transaction, Action`2 fetchHandler, Action`2 schemaHandler, CommandType cmdType, String cmdText, Int32 cmdTimeout, DbParameter[] cmdParms) in FreeSql.dll:token 0x6000c3a+0x48e
+   --- End of inner exception stack trace ---
+   at FreeSql.Internal.CommonProvider.AdoProvider.LoggerException(IObjectPool`1 pool, PrepareCommandResult pc, Exception ex, DateTime dt, StringBuilder logtxt, Boolean isThrowException) in FreeSql.dll:token 0x6000c0f+0x2d1
+   at FreeSql.Internal.CommonProvider.AdoProvider.ExecuteReaderMultiple(Int32 multipleResult, DbConnection connection, DbTransaction transaction, Action`2 fetchHandler, Action`2 schemaHandler, CommandType cmdType, String cmdText, Int32 cmdTimeout, DbParameter[] cmdParms) in FreeSql.dll:token 0x6000c3a+0x637
+   at FreeSql.Internal.CommonProvider.AdoProvider.ExecuteReader(DbConnection connection, DbTransaction transaction, Action`1 fetchHandler, CommandType cmdType, String cmdText, Int32 cmdTimeout, DbParameter[] cmdParms) in FreeSql.dll:token 0x6000c39+0x1d
+   at FreeSql.Internal.CommonProvider.Select0Provider`2.ToListAfPrivate(String sql, GetAllFieldExpressionTreeInfo af, ReadAnonymousTypeOtherInfo[] otherData) in FreeSql.dll:token 0x6000e20+0xd3
+   at FreeSql.Internal.CommonProvider.Select0Provider`2.ToListPrivate(GetAllFieldExpressionTreeInfo af, ReadAnonymousTypeOtherInfo[] otherData) in FreeSql.dll:token 0x6000e21+0x14e
+   at FreeSql.Internal.CommonProvider.Select0Provider`2.ToList(Boolean includeNestedMembers) in FreeSql.dll:token 0x6000e13+0xc5
+   at FreeSql.Internal.CommonProvider.Select1Provider`1.ToList(Boolean includeNestedMembers) in FreeSql.dll:token 0x6000ea1+0x0
+   at FreeSql.Internal.CommonProvider.Select0Provider`2.ToList() in FreeSql.dll:token 0x6000e12+0x0
+   at BossFramework.DB.DBTools.GetAll[T](Expression`1 extract) in D:\Code\BossPlugin\BossServer\BossFramework\DB\DBTools.cs:line 30
+   at PlotMarker.PlotManager.LoadCells(Plot parent) in D:\Code\BossPlugin\PlotMarker\PlotManager.cs:line 36
+   at PlotMarker.PlotManager.<>c.<Reload>b__3_1(Plot plot) in D:\Code\BossPlugin\PlotMarker\PlotManager.cs:line 29
+   at TShockAPI.LinqExt.ForEach[T](IEnumerable`1 source, Action`1 action) in D:\Code\BossPlugin\BossServer\TShock\Extensions\LinqExt.cs:line 32
+   at PlotMarker.PlotManager.Reload() in D:\Code\BossPlugin\PlotMarker\PlotManager.cs:line 26
+   at PlotMarker.PlotMarker.OnPostInitialize(EventArgs args) in D:\Code\BossPlugin\PlotMarker\PlotMarker.cs:line 96
+   at TerrariaApi.Server.HandlerCollection`1.Invoke(ArgsType args) in D:\Code\BossPlugin\BossServer\TerrariaApi.Server\HandlerCollection.cs:line 109
+[02/23/25 20:10:21] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/23/25 20:10:21] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/23/25 20:10:21] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/23/25 20:10:21] [Server API] Verbose: 	Mono: False
+[02/23/25 20:10:22] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:10:22] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/23/25 20:10:22] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:10:22] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:10:23] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/23/25 20:11:46] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/23/25 20:11:46] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/23/25 20:11:46] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/23/25 20:11:46] [Server API] Verbose: 	Mono: False
+[02/23/25 20:11:47] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/23/25 20:11:47] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:11:47] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/23/25 20:11:48] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:11:48] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:11:49] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/23/25 20:15:04] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/23/25 20:15:04] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Release\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/23/25 20:15:04] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/23/25 20:15:04] [Server API] Verbose: 	Mono: False
+[02/23/25 20:15:06] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/23/25 20:15:06] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:15:06] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/23/25 20:15:06] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/23/25 20:15:06] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:15:06] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/23/25 20:15:06] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:15:06] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:15:06] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/23/25 20:15:06] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/23/25 20:15:06] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/23/25 20:15:06] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/23/25 20:15:06] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:15:06] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:15:06] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:15:07] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/23/25 20:15:07] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/23/25 20:15:07] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:15:07] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:15:08] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/23/25 20:16:47] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/23/25 20:16:47] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/23/25 20:16:47] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/23/25 20:16:47] [Server API] Verbose: 	Mono: False
+[02/23/25 20:16:48] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:16:48] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/23/25 20:16:48] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:16:48] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:16:49] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/23/25 20:19:32] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/23/25 20:19:32] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/23/25 20:19:32] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/23/25 20:19:32] [Server API] Verbose: 	Mono: False
+[02/23/25 20:19:33] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/23/25 20:19:33] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:19:33] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/23/25 20:19:33] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/23/25 20:19:33] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:19:33] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/23/25 20:19:33] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:19:33] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:19:33] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/23/25 20:19:33] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/23/25 20:19:33] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/23/25 20:19:33] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/23/25 20:19:33] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:19:33] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:19:33] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:19:34] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/23/25 20:19:34] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/23/25 20:19:34] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:19:34] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:19:34] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/23/25 20:28:57] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/23/25 20:28:57] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/23/25 20:28:57] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/23/25 20:28:57] [Server API] Verbose: 	Mono: False
+[02/23/25 20:28:58] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/23/25 20:28:58] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:28:58] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/23/25 20:28:58] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/23/25 20:28:58] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:28:58] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/23/25 20:28:58] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:28:58] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:28:58] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/23/25 20:28:58] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/23/25 20:28:58] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/23/25 20:28:58] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/23/25 20:28:58] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:28:58] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:28:58] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:28:59] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/23/25 20:28:59] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/23/25 20:28:59] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:28:59] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/23/25 20:28:59] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/24/25 07:00:54] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/24/25 07:00:54] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/24/25 07:00:54] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/24/25 07:00:54] [Server API] Verbose: 	Mono: False
+[02/24/25 07:00:55] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/24/25 07:00:55] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:00:55] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/24/25 07:00:56] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:00:56] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/24/25 07:04:04] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/24/25 07:04:04] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/24/25 07:04:04] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/24/25 07:04:04] [Server API] Verbose: 	Mono: False
+[02/24/25 07:04:05] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/24/25 07:04:05] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:04:05] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/24/25 07:04:05] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/24/25 07:04:05] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:04:05] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/24/25 07:04:05] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:04:05] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:04:05] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/24/25 07:04:05] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/24/25 07:04:05] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/24/25 07:04:05] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/24/25 07:04:05] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:04:05] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:04:05] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:04:06] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/24/25 07:04:06] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/24/25 07:04:06] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:04:06] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:04:06] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/24/25 07:19:20] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/24/25 07:19:20] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/24/25 07:19:20] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/24/25 07:19:20] [Server API] Verbose: 	Mono: False
+[02/24/25 07:19:21] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/24/25 07:19:21] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:19:21] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/24/25 07:19:22] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:19:22] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:19:23] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/24/25 07:26:03] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/24/25 07:26:03] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/24/25 07:26:03] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/24/25 07:26:03] [Server API] Verbose: 	Mono: False
+[02/24/25 07:26:04] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/24/25 07:26:04] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:26:04] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/24/25 07:26:05] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:26:05] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 07:26:06] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/24/25 10:02:35] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/24/25 10:02:35] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/24/25 10:02:35] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/24/25 10:02:35] [Server API] Verbose: 	Mono: False
+[02/24/25 10:02:35] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/24/25 10:02:35] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:02:35] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/24/25 10:02:36] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:02:36] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/24/25 10:24:08] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/24/25 10:24:08] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/24/25 10:24:08] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/24/25 10:24:08] [Server API] Verbose: 	Mono: False
+[02/24/25 10:24:09] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:24:09] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/24/25 10:24:09] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:24:09] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:24:10] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[02/24/25 10:43:14] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[02/24/25 10:43:14] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[02/24/25 10:43:14] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[02/24/25 10:43:14] [Server API] Verbose: 	Mono: False
+[02/24/25 10:43:14] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[02/24/25 10:43:14] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:43:14] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[02/24/25 10:43:15] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[02/24/25 10:43:15] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[03/02/25 23:55:01] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[03/02/25 23:55:01] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[03/02/25 23:55:01] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[03/02/25 23:55:01] [Server API] Verbose: 	Mono: False
+[03/02/25 23:55:02] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[03/02/25 23:55:02] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[03/02/25 23:55:02] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[03/03/25 00:05:33] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[03/03/25 00:05:33] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[03/03/25 00:05:33] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[03/03/25 00:05:33] [Server API] Verbose: 	Mono: False
+[03/03/25 00:05:33] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[03/03/25 00:05:33] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:05:33] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[03/03/25 00:05:34] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:05:35] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:05:37] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[03/03/25 00:06:49] [Server API] Warning: Plugin "TShock" has had an unhandled exception thrown by one of its NetGreetPlayer handlers: 
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at TShockAPI.TShock.OnGreetPlayer(GreetPlayerEventArgs args) in BossServer.dll:token 0x6000932+0x15a
+   at TerrariaApi.Server.HandlerCollection`1.Invoke(ArgsType args) in BossServer.dll:token 0x6000f24+0x6a
+[03/03/25 00:23:27] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[03/03/25 00:23:27] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[03/03/25 00:23:27] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[03/03/25 00:23:27] [Server API] Verbose: 	Mono: False
+[03/03/25 00:23:27] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[03/03/25 00:23:27] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:23:27] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[03/03/25 00:23:28] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:23:28] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:23:29] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[03/03/25 00:53:34] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[03/03/25 00:53:34] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[03/03/25 00:53:34] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[03/03/25 00:53:34] [Server API] Verbose: 	Mono: False
+[03/03/25 00:53:34] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:53:34] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[03/03/25 00:53:34] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:53:34] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:53:36] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[03/03/25 00:55:32] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[03/03/25 00:55:32] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[03/03/25 00:55:32] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[03/03/25 00:55:32] [Server API] Verbose: 	Mono: False
+[03/03/25 00:55:33] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:55:33] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[03/03/25 00:55:33] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:55:33] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 00:55:35] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[03/03/25 01:16:12] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[03/03/25 01:16:12] [Server API] Verbose: 	Command line: D:\Code\BossPlugin\BossWeb\bin\Debug\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[03/03/25 01:16:12] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26120.0 (64bit: True)
+[03/03/25 01:16:12] [Server API] Verbose: 	Mono: False
+[03/03/25 01:16:12] [Server API] Info: Plugin Crossplay v1.10.2 (by Moneylover3246) initiated.
+[03/03/25 01:16:12] [Server API] Info: Plugin Philosophyz v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 01:16:12] [TShock] Info: Config path has been set to D:\Code\BossPlugin\Output\tshock
+[03/03/25 01:16:12] [Server API] Info: Plugin TShock v1.0.0.0 (by The TShock Team) initiated.
+[03/03/25 01:16:12] [Server API] Info: Plugin AlternativeCommandExecution v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 01:16:12] [Server API] Info: Plugin BadgeSystem v1.0.0.0 (by Jeoican) initiated.
+[03/03/25 01:16:12] [Server API] Info: Plugin Chameleon v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 01:16:12] [Server API] Info: Plugin Colosseo v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 01:16:12] [Server API] Info: Plugin CustomWeaponPlugin v1.0.0.0 (by Axeel) initiated.
+[03/03/25 01:16:12] [Server API] Info: Plugin FakeProvider v1.0.0.0 (by ASgo and Anzhelika) initiated.
+[03/03/25 01:16:12] [Server API] Info: Plugin Permabuffs v1.0.0.0 (by Zaicon) initiated.
+[03/03/25 01:16:12] [Server API] Info: Plugin PlotMarker v1.0.0.0 (by MR.H, Megghy修改) initiated.
+[03/03/25 01:16:12] [Server API] Info: Plugin RegionTrigger v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 01:16:12] [Server API] Info: Plugin Scattering v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 01:16:12] [Server API] Info: Plugin TeleportRestriction v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 01:16:13] [Server API] Info: Plugin TUIPlugin v0.1.0.0 (by ASgo & Anzhelika) initiated.
+[03/03/25 01:16:13] [Server API] Info: Plugin WorldEdit v1.0.0.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[03/03/25 01:16:13] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 01:16:13] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
+[03/03/25 01:16:14] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.

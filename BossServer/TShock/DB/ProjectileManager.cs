@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 using TShockAPI.Hooks;
 
 namespace TShockAPI.DB

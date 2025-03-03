@@ -1,0 +1,32 @@
+﻿<span>
+    @foreach (var content in ParsedContent)
+    {
+        switch (content)
+        {
+            case TerrariaTextContent text:
+                @text.Text
+                break;
+            case TerrariaColorTextContent colorText:
+                <span style="color: #@colorText.Hex;">
+                    @colorText.Text
+                </span>
+                break;
+            case TerrariaItemIDContent itemID:
+                    @itemID.ItemID
+                break;
+        }
+    }
+</span>
+
+@code {
+    [Parameter]
+    public string Content { get; set; }
+
+    public List<ITerrariaContent> ParsedContent { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        ParsedContent = Content.ParseContent();
+    }
+}

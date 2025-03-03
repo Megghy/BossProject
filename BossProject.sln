@@ -5,8 +5,6 @@ VisualStudioVersion = 17.1.32113.165
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSender", "MessageSender\MessageSender.csproj", "{BC1A604E-B9E5-4EA2-8701-C73F06687040}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BossFramework", "BossServer\BossFramework.csproj", "{66D95F3B-B506-4F1F-839D-04330D4BAFFC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlotMarker", "PlotMarker\PlotMarker.csproj", "{A3FFA622-9A63-4BD6-B60A-0F6B1ED71F36}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewBadgeSystem", "NewBadgeSystem\NewBadgeSystem.csproj", "{28B06A3E-90F5-4E31-AEED-E91ED319CBE7}"
@@ -39,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrProtocol", "TrProtocol\Tr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BossWeb", "BossWeb\BossWeb.csproj", "{087B6610-E2F0-4ECA-B623-631508083167}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BossServer", "BossServer\BossServer.csproj", "{945484A5-EBBE-1D1C-8EDD-6E6657038EDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,18 +61,6 @@ Global
 		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Release|x64.Build.0 = Release|Any CPU
 		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Release|x86.ActiveCfg = Release|Any CPU
 		{BC1A604E-B9E5-4EA2-8701-C73F06687040}.Release|x86.Build.0 = Release|Any CPU
-		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Debug|x64.ActiveCfg = Debug|x64
-		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Debug|x64.Build.0 = Debug|x64
-		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Debug|x86.Build.0 = Debug|Any CPU
-		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Release|x64.ActiveCfg = Release|x64
-		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Release|x64.Build.0 = Release|x64
-		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Release|x86.ActiveCfg = Release|Any CPU
-		{66D95F3B-B506-4F1F-839D-04330D4BAFFC}.Release|x86.Build.0 = Release|Any CPU
 		{A3FFA622-9A63-4BD6-B60A-0F6B1ED71F36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A3FFA622-9A63-4BD6-B60A-0F6B1ED71F36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3FFA622-9A63-4BD6-B60A-0F6B1ED71F36}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -265,6 +253,18 @@ Global
 		{087B6610-E2F0-4ECA-B623-631508083167}.Release|x64.Build.0 = Release|Any CPU
 		{087B6610-E2F0-4ECA-B623-631508083167}.Release|x86.ActiveCfg = Release|Any CPU
 		{087B6610-E2F0-4ECA-B623-631508083167}.Release|x86.Build.0 = Release|Any CPU
+		{945484A5-EBBE-1D1C-8EDD-6E6657038EDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{945484A5-EBBE-1D1C-8EDD-6E6657038EDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{945484A5-EBBE-1D1C-8EDD-6E6657038EDB}.Debug|x64.ActiveCfg = Debug|x64
+		{945484A5-EBBE-1D1C-8EDD-6E6657038EDB}.Debug|x64.Build.0 = Debug|x64
+		{945484A5-EBBE-1D1C-8EDD-6E6657038EDB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{945484A5-EBBE-1D1C-8EDD-6E6657038EDB}.Debug|x86.Build.0 = Debug|Any CPU
+		{945484A5-EBBE-1D1C-8EDD-6E6657038EDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{945484A5-EBBE-1D1C-8EDD-6E6657038EDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{945484A5-EBBE-1D1C-8EDD-6E6657038EDB}.Release|x64.ActiveCfg = Release|x64
+		{945484A5-EBBE-1D1C-8EDD-6E6657038EDB}.Release|x64.Build.0 = Release|x64
+		{945484A5-EBBE-1D1C-8EDD-6E6657038EDB}.Release|x86.ActiveCfg = Release|Any CPU
+		{945484A5-EBBE-1D1C-8EDD-6E6657038EDB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

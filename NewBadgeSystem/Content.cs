@@ -7,15 +7,15 @@ using TShockAPI;
 namespace BadgeSystem
 {
     [JsonConverter(typeof(BadgeConverter))]
-    public sealed class Content
+    public sealed record Content
     {
-        public string ContentValue { get; }
+        public string ContentValue { get; set; }
 
-        public string Identifier { get; }
+        public string Identifier { get; set; }
 
-        public Color Color { get; }
+        public Color Color { get; set; }
 
-        public string ColorHex { get; }
+        public string ColorHex { get; set; }
 
         public string Type { get; set; }
 

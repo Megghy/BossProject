@@ -6,7 +6,7 @@ using Terraria.DataStructures;
 #endregion
 namespace FakeProvider
 {
-    public struct TileReference : ITile
+    public struct FakeTileReference : ITile
     {
         #region Constants
 
@@ -31,7 +31,7 @@ namespace FakeProvider
         #endregion
         #region Constructor
 
-        public TileReference(StructTile[,] Data, int X, int Y)
+        public FakeTileReference(StructTile[,] Data, int X, int Y)
         {
             this.Data = Data;
             this.X = X;
@@ -704,12 +704,12 @@ namespace FakeProvider
             Data[X, Y].ClearWallPaintAndCoating();
         }
 
-        public static bool operator ==(TileReference left, TileReference right)
+        public static bool operator ==(FakeTileReference left, FakeTileReference right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(TileReference left, TileReference right)
+        public static bool operator !=(FakeTileReference left, FakeTileReference right)
         {
             return !(left == right);
         }

@@ -21,7 +21,7 @@ using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BCrypt.Net;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 using TShockAPI.Hooks;
 
 namespace TShockAPI.DB

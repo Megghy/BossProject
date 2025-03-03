@@ -720,7 +720,7 @@ namespace TShockAPI
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        private static List<String> ParseParameters(string str)
+        public static List<String> ParseParameters(string str)
         {
             var ret = new List<string>();
             var sb = new StringBuilder();
@@ -766,7 +766,7 @@ namespace TShockAPI
             return ret;
         }
 
-        private static bool IsWhiteSpace(char c)
+        public static bool IsWhiteSpace(char c)
         {
             return c == ' ' || c == '\t' || c == '\n';
         }

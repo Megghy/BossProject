@@ -66,6 +66,7 @@ namespace BossFramework.BCore
                 return null;
             return AllBRegion.Find(r => r.Name == region.Name && r.WorldId.ToString() == region.WorldID);
         }
+
         /// <summary>
         /// 返回指定领地中的所有玩家, 提供参数为null时返回所有未在领地中的玩家
         /// </summary>

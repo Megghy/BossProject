@@ -1,19 +1,55 @@
 ﻿@page "/players"
 @using BossFramework.BModels
+@using TShockAPI
+@using TShockAPI.DB
 
 <h3>Players</h3>
 
-@foreach (var player in players)
-{
-    @player.Name
-}
+<Table DataSource="@players">
+    <PropertyColumn Property="u => u.Player != null " Title="状态" Width="50" DefaultSortOrder="SortDirection.None">
+        @if (context.Player != null)
+        {
+            <Tag Color="TagColor.Green">在线</Tag>
+        }
+        else
+        {
+            <Tag Color="TagColor.DefaultInverse">离线</Tag>
+        }
+    </PropertyColumn>
+    <PropertyColumn Property="u => u.Account.ID" Title="Id" DefaultSortOrder="SortDirection.None">
+
+    </PropertyColumn>
+    <PropertyColumn Property="u => u.Account.Name" Title="Name" DefaultSortOrder="SortDirection.None">
+        @context.Account.Name
+    </PropertyColumn>
+    <ActionColumn>
+        <Space>
+            <SpaceItem>
+                <Button Color="Color.Blue1" OnClick="() => { selectedPlayer = context; showPlayerDetailModal = true; }">
+                    查看
+                </Button>
+            </SpaceItem>
+        </Space>
+    </ActionColumn>
+</Table>
+
+<Modal @bind-Visible="showPlayerDetailModal" Title="玩家详情" Style="width: 1300px; max-width: 95vw; height: 1200px; max-height: 95vh">
+    <PlayerDetail Player="selectedPlayer" />
+</Modal>
 
 @code {
-    BPlayer[] players = [];
+    public record TempUserData(UserAccount Account, BPlayer? Player);
+
+    List<TempUserData> players;
+    TempUserData? selectedPlayer;
+
+    bool showPlayerDetailModal = false;
 
     void GetPlayers()
     {
-        players = BossFramework.BInfo.OnlinePlayers;
+        var onlinePlayers = BossFramework.BInfo.OnlinePlayers;
+        var allPlayers = TShock.UserAccounts.GetUserAccounts();
+        players = allPlayers.Select(p => new TempUserData(p, onlinePlayers.FirstOrDefault(online => online.Name == p.Name))).OrderByDescending(players => players.Player != null).ThenByDescending(p => p.Account.Name).ToList();
     }
 
     protected override async Task OnInitializedAsync()

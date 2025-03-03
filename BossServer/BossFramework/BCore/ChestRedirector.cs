@@ -6,7 +6,7 @@ using BossFramework.DB;
 using Microsoft.Xna.Framework;
 using TrProtocol;
 using TrProtocol.Models;
-using TrProtocol.Packets;
+using EnchCoreApi.TrProtocol.NetPackets;
 using TShockAPI;
 
 namespace BossFramework.BCore

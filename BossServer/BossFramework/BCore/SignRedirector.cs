@@ -6,7 +6,7 @@ using BossFramework.BModels;
 using BossFramework.DB;
 using Microsoft.Xna.Framework;
 using TrProtocol;
-using TrProtocol.Packets;
+using EnchCoreApi.TrProtocol.NetPackets;
 using TShockAPI;
 
 namespace BossFramework.BCore
@@ -108,7 +108,7 @@ namespace BossFramework.BCore
                     SignUpdate?.Invoke(args);
                     if (!args.Handled)
                     {
-                        if (plr.TsPlayer.HasPermission("boss.player.sign.update"))
+                        if (plr.TSPlayer.HasPermission("boss.player.sign.update"))
                         {
                             UpdateSignDirect(plr, s, sign.Text);
                             plr?.SendSuccessMsg($"已更新标牌");
