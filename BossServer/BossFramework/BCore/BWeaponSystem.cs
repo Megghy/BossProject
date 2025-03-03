@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BossFramework.BAttributes;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
+using EnchCoreApi.TrProtocol.Interfaces;
 using EnchCoreApi.TrProtocol.NetPackets;
 using Terraria.ID;
 using TerrariaApi.Server;
@@ -226,7 +227,7 @@ namespace BossFramework.BCore
             plr.TRPlayer.inventory[slot].prefix = (byte)weapon.Prefix;
             plr.TRPlayer.inventory[slot].stack = weapon.Stack; //将玩家背标目标位置更改为指定物品
 
-            var packets = new List<Packet>();
+            var packets = new List<IAutoSerializableData>();
             var itemID = 400 - 399;
             packets.Add(new InstancedItem()
             {

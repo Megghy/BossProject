@@ -4,6 +4,7 @@ using System.Linq;
 using BossFramework.BCore;
 using BossFramework.BInterfaces;
 using BossFramework.DB;
+using EnchCoreApi.TrProtocol.Interfaces;
 using FreeSql.DataAnnotations;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -112,20 +113,20 @@ namespace BossFramework.BModels
 
         #region 常用方法
         public override string ToString() => $"{Name}";
-        internal bool CheckSendPacket(Packet p)
+        internal bool CheckSendPacket(IAutoSerializableData p)
             => BNet.PacketHandler.HandleSendData(false, new PacketEventArgs(this, p));
         /// <summary>
         /// 向玩家发送数据包
         /// </summary>
         /// <param name="p"></param>
-        public void SendPacket(Packet p)
+        public void SendPacket(IAutoSerializableData p)
         {
             if (!CheckSendPacket(p))
                 TSPlayer?.SendRawData(p.SerializePacket());
         }
-        public void SendPackets<T>(IEnumerable<T> p) where T : Packet
+        public void SendPackets<T>(IEnumerable<T> p) where T : IAutoSerializableData
         {
-            var packets = new List<Packet>();
+            var packets = new List<IAutoSerializableData>();
             p.ForEach(packet =>
             {
                 if (!CheckSendPacket(packet))

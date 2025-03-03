@@ -7,15 +7,17 @@ using System.Reflection;
 using BossFramework.BCore;
 using BossFramework.BModels;
 using BossFramework.BNet;
+using EnchCoreApi.TrProtocol.Interfaces;
+using EnchCoreApi.TrProtocol.Models;
+using EnchCoreApi.TrProtocol.Models.TileEntities;
 using EnchCoreApi.TrProtocol.NetPackets;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Terraria;
 using Terraria.GameContent.Events;
-using Terraria.GameContent.Tile_Entities;
+using Terraria.ID;
 using TShockAPI;
 using Color = Microsoft.Xna.Framework.Color;
-using ProtocolBitsByte = TrProtocol.Models.BitsByte;
 
 namespace BossFramework
 {
@@ -338,7 +340,7 @@ namespace BossFramework
             return data;
         }
         public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("Boss.BPlayer") ?? new(plr);
-        public static byte[] SerializePacket(this Packet p) => PacketHandler.Serializer.Serialize(p);
+        public static byte[] SerializePacket(this IAutoSerializableData p) => PacketHandler.Serializer.Serialize(p);
         public static void Kill(this SyncProjectile proj)
         {
             var plr = TShock.Players[proj.PlayerSlot]?.GetBPlayer();
@@ -356,21 +358,21 @@ namespace BossFramework
             plr?.SendPacket(proj);
             proj.ProjType = oldType;
         }
-        public static void SendTo(this Packet packet, BPlayer plr)
+        public static void SendTo(this IAutoSerializableData packet, BPlayer plr)
             => plr.SendPacket(packet);
 
-        public static void SendPacketToAll(this Packet packet, params BPlayer[] ignore)
+        public static void SendPacketToAll(this IAutoSerializableData packet, params BPlayer[] ignore)
             => BInfo.OnlinePlayers.Where(p => !(ignore?.Contains(p) == true))
                 .ForEach(p => p.SendPacket(packet));
-        public static void SendPacketToAll(this Packet packet, int ignoreIndex)
+        public static void SendPacketToAll(this IAutoSerializableData packet, int ignoreIndex)
             => BInfo.OnlinePlayers.Where(p => p.Index != ignoreIndex)
                 .ForEach(p => p.SendPacket(packet));
-        public static void SendPacketsToAll(this IEnumerable<Packet> packets, params BPlayer[] ignore)
+        public static void SendPacketsToAll(this IEnumerable<IAutoSerializableData> packets, params BPlayer[] ignore)
             => BInfo.OnlinePlayers.Where(p => !(ignore?.Contains(p) == true))
             .ForEach(p => p.SendPackets(packets));
-        public static void SendPacketsTo<T>(this IEnumerable<T> packets, BPlayer plr) where T : Packet
+        public static void SendPacketsTo<T>(this IEnumerable<T> packets, BPlayer plr) where T : IAutoSerializableData
             => plr.SendPackets(packets);
-        public static byte[] GetPacketsByteData(this IEnumerable<Packet> packets)
+        public static byte[] GetPacketsByteData(this IEnumerable<IAutoSerializableData> packets)
         {
             List<byte> packetData = new();
             packets.ForEach(packet => packetData.AddRange(packet.SerializePacket()));
@@ -490,15 +492,12 @@ namespace BossFramework
             }
         }
 
+        #region 协议库相关
 
-        public static Point ToPoint(this ShortPosition posision)
-            => new(posision.X, posision.Y);
-        public static Terraria.DataStructures.Point16 ToPoint16(this ShortPosition posision)
-            => new(posision.X, posision.Y);
-        public static ShortPosition ToShortPosition(this Point posision)
-            => new((short)posision.X, (short)posision.Y);
-        public static ShortPosition ToShortPosition(this Terraria.DataStructures.Point16 posision)
-            => new((short)posision.X, (short)posision.Y);
+        //public static Point ToPoint(this ShortPosition posision) => new(posision.X, posision.Y);
+        //public static Terraria.DataStructures.Point16 ToPoint16(this ShortPosition posision)=> new(posision.X, posision.Y);
+        //public static ShortPosition ToShortPosition(this Point posision)=> new((short)posision.X, (short)posision.Y);
+        //public static ShortPosition ToShortPosition(this Terraria.DataStructures.Point16 posision)=> new((short)posision.X, (short)posision.Y);
         public static Item Get(this ItemData item)
         {
             var i = new Item();
@@ -514,113 +513,146 @@ namespace BossFramework
                 Prefix = item.prefix,
                 Stack = (short)item.stack
             };
-        public static TrProtocol.Models.Vector2 Get(this Microsoft.Xna.Framework.Vector2 vector)
-            => new(vector.X, vector.Y);
-        public static Microsoft.Xna.Framework.Vector2 Get(this TrProtocol.Models.Vector2 vector)
-            => new(vector.X, vector.Y);
+        //public static TrProtocol.Models.Vector2 Get(this Vector2 vector) => new(vector.X, vector.Y);
+        //public static Microsoft.Xna.Framework.Vector2 Get(this TrProtocol.Models.Vector2 vector)=> new(vector.X, vector.Y);
         public static Terraria.DataStructures.TileEntity ToTrTileEntity(this TileEntity entity)
         {
             var result = entity switch
             {
-                TrProtocol.Models.TileEntities.TEDisplayDoll e => new TEDisplayDoll
+                EnchCoreApi.TrProtocol.Models.TileEntities.TEDisplayDoll e => new Terraria.GameContent.Tile_Entities.TEDisplayDoll
                 {
-                    Position = e.Position.ToPoint16(),
+                    Position = e.Position,
                     _dyes = e.Dyes.Select(i => i.Get()).ToArray(),
                     _items = e.Items.Select(i => i.Get()).ToArray(),
                 },
-                TrProtocol.Models.TileEntities.TEFoodPlatter e => new TEFoodPlatter()
+                EnchCoreApi.TrProtocol.Models.TileEntities.TEFoodPlatter e => new Terraria.GameContent.Tile_Entities.TEFoodPlatter()
                 {
                     item = e.Item.Get(),
-                    Position = e.Position.ToPoint16()
+                    Position = e.Position
                 },
-                TrProtocol.Models.TileEntities.TEHatRack e => new TEHatRack()
+                EnchCoreApi.TrProtocol.Models.TileEntities.TEHatRack e => new Terraria.GameContent.Tile_Entities.TEHatRack()
                 {
                     ID = e.ID,
-                    Position = e.Position.ToPoint16(),
-                    _dyes = e.Dyes.Select(i => i.Get()).ToArray(),
-                    _items = e.Items.Select(i => i.Get()).ToArray(),
+                    Position = e.Position,
+                    _dyes = [.. e.Dyes.Select(i => i.Get())],
+                    _items = [.. e.Items.Select(i => i.Get())],
                 },
-                TrProtocol.Models.TileEntities.TEItemFrame e => new TEItemFrame()
+                EnchCoreApi.TrProtocol.Models.TileEntities.TEItemFrame e => new Terraria.GameContent.Tile_Entities.TEItemFrame()
                 {
                     ID = e.ID,
-                    Position = e.Position.ToPoint16(),
+                    Position = e.Position,
                     item = e.Item.Get()
                 },
-                TrProtocol.Models.TileEntities.TELogicSensor e => new TELogicSensor()
+                EnchCoreApi.TrProtocol.Models.TileEntities.TELogicSensor e => new Terraria.GameContent.Tile_Entities.TELogicSensor()
                 {
                     ID = e.ID,
-                    Position = e.Position.ToPoint16(),
-                    logicCheck = (TELogicSensor.LogicCheckType)e.LogicCheck,
+                    Position = e.Position,
+                    logicCheck = (Terraria.GameContent.Tile_Entities.TELogicSensor.LogicCheckType)e.LogicCheck,
                     On = e.On
                 },
-                TrProtocol.Models.TileEntities.TETeleportationPylon e => new TETeleportationPylon()
+                EnchCoreApi.TrProtocol.Models.TileEntities.TETeleportationPylon e => new Terraria.GameContent.Tile_Entities.TETeleportationPylon()
                 {
                     ID = e.ID,
-                    Position = e.Position.ToPoint16()
+                    Position = e.Position
                 },
-                TrProtocol.Models.TileEntities.TETrainingDummy e => new TETrainingDummy()
+                EnchCoreApi.TrProtocol.Models.TileEntities.TETrainingDummy e => new Terraria.GameContent.Tile_Entities.TETrainingDummy()
                 {
                     ID = e.ID,
-                    Position = e.Position.ToPoint16(),
+                    Position = e.Position,
                     npc = e.NPC
                 },
-                TrProtocol.Models.TileEntities.TEWeaponsRack e => (Terraria.DataStructures.TileEntity)new TEWeaponsRack()
+                EnchCoreApi.TrProtocol.Models.TileEntities.TEWeaponsRack e => (Terraria.DataStructures.TileEntity)new Terraria.GameContent.Tile_Entities.TEWeaponsRack()
                 {
                     ID = e.ID,
-                    Position = e.Position.ToPoint16(),
+                    Position = e.Position,
                     item = e.Item.Get()
                 },
                 _ => null,
             };
             result.type = (byte)entity.EntityType;
-            result.Position = entity.Position.ToPoint16();
+            result.Position = entity.Position;
             result.ID = entity.ID;
             return result;
         }
         public static TileEntity ToProtocalTileEntity(this Terraria.DataStructures.TileEntity entity)
         {
-            var result = entity switch
+            switch (entity)
             {
-                TEDisplayDoll e => new TrProtocol.Models.TileEntities.TEDisplayDoll
-                {
-                    Dyes = e._dyes.Select(i => i.Get()).ToArray(),
-                    Items = e._items.Select(i => i.Get()).ToArray(),
-                },
-                TEFoodPlatter e => new TrProtocol.Models.TileEntities.TEFoodPlatter()
-                {
-                    Item = e.item.Get(),
-                    Position = e.Position.ToShortPosition()
-                },
-                TEHatRack e => new TrProtocol.Models.TileEntities.TEHatRack()
-                {
-                    Dyes = e._dyes.Select(i => i.Get()).ToArray(),
-                    Items = e._items.Select(i => i.Get()).ToArray(),
-                },
-                TEItemFrame e => new TrProtocol.Models.TileEntities.TEItemFrame()
-                {
-                    Item = e.item.Get()
-                },
-                TELogicSensor e => new TrProtocol.Models.TileEntities.TELogicSensor()
-                {
-                    LogicCheck = (LogicCheckType)e.logicCheck,
-                    On = e.On
-                },
-                TETeleportationPylon e => new TrProtocol.Models.TileEntities.TETeleportationPylon()
-                {
-                },
-                TETrainingDummy e => new TrProtocol.Models.TileEntities.TETrainingDummy()
-                {
-                    NPC = e.npc
-                },
-                TEWeaponsRack e => (TrProtocol.Models.TileEntity)new TrProtocol.Models.TileEntities.TEWeaponsRack()
-                {
-                    Item = e.item.Get()
-                },
-                _ => null,
-            };
-            result.Position = entity.Position.ToShortPosition();
-            result.ID = entity.ID;
+                case Terraria.GameContent.Tile_Entities.TEDisplayDoll e:
+                    BitsByte bitsByte = (byte)0;
+                    bitsByte[0] = !e._items[0].IsAir;
+                    bitsByte[1] = !e._items[1].IsAir;
+                    bitsByte[2] = !e._items[2].IsAir;
+                    bitsByte[3] = !e._items[3].IsAir;
+                    bitsByte[4] = !e._items[4].IsAir;
+                    bitsByte[5] = !e._items[5].IsAir;
+                    bitsByte[6] = !e._items[6].IsAir;
+                    bitsByte[7] = !e._items[7].IsAir;
+                    BitsByte bitsByte2 = (byte)0;
+                    bitsByte2[0] = !e._dyes[0].IsAir;
+                    bitsByte2[1] = !e._dyes[1].IsAir;
+                    bitsByte2[2] = !e._dyes[2].IsAir;
+                    bitsByte2[3] = !e._dyes[3].IsAir;
+                    bitsByte2[4] = !e._dyes[4].IsAir;
+                    bitsByte2[5] = !e._dyes[5].IsAir;
+                    bitsByte2[6] = !e._dyes[6].IsAir;
+                    bitsByte2[7] = !e._dyes[7].IsAir;
+                    return new EnchCoreApi.TrProtocol.Models.TileEntities.TEDisplayDoll(e.ID, e.Position, bitsByte, bitsByte2)
+                    {
+                        Dyes = e._dyes.Select(i => i.Get()).ToArray(),
+                        Items = e._items.Select(i => i.Get()).ToArray(),
+                    };
+                case Terraria.GameContent.Tile_Entities.TEFoodPlatter e:
+                    return new EnchCoreApi.TrProtocol.Models.TileEntities.TEFoodPlatter(e.ID, e.Position, e.item.Get());
+                case Terraria.GameContent.Tile_Entities.TEHatRack e:
+                    bitsByte = (byte)0;
+                    bitsByte[0] = !e._items[0].IsAir;
+                    bitsByte[1] = !e._items[1].IsAir;
+                    bitsByte[2] = !e._dyes[0].IsAir;
+                    bitsByte[3] = !e._dyes[1].IsAir;
+                    return new EnchCoreApi.TrProtocol.Models.TileEntities.TEHatRack(e.ID, e.Position, bitsByte)
+                    {
+                        Dyes = e._dyes.Select(i => i.Get()).ToArray(),
+                        Items = e._items.Select(i => i.Get()).ToArray(),
+                    };
+                    break;
+                case Terraria.GameContent.Tile_Entities.TEItemFrame e:
+                    result = new EnchCoreApi.TrProtocol.Models.TileEntities.TEItemFrame(e.ID, e.Position,)
+                    {
+                        Item = e.item.Get()
+                    };
+                    break;
+                case Terraria.GameContent.Tile_Entities.TELogicSensor e:
+                    result = new EnchCoreApi.TrProtocol.Models.TileEntities.TELogicSensor(e.ID, e.Position,)
+                    {
+                        LogicCheck = (LogicCheckType)e.logicCheck,
+                        On = e.On
+                    };
+                    break;
+                case Terraria.GameContent.Tile_Entities.TETeleportationPylon e:
+                    result = new EnchCoreApi.TrProtocol.Models.TileEntities.TETeleportationPylon(e.ID, e.Position,)
+                    {
+                    };
+                    break;
+                case Terraria.GameContent.Tile_Entities.TETrainingDummy e:
+                    result = new EnchCoreApi.TrProtocol.Models.TileEntities.TETrainingDummy(e.ID, e.Position,)
+                    {
+                        NPC = e.npc
+                    };
+                    break;
+                case Terraria.GameContent.Tile_Entities.TEWeaponsRack e:
+                    result = new EnchCoreApi.TrProtocol.Models.TileEntities.TEWeaponsRack(e.ID, e.Position,)
+                    {
+                        Item = e.item.Get()
+                    };
+                    break;
+                default:
+                    result = null;
+                    break;
+            }
             return result;
         }
+
+        #endregion
     }
 }

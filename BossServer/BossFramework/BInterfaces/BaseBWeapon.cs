@@ -1,9 +1,8 @@
-﻿extern alias TrProtocol;
-
-using BossFramework.BModels;
+﻿using BossFramework.BModels;
+using EnchCoreApi.TrProtocol.NetPackets;
 using Microsoft.Xna.Framework;
 using Terraria;
-using TrProtocol::EnchCoreApi.TrProtocol.NetPackets;
+using Terraria.ID;
 using TShockAPI;
 
 namespace BossFramework.BInterfaces
@@ -35,9 +34,7 @@ namespace BossFramework.BInterfaces
                     b2[5] = NotAmmo.HasValue;
                     var item = new Terraria.Item();
                     item.SetDefaults(ItemID);
-                    var bb1 = new TrProtocol.Terraria.BitsByte() { value = b1.value };
-                    var bb2 = new TrProtocol.Terraria.BitsByte() { value = b2.value };
-                    _tweakePacket = new ItemTweaker(-1, bb1, bb2, Color?.PackedValue ?? item.color.PackedValue,
+                    _tweakePacket = new ItemTweaker(-1, b1, b2, Color?.PackedValue ?? item.color.PackedValue,
                         (ushort)(Damage ?? item.damage),
                         (float)(KnockBack ?? item.knockBack),
                         (ushort)(AnimationTime ?? item.useAnimation),
@@ -135,31 +132,45 @@ namespace BossFramework.BInterfaces
         {
             plr.RelesedProjs.Add(new(plr, plr.ProjContext.CreateOrSyncProj(plr, proj, true), this, plr.CurrentRegion));
         }
-        public void CreateProj(BPlayer plr, int projID, Vector2 position, Vector2 velocity, int damage = -1, float knockBack = -1, float ai0 = -1, float ai1 = -1)
+        public void CreateProj(BPlayer plr, int projID, Vector2 position, Vector2 velocity, short? damage = null, float? knockBack = null, float ai0 = -1, float ai1 = -1)
         {
             _proj.SetDefaults(projID);
-            var bb = new BitsByte();
-            bb[0] = ai0 != -1;
-            bb[1] = ai1 != -1;
-            bb[3] = true; //bannerid
-            bb[4] = damage != -1;
-            bb[5] = knockBack != -1;
-            bb[6] = true;
-            plr.RelesedProjs.Add(new(plr, plr.ProjContext.CreateOrSyncProj(plr, new()
+            var bb1 = new BitsByte();
+            var bb2 = new BitsByte();
+            bb1[0] = ai0 != -1;
+            bb1[1] = ai1 != -1;
+
+            bb2[0] = _proj.ai[2] != 0f; //这里是2
+
+            if (_proj.bannerIdToRespondTo != 0)
             {
-                Bit1 = bb,
-                AI1 = ai0 == -1 ? _proj.ai[0] : ai0,
-                AI2 = ai1 == -1 ? _proj.ai[1] : ai1,
-                Damage = (short)(damage == -1 ? _proj.damage : damage),
-                OriginalDamage = (ushort)_proj.originalDamage,
-                Knockback = knockBack == -1 ? _proj.knockBack : knockBack,
-                PlayerSlot = plr.Index,
-                Position = position,
-                Velocity = velocity,
-                ProjSlot = 1000,
-                ProjType = (short)projID,
-                BannerId = (ushort)_proj.bannerIdToRespondTo
-            }, true), this, plr.CurrentRegion));
+                bb1[3] = true;
+            }
+            if (damage.HasValue)
+            {
+                bb1[4] = true;
+            }
+            if (knockBack.HasValue)
+            {
+                bb1[5] = true;
+            }
+            if (_proj.type > 0 && _proj.type < ProjectileID.Count && ProjectileID.Sets.NeedsUUID[_proj.type])
+            {
+                bb1[7] = true;
+            }
+            if (_proj.originalDamage != 0)
+            {
+                bb1[6] = true;
+            }
+            if ((byte)bb2 != 0)
+            {
+                bb1[2] = true;
+            }
+
+            damage ??= (short)_proj.damage;
+            knockBack ??= _proj.knockBack;
+
+            plr.RelesedProjs.Add(new(plr, plr.ProjContext.CreateOrSyncProj(plr, new(1000, position, velocity, plr.Index, (short)projID, bb1, bb2, (float)(ai0 == -1 ? _proj.ai[0] : ai0), (float)(ai1 == -1 ? _proj.ai[1] : ai1), (ushort)_proj.bannerIdToRespondTo, damage.Value, knockBack.Value, (short)_proj.originalDamage, (short)_proj.projUUID, _proj.ai[2]), true), this, plr.CurrentRegion));
         }
 
         public override bool Equals(object obj)
