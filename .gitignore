@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 Output/
+BossServer/testscipts/*
+/BossServer/BossFramework/testscipts/testweapon.cs
