@@ -96,7 +96,7 @@ namespace BossFramework.BCore
                 .ForEach(p =>
                 {
                     args.CommandText = p.Replace(new(args.Player.GetBPlayer()), args.CommandText);
-                    if (args.Parameters.Any())
+                    if (args.Parameters.Count != 0)
                         for (int i = 0; i < args.Parameters.Count; i++)
                         {
                             if (p.Match(args.Parameters[i]))

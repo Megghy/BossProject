@@ -35,4 +35,7 @@
               DestinationFolder="$(OutputFolder)"
               SkipUnchangedFiles="true" />
     </Target>
+     <Target Name = "Clean">
+        <RemoveDir Directories="$(builtdir)" />
+    </Target>
 </Project>

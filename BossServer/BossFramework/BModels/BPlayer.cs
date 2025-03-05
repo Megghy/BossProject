@@ -7,6 +7,8 @@ using BossFramework.DB;
 using FreeSql.DataAnnotations;
 using Microsoft.Xna.Framework;
 using Terraria;
+using TrProtocol;
+using TrProtocol.Packets;
 using TShockAPI;
 using static BossFramework.BModels.BEventArgs;
 
@@ -68,6 +70,10 @@ namespace BossFramework.BModels
         public float Y => TSPlayer.Y;
         public int TileX => TSPlayer.TileX;
         public int TileY => TSPlayer.TileY;
+        public Point TilePosition => new(TileX, TileY);
+        public Vector2 TilePositionV => new(TileX, TileY);
+        public Vector2 Position => TPlayer.position;
+        public Vector2 Velocity => TPlayer.velocity;
 
         public readonly Dictionary<Func<BaseEventArgs, string>, int> PlayerStatusCallback = new();
 
@@ -90,6 +96,7 @@ namespace BossFramework.BModels
 
 
         public (short slot, BSign sign)? WatchingSign { get; internal set; }
+        public List<BSign> SendedSigns = [];
         public short LastWatchingSignIndex { get; internal set; } = -1;
 
         public (short slot, BChest chest)? WatchingChest { get; set; }
@@ -114,6 +121,7 @@ namespace BossFramework.BModels
         public override string ToString() => $"{Name}";
         internal bool CheckSendPacket(Packet p)
             => BNet.PacketHandler.HandleSendData(false, new PacketEventArgs(this, p));
+
         /// <summary>
         /// 向玩家发送数据包
         /// </summary>
@@ -121,7 +129,7 @@ namespace BossFramework.BModels
         public void SendPacket(Packet p)
         {
             if (!CheckSendPacket(p))
-                TSPlayer?.SendRawData(p.SerializePacket());
+                SendRawData(p.SerializePacket());
         }
         public void SendPackets<T>(IEnumerable<T> p) where T : Packet
         {
@@ -131,7 +139,7 @@ namespace BossFramework.BModels
                 if (!CheckSendPacket(packet))
                     packets.Add(packet);
             });
-            TSPlayer?.SendRawData(packets.GetPacketsByteData());
+            SendRawData(packets.GetPacketsByteData());
         }
         public void SendRawData(byte[] data) => TSPlayer?.SendRawData(data);
         public void SendCombatMessage(string msg, Color color = default, bool randomPosition = true)

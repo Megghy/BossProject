@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using BossFramework;
@@ -19,7 +18,7 @@ using Terraria.Social;
 using Terraria.Utilities;
 using TerrariaApi.Server;
 using TrProtocol;
-using EnchCoreApi.TrProtocol.NetPackets;
+using TrProtocol.Packets;
 using TShockAPI;
 #endregion
 namespace FakeProvider
@@ -27,9 +26,6 @@ namespace FakeProvider
     [ApiVersion(2, 1)]
     public class FakeProviderPlugin : TerrariaPlugin
     {
-        [DllImport("User32.dll", CharSet = CharSet.Unicode)]
-        public static extern int MessageBox(IntPtr h, string m, string c, int type);
-
         #region Data
 
         public override string Name => "FakeProvider";
@@ -138,7 +134,7 @@ namespace FakeProvider
 
             HookEvents.Terraria.IO.WorldFile.LoadHeader += WorldFile_LoadHeader;
             HookEvents.Terraria.IO.WorldFile.LoadWorld += OnPreLoadWorld;
-            ServerApi.Hooks.WorldSave.Register(this, OnPreSaveWorld);
+            //ServerApi.Hooks.WorldSave.Register(this, OnPreSaveWorld);
             //ServerApi.Hooks.NetSendData.Register(this, OnSendData, Int32.MaxValue);
             ServerApi.Hooks.ServerLeave.Register(this, OnServerLeave);
 
@@ -171,7 +167,7 @@ namespace FakeProvider
                 //ServerApi.Hooks.PostWorldLoad.Deregister(this, OnPostLoadWorld);
                 HookEvents.Terraria.IO.WorldFile.LoadWorld -= OnPreLoadWorld;
                 WorldGen.Hooks.OnWorldLoad -= OnPostLoadWorld;
-                ServerApi.Hooks.WorldSave.Deregister(this, OnPreSaveWorld);
+                //ServerApi.Hooks.WorldSave.Deregister(this, OnPreSaveWorld);
                 ServerApi.Hooks.NetSendData.Deregister(this, OnSendData);
                 ServerApi.Hooks.ServerLeave.Deregister(this, OnServerLeave);
 
@@ -1503,268 +1499,6 @@ Custom valid : {ValidateWorldData(array, num)}";
 
             using (IDisposable previous = Main.tile as IDisposable)
                 Main.tile = FakeProviderAPI.World;
-        }
-
-        #endregion
-        #region LoadWorldDirect
-
-        private static void LoadWorldDirect(bool loadFromCloud)
-        {
-            Main.lockMenuBGChange = true;
-            WorldFile._isWorldOnCloud = loadFromCloud;
-            Main.checkXMas();
-            Main.checkHalloween();
-            bool flag = loadFromCloud && SocialAPI.Cloud != null;
-            if (!FileUtilities.Exists(Main.worldPathName, flag) && Main.autoGen)
-            {
-                if (!flag)
-                {
-                    for (int i = Main.worldPathName.Length - 1; i >= 0; i--)
-                    {
-                        if (Main.worldPathName.Substring(i, 1) == (Path.DirectorySeparatorChar.ToString() ?? ""))
-                        {
-                            Terraria.Utils.TryCreatingDirectory(Directory.GetParent(Main.worldPathName.Substring(0, i)).FullName);
-                            break;
-                        }
-                    }
-                }
-                WorldGen.clearWorld();
-                Main.ActiveWorldFileData = WorldFile.CreateMetadata((Main.worldName == "") ? "World" : Main.worldName, flag, Main.GameMode);
-                string text = (Main.AutogenSeedName ?? "").Trim();
-                if (text.Length == 0)
-                {
-                    Main.ActiveWorldFileData.SetSeedToRandom();
-                }
-                else
-                {
-                    Main.ActiveWorldFileData.SetSeed(text);
-                }
-                WorldGen.GenerateWorld(Main.ActiveWorldFileData.Seed, Main.AutogenProgress);
-                WorldFile.SaveWorld();
-            }
-            using (MemoryStream memoryStream = new MemoryStream(FileUtilities.ReadAllBytes(Main.worldPathName, flag)))
-            {
-                using (BinaryReader binaryReader = new BinaryReader(memoryStream))
-                {
-                    try
-                    {
-                        WorldGen.loadFailed = false;
-                        WorldGen.loadSuccess = false;
-                        int num = WorldFile._versionNumber = binaryReader.ReadInt32();
-                        int num2;
-                        if (num <= 87)
-                        {
-                            num2 = WorldFile.LoadWorld_Version1_Old_BeforeRelease88(binaryReader);
-                        }
-                        else
-                        {
-                            num2 = LoadWorld_Version2(binaryReader);
-                        }
-                        if (num < 141)
-                        {
-                            if (!loadFromCloud)
-                            {
-                                Main.ActiveWorldFileData.CreationTime = File.GetCreationTime(Main.worldPathName);
-                            }
-                            else
-                            {
-                                Main.ActiveWorldFileData.CreationTime = DateTime.Now;
-                            }
-                        }
-                        WorldFile.CheckSavedOreTiers();
-
-                        LoadWorldSize = binaryReader.BaseStream.Position; //DEBUG
-
-                        binaryReader.Close();
-                        memoryStream.Close();
-                        if (num2 != 0)
-                        {
-                            WorldGen.loadFailed = true;
-                        }
-                        else
-                        {
-                            WorldGen.loadSuccess = true;
-                        }
-                        if (WorldGen.loadFailed || !WorldGen.loadSuccess)
-                        {
-                            MessageBox((IntPtr)0, $"Failed loading world ({Main.worldPathName}): (loadFailed || !WorldGen.loadSuccess)", "TerrariaServer startup error", 0);
-                            Environment.Exit(1);
-                        }
-                        WorldFile.ConvertOldTileEntities();
-                        WorldFile.ClearTempTiles();
-                        WorldGen.gen = true;
-                        //WorldGen.waterLine = Main.maxTilesY;
-                        Liquid.QuickWater(2, -1, -1);
-                        WorldGen.WaterCheck();
-                        int num3 = 0;
-                        Liquid.quickSettle = true;
-                        int num4 = Liquid.numLiquid + LiquidBuffer.numLiquidBuffer;
-                        float num5 = 0f;
-                        while (Liquid.numLiquid > 0 && num3 < 100000)
-                        {
-                            num3++;
-                            float num6 = (float)(num4 - (Liquid.numLiquid + LiquidBuffer.numLiquidBuffer)) / (float)num4;
-                            if (Liquid.numLiquid + LiquidBuffer.numLiquidBuffer > num4)
-                            {
-                                num4 = Liquid.numLiquid + LiquidBuffer.numLiquidBuffer;
-                            }
-                            if (num6 > num5)
-                            {
-                                num5 = num6;
-                            }
-                            else
-                            {
-                                num6 = num5;
-                            }
-                            SetStatusText(string.Concat(new object[]
-                            {
-                                Lang.gen[27].Value,
-                                " ",
-                                (int)(num6 * 100f / 2f + 50f),
-                                "%"
-                            }));
-                            Liquid.UpdateLiquid();
-                        }
-                        Liquid.quickSettle = false;
-                        Main.weatherCounter = WorldGen.genRand.Next(3600, 18000);
-                        Cloud.resetClouds();
-                        WorldGen.WaterCheck();
-                        WorldGen.gen = false;
-                        NPC.setFireFlyChance();
-                        if (Main.slimeRainTime > 0.0)
-                        {
-                            Main.StartSlimeRain(false);
-                        }
-                        NPC.SetWorldSpecificMonstersByWorldID();
-                    }
-                    catch (Exception value)
-                    {
-                        WorldGen.loadFailed = true;
-                        WorldGen.loadSuccess = false;
-                        System.Console.WriteLine(value);
-                        try
-                        {
-                            binaryReader.Close();
-                            memoryStream.Close();
-                        }
-                        catch
-                        {
-                        }
-                        MessageBox((IntPtr)0, $"Failed loading world ({Main.worldPathName}):\n{value}", "TerrariaServer startup error", 0);
-                        Environment.Exit(1);
-                    }
-                }
-            }
-
-            EventInfo eventOnWorldLoad = typeof(WorldFile).GetEvent("OnWorldLoad", BindingFlags.Public | BindingFlags.Static);
-            eventOnWorldLoad.GetRaiseMethod()?.Invoke(null, new object[] { });
-            //if (WorldFile.OnWorldLoad != null)
-            //WorldFile.OnWorldLoad();
-        }
-
-
-        #endregion
-        #region LoadWorld_Version2
-
-        private static int LoadWorld_Version2(BinaryReader reader)
-        {
-            reader.BaseStream.Position = 0L;
-            bool[] importance;
-            int[] array;
-            if (!WorldFile.LoadFileFormatHeader(reader, out importance, out array))
-            {
-                return 5;
-            }
-            if (reader.BaseStream.Position != (long)array[0])
-            {
-                return 5;
-            }
-            WorldFile.LoadHeader(reader);
-            if (reader.BaseStream.Position != (long)array[1])
-            {
-                return 5;
-            }
-
-            // ======================
-            CreateCustomTileProvider();
-            // ======================
-
-            WorldFile.LoadWorldTiles(reader, importance);
-            if (reader.BaseStream.Position != (long)array[2])
-            {
-                return 5;
-            }
-            WorldFile.LoadChests(reader);
-            if (reader.BaseStream.Position != (long)array[3])
-            {
-                return 5;
-            }
-            WorldFile.LoadSigns(reader);
-            if (reader.BaseStream.Position != (long)array[4])
-            {
-                return 5;
-            }
-            WorldFile.LoadNPCs(reader);
-            if (reader.BaseStream.Position != (long)array[5])
-            {
-                return 5;
-            }
-            if (WorldFile._versionNumber >= 116)
-            {
-                if (WorldFile._versionNumber < 122)
-                {
-                    WorldFile.LoadDummies(reader);
-                    if (reader.BaseStream.Position != (long)array[6])
-                    {
-                        return 5;
-                    }
-                }
-                else
-                {
-                    WorldFile.LoadTileEntities(reader);
-                    if (reader.BaseStream.Position != (long)array[6])
-                    {
-                        return 5;
-                    }
-                }
-            }
-            if (WorldFile._versionNumber >= 170)
-            {
-                WorldFile.LoadWeightedPressurePlates(reader);
-                if (reader.BaseStream.Position != (long)array[7])
-                {
-                    return 5;
-                }
-            }
-            if (WorldFile._versionNumber >= 189)
-            {
-                WorldFile.LoadTownManager(reader);
-                if (reader.BaseStream.Position != (long)array[8])
-                {
-                    return 5;
-                }
-            }
-            if (WorldFile._versionNumber >= 210)
-            {
-                WorldFile.LoadBestiary(reader, WorldFile._versionNumber);
-                if (reader.BaseStream.Position != (long)array[9])
-                {
-                    return 5;
-                }
-            }
-            else
-            {
-                WorldFile.LoadBestiaryForVersionsBefore210();
-            }
-            if (WorldFile._versionNumber >= 220)
-            {
-                WorldFile.LoadCreativePowers(reader, WorldFile._versionNumber);
-                if (reader.BaseStream.Position != (long)array[10])
-                {
-                    return 5;
-                }
-            }
-            return WorldFile.LoadFooter(reader);
         }
 
         #endregion

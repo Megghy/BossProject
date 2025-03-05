@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Terraria;
 using TrProtocol;
-using EnchCoreApi.TrProtocol.NetPackets;
+using TrProtocol.Packets;
 using TShockAPI;
 
 namespace BossFramework.BModels

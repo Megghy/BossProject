@@ -3,16 +3,18 @@ using System.Data;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
 using BossFramework.BCore;
 using BossFramework.BModels;
 using BossFramework.BNet;
-using EnchCoreApi.TrProtocol.NetPackets;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Terraria;
 using Terraria.GameContent.Events;
 using Terraria.GameContent.Tile_Entities;
+using TrProtocol;
+using TrProtocol.Models;
+using TrProtocol.Packets;
 using TShockAPI;
 using Color = Microsoft.Xna.Framework.Color;
 using ProtocolBitsByte = TrProtocol.Models.BitsByte;
@@ -338,7 +340,17 @@ namespace BossFramework
             return data;
         }
         public static BPlayer GetBPlayer(this TSPlayer plr) => plr.GetData<BPlayer>("Boss.BPlayer") ?? new(plr);
-        public static byte[] SerializePacket(this Packet p) => PacketHandler.Serializer.Serialize(p);
+        static MemoryCache _packetCache = new( new MemoryCacheOptions() { });
+        public static byte[] SerializePacket(this Packet p)
+        {
+            if(_packetCache.TryGetValue(p, out byte[] data)) return data;
+            else
+            {
+                data = PacketHandler.Serializer.Serialize(p);
+                _packetCache.Set(p, data, TimeSpan.FromSeconds(10));
+                return data;
+            }
+        }
         public static void Kill(this SyncProjectile proj)
         {
             var plr = TShock.Players[proj.PlayerSlot]?.GetBPlayer();
@@ -372,9 +384,9 @@ namespace BossFramework
             => plr.SendPackets(packets);
         public static byte[] GetPacketsByteData(this IEnumerable<Packet> packets)
         {
-            List<byte> packetData = new();
+            List<byte> packetData = [];
             packets.ForEach(packet => packetData.AddRange(packet.SerializePacket()));
-            return packetData.ToArray();
+            return [.. packetData];
         }
         public static void SendMsg(this TSPlayer plr, object msg, Color color = default)
         {
@@ -407,7 +419,7 @@ namespace BossFramework
 
             return true;
         }
-        public static MethodInfo ParseParameters = typeof(Commands).GetMethod("ParseParameters", BindingFlags.NonPublic | BindingFlags.Static);
+        //public static MethodInfo ParseParameters = typeof(Commands).GetMethod("ParseParameters", BindingFlags.NonPublic | BindingFlags.Static);
 
         private static bool Internal_ParseCmd(string text, out string cmdText, out string cmdName, out List<string> args, out bool silent)
         {
@@ -430,11 +442,11 @@ namespace BossFramework
                 cmdName = null;
                 return false;
             }
-            cmdName = index < 0 ? cmdText.ToLower() : cmdText.Substring(0, index).ToLower();
+            cmdName = index < 0 ? cmdText.ToLower() : cmdText[..index].ToLower();
 
             args = index < 0 ?
                 [] :
-                ParseParameters.Invoke(null, [cmdText[index..]]) as List<string>;
+                Commands.ParseParameters(cmdText[index..]);
             return true;
         }
         public static bool HandleCommandDirect(TSPlayer player, string cmdText, string cmdName, List<string> args, bool silent, bool ignorePerm)
@@ -622,5 +634,38 @@ namespace BossFramework
             result.ID = entity.ID;
             return result;
         }
+
+        public static float Distance(Point value1, Microsoft.Xna.Framework.Vector2 value2)
+        {
+            float num = value1.X - value2.X;
+            float num2 = value1.Y - value2.Y;
+            float num3 = num * num + num2 * num2;
+            return (float)Math.Sqrt(num3);
+        }
+
+        public static void Distance(ref Point value1, ref Microsoft.Xna.Framework.Vector2 value2, out float result)
+        {
+            float num = value1.X - value2.X;
+            float num2 = value1.Y - value2.Y;
+            float num3 = num * num + num2 * num2;
+            result = (float)Math.Sqrt(num3);
+        }
+        public static bool IsNearBy(Microsoft.Xna.Framework.Vector2 p, Microsoft.Xna.Framework.Vector2 p2, float distance)
+        {
+            float squaredDistance = Microsoft.Xna.Framework.Vector2.DistanceSquared(p, p2);
+            float squaredMax = distance * distance;
+            return squaredDistance <= squaredMax;
+        }
+        public static bool IsNearBy(Microsoft.Xna.Framework.Vector2 p, Point p2, float distance)
+            => IsNearBy(p, new Microsoft.Xna.Framework.Vector2(p2.X, p2.Y), distance);
+        /// <summary>
+        /// p2 为物块坐标
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="p2"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
+        public static bool IsNearBy(this BPlayer p, Point p2, float distance = 150)
+            => IsNearBy(p.TilePositionV, new Microsoft.Xna.Framework.Vector2(p2.X, p2.Y), distance);
     }
 }

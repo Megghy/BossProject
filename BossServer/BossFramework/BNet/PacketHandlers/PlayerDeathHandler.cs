@@ -3,7 +3,7 @@ using BossFramework.BModels;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Localization;
-using EnchCoreApi.TrProtocol.NetPackets;
+using TrProtocol.Packets;
 using TShockAPI;
 
 namespace BossFramework.BNet.PacketHandlers

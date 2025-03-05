@@ -1,11 +1,9 @@
-﻿using BossFramework.BInterfaces;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Terraria;
+using BossFramework.BInterfaces;
+using Newtonsoft.Json;
 using TShockAPI;
 
 public class RandomCmd1 : IScriptModule
@@ -150,10 +148,10 @@ public class RandomCmd1 : IScriptModule
 
     private static bool Internal_ParseCmd(string text, out string cmdText, out string cmdName, out List<string> args, out bool silent)
     {
-		if(text.StartsWith('/') || text.StartsWith('.'))
-			cmdText = text.Remove(0, 1);
-		else 
-			cmdText = text;
+        if (text.StartsWith('/') || text.StartsWith('.'))
+            cmdText = text.Remove(0, 1);
+        else
+            cmdText = text;
         var cmdPrefix = text[0].ToString();
         silent = cmdPrefix == Commands.SilentSpecifier;
 

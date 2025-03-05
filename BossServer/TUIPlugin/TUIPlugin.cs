@@ -11,7 +11,7 @@ using TerrariaUI;
 using TerrariaUI.Base;
 using TerrariaUI.Hooks.Args;
 using TerrariaUI.Widgets;
-using EnchCoreApi.TrProtocol.NetPackets;
+using TrProtocol.Packets;
 using TShockAPI;
 using TShockAPI.Hooks;
 using Timer = System.Timers.Timer;
@@ -55,7 +55,7 @@ namespace TUIPlugin
             : base(game)
         {
             // ????????????????????????
-           // Order = -1000;
+            // Order = -1000;
         }
 
         #endregion Constructor

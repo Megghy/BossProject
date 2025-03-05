@@ -21,14 +21,14 @@ namespace BossFramework.BCore.Cmds
                     args.Player.SendErrorMsg($"{name} 已存在.");
                     return;
                 }
-                var code = args.FullCommand.Remove(0, args.SubCommandName.Length + args.CommandName.Length + args[0].Length + 3);
+                var code = args.FullCommand[(args.SubCommandName.Length + args.CommandName.Length + args[0].Length + 3)..];
                 try
                 {
                     var info = new PlaceholderInfo()
                     {
                         Name = name,
                         EvalString = code,
-                        ResultDelegate = CSScript.Evaluator.CreateDelegate<string>(@"string placeholder(TShockAPI.CommandArgs args){" + code + "}")
+                        ResultDelegate = CSScript.Evaluator.CreateDelegate<string>(@"string placeholder(BossFramework.BModels.BEventArgs.BaseEventArgs args){" + code + "}")
                     };
                     DBTools.Insert(info);
                     CommandPlaceholder.Placeholders.Add(info);
@@ -63,7 +63,7 @@ namespace BossFramework.BCore.Cmds
         [NeedPermission("boss.admin.placeholder.list")]
         public static void List(SubCommandArgs args)
         {
-            args.Player.SendInfoMsg(string.Join("\r\n", CommandPlaceholder.Placeholders.Select(p => $"{{{p.Name}}} => {p.EvalString}")));
+            args.Player.SendInfoMsg(string.Join("\r\n", CommandPlaceholder.Placeholders.Select(p => $"{{{{{p.Name}}}}} => {p.EvalString}")));
         }
     }
 }

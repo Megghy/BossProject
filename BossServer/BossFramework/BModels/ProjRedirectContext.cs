@@ -1,18 +1,14 @@
 ﻿using System.Linq;
 using BossFramework.BCore;
-using EnchCoreApi.TrProtocol.NetPackets;
+using TrProtocol.Packets;
 using TShockAPI;
 
 namespace BossFramework.BModels
 {
-    public sealed class ProjRedirectContext
+    public sealed class ProjRedirectContext(BRegion bindingRegion)
     {
-        public ProjRedirectContext(BRegion bindingRegion)
-        {
-            BindingRegion = bindingRegion;
-        }
         public SyncProjectile?[] Projs { get; private set; } = new SyncProjectile?[1001];
-        public BRegion BindingRegion { get; private set; }
+        public BRegion BindingRegion { get; private set; } = bindingRegion;
 
         /// <summary>
         /// 在当前弹幕上下文中创建弹幕

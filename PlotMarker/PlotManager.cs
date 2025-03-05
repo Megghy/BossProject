@@ -240,7 +240,7 @@ namespace PlotMarker
         }
         public static Cell GetCurrentCell(this TSPlayer plr)
         {
-            if (CurrentPlot.Cells.FirstOrDefault(c => c.IsVisiable && c.Contains(plr.TileX, plr.TileY)) is { } cell)
+            if (CurrentPlot is not null && CurrentPlot.Cells.FirstOrDefault(c => c.IsVisiable && c.Contains(plr.TileX, plr.TileY)) is { } cell)
                 return cell;
             return null;
         }

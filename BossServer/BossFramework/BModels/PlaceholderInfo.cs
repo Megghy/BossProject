@@ -10,8 +10,8 @@ namespace BossFramework.BModels
         public override void Init()
         {
             ResultDelegate = CSScript.Evaluator.CreateDelegate<string>(@"string placeholder(BossFramework.BModels.BEventArgs.BaseEventArgs args){" + EvalString + "}");
-            _regex = new Regex(@"\{\s*" + Name + @"\s*\}");
-            _nonRegex = new Regex(@"\{\s*" + "!" + Name + @"\s*\}");
+            _regex = new Regex(@"\{\{\s*" + Name + @"\s*\}\}");
+            _nonRegex = new Regex(@"\{\{\s*" + "!" + Name + @"\s*\}\}");
         }
         private Regex _regex;
         private Regex _nonRegex;
@@ -20,7 +20,7 @@ namespace BossFramework.BModels
         public MethodDelegate<string> ResultDelegate { get; internal set; }
         public bool Match(string text)
             => _regex is null
-            ? text.Contains($"{{{Name}}}") || text.Contains($"{{!{Name}}}")
+            ? text.Contains($"{{{{{Name}}}}}") || text.Contains($"{{{{!{Name}}}}}")
             : _regex.IsMatch(text) || _nonRegex.IsMatch($"!{text}");
         public string Replace(BEventArgs.BaseEventArgs args, string text)
         {
@@ -28,12 +28,12 @@ namespace BossFramework.BModels
             {
                 var match = _nonRegex.Match(text);
                 var newText = text;
-                match.Groups.Keys.ForEach(k => newText = newText.Replace(match.Groups[k].Value, $"{{{Name}}}"));
+                match.Groups.Keys.ForEach(k => newText = newText.Replace(match.Groups[k].Value, $"{{{{Name}}}}"));
                 return newText;
             }
-            var result = ResultDelegate?.Invoke(new object[] { args });
+            var result = ResultDelegate?.Invoke([args]);
             if (_regex is null)
-                return text.Replace($"{{{Name}}}", result);
+                return text.Replace($"{{{{Name}}}}", result);
             else
             {
                 var match = _regex.Match(text);

@@ -1,9 +1,8 @@
-﻿extern alias TrProtocol;
-
-using BossFramework.BModels;
+﻿using BossFramework.BModels;
 using Microsoft.Xna.Framework;
 using Terraria;
-using TrProtocol::EnchCoreApi.TrProtocol.NetPackets;
+using Terraria.ID;
+using TrProtocol.Packets;
 using TShockAPI;
 
 namespace BossFramework.BInterfaces
@@ -35,21 +34,24 @@ namespace BossFramework.BInterfaces
                     b2[5] = NotAmmo.HasValue;
                     var item = new Terraria.Item();
                     item.SetDefaults(ItemID);
-                    var bb1 = new TrProtocol.Terraria.BitsByte() { value = b1.value };
-                    var bb2 = new TrProtocol.Terraria.BitsByte() { value = b2.value };
-                    _tweakePacket = new ItemTweaker(-1, bb1, bb2, Color?.PackedValue ?? item.color.PackedValue,
-                        (ushort)(Damage ?? item.damage),
-                        (float)(KnockBack ?? item.knockBack),
-                        (ushort)(AnimationTime ?? item.useAnimation),
-                        (ushort)(UseTime ?? item.useTime),
-                        (short)(ShootProj ?? item.shoot),
-                        ShootSpeed ?? item.shootSpeed,
-                        (short)(Width ?? item.width),
-                        (short)(Height ?? item.height),
-                        (float)(Size ?? item.scale),
-                        (short)(Ammo ?? item.ammo),
-                        (short)(UseAmmo ?? item.useAmmo),
-                        NotAmmo ?? item.notAmmo);
+                    _tweakePacket = new ItemTweaker()
+                    {
+                        Bit1 = b1.value,
+                        Bit2 = b2.value,
+                        PackedColor = Color?.PackedValue ?? item.color.PackedValue,
+                        Damage = (ushort)(Damage ?? item.damage),
+                        Knockback = (ushort)(KnockBack ?? item.knockBack),
+                        UseAnimation = (ushort)(AnimationTime ?? item.useAnimation),
+                        UseTime = (ushort)(UseTime ?? item.useTime),
+                        Shoot = (short)(ShootProj ?? item.shoot),
+                        ShootSpeed = ShootSpeed ?? item.shootSpeed,
+                        Width = (short)(Width ?? item.width),
+                        Height = (short)(Height ?? item.height),
+                        Scale = Size ?? item.scale,
+                        Ammo = (short)(Ammo ?? item.ammo),
+                        UseAmmo = (short)(UseAmmo ?? item.useAmmo),
+                        NotAmmo = NotAmmo ?? item.notAmmo,
+                    };
                 }
                 return (ItemTweaker)_tweakePacket;
             }
@@ -57,12 +59,13 @@ namespace BossFramework.BInterfaces
         public abstract string Name { get; }
         public abstract int ItemID { get; }
         public abstract int Prefix { get; }
+        [Obsolete("不推荐使用")]
         public abstract int Stack { get; }
 
         public virtual int? Width { get; }
         public virtual int? Height { get; }
         public virtual int? Damage { get; }
-        public virtual Microsoft.Xna.Framework.Color? Color { get; }
+        public virtual Color? Color { get; }
         public virtual int? KnockBack { get; }
         public virtual int? AnimationTime { get; }
         public virtual int? UseTime { get; }
@@ -135,27 +138,62 @@ namespace BossFramework.BInterfaces
         {
             plr.RelesedProjs.Add(new(plr, plr.ProjContext.CreateOrSyncProj(plr, proj, true), this, plr.CurrentRegion));
         }
-        public void CreateProj(BPlayer plr, int projID, Vector2 position, Vector2 velocity, int damage = -1, float knockBack = -1, float ai0 = -1, float ai1 = -1)
+        public void CreateProj(BPlayer plr, int projID, Vector2 position, Vector2 velocity, int? damage = null, float? knockBack = null, float? ai0 = null, float? ai1 = null, float? ai2 = null)
         {
             _proj.SetDefaults(projID);
-            var bb = new BitsByte();
-            bb[0] = ai0 != -1;
-            bb[1] = ai1 != -1;
-            bb[3] = true; //bannerid
-            bb[4] = damage != -1;
-            bb[5] = knockBack != -1;
-            bb[6] = true;
+            var bb1 = new BitsByte();
+            var bb2 = new BitsByte();
+
+            ai0 ??= _proj.ai[0];
+            ai1 ??= _proj.ai[1];
+            ai2 ??= _proj.ai[2];
+
+            damage ??= (short)_proj.damage;
+            knockBack ??= _proj.knockBack;
+
+            bb1[0] = ai0.Value != 0f;
+            bb1[1] = ai1.Value != 0f;
+
+            bb2[0] = ai2.Value != 0f; //这里是2
+
+            if (_proj.bannerIdToRespondTo != 0)
+            {
+                bb1[3] = true;
+            }
+            if (damage.Value != 0)
+            {
+                bb1[4] = true;
+            }
+            if (knockBack.Value != 0)
+            {
+                bb1[5] = true;
+            }
+            if (_proj.type > 0 && _proj.type < ProjectileID.Count && ProjectileID.Sets.NeedsUUID[_proj.type])
+            {
+                bb1[7] = true;
+            }
+            if (_proj.originalDamage != 0)
+            {
+                bb1[6] = true;
+            }
+            if ((byte)bb2 != 0)
+            {
+                bb1[2] = true;
+            }
+
             plr.RelesedProjs.Add(new(plr, plr.ProjContext.CreateOrSyncProj(plr, new()
             {
-                Bit1 = bb,
-                AI1 = ai0 == -1 ? _proj.ai[0] : ai0,
-                AI2 = ai1 == -1 ? _proj.ai[1] : ai1,
-                Damage = (short)(damage == -1 ? _proj.damage : damage),
-                OriginalDamage = (ushort)_proj.originalDamage,
-                Knockback = knockBack == -1 ? _proj.knockBack : knockBack,
+                Bit1 = bb1.value,
+                Bit2 = bb2.value,
+                AI1 = ai0.Value,
+                AI2 = ai1.Value,
+                AI3 = ai2.Value,
+                Damange = (short)damage.Value,
+                OriginalDamage = (short)_proj.originalDamage,
+                Knockback = knockBack.Value,
                 PlayerSlot = plr.Index,
-                Position = position,
-                Velocity = velocity,
+                Position = new(position.X, position.Y),
+                Velocity = new(velocity.X, velocity.Y),
                 ProjSlot = 1000,
                 ProjType = (short)projID,
                 BannerId = (ushort)_proj.bannerIdToRespondTo

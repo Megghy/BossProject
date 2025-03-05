@@ -58,7 +58,7 @@ namespace BossFramework.BCore
                     BLog.Error(ex);
                 }
             });
-            return scripts.ToArray();
+            return [.. scripts];
         }
         [AutoInit(order: 10)]
         private static void CheckPath()

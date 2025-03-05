@@ -173,7 +173,7 @@ public class RandomCmd : IScriptModule
 
         args = index < 0 ?
             new List<string>() :
-            BUtils.ParseParameters.Invoke(null, [cmdText.Substring(index)]) as List<string> ?? [];
+            Commands.ParseParameters(cmdText[index..]) ?? [];
         return true;
     }
 

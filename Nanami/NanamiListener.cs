@@ -1,6 +1,7 @@
-﻿using EnchCoreApi.TrProtocol.NetPackets;
+﻿
 using Microsoft.Xna.Framework;
 using Terraria;
+using TrProtocol.Packets;
 using TShockAPI;
 
 namespace Nanami

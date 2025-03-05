@@ -6,7 +6,7 @@ using BossFramework.DB;
 using Microsoft.Xna.Framework;
 using TrProtocol;
 using TrProtocol.Models;
-using EnchCoreApi.TrProtocol.NetPackets;
+using TrProtocol.Packets;
 using TShockAPI;
 
 namespace BossFramework.BCore
@@ -273,7 +273,7 @@ namespace BossFramework.BCore
             var result = new List<BChest>();
             result.AddRange(Chests);
             result.AddRange(_overrideChest);
-            return result.ToArray();
+            return [.. result];
         }
         public static BChest[] GetChestsInArea(int startX, int startY, int width, int height)
         {
@@ -284,7 +284,7 @@ namespace BossFramework.BCore
                 if (!result.Exists(r => r.Contains(c.X, c.Y)) && rec.Contains(c.X, c.Y))
                     result.Add(c);
             });
-            return result.ToArray();
+            return [.. result];
         }
     }
 }

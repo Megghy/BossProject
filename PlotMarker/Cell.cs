@@ -8,7 +8,7 @@ using Terraria;
 using Terraria.GameContent.Tile_Entities;
 using TrProtocol;
 using TrProtocol.Models;
-using EnchCoreApi.TrProtocol.NetPackets;
+using TrProtocol.Packets;
 using TShockAPI;
 using IProtocolTileEntity = TrProtocol.Models.TileEntity;
 using TileEntity = Terraria.DataStructures.TileEntity;
@@ -99,7 +99,7 @@ namespace PlotMarker
 
         public Plot Parent => PlotManager.Plots.FirstOrDefault(p => p.Id == PlotId);
         public bool IsVisiable
-            => UsingCellPositionIndex.Any();
+            => UsingCellPositionIndex.Count != 0;
         public short X
             => (short)(LastPositionIndex == -1
             ? -1
@@ -444,7 +444,8 @@ namespace PlotMarker
             });
             if (reScanEntity)
                 FakeProviderAPI.World.ScanEntities(); //fakeprovider重新获取entity
-            BInfo.OnlinePlayers.ForEach(p => p.SendRawData(packetData.ToArray()));
+            var data = packetData.ToArray();
+            BInfo.OnlinePlayers.ForEach(p => p.SendRawData(data));
         }
         #endregion
 

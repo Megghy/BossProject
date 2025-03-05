@@ -1,8 +1,8 @@
 ﻿using BossFramework;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using EnchCoreApi.TrProtocol.NetPackets;
 using Terraria;
+using TrProtocol.Packets;
 using TShockAPI;
 using ProtocalBitByte = TrProtocol.Models.BitsByte;
 

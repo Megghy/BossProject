@@ -1,5 +1,6 @@
 ﻿using BossFramework.BInterfaces;
-using EnchCoreApi.TrProtocol.NetPackets;
+using TrProtocol.Packets;
+
 
 namespace BossFramework.BModels
 {

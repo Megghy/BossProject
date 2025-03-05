@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 using BossFramework.BAttributes;
 using BossFramework.BInterfaces;
 using BossFramework.BModels;
-using EnchCoreApi.TrProtocol.NetPackets;
 using Terraria.ID;
 using TerrariaApi.Server;
+using TrProtocol;
+using TrProtocol.Packets;
 using TShockAPI;
 
 namespace BossFramework.BCore
@@ -45,7 +46,7 @@ namespace BossFramework.BCore
         private static void LoadWeapon()
         {
             var tempWeapons = ScriptManager.LoadScripts<BaseBWeapon>(WeaponScriptPath);
-            BWeapons.Clear();
+            BWeapons?.Clear();
             foreach (var weapon in tempWeapons)
             {
                 if (BWeapons.Exists(w => w.Prefix == weapon.Prefix && w.ItemID == weapon.ItemID)) //检查是否有重复的武器
@@ -67,7 +68,7 @@ namespace BossFramework.BCore
             });
         }
 
-        public static List<BaseBWeapon> BWeapons { get; private set; }
+        public static List<BaseBWeapon> BWeapons { get; private set; } = [];
 
         #region 事件
         public static void OnGameUpdate(EventArgs args)

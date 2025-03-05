@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using BossFramework.BAttributes;
 using BossFramework.BModels;
-using EnchCoreApi.TrProtocol.NetPackets;
+using TrProtocol.Packets;
 using TShockAPI;
 
 namespace BossFramework.BCore
