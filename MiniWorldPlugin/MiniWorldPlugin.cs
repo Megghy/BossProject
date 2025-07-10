@@ -1,7 +1,6 @@
 ﻿using MiniWorldPlugin.Commands;
 using MiniWorldPlugin.Managers;
 using MiniWorldPlugin.Services;
-using ReflectionMagic;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
@@ -78,6 +77,7 @@ namespace MiniWorldPlugin
                 MWCommands.Register();
 
                 TShockAPI.Hooks.PlayerHooks.PlayerCommand += OnCommand;
+                ServerApi.Hooks.ServerLeave.Register(MiniWorldPlugin.Instance, OnServerLeave);
 
                 TShock.Log.ConsoleInfo("[MiniWorld] 插件已加载。");
             }
@@ -85,6 +85,12 @@ namespace MiniWorldPlugin
             {
                 TShock.Log.ConsoleError($"[MiniWorld] 初始化时出错: {ex}");
             }
+        }
+
+        private static void OnServerLeave(LeaveEventArgs args)
+        {
+            var player = TShock.Players[args.Who];
+            WorldManager.Instance.RemovePlayerWorld(player);
         }
 
         private static void OnCommand(TShockAPI.Hooks.PlayerCommandEventArgs args)
@@ -100,7 +106,13 @@ namespace MiniWorldPlugin
                 var session = data.Session;
                 if (string.Equals(args.CommandName, "tp", StringComparison.OrdinalIgnoreCase))
                 {
-                    var targets = TShock.Utils.AsDynamic().FindPlayer(args.Parameters[0]) as List<TSPlayer>;
+                    if (args.Parameters.Count == 0)
+                    {
+                        args.Player.SendErrorMessage("请输入玩家名称");
+                        args.Handled = true;
+                        return;
+                    }
+                    var targets = TShock.Players.FirstOrDefault(p => p.Name == args.Parameters[0]) is { } t ? [t] : TShock.Players.Where(p => p.Name.ToLower().Contains(args.Parameters[0].ToLower())).ToList();
                     if (targets.Count == 0)
                     {
                         args.Player.SendErrorMessage("玩家不存在");

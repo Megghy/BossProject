@@ -28,6 +28,20 @@ namespace MiniWorldPlugin.Hooks
             if (session == null)
                 return;
 
+
+            var world = WorldManager.Instance.GetPlayerWorld(player);
+            if (world.OwnerId == player.Account.ID)
+            {
+                player.SetData("MiniWorld.InOwnedWorld", true);
+                player.SetData("MiniWorld.CanEdit", true);
+            }
+            else if (world.AllowedEditors.Contains(player.Account.ID) || player.HasPermission("mw.admin"))
+            {
+                player.SetData("MiniWorld.CanEdit", true);
+            }
+
+            player.SetData("MiniWorld.InWorld", true);
+
             // 订阅数据包发送事件
             session.PacketSendingToServer += HandlePacketModification;
 
@@ -39,6 +53,10 @@ namespace MiniWorldPlugin.Hooks
                     playerSession.PacketSendingToServer -= HandlePacketModification;
                     WorldManager.Instance.RemovePlayerWorld(playerSession.Player);
                     _permissionWarningCooldown.TryRemove(playerSession.Player.Index, out _);
+
+                    player.RemoveData("MiniWorld.InOwnedWorld");
+                    player.RemoveData("MiniWorld.CanEdit");
+                    player.RemoveData("MiniWorld.InWorld");
                 }
             };
         }

@@ -1,5 +1,6 @@
 ﻿#region Using
 using System.IO.Compression;
+using FakeProvider.Handlers;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Tile_Entities;
@@ -37,7 +38,7 @@ namespace FakeProvider
 
             foreach (var group in FakeProviderAPI.GroupByPersonal(clients, X, Y, Width, Height))
             {
-                FakeProviderPlugin.SendTo(group, Generate(group.Key, X, Y, Width, Height));
+                NetworkHandler.SendTo(group, Generate(group.Key, X, Y, Width, Height));
             }
         }
 

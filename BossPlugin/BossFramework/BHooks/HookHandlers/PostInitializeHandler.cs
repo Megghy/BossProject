@@ -10,6 +10,20 @@ namespace BossFramework.BHooks.HookHandlers
         {
             //var updateTimerField = TShock.UpdateManager.GetType().GetField("CheckXMinutes", BindingFlags.NonPublic | BindingFlags.Instance)!;
             //updateTimerField.SetValue(TShock.UpdateManager, 9999999); //不检查更新
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(500);
+                    if (TShock.UpdateManager is null)
+                    {
+                        continue;
+                    }
+                    TShock.UpdateManager.AsDynamic().CheckXMinutes = 999999999;
+                    //BLog.Success($"已停止TShock更新检查");
+                    //break;
+                }
+            });
             var auto = new Dictionary<MethodInfo, AutoPostInitAttribute>();
             Assembly.GetExecutingAssembly()
                         .GetTypes()

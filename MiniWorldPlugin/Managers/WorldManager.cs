@@ -23,7 +23,6 @@ namespace MiniWorldPlugin.Managers
 
         private readonly ConcurrentDictionary<int, MiniWorldModel> _worlds;
         private readonly ConcurrentDictionary<string, TSPlayer> _startingWorlds = new();
-        private readonly ConcurrentDictionary<int, MiniWorldModel> _playerWorlds = new();
         private readonly System.Timers.Timer _emptyWorldCheckTimer;
 
         public WorldManager()
@@ -228,7 +227,7 @@ namespace MiniWorldPlugin.Managers
 
         public MiniWorldModel? GetWorld(int ownerId, string worldName)
         {
-            return _worlds.Values.FirstOrDefault(w => w.OwnerId == ownerId && w.WorldName.Equals(worldName, StringComparison.OrdinalIgnoreCase));
+            return _worlds.Values.FirstOrDefault(w => w.WorldName.Equals(worldName, StringComparison.OrdinalIgnoreCase));
         }
 
         public MiniWorldModel? GetWorldById(int worldId)
@@ -450,13 +449,14 @@ namespace MiniWorldPlugin.Managers
                     GlobalCommand = ["mw"]
                 };
 
-                BInfo.OnlinePlayers.Where(p => p.Name != player.Name).ForEach(p =>
-                {
-                    //p.SendInfoMsg($"[MiniWorld] {player.Name} 前往世界: {world.WorldName}");
-                });
+
 
                 await player.SwitchToServer(forwardServer, 30);
 
+                BInfo.OnlinePlayers.Where(p => p.Name != player.Name && MSCAPI.GetPlayingSession(player)?.TargetServer.Port == MSCAPI.GetPlayingSession(p.TSPlayer)?.TargetServer.Port).ForEach(p =>
+                {
+                    p.SendInfoMsg($"[MiniWorld] {player.Name} 正在加入世界");
+                });
 
                 AddPlayerWorld(player, world);
             }
@@ -673,19 +673,19 @@ namespace MiniWorldPlugin.Managers
 
         public MiniWorldModel GetPlayerWorld(TSPlayer player)
         {
-            return _playerWorlds.TryGetValue(player.Index, out var world) ? world : null;
+            return player.GetData<MiniWorldModel>("MiniWorld.PlayingWorld");
         }
         public (MiniWorldModel World, PlayerSession Session) GetPlayerWorldAndSession(TSPlayer player)
         {
-            return (_playerWorlds.TryGetValue(player.Index, out var world) ? world : null, MSCAPI.GetPlayingSession(player));
+            return (GetPlayerWorld(player), MSCAPI.GetPlayingSession(player));
         }
         public void AddPlayerWorld(TSPlayer player, MiniWorldModel world)
         {
-            _playerWorlds[player.Index] = world;
+            player.SetData("MiniWorld.PlayingWorld", world);
         }
         public void RemovePlayerWorld(TSPlayer player)
         {
-            _playerWorlds.TryRemove(player.Index, out _);
+            player.RemoveData("MiniWorld.PlayingWorld");
         }
 
         /// <summary>

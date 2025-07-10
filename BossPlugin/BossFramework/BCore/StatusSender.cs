@@ -32,7 +32,7 @@ namespace BossFramework.BCore
                     Max = 0,
                     Flag = 0,
                 });
-                if (!p.WaitingPing)
+                if (!p.WaitingPing || p.PingChecker.ElapsedMilliseconds > 20000)
                 {
                     p.WaitingPing = true;
                     p.SendRawData(PingPacketData);

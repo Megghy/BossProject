@@ -8,7 +8,7 @@ namespace BossFramework.BHooks.HookHandlers
     {
         public static void OnAnnounce(object sender, PlayerAnnounceEventArgs args)
         {
-            if (!Terraria.Netplay.Disconnect && (args.Text.ToString().EndsWith("已离开") || args.Text.ToString().EndsWith("has left.", StringComparison.CurrentCultureIgnoreCase)))
+            if (!Terraria.Netplay.Disconnect && (args.Text.ToString().EndsWith("已离开") || args.Text.ToString().EndsWith("离开了游戏。") || args.Text.ToString().EndsWith("has left.", StringComparison.CurrentCultureIgnoreCase)))
             {
                 try
                 {

@@ -16,6 +16,9 @@ namespace BossFramework.BHooks.HookHandlers
             var tsPlr = TShock.Players[args.Who];
             if (tsPlr != null && tsPlr.Account is { } account)
             {
+                tsPlr.ReceivedInfo = false; // 关闭进出通知
+                tsPlr.SilentJoinInProgress = true;
+
                 if (DB.DBTools.Get<BPlayer>(account.ID) is { } bPlr)
                 {
                     bPlr.TsPlayer = tsPlr;

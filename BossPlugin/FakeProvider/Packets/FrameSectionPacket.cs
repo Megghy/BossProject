@@ -1,4 +1,5 @@
 ﻿#region Using
+using FakeProvider.Handlers;
 using Terraria;
 #endregion
 namespace FakeProvider
@@ -31,7 +32,7 @@ namespace FakeProvider
                     clients.Add(client);
             }
 
-            FakeProviderPlugin.SendTo(clients, Generate(SX, SY, EX, EY));
+            NetworkHandler.SendTo(clients, Generate(SX, SY, EX, EY));
         }
 
         #endregion

@@ -81,13 +81,14 @@ namespace MultiSCore.Services
                         // 拦截并处理聊天数据包以实现 /msc 等命令和跨服聊天
                         if (packetType == PacketTypes.LoadNetModule && args.Data.Span[3] == 1)
                         {
-                            if (HandleChatPacket(args, session))
+                            if (HandleChatPacket(args, session)) // 是主服该处理的时候返回true
                             {
-                                args.Handled = true;
+                                args.Handled = false;
                             }
                             else
                             {
-                                args.Handled = false;
+                                args.Handled = true;
+                                _ = session.SendToServerAsync(args.Data, true); // 异步转发
                             }
                         }
                         else
@@ -138,7 +139,8 @@ namespace MultiSCore.Services
 
                 if (session.State != SessionState.Returning)
                 {
-                    if (args.Data.Span[2] == 82 && args.Data.Span[3] == 1)
+                    var packet = (PacketTypes)args.Data.Span[2];
+                    if ((packet == PacketTypes.LoadNetModule && args.Data.Span[3] == 1))
                     {
                         // 聊天包不拦截
                     }
@@ -254,25 +256,31 @@ namespace MultiSCore.Services
                 if (netTextModuleC2S.Command == "Say")
                 {
                     var text = netTextModuleC2S.Text;
+                    if (text.StartsWith("//") && !player.ContainsData("MiniWorld.CanEdit"))
+                    {
+                        player.SendErrorMessage($"[MiniWorld] 你没有权限在这个世界中使用 WorldEdit");
+                        return true;
+                    }
                     if (text.StartsWith(TShockAPI.Commands.Specifier) || text.StartsWith(TShockAPI.Commands.SilentSpecifier))
                     {
                         var cmdText = text.Split(' ')[0].ToLower();
                         var specifier = text.StartsWith(TShockAPI.Commands.Specifier) ? TShockAPI.Commands.Specifier : TShockAPI.Commands.SilentSpecifier;
-                        var cmdName = cmdText[specifier.Length..];
+                        var cmdName = cmdText[specifier.Length..].ToLower();
 
                         // 如果是msc命令或在全局命令列表中，则在主服务器上执行
                         if (cmdName == "msc" || session.TargetServer.GlobalCommand.Contains(cmdName))
                         {
-                            TShockAPI.Commands.HandleCommand(player, text);
+                            //TShockAPI.Commands.HandleCommand(player, text);
                             return true; // 已处理，拦截数据包
+                        }
+                        else
+                        {
+                            return false;
                         }
                     }
                     else
                     {
-                        // 跨服聊天逻辑: 将消息广播给主服务器上的所有本地玩家
-                        var message = $"[{session.TargetServer.Name}] {player.Name}: {text}";
-                        //TShock.Utils.Broadcast(message, Microsoft.Xna.Framework.Color.White);
-                        return false; // 不拦截, 由主服广播
+                        return true; // 由主服广播
                     }
                 }
             }

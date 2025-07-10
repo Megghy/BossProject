@@ -103,6 +103,14 @@ namespace FakeProvider
         public ushort TileOnTopIndex(int X, int Y) => ProviderIndexes[X, Y];
 
         #endregion
+        #region GetProviderByIndex
+        public TileProvider GetProviderByIndex(int index)
+        {
+            if (index < 0 || index >= _GlobalProvidersBuffer.Length)
+                return null;
+            return _GlobalProvidersBuffer[index];
+        }
+        #endregion
 
         #region Dispose
 
@@ -369,7 +377,7 @@ namespace FakeProvider
         public void HideEntities()
         {
             lock (Locker)
-                foreach (TileProvider provider in _GlobalProvidersOrder)
+                foreach (TileProvider provider in _GlobalProvidersOrder.Concat(_PersonalProviders))
                     if (provider.Name != FakeProviderAPI.WorldProviderName)
                         provider.HideEntities();
         }
@@ -380,7 +388,7 @@ namespace FakeProvider
         public void UpdateEntities()
         {
             lock (Locker)
-                foreach (TileProvider provider in _GlobalProvidersOrder)
+                foreach (TileProvider provider in _GlobalProvidersOrder.Concat(_PersonalProviders))
                     if (provider.Name != FakeProviderAPI.WorldProviderName)
                         provider.UpdateEntities();
         }
@@ -391,7 +399,7 @@ namespace FakeProvider
         public void ScanRectangle(int X, int Y, int Width, int Height, TileProvider IgnoreProvider = null)
         {
             lock (Locker)
-                foreach (TileProvider provider in _GlobalProvidersOrder)
+                foreach (TileProvider provider in _GlobalProvidersOrder.Concat(_PersonalProviders))
                     if (provider != IgnoreProvider)
                     {
                         Intersect(provider, X, Y, Width, Height, out int x, out int y, out int width, out int height);

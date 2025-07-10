@@ -153,7 +153,15 @@ namespace MultiSCore.Services
         /// </summary>
         public void OnPlayerLeave(int playerIndex)
         {
+            var player = TShock.Players[playerIndex];
             RemoveSession(playerIndex);
+            for(var i = 0; i < _sessions.Count; i++)
+            {
+                if(_sessions[i].Player.Name == player.Name)
+                {
+                    _sessions.TryRemove(i, out _);
+                }
+            }
         }
 
         /// <summary>

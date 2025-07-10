@@ -1,4 +1,5 @@
 ﻿#region Using
+using FakeProvider.Handlers;
 using Terraria;
 using BitsByte = TrProtocol.Models.BitsByte;
 #endregion
@@ -32,7 +33,7 @@ namespace FakeProvider
             }
 
             foreach (var group in FakeProviderAPI.GroupByPersonal(clients, X, Y, Width, Height))
-                FakeProviderPlugin.SendTo(group, Generate(group.Key, X, Y, Width, Height, TileChangeType));
+                NetworkHandler.SendTo(group, Generate(group.Key, X, Y, Width, Height, TileChangeType));
         }
 
         #endregion

@@ -126,7 +126,7 @@ namespace MultiSCore.Model
             }
 
             Player.SetData("MultiSCore.Forwarded", true);
-            Player.SetData("MultiSCore.WorldName", TargetServer.Name);
+            Player.SetData("MultiSCore.WorldName", serverInfo?.Name);
 
             TargetServer = serverInfo;
             try
@@ -626,7 +626,7 @@ namespace MultiSCore.Model
             Player.RemoveData("MultiSCore.Forwarded");
             Player.RemoveData("MultiSCore.WorldName");
 
-            TShock.Log.ConsoleInfo($"[MultiSCore] {Player.Name} 会话已释放.");
+            //TShock.Log.ConsoleInfo($"[MultiSCore] {Player.Name} 会话已释放.");
             Disposing?.Invoke(this, this);
             DisposeConnection();
             MSCPlugin.Instance._sessionManager.RemoveSession(Index);

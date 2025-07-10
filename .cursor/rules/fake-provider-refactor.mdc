@@ -1,0 +1,25 @@
+# FakeProvider 模块重构指南
+
+`FakeProvider` 模块已经过重大重构，以提高性能、模块化和代码质量。以下是关键原则和变更：
+
+## 1. 关注点分离
+
+实体管理逻辑（用于牌子、箱子等）已从物块数据管理中完全分离。
+
+- **`TileProvider`**: `[BossPlugin/FakeProvider/TileProvider/TileProvider.cs](mdc:BossPlugin/FakeProvider/TileProvider/TileProvider.cs)` 类现在仅负责管理物块数据。它将所有与实体相关的操作委托给 `EntityManager`。
+- **`EntityManager`**: 新类 `[BossPlugin/FakeProvider/TileProvider/EntityManager.cs](mdc:BossPlugin/FakeProvider/TileProvider/EntityManager.cs)` 现在封装了在提供者（provider）内创建、管理和扫描游戏内实体的所有逻辑。
+
+## 2. 性能优化
+
+已实现多项关键性能增强：
+
+- **TileReference 缓存**: 在 `[BossPlugin/FakeProvider/TileProvider/TileProvider.cs](mdc:BossPlugin/FakeProvider/TileProvider/TileProvider.cs)` 中，`TileReference` 对象现在被缓存，以防止频繁的堆分配并减少垃圾回收（GC）压力，尤其是在高频物块访问期间。
+- **高效的实体查找**: `[BossPlugin/FakeProvider/FakeProviderPlugin.cs](mdc:BossPlugin/FakeProvider/FakeProviderPlugin.cs)` 中的 `GetTopEntity` 方法已得到优化。它现在使用预计算的 `ProviderIndexes` 映射表来实现接近 O(1) 的查找时间，避免了对所有提供者和实体进行高成本的迭代。
+- **快速类型检查**: 在 `[BossPlugin/FakeProvider/TileProvider/EntityManager.cs](mdc:BossPlugin/FakeProvider/TileProvider/EntityManager.cs)` 中，慢速的、基于字符串的类型比较已被替换为使用 `HashSet<Type>` 的快速查找，以识别可扫描的实体类型。
+
+## 3. 代码整合与现代化
+
+- **物块数据的单一数据源**: 冗余的 `TileData` 结构已被移除。整个模块现在专门使用功能更丰富的 `[BossPlugin/FakeProvider/TileProvider/Tiles/StructTile.cs](mdc:BossPlugin/FakeProvider/TileProvider/Tiles/StructTile.cs)` 结构，确保了物块数据的单一、一致表示。
+- **现代 C# 特性**: 在适用的情况下，已使用主构造函数等现代 C#特性使代码更简洁。
+
+这些变更确保了 `FakeProvider` 模块既高性能又易于维护，同时保留了与 `[BossPlugin/FakeProvider/FakeProviderPlugin.cs](mdc:BossPlugin/FakeProvider/FakeProviderPlugin.cs)` 的 API 兼容性。

@@ -1,17 +1,12 @@
-﻿using Terraria;
+using Terraria;
 
 namespace FakeProvider
 {
-    public class TileCollection : ModFramework.ICollection<ITile>
+    public class TileCollection(ITile[,] collection) : ModFramework.ICollection<ITile>
     {
-        protected ITile[,] Tiles;
+        protected ITile[,] Tiles = collection;
         public int Width => Tiles.GetLength(0);
         public int Height => Tiles.GetLength(1);
-
-        public TileCollection(ITile[,] collection)
-        {
-            Tiles = collection;
-        }
 
         public virtual ITile this[int x, int y]
         {

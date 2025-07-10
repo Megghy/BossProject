@@ -1,5 +1,6 @@
 ﻿using BossFramework.BAttributes;
 using TerrariaApi.Server;
+using TShockAPI;
 using TShockAPI.Hooks;
 
 namespace BossFramework.BHooks
@@ -22,6 +23,12 @@ namespace BossFramework.BHooks
             PlayerHooks.PlayerCommand += HookHandlers.PlayerCommandHandler.OnPlayerCommand;
 
             //ServerApi.Hooks.ServerConnect.Register(BossPlugin.Instance, HookHandlers.PlayerConnectHandler.OnConnect, int.MinValue);
+            ServerApi.Hooks.ServerJoin.Register(BossPlugin.Instance, (args) =>
+            {
+                var tsPlr = TShock.Players[args.Who];
+                tsPlr.ReceivedInfo = false; // 关闭进出通知
+                tsPlr.SilentJoinInProgress = true;
+            });
             ServerApi.Hooks.NetGreetPlayer.Register(BossPlugin.Instance, HookHandlers.PlayerGreetHandler.OnGreetPlayer, int.MinValue);
             ServerApi.Hooks.ServerLeave.Register(BossPlugin.Instance, HookHandlers.PlayerLeaveHandler.OnPlayerLeave);
             ServerApi.Hooks.GamePostInitialize.Register(BossPlugin.Instance, HookHandlers.PostInitializeHandler.OnGamePostInitialize, int.MaxValue);

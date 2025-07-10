@@ -1,34 +1,11 @@
 ﻿#region Using
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Terraria;
 using Terraria.DataStructures;
-using Terraria.GameContent.Tile_Entities;
 #endregion
 namespace FakeProvider
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 14)]
-    internal struct TileData
-    {
-        public ushort type;
-
-        public ushort wall;
-
-        public byte liquid;
-
-        public ushort sTileHeader;
-
-        public byte bTileHeader;
-
-        public byte bTileHeader2;
-
-        public byte bTileHeader3;
-
-        public short frameX;
-
-        public short frameY;
-    }
     internal sealed class TileReference : Tile
     {
         //
@@ -36,7 +13,7 @@ namespace FakeProvider
         //     Size of the tile data in bytes
         public const int TileSize = 14;
 
-        internal unsafe readonly TileData* _tile;
+        internal unsafe readonly StructTile* _tile;
 
         public unsafe override ushort type
         {
@@ -157,9 +134,9 @@ namespace FakeProvider
         // 参数:
         //   tile:
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe TileReference(ref TileData tile)
+        public unsafe TileReference(ref StructTile tile)
         {
-            _tile = (TileData*)Unsafe.AsPointer(ref tile);
+            _tile = (StructTile*)Unsafe.AsPointer(ref tile);
         }
 
         //
@@ -177,7 +154,10 @@ namespace FakeProvider
         #region Data
 
         public TileProviderCollection ProviderCollection { get; internal set; }
-        internal TileData[,] Data;
+        internal StructTile[,] Data;
+        private TileReference[,] _tileReferenceCache;
+        internal readonly EntityManager _entityManager;
+        public EntityManager EntityManager => _entityManager;
         public string Name { get; private set; }
         public int X { get; private set; }
         public int Y { get; private set; }
@@ -189,9 +169,7 @@ namespace FakeProvider
         public bool Enabled { get; private set; } = false;
         public HashSet<int> Observers { get; private set; }
         public bool IsPersonal => Observers != null;
-        private List<IFake> _Entities = new List<IFake>();
-        public ReadOnlyCollection<IFake> Entities => new ReadOnlyCollection<IFake>(_Entities.ToList());
-        private object Locker = new object();
+        public ReadOnlyCollection<IFake> Entities => _entityManager.Entities;
 
         public int GetIndex(int x, int y) => x * (Height - 1) + y;
 
@@ -199,7 +177,10 @@ namespace FakeProvider
 
         #region Constructor
 
-        internal TileProvider() { }
+        internal TileProvider()
+        {
+            _entityManager = new(this);
+        }
 
         #endregion
         #region Initialize
@@ -238,7 +219,8 @@ namespace FakeProvider
         {
             if (Width <= 0 || Height <= 0) throw new ArgumentException("Invalid width or height.");
             this.Name = Name;
-            this.Data = new TileData[Width, Height];
+            this.Data = new StructTile[Width, Height];
+            this._tileReferenceCache = new TileReference[Width, Height];
             this.X = X;
             this.Y = Y;
             this.Width = Width;
@@ -273,9 +255,15 @@ namespace FakeProvider
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                //data ??= new TileData[Width * Height];
                 if (x < 0 || y < 0 || x >= Width || y >= Height) return ProviderCollection.VoidTile;
-                return new TileReference(ref Data[x, y]);
+
+                var tileRef = _tileReferenceCache[x, y];
+                if (tileRef == null)
+                {
+                    tileRef = new TileReference(ref Data[x, y]);
+                    _tileReferenceCache[x, y] = tileRef;
+                }
+                return tileRef;
             }
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
@@ -322,12 +310,13 @@ namespace FakeProvider
                 if (Width <= 0 || Height <= 0)
                     throw new ArgumentException("Invalid new width or height.");
 
-                TileData[,] newData = new TileData[Width, Height];
+                StructTile[,] newData = new StructTile[Width, Height];
                 for (int i = 0; i < Width; i++)
                     for (int j = 0; j < Height; j++)
                         if ((i < this.Width) && (j < this.Height))
                             newData[i, j] = Data[i, j];
                 this.Data = newData;
+                this._tileReferenceCache = new TileReference[Width, Height];
                 this.Width = Width;
                 this.Height = Height;
             }
@@ -441,8 +430,7 @@ namespace FakeProvider
 
         public void ClearEntities()
         {
-            foreach (var entity in Entities)
-                RemoveEntity(entity);
+            _entityManager.Clear();
         }
 
         #endregion
@@ -456,8 +444,7 @@ namespace FakeProvider
                 for (int y = 0; y < Height; y++)
                     this[x, y] = provider[x, y];
 
-            foreach (var entity in provider.Entities)
-                AddEntity(entity);
+            _entityManager.CopyFrom(provider._entityManager);
         }
 
         #endregion
@@ -510,560 +497,99 @@ namespace FakeProvider
 
         #region AddSign
 
-        public FakeSign AddSign(int X, int Y, string Text)
-        {
-            FakeSign sign = new FakeSign(this, -1, X, Y, Text);
-            lock (Locker)
-                _Entities.Add(sign);
-            UpdateEntity(sign);
-            return sign;
-        }
+        public FakeSign AddSign(int X, int Y, string Text) => _entityManager.AddSign(X, Y, Text);
 
         #endregion
         #region AddChest
 
-        public FakeChest AddChest(int X, int Y, Item[] Items = null)
-        {
-            FakeChest chest = new FakeChest(this, -1, X, Y, Items);
-            lock (Locker)
-                _Entities.Add(chest);
-            UpdateEntity(chest);
-            return chest;
-        }
+        public FakeChest AddChest(int X, int Y, Item[] Items = null) => _entityManager.AddChest(X, Y, Items);
 
         #endregion
         #region AddTrainingDummy
 
-        public FakeTrainingDummy AddTrainingDummy(int X, int Y)
-        {
-            FakeTrainingDummy dummy = new FakeTrainingDummy(this, -1, X, Y);
-            lock (Locker)
-                _Entities.Add(dummy);
-            UpdateEntity(dummy);
-            return dummy;
-        }
+        public FakeTrainingDummy AddTrainingDummy(int X, int Y) => _entityManager.AddTrainingDummy(X, Y);
 
         #endregion
         #region AddItemFrame
 
-        public FakeItemFrame AddItemFrame(int X, int Y, Item Item = null)
-        {
-            FakeItemFrame itemFrame = new FakeItemFrame(this, -1, X, Y, Item);
-            lock (Locker)
-                _Entities.Add(itemFrame);
-            UpdateEntity(itemFrame);
-            return itemFrame;
-        }
+        public FakeItemFrame AddItemFrame(int X, int Y, Item Item = null) => _entityManager.AddItemFrame(X, Y, Item);
 
         #endregion
         #region AddLogicSensor
 
-        public FakeLogicSensor AddLogicSensor(int X, int Y, TELogicSensor.LogicCheckType LogicCheckType)
-        {
-            FakeLogicSensor sensor = new FakeLogicSensor(this, -1, X, Y, LogicCheckType);
-            lock (Locker)
-                _Entities.Add(sensor);
-            UpdateEntity(sensor);
-            return sensor;
-        }
+        public FakeLogicSensor AddLogicSensor(int X, int Y, Terraria.GameContent.Tile_Entities.TELogicSensor.LogicCheckType LogicCheckType) => _entityManager.AddLogicSensor(X, Y, LogicCheckType);
 
         #endregion
         #region AddDisplayDoll
 
-        public FakeDisplayDoll AddDisplayDoll(int X, int Y, Item[] Items = null, Item[] Dyes = null)
-        {
-            FakeDisplayDoll doll = new FakeDisplayDoll(this, -1, X, Y, Items, Dyes);
-            lock (Locker)
-                _Entities.Add(doll);
-            UpdateEntity(doll);
-            return doll;
-        }
+        public FakeDisplayDoll AddDisplayDoll(int X, int Y, Item[] Items = null, Item[] Dyes = null) => _entityManager.AddDisplayDoll(X, Y, Items, Dyes);
 
         #endregion
         #region AddFoodPlatter
 
-        public FakeFoodPlatter AddFoodPlatter(int X, int Y, Item Item = null)
-        {
-            FakeFoodPlatter foodPlatter = new FakeFoodPlatter(this, -1, X, Y, Item);
-            lock (Locker)
-                _Entities.Add(foodPlatter);
-            UpdateEntity(foodPlatter);
-            return foodPlatter;
-        }
+        public FakeFoodPlatter AddFoodPlatter(int X, int Y, Item Item = null) => _entityManager.AddFoodPlatter(X, Y, Item);
 
         #endregion
         #region AddHatRack
 
-        public FakeHatRack AddHatRack(int X, int Y, Item[] Items = null, Item[] Dyes = null)
-        {
-            FakeHatRack rack = new FakeHatRack(this, -1, X, Y, Items, Dyes);
-            lock (Locker)
-                _Entities.Add(rack);
-            UpdateEntity(rack);
-            return rack;
-        }
+        public FakeHatRack AddHatRack(int X, int Y, Item[] Items = null, Item[] Dyes = null) => _entityManager.AddHatRack(X, Y, Items, Dyes);
 
         #endregion
         #region AddTeleportationPylon
 
-        public FakeTeleportationPylon AddTeleportationPylon(int X, int Y)
-        {
-            FakeTeleportationPylon pylon = new FakeTeleportationPylon(this, -1, X, Y);
-            lock (Locker)
-                _Entities.Add(pylon);
-            UpdateEntity(pylon);
-            return pylon;
-        }
+        public FakeTeleportationPylon AddTeleportationPylon(int X, int Y) => _entityManager.AddTeleportationPylon(X, Y);
 
         #endregion
         #region AddWeaponsRack
 
-        public FakeWeaponsRack AddWeaponsRack(int X, int Y, Item Item = null)
-        {
-            FakeWeaponsRack itemFrame = new FakeWeaponsRack(this, -1, X, Y, Item);
-            lock (Locker)
-                _Entities.Add(itemFrame);
-            UpdateEntity(itemFrame);
-            return itemFrame;
-        }
+        public FakeWeaponsRack AddWeaponsRack(int X, int Y, Item Item = null) => _entityManager.AddWeaponsRack(X, Y, Item);
 
         #endregion
         #region AddEntity
 
-        public IFake AddEntity(IFake Entity) =>
-            Entity is Sign sign
-                ? AddEntity(sign)
-                : Entity is Chest chest
-                    ? AddEntity(chest)
-                    : Entity is TileEntity tileEntity
-                        ? AddEntity(tileEntity)
-                        : throw new ArgumentException($"Unknown entity type {Entity.GetType().Name}",
-                            nameof(Entity));
+        public IFake AddEntity(IFake Entity) => _entityManager.AddEntity(Entity);
 
-        public FakeSign AddEntity(Sign Entity, bool replace = false)
-        {
-            int x = Entity.x - this.X;
-            int y = Entity.y - this.Y;
-            FakeSign sign = new FakeSign(this, replace ? Array.IndexOf(Main.sign, Entity) : -1, x, y, Entity.text);
-            lock (Locker)
-                _Entities.Add(sign);
-            UpdateEntity(sign);
-            return sign;
-        }
+        public FakeSign AddEntity(Sign Entity, bool replace = false) => _entityManager.AddEntity(Entity, replace);
 
-        public FakeChest AddEntity(Chest Entity, bool replace = false)
-        {
-            int x = Entity.x - this.X;
-            int y = Entity.y - this.Y;
-            FakeChest chest = new FakeChest(this, replace ? Array.IndexOf(Main.chest, Entity) : -1, x, y, Entity.item);
-            lock (Locker)
-                _Entities.Add(chest);
-            UpdateEntity(chest);
-            return chest;
-        }
+        public FakeChest AddEntity(Chest Entity, bool replace = false) => _entityManager.AddEntity(Entity, replace);
 
-        public IFake AddEntity(TileEntity Entity, bool replace = false) =>
-            Entity is TETrainingDummy trainingDummy
-                ? (IFake)AddEntity(trainingDummy, replace)
-                : Entity is TEItemFrame itemFrame
-                    ? (IFake)AddEntity(itemFrame, replace)
-                    : Entity is TELogicSensor logicSensor
-                        ? (IFake)AddEntity(logicSensor, replace)
-                        : Entity is TEDisplayDoll displayDoll
-                            ? (IFake)AddEntity(displayDoll, replace)
-                            : Entity is TEFoodPlatter foodPlatter
-                                ? (IFake)AddEntity(foodPlatter, replace)
-                                : Entity is TEHatRack hatRack
-                                    ? (IFake)AddEntity(hatRack, replace)
-                                    : Entity is TETeleportationPylon teleportationPylon
-                                        ? (IFake)AddEntity(teleportationPylon, replace)
-                                        : Entity is TEWeaponsRack weaponsRack
-                                            ? (IFake)AddEntity(weaponsRack, replace)
-                                            : throw new ArgumentException($"Unknown entity type {Entity.GetType().Name}", nameof(Entity));
+        public IFake AddEntity(TileEntity Entity, bool replace = false) => _entityManager.AddEntity(Entity, replace);
 
-        public FakeTrainingDummy AddEntity(TETrainingDummy Entity, bool replace = false)
-        {
-            int x = Entity.Position.X - this.X;
-            int y = Entity.Position.Y - this.Y;
-            if (replace)
-            {
-                TileEntity.ByID.Remove(Entity.ID);
-                TileEntity.ByPosition.Remove(Entity.Position);
-            }
-            FakeTrainingDummy fake = new FakeTrainingDummy(this, replace ? Entity.ID : -1, x, y, Entity.npc);
-            lock (Locker)
-                _Entities.Add(fake);
-            UpdateEntity(fake);
-            return fake;
-        }
+        public FakeTrainingDummy AddEntity(Terraria.GameContent.Tile_Entities.TETrainingDummy Entity, bool replace = false) => _entityManager.AddEntity(Entity, replace);
 
-        public FakeItemFrame AddEntity(TEItemFrame Entity, bool replace = false)
-        {
-            int x = Entity.Position.X - this.X;
-            int y = Entity.Position.Y - this.Y;
-            if (replace)
-            {
-                TileEntity.ByID.Remove(Entity.ID);
-                TileEntity.ByPosition.Remove(Entity.Position);
-            }
-            FakeItemFrame fake = new FakeItemFrame(this, replace ? Entity.ID : -1, x, y, Entity.item);
-            lock (Locker)
-                _Entities.Add(fake);
-            UpdateEntity(fake);
-            return fake;
-        }
+        public FakeItemFrame AddEntity(Terraria.GameContent.Tile_Entities.TEItemFrame Entity, bool replace = false) => _entityManager.AddEntity(Entity, replace);
 
-        public FakeLogicSensor AddEntity(TELogicSensor Entity, bool replace = false)
-        {
-            int x = Entity.Position.X - this.X;
-            int y = Entity.Position.Y - this.Y;
-            if (replace)
-            {
-                TileEntity.ByID.Remove(Entity.ID);
-                TileEntity.ByPosition.Remove(Entity.Position);
-            }
-            FakeLogicSensor fake = new FakeLogicSensor(this, replace ? Entity.ID : -1, x, y, Entity.logicCheck);
-            lock (Locker)
-                _Entities.Add(fake);
-            UpdateEntity(fake);
-            return fake;
-        }
+        public FakeLogicSensor AddEntity(Terraria.GameContent.Tile_Entities.TELogicSensor Entity, bool replace = false) => _entityManager.AddEntity(Entity, replace);
 
-        public FakeDisplayDoll AddEntity(TEDisplayDoll Entity, bool replace = false)
-        {
-            int x = Entity.Position.X - this.X;
-            int y = Entity.Position.Y - this.Y;
-            if (replace)
-            {
-                TileEntity.ByID.Remove(Entity.ID);
-                TileEntity.ByPosition.Remove(Entity.Position);
-            }
-            FakeDisplayDoll fake = new FakeDisplayDoll(this, replace ? Entity.ID : -1, x, y, Entity._items, Entity._dyes);
-            lock (Locker)
-                _Entities.Add(fake);
-            UpdateEntity(fake);
-            return fake;
-        }
+        public FakeDisplayDoll AddEntity(Terraria.GameContent.Tile_Entities.TEDisplayDoll Entity, bool replace = false) => _entityManager.AddEntity(Entity, replace);
 
-        public FakeFoodPlatter AddEntity(TEFoodPlatter Entity, bool replace = false)
-        {
-            int x = Entity.Position.X - this.X;
-            int y = Entity.Position.Y - this.Y;
-            if (replace)
-            {
-                TileEntity.ByID.Remove(Entity.ID);
-                TileEntity.ByPosition.Remove(Entity.Position);
-            }
-            FakeFoodPlatter fake = new FakeFoodPlatter(this, replace ? Entity.ID : -1, x, y, Entity.item);
-            lock (Locker)
-                _Entities.Add(fake);
-            UpdateEntity(fake);
-            return fake;
-        }
+        public FakeFoodPlatter AddEntity(Terraria.GameContent.Tile_Entities.TEFoodPlatter Entity, bool replace = false) => _entityManager.AddEntity(Entity, replace);
 
-        public FakeHatRack AddEntity(TEHatRack Entity, bool replace = false)
-        {
-            int x = Entity.Position.X - this.X;
-            int y = Entity.Position.Y - this.Y;
-            if (replace)
-            {
-                TileEntity.ByID.Remove(Entity.ID);
-                TileEntity.ByPosition.Remove(Entity.Position);
-            }
-            FakeHatRack fake = new FakeHatRack(this, replace ? Entity.ID : -1, x, y, Entity._items, Entity._dyes);
-            lock (Locker)
-                _Entities.Add(fake);
-            UpdateEntity(fake);
-            return fake;
-        }
+        public FakeHatRack AddEntity(Terraria.GameContent.Tile_Entities.TEHatRack Entity, bool replace = false) => _entityManager.AddEntity(Entity, replace);
 
-        public FakeTeleportationPylon AddEntity(TETeleportationPylon Entity, bool replace = false)
-        {
-            int x = Entity.Position.X - this.X;
-            int y = Entity.Position.Y - this.Y;
-            if (replace)
-            {
-                TileEntity.ByID.Remove(Entity.ID);
-                TileEntity.ByPosition.Remove(Entity.Position);
-            }
-            FakeTeleportationPylon fake = new FakeTeleportationPylon(this, replace ? Entity.ID : -1, x, y);
-            lock (Locker)
-                _Entities.Add(fake);
-            UpdateEntity(fake);
-            return fake;
-        }
+        public FakeTeleportationPylon AddEntity(Terraria.GameContent.Tile_Entities.TETeleportationPylon Entity, bool replace = false) => _entityManager.AddEntity(Entity, replace);
 
-        public FakeWeaponsRack AddEntity(TEWeaponsRack Entity, bool replace = false)
-        {
-            int x = Entity.Position.X - this.X;
-            int y = Entity.Position.Y - this.Y;
-            if (replace)
-            {
-                TileEntity.ByID.Remove(Entity.ID);
-                TileEntity.ByPosition.Remove(Entity.Position);
-            }
-            FakeWeaponsRack fake = new FakeWeaponsRack(this, replace ? Entity.ID : -1, x, y, Entity.item);
-            lock (Locker)
-                _Entities.Add(fake);
-            UpdateEntity(fake);
-            return fake;
-        }
+        public FakeWeaponsRack AddEntity(Terraria.GameContent.Tile_Entities.TEWeaponsRack Entity, bool replace = false) => _entityManager.AddEntity(Entity, replace);
 
         #endregion
         #region RemoveEntity
 
-        public void RemoveEntity(IFake Entity)
-        {
-            lock (Locker)
-            {
-                HideEntity(Entity);
-                if (!_Entities.Remove(Entity))
-                    throw new Exception("No such entity in this tile provider.");
-            }
-        }
+        public void RemoveEntity(IFake Entity) => _entityManager.RemoveEntity(Entity);
 
         #endregion
         #region UpdateEntities
 
-        public void UpdateEntities()
-        {
-            lock (Locker)
-                foreach (IFake entity in _Entities.ToArray())
-                    UpdateEntity(entity);
-        }
+        public void UpdateEntities() => _entityManager.UpdateEntities();
 
         #endregion
         #region HideEntities
 
-        public void HideEntities()
-        {
-            lock (Locker)
-                foreach (IFake entity in _Entities.ToArray())
-                    HideEntity(entity);
-        }
-
-        #endregion
-        #region UpdateEntity
-
-        private bool UpdateEntity(IFake Entity)
-        {
-            if (IsEntityTile(Entity.RelativeX, Entity.RelativeY, Entity.TileTypes)
-                    && TileOnTop(Entity.RelativeX, Entity.RelativeY))
-                return ApplyEntity(Entity);
-            else
-                HideEntity(Entity);
-            return true;
-        }
-
-        #endregion
-        #region ApplyEntity
-
-        private bool ApplyEntity(IFake Entity)
-        {
-            if (Entity is FakeSign)
-            {
-                Entity.X = this.X + Entity.RelativeX;
-                Entity.Y = this.Y + Entity.RelativeY;
-                if (Entity.Index >= 0 && Main.sign[Entity.Index] == Entity)
-                    return true;
-
-                bool applied = false;
-                for (int i = 0; i < 1000; i++)
-                {
-                    if (Main.sign[i] != null && Main.sign[i].x == Entity.X && Main.sign[i].y == Entity.Y)
-                        Main.sign[i] = null;
-                    if (!applied && Main.sign[i] == null)
-                    {
-                        applied = true;
-                        Main.sign[i] = (FakeSign)Entity;
-                        Entity.Index = i;
-                    }
-                }
-                return applied;
-            }
-            else if (Entity is FakeChest)
-            {
-                Entity.X = this.X + Entity.RelativeX;
-                Entity.Y = this.Y + Entity.RelativeY;
-                if (Entity.Index >= 0 && Main.chest[Entity.Index] == Entity)
-                    return true;
-
-                bool applied = false;
-                for (int i = 0; i < 1000; i++)
-                {
-                    if (Main.chest[i] != null && Main.chest[i].x == Entity.X && Main.chest[i].y == Entity.Y)
-                        Main.chest[i] = null;
-                    if (!applied && Main.chest[i] == null)
-                    {
-                        applied = true;
-                        Main.chest[i] = (FakeChest)Entity;
-                        Entity.Index = i;
-                    }
-                }
-                return applied;
-            }
-            else if (Entity is TileEntity)
-            {
-                Point16 position = new Point16(Entity.X, Entity.Y);
-                if (TileEntity.ByPosition.TryGetValue(position, out TileEntity entity)
-                        && entity == Entity)
-                    TileEntity.ByPosition.Remove(position);
-                Entity.X = this.X + Entity.RelativeX;
-                Entity.Y = this.Y + Entity.RelativeY;
-                TileEntity.ByPosition[new Point16(Entity.X, Entity.Y)] = (TileEntity)Entity;
-                if (Entity.Index < 0)
-                    Entity.Index = TileEntity.AssignNewID();
-                TileEntity.ByID[Entity.Index] = (TileEntity)Entity;
-                return true;
-            }
-            else
-                throw new ArgumentException($"Unknown entity type {Entity.GetType().Name}", nameof(Entity));
-        }
-
-        #endregion
-        #region HideEntity
-
-        private void HideEntity(IFake Entity)
-        {
-            if (Entity is Sign)
-            {
-                if (Entity.Index >= 0 && Main.sign[Entity.Index] == Entity)
-                    Main.sign[Entity.Index] = null;
-            }
-            else if (Entity is Chest)
-            {
-                if (Entity.Index >= 0 && Main.chest[Entity.Index] == Entity)
-                    Main.chest[Entity.Index] = null;
-            }
-            else if (Entity is TileEntity entity)
-            {
-                TileEntity.ByID.Remove(Entity.Index);
-                if (Entity.Index >= 0
-                        && TileEntity.ByPosition.TryGetValue(entity.Position, out TileEntity entity2)
-                        && entity == entity2)
-                    TileEntity.ByPosition.Remove(entity.Position);
-
-                if (Entity is TETrainingDummy trainingDummy && trainingDummy.npc >= 0)
-                {
-                    NPC npc = Main.npc[trainingDummy.npc];
-                    npc.type = 0;
-                    npc.active = false;
-                    NetMessage.SendData((int)PacketTypes.NpcUpdate, -1, -1, null, trainingDummy.npc);
-                    trainingDummy.npc = -1;
-                }
-            }
-            else
-                throw new ArgumentException($"Unknown entity type {Entity.GetType().Name}", nameof(Entity));
-        }
-
-        #endregion
-        #region GetEntityTileTypes
-
-        private ushort[] GetEntityTileTypes(TileEntity Entity) =>
-            Entity is TETrainingDummy
-                ? FakeTrainingDummy._TileTypes
-                : Entity is TEItemFrame
-                    ? FakeItemFrame._TileTypes
-                    : Entity is TELogicSensor
-                        ? FakeLogicSensor._TileTypes
-                        : Entity is TEDisplayDoll
-                            ? FakeDisplayDoll._TileTypes
-                            : Entity is TEFoodPlatter
-                                ? FakeFoodPlatter._TileTypes
-                                : Entity is TEHatRack
-                                    ? FakeHatRack._TileTypes
-                                    : Entity is TETeleportationPylon
-                                        ? FakeTeleportationPylon._TileTypes
-                                        : Entity is TEWeaponsRack
-                                            ? FakeWeaponsRack._TileTypes
-                                            : throw new ArgumentException($"Unknown entity type {Entity.GetType().Name}", nameof(Entity));
+        public void HideEntities() => _entityManager.HideEntities();
 
         #endregion
         #region ScanEntities
 
-        public void ScanEntities()
-        {
-            lock (Locker)
-                foreach (IFake entity in _Entities.ToArray())
-                    if (!IsEntityTile(entity.RelativeX, entity.RelativeY, entity.TileTypes))
-                        RemoveEntity(entity);
-
-            (int x, int y, int width, int height) = XYWH();
-            for (int i = 0; i < Main.sign.Length; i++)
-            {
-                Sign sign = Main.sign[i];
-                if (sign == null)
-                    continue;
-
-                if (sign.GetType().Name == nameof(Sign) // <=> not FakeSign or some other inherited type
-                    && Helper.Inside(sign.x, sign.y, x, y, width, height)
-                    && TileOnTop(sign.x - this.X, sign.y - this.Y))
-                {
-                    if (IsEntityTile(sign.x - this.X, sign.y - this.Y, FakeSign._TileTypes))
-                        AddEntity(sign, true);
-                    else
-                        Main.sign[i] = null;
-                }
-            }
-
-            for (int i = 0; i < Main.chest.Length; i++)
-            {
-                Chest chest = Main.chest[i];
-                if (chest == null)
-                    continue;
-
-                if (chest.GetType().Name == nameof(Chest) // <=> not FakeChest or some other inherited type
-                    && Helper.Inside(chest.x, chest.y, x, y, width, height)
-                    && TileOnTop(chest.x - this.X, chest.y - this.Y))
-                {
-                    if (IsEntityTile(chest.x - this.X, chest.y - this.Y, FakeChest._TileTypes))
-                        AddEntity(chest, true);
-                    else
-                        Main.chest[i] = null;
-                }
-            }
-
-            foreach (TileEntity entity in TileEntity.ByID.Values.ToArray())
-            {
-                int entityX = entity.Position.X;
-                int entityY = entity.Position.Y;
-
-                if ((entity.GetType().Name == nameof(TETrainingDummy)            // <=> not FakeTrainingDummy or some other inherited type
-                        || entity.GetType().Name == nameof(TEItemFrame)          // <=> not FakeItemFrame or some other inherited type
-                        || entity.GetType().Name == nameof(TELogicSensor)        // <=> not FakeLogicSensor or some other inherited type
-                        || entity.GetType().Name == nameof(TEDisplayDoll)        // <=> not FakeDisplayDoll or some other inherited type
-                        || entity.GetType().Name == nameof(TEFoodPlatter)        // <=> not FakeFoodPlatter or some other inherited type
-                        || entity.GetType().Name == nameof(TEHatRack)            // <=> not FakeHatRack or some other inherited type
-                        || entity.GetType().Name == nameof(TETeleportationPylon) // <=> not FakeTeleportationPylon or some other inherited type
-                        || entity.GetType().Name == nameof(TEWeaponsRack))       // <=> not FakeWeaponsRack or some other inherited type
-                    && Helper.Inside(entityX, entityY, x, y, width, height)
-                    && TileOnTop(entityX - this.X, entityY - this.Y))
-                {
-                    if (IsEntityTile(entityX - this.X, entityY - this.Y, GetEntityTileTypes(entity)))
-                        AddEntity(entity, true);
-                    else
-                    {
-                        TileEntity.ByID.Remove(entity.ID);
-                        TileEntity.ByPosition.Remove(entity.Position);
-                    }
-                }
-            }
-        }
-
-        #endregion
-        #region IsEntityTile
-
-        private bool IsEntityTile(int X, int Y, ushort[] TileTypes)
-        {
-            ITile providerTile = GetTileSafe(X, Y);
-            return providerTile.active() && TileTypes.Contains(providerTile.type);
-        }
-
-        #endregion
-        #region TileOnTop
-
-        private bool TileOnTop(int X, int Y) =>
-            ProviderCollection?.TileOnTopIndex(this.X + X, this.Y + Y) == Index;
+        public void ScanEntities() => _entityManager.ScanEntities();
 
         #endregion
 
