@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using Terraria;
 using TShockAPI;
 using TShockAPI.DB;
+using TShockAPI.DB.Queries;
 
 namespace RegionTrigger
 {
@@ -34,8 +35,8 @@ namespace RegionTrigger
 
             var creator = new SqlTableCreator(db,
                                               db.GetSqlType() == SqlType.Sqlite
-                                                  ? (IQueryBuilder)new SqliteQueryCreator()
-                                                  : new MysqlQueryCreator());
+                                                  ? (IQueryBuilder)new SqliteQueryBuilder()
+                                                  : new MysqlQueryBuilder());
             creator.EnsureTableStructure(table);
         }
 

@@ -28,7 +28,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\BossServer\BossServer.csproj" />
+	  <ProjectReference Include="..\BossPlugin\BossPlugin.csproj" />
 	  <ProjectReference Include="..\NewBadgeSystem\NewBadgeSystem.csproj" />
 	</ItemGroup>
 </Project>

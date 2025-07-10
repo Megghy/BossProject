@@ -5,6 +5,7 @@ using TerrariaApi.Server;
 using TShockAPI;
 using TShockAPI.DB;
 using TShockAPI.Hooks;
+using static BossFramework.BCore.QQBot;
 
 namespace Chameleon
 {
@@ -127,7 +128,7 @@ namespace Chameleon
         private static bool HandleConnecting(TSPlayer player)
         {
             var account = TShock.UserAccounts.GetUserAccountByName(player.Name);
-            player.DataWhenJoined = new PlayerData(player);
+            player.DataWhenJoined = new PlayerData();
             player.DataWhenJoined.CopyCharacter(player);
 
             if (account != null)
@@ -135,6 +136,19 @@ namespace Chameleon
                 // uuid自动登录 已注册part.2
                 if (!TShock.Config.Settings.DisableUUIDLogin && account.UUID == player.UUID)
                 {
+                    if (Config.CheckQQ)
+                    {
+                        QQBindingRecord binding = QQBinding.GetBinding(account.ID);
+                        if (binding == null)
+                        {
+                            SendCode(player, account.ID);
+                            return true;
+                        }
+                        if (CheckBan(player, binding))
+                        {
+                            return true;
+                        }
+                    }
                     if (player.State == 1)
                         player.State = 2;
                     NetMessage.SendData((int)PacketTypes.WorldInfo, player.Index);
@@ -206,6 +220,19 @@ namespace Chameleon
             {
                 if (account.VerifyPassword(password))
                 {
+                    if (Config.CheckQQ)
+                    {
+                        QQBindingRecord binding = QQBinding.GetBinding(account.ID);
+                        if (binding == null)
+                        {
+                            SendCode(player, account.ID);
+                            return true;
+                        }
+                        if (CheckBan(player, binding))
+                        {
+                            return true;
+                        }
+                    }
                     player.RequiresPassword = false;
                     player.PlayerData = TShock.CharacterDB.GetPlayerData(player, account.ID);
 
@@ -265,7 +292,19 @@ namespace Chameleon
                     Kick(player, "密码位数不能少于" + TShock.Config.Settings.MinimumPasswordLength + "个字符。", "注册失败");
                     return true;
                 }
-                player.SendSuccessMessage("账户{0}注册成功。", account.Name);
+                TShock.UserAccounts.AddUserAccount(account);
+                TShock.Log.ConsoleInfo("玩家{0}注册了新账户：{1}", new object[2] { player.Name, account.Name });
+                if (TShock.UserAccounts.GetUserAccountID(account.Name) == -1)
+                {
+                    Kick(player, "注册失败", "错误");
+                    return true;
+                }
+                if (Config.CheckQQ)
+                {
+                    SendCode(player, account.ID);
+                }
+                return true;
+                /*player.SendSuccessMessage("账户{0}注册成功。", account.Name);
                 player.SendSuccessMessage("你的密码是{0}", password);
                 TShock.UserAccounts.AddUserAccount(account);
                 TShock.Log.ConsoleInfo("玩家{0}注册了新账户：{1}", player.Name, account.Name);
@@ -308,14 +347,28 @@ namespace Chameleon
                 TShock.Log.ConsoleInfo(player.Name + "成功验证登录.");
                 TShock.UserAccounts.SetUserAccountUUID(account, player.UUID);
                 PlayerHooks.OnPlayerPostLogin(player);
-                return true;
+                return true;*/
             }
 
             // 系统预留账户名
             Kick(player, "该用户名已被占用。", "请更换人物名");
             return true;
         }
-
+        private static void SendCode(TSPlayer player, int id)
+        {
+            string arg = QQBindingCode.Create(id);
+            Kick(player, string.Format(Config.BindHint, arg), "提示");
+        }
+        private static bool CheckBan(TSPlayer player, QQBindingRecord bindingRecord)
+        {
+            QQBanRecord banRecord = QQBan.GetBanRecord(bindingRecord.QQ);
+            if (banRecord == null)
+            {
+                return false;
+            }
+            Kick(player, $"该账号关联的QQ号已被封禁。\n封禁Id: #{banRecord.Id}。\n理由: {banRecord.Reason}", "封禁");
+            return true;
+        }
         private static void AddToList(string playerName)
         {
             var index = 0;

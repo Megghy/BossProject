@@ -25,7 +25,6 @@ namespace PlotMarker
 
         public override void Initialize()
         {
-            ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
             ServerApi.Hooks.NetGetData.Register(this, OnGetData, 1000);
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreet);
             ServerApi.Hooks.ServerLeave.Register(this, OnLeave);
@@ -40,7 +39,6 @@ namespace PlotMarker
         {
             if (disposing)
             {
-                ServerApi.Hooks.GameInitialize.Deregister(this, OnInitialize);
                 ServerApi.Hooks.NetGetData.Deregister(this, OnGetData);
                 ServerApi.Hooks.NetGreetPlayer.Deregister(this, OnGreet);
                 ServerApi.Hooks.ServerLeave.Deregister(this, OnLeave);
@@ -69,6 +67,11 @@ namespace PlotMarker
 
         private static void OnInitialize(EventArgs e)
         {
+
+        }
+
+        private static void OnPostInitialize(EventArgs args)
+        {
             Config = Configuration.Read(Configuration.ConfigPath);
             Config.Write(Configuration.ConfigPath);
 
@@ -89,10 +92,7 @@ namespace PlotMarker
                 AllowServer = false,
                 HelpText = "管理玩家属地区域, 只限管理."
             });
-        }
 
-        private static void OnPostInitialize(EventArgs args)
-        {
             PlotManager.Reload();
 
             if (PlotManager.CurrentPlot != null)

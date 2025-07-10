@@ -25,7 +25,6 @@ namespace RegionTrigger
 
         public override void Initialize()
         {
-            ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
             ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInit, -10);
             ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreetPlayer);
             ServerApi.Hooks.GameUpdate.Register(this, OnUpdate);
@@ -42,7 +41,6 @@ namespace RegionTrigger
         {
             if (disposing)
             {
-                ServerApi.Hooks.GameInitialize.Deregister(this, OnInitialize);
                 ServerApi.Hooks.GamePostInitialize.Deregister(this, OnPostInit);
                 ServerApi.Hooks.NetGreetPlayer.Deregister(this, OnGreetPlayer);
                 ServerApi.Hooks.GameUpdate.Deregister(this, OnUpdate);
@@ -58,15 +56,11 @@ namespace RegionTrigger
             base.Dispose(disposing);
         }
 
-        private void OnInitialize(EventArgs args)
+        private void OnPostInit(EventArgs args)
         {
             Commands.ChatCommands.Add(new Command("regiontrigger.manage", RegionSetProperties, "rt"));
 
             RtRegions = new RtRegionManager(TShock.DB);
-        }
-
-        private void OnPostInit(EventArgs args)
-        {
             RtRegions.Reload();
         }
 

@@ -1,0 +1,50 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# SignalR 通信模式指南
+
+## SignalR 客户端实现
+主要实现在 [Services/SignalRClientService.cs](mdc:Services/SignalRClientService.cs) 中。
+
+## 支持的 SignalR 事件
+
+### 📥 接收的事件 (从主服务器)
+- **StartServer** - 启动游戏服务器
+  - 参数: `StartServerCommand` JSON 字符串
+  - 处理: 调用 `GameServerManager.StartServerAsync()`
+
+- **StopServer** - 停止游戏服务器
+  - 参数: `StopServerCommand` JSON 字符串
+  - 处理: 调用 `GameServerManager.StopServerAsync()`
+
+- **QueryServers** - 查询服务器信息
+  - 参数: `QueryServerCommand` JSON 字符串
+  - 处理: 返回单个或所有服务器信息
+
+- **QueryNodeInfo** - 查询节点信息
+  - 参数: 无
+  - 处理: 返回当前节点状态信息
+
+### 📤 发送的事件 (到主服务器)
+- **RegisterNode** - 注册节点
+- **Heartbeat** - 心跳包 (每30秒)
+- **ServerStatusUpdate** - 服务器状态更新
+- **ServerInfo** - 单个服务器信息
+- **ServerList** - 服务器列表
+- **NodeInfo** - 节点信息
+
+## 连接管理
+- 自动重连机制
+- 心跳监控
+- 连接状态事件通知
+- 重试逻辑 (配置在 [appsettings.json](mdc:appsettings.json))
+
+## 错误处理
+- 所有 SignalR 事件处理都包装在 try-catch 中
+- 连接失败时的重试逻辑
+- 日志记录所有通信活动
+
+## 命令模型
+所有命令模型定义在 [Models/Commands.cs](mdc:Models/Commands.cs) 中，使用 JSON 序列化进行传输。

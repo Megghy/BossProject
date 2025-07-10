@@ -11,6 +11,7 @@ using Terraria.Utilities;
 using TerrariaApi.Server;
 using TShockAPI;
 using TShockAPI.DB;
+using TShockAPI.DB.Queries;
 using WorldEdit.Commands;
 using WorldEdit.Expressions;
 using WorldEdit.Extensions;
@@ -544,7 +545,7 @@ namespace WorldEdit
             #endregion
 
             var sqlcreator = new SqlTableCreator(Database,
-                Database.GetSqlType() == SqlType.Sqlite ? (IQueryBuilder)new SqliteQueryCreator() : new MysqlQueryCreator());
+                Database.GetSqlType() == SqlType.Sqlite ? (IQueryBuilder)new SqliteQueryBuilder() : new MysqlQueryBuilder());
             sqlcreator.EnsureTableStructure(new SqlTable("WorldEdit",
                 new SqlColumn("Account", MySqlDbType.Int32) { Primary = true },
                 new SqlColumn("RedoLevel", MySqlDbType.Int32),

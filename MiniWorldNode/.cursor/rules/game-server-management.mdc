@@ -1,0 +1,60 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# 游戏服务器管理指南
+
+## 核心管理器
+[Services/GameServerManager.cs](mdc:Services/GameServerManager.cs) 是游戏服务器管理的核心组件。
+
+## 主要功能
+
+### 🚀 启动服务器流程
+1. **地图准备** - `PrepareMapAsync()`
+   - 检查目标地图是否存在
+   - 不存在则从默认地图复制
+   - 默认地图路径: `Maps/DefaultMap/`
+   - 新地图路径: `Maps/{MapName}.wld`
+
+2. **端口分配** - `GetAvailablePortAsync()`
+   - 从基础端口开始 (默认 7777)
+   - 依次向上查找可用端口
+   - 支持最多 100 个端口范围
+   - 使用 SemaphoreSlim 确保线程安全
+
+3. **进程启动** - `StartTShockProcessAsync()`
+   - 构建 TShock 启动参数
+   - 启动进程并获取 PID
+   - 异步处理进程输出日志
+
+### 🛑 停止服务器流程
+- 优雅关闭 vs 强制终止
+- 等待 10 秒后强制终止
+- 清理服务器记录
+
+### 📊 状态管理
+服务器状态定义在 [Models/GameServerInfo.cs](mdc:Models/GameServerInfo.cs):
+- `Stopped` - 已停止
+- `Starting` - 启动中
+- `Running` - 运行中
+- `Stopping` - 停止中
+- `Error` - 错误状态
+
+## 配置选项
+在 [appsettings.json](mdc:appsettings.json) 中配置:
+- `DefaultMapPath` - 默认地图路径
+- `MapsDirectory` - 地图存储目录
+- `LogsDirectory` - 日志存储目录
+- `TShockPath` - TShock 程序路径
+- `BasePort` - 基础端口号
+
+## 日志管理
+- 每个服务器独立的日志文件
+- 日志路径: `Logs/{ServerId}_{timestamp}.log`
+- 实时写入进程输出
+
+## 线程安全
+- 使用 `ConcurrentDictionary` 存储服务器信息
+- 端口分配使用 `SemaphoreSlim` 保护
+- 异步操作确保非阻塞执行

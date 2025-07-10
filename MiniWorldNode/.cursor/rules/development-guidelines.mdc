@@ -1,0 +1,73 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# 开发指南和最佳实践
+
+## 代码规范
+
+### 📝 注释规范
+- 所有公共类和方法必须有中文 XML 注释
+- 使用 `/// <summary>` 标签描述功能
+- 复杂逻辑添加行内注释说明
+
+### 🏗️ 架构原则
+1. **单一职责**: 每个服务类只负责一个特定功能
+2. **依赖注入**: 使用构造函数注入，避免静态依赖
+3. **异步优先**: 所有 I/O 操作使用异步方法
+4. **配置外置**: 所有配置项放在 [appsettings.json](mdc:appsettings.json) 中
+
+## 添加新功能
+
+### 📦 添加新的 SignalR 命令
+1. 在 [Models/Commands.cs](mdc:Models/Commands.cs) 中定义命令模型
+2. 在 [Services/SignalRClientService.cs](mdc:Services/SignalRClientService.cs) 的 `RegisterEventHandlers()` 中注册处理器
+3. 在相应的服务类中实现业务逻辑
+
+### 🔧 添加新的服务
+1. 在 `Services/` 目录创建服务类
+2. 在 [Program.cs](mdc:Program.cs) 中注册到 DI 容器
+3. 如果是后台服务，继承 `BackgroundService`
+
+### ⚙️ 添加新的配置项
+1. 在 [Models/ServerSettings.cs](mdc:Models/ServerSettings.cs) 中添加属性
+2. 在 [appsettings.json](mdc:appsettings.json) 中添加配置值
+3. 使用 `IOptions<ServerSettings>` 注入使用
+
+## 错误处理
+
+### 🚨 异常处理原则
+- 所有异步方法都要包装 try-catch
+- 记录详细的错误日志
+- 对外提供友好的错误信息
+- 关键操作失败时要有回滚机制
+
+### 📊 日志记录
+- 使用 `ILogger<T>` 进行结构化日志
+- 日志级别: Information, Warning, Error
+- 关键操作都要记录开始和结束
+
+## 性能考虑
+
+### ⚡ 并发处理
+- 使用 `ConcurrentDictionary` 进行线程安全的集合操作
+- 使用 `SemaphoreSlim` 控制资源访问
+- 避免阻塞主线程
+
+### 🔄 资源管理
+- 及时释放进程资源
+- 使用 `using` 语句管理一次性资源
+- 监控内存和 CPU 使用情况
+
+## 测试建议
+
+### 🧪 单元测试
+- 为每个服务类编写单元测试
+- 模拟外部依赖 (如文件系统、进程)
+- 测试异常情况和边界条件
+
+### 🔍 集成测试
+- 测试 SignalR 连接和通信
+- 测试完整的服务器启动/停止流程
+- 验证配置加载和验证

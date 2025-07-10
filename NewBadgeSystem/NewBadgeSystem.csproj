@@ -1,3 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="$(SolutionDir)Plugin.Common.props" />
+  <ItemGroup>
+    <ProjectReference Include="..\MiniWorldPlugin\MiniWorldPlugin.csproj" />
+  </ItemGroup>
 </Project>

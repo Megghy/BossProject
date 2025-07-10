@@ -1,0 +1,64 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# 配置管理指南
+
+## 配置文件结构
+主配置文件位于 [appsettings.json](mdc:appsettings.json)。
+
+## 配置模型
+配置映射到 [Models/ServerSettings.cs](mdc:Models/ServerSettings.cs) 类。
+
+## 关键配置项
+
+### 🌐 连接设置
+- **HubUrl**: 主服务器 SignalR Hub 地址
+- **NodeId**: 当前节点的唯一标识
+- **NodeName**: 节点显示名称
+
+### 📁 路径设置
+- **DefaultMapPath**: 默认地图文件夹路径 (`Maps/DefaultMap`)
+- **MapsDirectory**: 地图存储目录 (`Maps`)
+- **LogsDirectory**: 日志存储目录 (`Logs`)
+- **TShockPath**: TShock 服务器可执行文件路径
+
+### 🔧 运行时设置
+- **BasePort**: 基础端口号 (默认 7777)
+- **MaxRetryAttempts**: 最大重试次数
+- **RetryDelaySeconds**: 重试延迟时间
+
+## 使用配置
+
+### 💉 依赖注入
+```csharp
+public MyService(IOptions<ServerSettings> settings)
+{
+    _settings = settings.Value;
+}
+```
+
+### 📝 在 Program.cs 中注册
+```csharp
+services.Configure<ServerSettings>(
+    context.Configuration.GetSection("ServerSettings"));
+```
+
+## 配置验证
+- 启动时自动验证必需的路径和文件
+- 创建不存在的目录
+- 验证 TShock 程序是否存在
+
+## 环境配置
+支持不同环境的配置文件:
+- `appsettings.json` - 基础配置
+- `appsettings.Development.json` - 开发环境
+- `appsettings.Production.json` - 生产环境
+
+## 配置热重载
+配置文件支持热重载，但某些设置需要重启应用程序才能生效:
+- 连接地址和端口
+- 文件路径设置
+- 节点标识信息
+

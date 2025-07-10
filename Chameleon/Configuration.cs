@@ -29,7 +29,11 @@ namespace Chameleon
              " 2. 在\"服务器密码\"中输入自己的密码, 以后加服时输入这个密码即可."
 
 
-    };
+        };
+        [JsonProperty("启用QQ验证")]
+        public bool CheckQQ = true;
+        [JsonProperty("绑定提示语")]
+        public string BindHint = "该账号未绑定QQ\n请在群内私聊PixelArc发送\"绑定{0}\"来绑定该账号。\n{0}为你的验证码，请不要透露给他人。\n该验证码有效期为10分钟。\n绑定成功后请重新进入服务器。";
 
         public void Write(string path)
         {

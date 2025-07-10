@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using TShockAPI;
 using TShockAPI.DB;
+using TShockAPI.DB.Queries;
 
 namespace Permabuffs
 {
@@ -36,7 +37,7 @@ namespace Permabuffs
 
             }
 
-            SqlTableCreator sqlcreator = new SqlTableCreator(db, db.GetSqlType() == SqlType.Sqlite ? (IQueryBuilder)new SqliteQueryCreator() : new MysqlQueryCreator());
+            SqlTableCreator sqlcreator = new SqlTableCreator(db, db.GetSqlType() == SqlType.Sqlite ? (IQueryBuilder)new SqliteQueryBuilder() : new MysqlQueryBuilder());
 
             sqlcreator.EnsureTableStructure(new SqlTable("Permabuffs",
                 new SqlColumn("UserID", MySqlDbType.Int32) { Primary = true, Unique = true, Length = 4 },

@@ -1,41 +1,7 @@
 ﻿<Project>
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>disable</Nullable>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
-    </PropertyGroup>
-
+	<Import Project="$(SolutionDir)Common.props" />
+	
     <ItemGroup>
-        <ProjectReference Include="..\BossServer\BossServer.csproj" />
+        <ProjectReference Include="..\BossPlugin\BossPlugin.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-        <PluginFiles Include="$(TargetDir)*.dll"/>
-        <PluginFiles Include="$(TargetDir)*.pdb"/>
-    </ItemGroup>
-
-    <!-- 统一输出路径配置 -->
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-        <OutputFolder>$(SolutionDir)Output-Release\ServerPlugins</OutputFolder>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-        <OutputFolder>$(SolutionDir)Output\ServerPlugins</OutputFolder>
-    </PropertyGroup>
-
-    <Target Name="PostBuild" 
-            AfterTargets="PostBuildEvent">
-        <!-- 创建目录 -->
-        <MakeDir Directories="$(OutputFolder)" />
-        
-        <!-- 使用 Copy 任务 -->
-        <Copy SourceFiles="@(PluginFiles)"
-              DestinationFolder="$(OutputFolder)"
-              SkipUnchangedFiles="true" />
-    </Target>
-     <Target Name = "Clean">
-        <RemoveDir Directories="$(builtdir)" />
-    </Target>
 </Project>

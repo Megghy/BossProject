@@ -80,12 +80,6 @@ namespace TeleportRestriction
 
         private void OnPostInit(EventArgs args)
         {
-            Trm = new TrRegionManager(TShock.DB);
-            Trm.LoadRegions();
-        }
-
-        private void OnInit(EventArgs args)
-        {
             var index = Commands.ChatCommands.FindIndex(cmd => cmd.HasAlias("tp"));
 
             Commands.ChatCommands.RemoveAll(cmd => cmd.HasAlias("tp"));
@@ -96,6 +90,13 @@ namespace TeleportRestriction
                 HelpText = "传送到其他玩家位置."
             });
             Commands.ChatCommands.Add(new Command("teleportres.manage", TrManage, "tpres"));
+            Trm = new TrRegionManager(TShock.DB);
+            Trm.LoadRegions();
+        }
+
+        private void OnInit(EventArgs args)
+        {
+
         }
 
         // 烂到了一种境界

@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using Terraria;
 using TShockAPI;
 using TShockAPI.DB;
+using TShockAPI.DB.Queries;
 
 namespace Scattering
 {
@@ -34,12 +35,12 @@ namespace Scattering
             IQueryBuilder provider;
             if (db.GetSqlType() != SqlType.Sqlite)
             {
-                IQueryBuilder queryBuilder = new MysqlQueryCreator();
+                IQueryBuilder queryBuilder = new MysqlQueryBuilder();
                 provider = queryBuilder;
             }
             else
             {
-                IQueryBuilder queryBuilder2 = new SqliteQueryCreator();
+                IQueryBuilder queryBuilder2 = new SqliteQueryBuilder();
                 provider = queryBuilder2;
             }
             new SqlTableCreator(db, provider).EnsureTableStructure(table);

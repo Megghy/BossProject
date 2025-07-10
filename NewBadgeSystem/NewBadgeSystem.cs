@@ -1,3 +1,4 @@
+using MiniWorldPlugin.Managers;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
@@ -228,7 +229,8 @@ namespace BadgeSystem
             args.Handled = true;
             TSPlayer tSPlayer = args.Player;
             var playerData = PlayerData.GetPlayerData(tSPlayer);
-            TShock.Utils.Broadcast(string.Format(TShock.Config.Settings.ChatFormat, tSPlayer.Group.Name, tSPlayer.Group.Prefix + playerData.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix, args.RawText), new(tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B));
+            var world = WorldManager.Instance.GetPlayerWorld(tSPlayer);
+            TShock.Utils.Broadcast(string.Format(TShock.Config.Settings.ChatFormat, tSPlayer.Group.Name, (world is null ? "" : $"([c/BCBCBC:{world.WorldName}]) ") + tSPlayer.Group.Prefix + playerData.Prefix, tSPlayer.Name, tSPlayer.Group.Suffix, args.RawText), new(tSPlayer.Group.R, tSPlayer.Group.G, tSPlayer.Group.B));
         }
 
         private static void BadgeInfo(CommandArgs args)

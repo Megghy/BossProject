@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using TShockAPI;
 using TShockAPI.DB;
+using TShockAPI.DB.Queries;
 
 namespace BadgeSystem
 {
@@ -27,12 +28,12 @@ namespace BadgeSystem
             IQueryBuilder provider;
             if (_database?.GetSqlType() != SqlType.Sqlite)
             {
-                IQueryBuilder queryBuilder = new MysqlQueryCreator();
+                IQueryBuilder queryBuilder = new MysqlQueryBuilder();
                 provider = queryBuilder;
             }
             else
             {
-                IQueryBuilder queryBuilder2 = new SqliteQueryCreator();
+                IQueryBuilder queryBuilder2 = new SqliteQueryBuilder();
                 provider = queryBuilder2;
             }
             SqlTableCreator sqlTableCreator = new SqlTableCreator(database, provider);

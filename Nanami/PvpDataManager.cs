@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using TShockAPI;
 using TShockAPI.DB;
+using TShockAPI.DB.Queries;
 
 namespace Nanami
 {
@@ -25,8 +26,8 @@ namespace Nanami
 
             var creator = new SqlTableCreator(_database,
                                               _database.GetSqlType() == SqlType.Sqlite
-                                                  ? (IQueryBuilder)new SqliteQueryCreator()
-                                                  : new MysqlQueryCreator());
+                                                  ? (IQueryBuilder)new SqliteQueryBuilder()
+                                                  : new MysqlQueryBuilder());
             creator.EnsureTableStructure(table);
         }
 

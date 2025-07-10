@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using Terraria;
 using TShockAPI;
 using TShockAPI.DB;
+using TShockAPI.DB.Queries;
 
 namespace Philosophyz
 {
@@ -79,8 +80,8 @@ namespace Philosophyz
             );
             var creator = new SqlTableCreator(db,
                                               db.GetSqlType() == SqlType.Sqlite
-                                                  ? (IQueryBuilder)new SqliteQueryCreator()
-                                                  : new MysqlQueryCreator());
+                                                  ? (IQueryBuilder)new SqliteQueryBuilder()
+                                                  : new MysqlQueryBuilder());
             creator.EnsureTableStructure(table);
             creator.EnsureTableStructure(charsTable);
         }
@@ -309,16 +310,18 @@ namespace Philosophyz
         /// <returns>item1: 存档标识 item2: 存档数据</returns>
         private static Tuple<string, PlayerData> Read(QueryResult reader)
         {
-            var inventory = reader.Get<string>("Inventory").Split('~').Select(NetItem.Parse).ToList();
+            var items = reader.Get<string>("Inventory").Split('~');
+            //Console.WriteLine(string.Join("\r\n", items));
+            var inventory = items.Select(NetItem.Parse).ToList();
             if (inventory.Count < NetItem.MaxInventory)
             {
                 //TODO: unhardcode this - stop using magic numbers and use NetItem numbers
                 //Set new armour slots empty
-                inventory.InsertRange(67, new NetItem[2]);
+                //inventory.InsertRange(67, new NetItem[2]);
                 //Set new vanity slots empty
-                inventory.InsertRange(77, new NetItem[2]);
+                //inventory.InsertRange(77, new NetItem[2]);
                 //Set new dye slots empty
-                inventory.InsertRange(87, new NetItem[2]);
+                //inventory.InsertRange(87, new NetItem[2]);
                 //Set the rest of the new slots empty
                 inventory.AddRange(new NetItem[NetItem.MaxInventory - inventory.Count]);
             }

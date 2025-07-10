@@ -697,3 +697,19 @@ System.NullReferenceException: Object reference not set to an instance of an obj
 [03/03/25 01:16:13] [Server API] Info: Plugin MessageSender v1.0.0.0 (by MistZZT) initiated.
 [03/03/25 01:16:13] [Server API] Info: Plugin Nanami v1.0.0.0 (by MistZZT) initiated.
 [03/03/25 01:16:14] [Server API] Info: Plugin BossPlugin v1.0.0.0 (by Megghy) initiated.
+[06/27/25 08:35:51] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[06/27/25 08:35:51] [Server API] Verbose: 	Command line: G:\BossPlugin\BossWeb\bin\Release\net9.0\BossWeb.dll -configpath D:\Code\BossPlugin\Output\tshock -additionalplugins D:\Code\BossPlugin\Output\ServerPlugins
+[06/27/25 08:35:51] [Server API] Verbose: 	OS: Microsoft Windows NT 10.0.26100.0 (64bit: True)
+[06/27/25 08:35:51] [Server API] Verbose: 	Mono: False
+[06/27/25 08:35:51] [Server API] Error: Startup aborted due to an exception in the Server API initialization:
+System.InvalidOperationException: Failed to load assembly "OneBlockChallenge.dll".
+ ---> System.IO.FileNotFoundException: Could not load file or assembly 'TerrariaServer, Version=5.2.0.0, Culture=neutral, PublicKeyToken=null'. 系统找不到指定的文件。
+File name: 'TerrariaServer, Version=5.2.0.0, Culture=neutral, PublicKeyToken=null'
+   at System.Reflection.RuntimeAssembly.GetExportedTypes(QCallAssembly assembly, ObjectHandleOnStack retTypes)
+   at System.Reflection.RuntimeAssembly.GetExportedTypes(QCallAssembly assembly, ObjectHandleOnStack retTypes)
+   at System.Reflection.RuntimeAssembly.GetExportedTypes() in System.Private.CoreLib.dll:token 0x6007a86+0xb
+   at TerrariaApi.Server.ServerApi.LoadPlugins() in G:\BossPlugin\BossServer\TerrariaApi.Server\ServerApi.cs:line 401
+   --- End of inner exception stack trace ---
+   at TerrariaApi.Server.ServerApi.LoadPlugins() in G:\BossPlugin\BossServer\TerrariaApi.Server\ServerApi.cs:line 450
+   at TerrariaApi.Server.ServerApi.Initialize(String[] commandLineArgs, Main game) in G:\BossPlugin\BossServer\TerrariaApi.Server\ServerApi.cs:line 123
+   at TerrariaApi.Server.HookManager.InitialiseAPI() in G:\BossPlugin\BossServer\TerrariaApi.Server\HookManager.cs:line 28

@@ -1,0 +1,17 @@
+{
+  "profiles": {
+    "Boss_Megghy": {
+      "commandName": "Executable",
+      "executablePath": "$(MSBuildStartupDirectory)\\Output\\TShock.Server.exe",
+      "commandLineArgs": "-language zh-Hans -ip 127.0.0.1 -port 7777 -maxplayers 8 -world G:\\BossPlugin\\Output\\test.wld",
+      "workingDirectory": "$(MSBuildStartupDirectory)\\Output",
+      "nativeDebugging": true
+    },
+    "Boss_Jeoi": {
+      "commandName": "Executable",
+      "executablePath": "$(MSBuildStartupDirectory)\\Output\\BossServer.exe",
+      "commandLineArgs": "-language zh-Hans -ip 127.0.0.1 -port 7777 -maxplayers 8 -world C:/Users/Jeoi/Documents/My Games/Terraria/Worlds/BOSS工作室.wld",
+      "workingDirectory": "$(MSBuildStartupDirectory)\\Output"
+    }
+  }
+}

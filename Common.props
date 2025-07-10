@@ -1,0 +1,83 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>annotations</Nullable>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<NuGetAudit>False</NuGetAudit>
+		
+		<!-- 关键配置：强制复制 NuGet 包的 DLL 到输出目录 -->
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<!-- 可选：如果需要复制引用程序集 -->
+		<CopyRefAssembliesToPublishDirectory>true</CopyRefAssembliesToPublishDirectory>
+    </PropertyGroup>
+    
+    <!-- 项目主DLL和PDB文件 -->
+    <ItemGroup>
+        <ProjectFiles Include="$(TargetDir)$(TargetName).dll"/>
+        <ProjectFiles Include="$(TargetDir)$(TargetName).pdb"/>
+    </ItemGroup>
+    
+    <!-- 获取ServerPlugins文件夹中已存在的DLL文件 -->
+    <ItemGroup>
+        <ExistingServerPluginsDlls Include="$(ServerPluginsFolder)\*.dll" />
+        <ExistingServerPluginsPdbs Include="$(ServerPluginsFolder)\*.pdb" />
+    </ItemGroup>
+    
+    <!-- 其他所有DLL和PDB文件，排除项目主文件、TShockAPI文件和ServerPlugins中已存在的DLL -->
+    <ItemGroup>
+        <OtherFiles Include="$(TargetDir)*.dll" 
+                    Exclude="$(TargetDir)$(TargetName).dll;$(TargetDir)TShockAPI.dll;@(ExistingServerPluginsDlls -> '$(TargetDir)%(Filename)%(Extension)')"/>
+        <OtherFiles Include="$(TargetDir)*.pdb" 
+                    Exclude="$(TargetDir)$(TargetName).pdb;$(TargetDir)TShockAPI.pdb"/>
+    </ItemGroup>
+    
+    <!-- 统一输出路径配置 -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <ServerPluginsFolder>$(SolutionDir)Output-Release\ServerPlugins</ServerPluginsFolder>
+        <BinFolder>$(SolutionDir)Output-Release\bin</BinFolder>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <ServerPluginsFolder>$(SolutionDir)Output\ServerPlugins</ServerPluginsFolder>
+        <BinFolder>$(SolutionDir)Output\bin</BinFolder>
+    </PropertyGroup>
+    
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <!-- 创建目录 -->
+        <MakeDir Directories="$(ServerPluginsFolder)" />
+        <MakeDir Directories="$(BinFolder)" />
+        
+        <!-- 在复制前重新评估ServerPlugins中已存在的DLL -->
+        <ItemGroup>
+            <ExistingServerPluginsDlls Include="$(ServerPluginsFolder)\*.dll" />
+        </ItemGroup>
+        
+        <!-- 重新定义要复制的其他文件，排除ServerPlugins中已存在的DLL -->
+        <ItemGroup>
+            <FilteredOtherDlls Include="$(TargetDir)*.dll" 
+                              Exclude="$(TargetDir)$(TargetName).dll;$(TargetDir)TShockAPI.dll;@(ExistingServerPluginsDlls -> '$(TargetDir)%(Filename)%(Extension)')"/>
+            <FilteredOtherPdbs Include="$(TargetDir)*.pdb" 
+                               Exclude="$(TargetDir)$(TargetName).pdb;$(TargetDir)TShockAPI.pdb"/>
+        </ItemGroup>
+        
+        <!-- 复制项目主文件到ServerPlugins -->
+        <Copy SourceFiles="@(ProjectFiles)"
+              DestinationFolder="$(ServerPluginsFolder)"
+              SkipUnchangedFiles="true" />
+              
+        <!-- 复制其他文件到bin目录，排除ServerPlugins中已存在的DLL -->
+        <Copy SourceFiles="@(FilteredOtherDlls);@(FilteredOtherPdbs)"
+              DestinationFolder="$(BinFolder)"
+              SkipUnchangedFiles="true" />
+              
+        <!-- 输出调试信息 -->
+        <Message Text="已排除以下ServerPlugins中存在的DLL: @(ExistingServerPluginsDlls -> '%(Filename)%(Extension)', ', ')" 
+                 Importance="high" 
+                 Condition="'@(ExistingServerPluginsDlls)' != ''" />
+    </Target>
+    
+    <Target Name="Clean">
+        <RemoveDir Directories="$(builtdir)" />
+    </Target>
+</Project>

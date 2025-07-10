@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="$(SolutionDir)Plugin.Common.props" />
+
+	<ItemGroup>
+	  <ProjectReference Include="..\MultiSCore\MultiSCore.csproj" />
+	  <ProjectReference Include="..\MiniWorld.Shared\MiniWorld.Shared.csproj" />
+	</ItemGroup>
+
+</Project>

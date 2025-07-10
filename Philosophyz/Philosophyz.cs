@@ -32,9 +32,9 @@ namespace Philosophyz
 
         public override void Initialize()
         {
-            ServerApi.Hooks.GameInitialize.Register(this, OnInit);
             ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInit);
             ServerApi.Hooks.GameUpdate.Register(this, OnUpdate, 9000);
+            GeneralHooks.ReloadEvent += OnReload;
 
             RegionHooks.RegionDeleted += OnRegionDeleted;
 
@@ -45,10 +45,11 @@ namespace Philosophyz
         {
             if (disposing)
             {
-                ServerApi.Hooks.GameInitialize.Deregister(this, OnInit);
                 ServerApi.Hooks.GamePostInitialize.Deregister(this, OnPostInit);
 
                 RegionHooks.RegionDeleted -= OnRegionDeleted;
+
+                GeneralHooks.ReloadEvent -= OnReload;
 
                 ServerApi.Hooks.NetSendData.Deregister(this, OnOtapiSendData);
             }
@@ -57,6 +58,10 @@ namespace Philosophyz
 
         private DateTime _lastCheck = DateTime.UtcNow;
 
+        void OnReload(ReloadEventArgs e)
+        {
+            PzRegions.ReloadRegions();
+        }
         private void OnUpdate(EventArgs args)
         {
             if ((DateTime.UtcNow - _lastCheck).TotalSeconds < DefaultCheckTime)
@@ -134,11 +139,6 @@ namespace Philosophyz
 
         private void OnPostInit(EventArgs args)
         {
-            PzRegions.ReloadRegions();
-        }
-
-        private void OnInit(EventArgs args)
-        {
             if (!TShock.ServerSideCharacterConfig.Settings.Enabled)
             {
                 TShock.Log.ConsoleError("[Pz] 未开启SSC! 你可能选错了插件.");
@@ -151,6 +151,12 @@ namespace Philosophyz
             Commands.ChatCommands.Add(new Command("pz.select", PzSelect, "pzselect") { AllowServer = false });
 
             PzRegions = new PzRegionManager(TShock.DB);
+            PzRegions.ReloadRegions();
+        }
+
+        private void OnInit(EventArgs args)
+        {
+
         }
 
         private void OnRegionDeleted(RegionHooks.RegionDeletedEventArgs args)

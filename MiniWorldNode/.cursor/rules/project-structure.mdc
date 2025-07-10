@@ -1,0 +1,40 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# 迷你世界多服务器客户端 - 项目结构指南
+
+## 项目概述
+这是一个用于管理游戏多服务器的客户端程序，通过 SignalR 连接到主服务器并管理 TShock 游戏服务器实例。
+
+## 核心架构组件
+
+### 🎯 主入口点
+- [Program.cs](mdc:Program.cs) - 应用程序主入口，配置依赖注入和托管服务
+
+### 📋 数据模型层 (Models/)
+- [Models/ServerSettings.cs](mdc:Models/ServerSettings.cs) - 服务器配置模型
+- [Models/GameServerInfo.cs](mdc:Models/GameServerInfo.cs) - 游戏服务器信息和状态枚举
+- [Models/Commands.cs](mdc:Models/Commands.cs) - SignalR 命令模型和节点信息
+
+### 🔧 业务服务层 (Services/)
+- [Services/GameServerManager.cs](mdc:Services/GameServerManager.cs) - 核心服务器管理逻辑
+- [Services/SignalRClientService.cs](mdc:Services/SignalRClientService.cs) - SignalR 客户端通信
+- [Services/NodeInfoService.cs](mdc:Services/NodeInfoService.cs) - 节点性能监控
+- [Services/ConsoleCommandService.cs](mdc:Services/ConsoleCommandService.cs) - 本地控制台管理
+
+### ⚙️ 配置文件
+- [appsettings.json](mdc:appsettings.json) - 应用程序配置设置
+
+## 设计模式
+- **依赖注入**: 使用 Microsoft.Extensions.DependencyInjection
+- **后台服务**: 使用 BackgroundService 进行长期运行任务
+- **选项模式**: 使用 IOptions<T> 进行配置管理
+- **发布订阅**: SignalR 事件驱动通信
+
+## 数据流向
+1. SignalR 接收主服务器命令
+2. 解析命令并调用相应的服务方法
+3. 游戏服务器管理器处理业务逻辑
+4. 返回结果通过 SignalR 发送给主服务器
