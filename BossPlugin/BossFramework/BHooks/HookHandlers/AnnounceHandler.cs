@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using TShockAPI;
-using static OTAPI.Hooks.NetMessage;
+﻿using static OTAPI.Hooks.NetMessage;
 
 namespace BossFramework.BHooks.HookHandlers
 {
@@ -13,7 +11,7 @@ namespace BossFramework.BHooks.HookHandlers
                 try
                 {
                     var plrName = Terraria.Netplay.Clients[args.Plr].Name;
-                    TShock.Utils.Broadcast($"{">>".Color("C8B592")} {plrName} {"离开服务器".Color("C8B592")}", Color.White);
+                    //TShock.Utils.Broadcast($"{">>".Color("C8B592")} {plrName} {"离开服务器".Color("C8B592")}", Color.White);
                     args.Result = PlayerAnnounceResult.None;
                 }
                 catch { }

@@ -78,6 +78,7 @@ namespace BossFramework.BNet
             var clientInfo = RemoteClient?.Name ?? "未知用户";
             var address = _remoteAddress ?? "未知地址";
             BLog.Log($"[{clientInfo}@{address}] 已断开连接.");
+
         }
 
         protected override void OnReceived(byte[] buffer, long offset, long size)

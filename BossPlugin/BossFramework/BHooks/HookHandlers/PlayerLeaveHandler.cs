@@ -9,8 +9,10 @@ namespace BossFramework.BHooks.HookHandlers
         public static void OnPlayerLeave(LeaveEventArgs args)
         {
             var bPlr = TShock.Players[args.Who].GetBPlayer();
-            TShock.Utils.Broadcast($"{">>".Color("C8B592")} {bPlr.Name} {"离开服务器".Color("C8B592")}", Color.White);
-
+            if (bPlr is not null && !string.IsNullOrEmpty(bPlr.Name))
+            {
+                TShock.Utils.Broadcast($"{">>".Color("C8B592")} {bPlr.Name} {"离开服务器".Color("C8B592")}", Color.White);
+            }
         }
     }
 }

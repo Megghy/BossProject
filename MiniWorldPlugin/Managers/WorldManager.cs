@@ -408,7 +408,7 @@ namespace MiniWorldPlugin.Managers
                 if (serverInfo.Status == ServerStatus.Running)
                 {
                     UpdateWorldState(world, WorldStatus.Online, serverInfo.Port);
-                    player.SendSuccessMessage($"世界 '{world.WorldName}' 已启动, 请稍等几秒...");
+                    player.SendSuccessMessage($"世界 '{world.WorldName}' 正在初始化, 请稍等几秒...");
                     await TeleportPlayerToWorld(player, world);
                 }
                 else

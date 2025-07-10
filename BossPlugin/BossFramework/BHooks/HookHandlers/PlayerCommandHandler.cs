@@ -11,7 +11,7 @@ namespace BossFramework.BHooks.HookHandlers
                 return;
             }
 
-            if (args.Player.ContainsData("MiniWorld.InWorld"))
+            if (args.Player.ContainsData("MiniWorld.InWorld") && args.CommandText.StartsWith("//"))
             {
                 args.Handled = true; // 阻止指令继续处理
             }

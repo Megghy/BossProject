@@ -1,3 +1,4 @@
+using BossFramework;
 using MultiSCore.Hooks;
 using MultiSCore.Model;
 using Terraria;
@@ -275,6 +276,7 @@ namespace MultiSCore.Services
                         }
                         else
                         {
+                            BLog.Info($"[MultiSCore] 玩家 {player.Name} 在 {session.TargetServer.Name} 执行了命令: {text}");
                             return false;
                         }
                     }

@@ -450,7 +450,7 @@ namespace MultiSCore.Model
                     if (currentPacket.Length >= 4)
                     {
                         RemoteIndex = currentPacket.Span[3];
-                        Console.WriteLine($"[MultiSCore] 玩家 {Player.Name} 在子服务器 {TargetServer.Name} 的远程索引为 {RemoteIndex}。");
+                        //Console.WriteLine($"[MultiSCore] 玩家 {Player.Name} 在子服务器 {TargetServer.Name} 的远程索引为 {RemoteIndex}。");
                     }
                     break;
 
@@ -465,7 +465,7 @@ namespace MultiSCore.Model
                             var worldInfo = BossFramework.BNet.PacketHandler.Serializer.Deserialize(reader) as TrProtocol.Packets.WorldData;
                             if (SpawnX == -1)
                             {
-                                Console.WriteLine($"[MultiSCore] {Player.Name} 已设定世界出生点, SpawnX: {SpawnX}, SpawnY: {SpawnY}");
+                                //Console.WriteLine($"[MultiSCore] {Player.Name} 已设定世界出生点, SpawnX: {SpawnX}, SpawnY: {SpawnY}");
                             }
                             SpawnX = worldInfo.SpawnX;
                             SpawnY = worldInfo.SpawnY;
